@@ -1876,9 +1876,7 @@ PRINT "WP workspace from  ", ~WP," to ", ~P%
 CODE% = &11E3
 LOAD% = &11E3
 
- ORG CODE%
-
-.x11E3
+ORG CODE%
 
  JMP DOENTRY
  JMP DOBEGIN
@@ -1889,13 +1887,12 @@ LOAD% = &11E3
 
 .BRKV
 
- EQUB &D5
- EQUB &11
+ EQUW &11D5
 
 .INBAY
 
- LDX #&00
- LDY #&00
+ LDX #0
+ LDY #0
  JSR &8888
  JMP SCRAM
 
@@ -1906,7 +1903,7 @@ LOAD% = &11E3
 
 .scramble
 
- LDY #&00
+ LDY #0
  STY SC
  LDX #&13
 
@@ -1919,9 +1916,11 @@ LOAD% = &11E3
  STA (SC),Y
  DEY
  BNE &1207
+
  INX
  CPX #&60
  BNE &1207
+
  JMP BRKBK
 
 \ ******************************************************************************
@@ -3166,7 +3165,8 @@ LOAD% = &11E3
 
 .MV3
 
-\ MVEIT Parts 2 to 6 not required when docked
+                        \ Fall through into part 7 (parts 2-6 are not required
+                        \ when we are docked)
 
 \ ******************************************************************************
 \
@@ -3305,8 +3305,8 @@ LOAD% = &11E3
 
  LDA INWK+31            \ Fetch the ship's exploding/killed state from byte #31
 
- AND #%00100000         \ If we are exploding then jump to MVD1 to remove it from
- BNE MVD1               \ the scanner permanently
+ AND #%00100000         \ If we are exploding then jump to MVD1 to remove it
+ BNE MVD1               \ from the scanner permanently
 
  LDA INWK+31            \ Set bit 4 to keep the ship visible on the scanner
  ORA #%00010000
@@ -4834,10 +4834,9 @@ NEXT
 
 .FLKB
 
- LDA #&0F
+ LDA #15
  TAX
  JMP OSBYTE
-
 \ ******************************************************************************
 \
 \       Name: NLIN3
@@ -7645,9 +7644,10 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \ ******************************************************************************
 
  LDA MCNT               \ Fetch the main loop counter and calculate MCNT mod 4,
- AND #3                 \ jumping to rT9 if it is non-zero. R5-1 contains an RTS,
- BNE R5-1               \ so the following code only runs every 4 iterations of
-                        \ the main loop, otherwise we return from the subroutine
+ AND #3                 \ jumping to R5-1 if it is non-zero. R5-1 contains an
+ BNE R5-1               \ RTS, so the following code only runs every 4
+                        \ iterations of the main loop, otherwise we return from
+                        \ the subroutine
 
  LDY #0                 \ Set Y = 0, for use in various places below
 
@@ -9235,11 +9235,17 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
  RTS                    \ Return from the subroutine
 
-\ Junk, same as in D.CODE
-
- EQUB &8C, &E7, &8D, &ED, &8A, &E6, &C1, &C8
- EQUB &C8, &8B, &E0, &8A, &E6, &D6, &C5, &C6
- EQUB &C1, &CA, &95, &9D, &9C, &97
+ EQUB &8C, &E7          \ This data appears to be unused (the same block appears
+ EQUB &8D, &ED          \ in the flight code)
+ EQUB &8A, &E6
+ EQUB &C1, &C8
+ EQUB &C8, &8B
+ EQUB &E0, &8A
+ EQUB &E6, &D6
+ EQUB &C5, &C6
+ EQUB &C1, &CA
+ EQUB &95, &9D
+ EQUB &9C, &97
 
 \ ******************************************************************************
 \
@@ -9296,12 +9302,10 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  LDX XX+1               \ And then doing the high bytes
  STX S
 
-                        \ Fall through into MLS1 to calculate (A P) = A * ALP1
-
-\ Start of .MLS1?
-
- LDX ALP1
+ LDX ALP1               \ ???? Has no effect, as P is about to be overwritten
  STX P
+
+                        \ Fall through into MLS1 to calculate (A P) = A * ALP1
 
 \ ******************************************************************************
 \
@@ -14509,7 +14513,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ activated, so jump to Ghy to process it
 
         LDA     QQ11
-        BEQ     TTC111
+        BEQ     TTH111
 
         AND     #$C0
         BEQ     zZ+1
@@ -14590,11 +14594,10 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ left corner of the screen, and return from the
                         \ subroutine using a tail call
 
-.TTC111
+.TTH111
 
  JSR TT111
  JMP TTX111
-
 \ ******************************************************************************
 \
 \       Name: Ghy
@@ -15316,11 +15319,26 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
  RTS                    \ Return from the subroutine
 
-\ Start loading Flight code as key #f0 hit
+\ ******************************************************************************
+\
+\       Name: TT110
+\       Type: Subroutine
+\   Category: Flight
+\    Summary: Launch from a station or show the front space view
+\
+\ ------------------------------------------------------------------------------
+\
+\ Launch the ship (if we are docked), or show the front space view (if we are
+\ already in space).
+\
+\ Called when red key f0 is pressed while docked (launch), after we arrive in a
+\ new galaxy, or after a hyperspace if the current view is a space view.
+\
+\ ******************************************************************************
 
 .TT110
 
- LDX #&3F
+ LDX #&3F               \ ????
 
 .L2E94
 
@@ -15487,7 +15505,6 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
  EQUS "R.D.CODE"
  EQUB 13
-
 \ ******************************************************************************
 \
 \       Name: EQSHP
@@ -16146,16 +16163,6 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
                         \ Return from the subroutine using a tail call
 
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
-
 \ ******************************************************************************
 \
 \       Name: refund
@@ -16178,6 +16185,16 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \   X                   X is preserved
 \
 \ ******************************************************************************
+
+ NOP                    \ ????
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
 
 \.ref2                  \ These instructions are commented out in the original
 \LDY #18                \ source, but they would jump to pres in the EQSHP
@@ -18740,15 +18757,24 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
  RTS                    \ Return from the subroutine
 
-\ Last bit of WPLS2 - split out? is it used?
+\ ******************************************************************************
+\
+\       Name: WP1
+\       Type: Subroutine
+\   Category: Drawing planets
+\    Summary: Reset the ball line heap
+\
+\ ******************************************************************************
 
 .WP1
 
- LDA #&01
+ LDA #1                 \ Set LSP = 1 to reset the ball line heap pointer
  STA LSP
- LDA #&FF
+
+ LDA #&FF               \ Set LSX2 = &FF to indicate the ball line heap is empty
  STA LSX2
- RTS
+
+ RTS                    \ Return from the subroutine
 
 \ ******************************************************************************
 \
@@ -19684,8 +19710,6 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
  RTS                    \ Return from the subroutine
 
-\ No main game loop 1
-
 \ ******************************************************************************
 \
 \       Name: Main game loop (Part 2 of 6)
@@ -19694,6 +19718,9 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \    Summary: Call main flight loop, potentially spawn trader, asteroid, cargo
 \
 \ ------------------------------------------------------------------------------
+\
+\ In the docked code, we start the main game loop at part 2 and then jump
+\ straight to part 5, as parts 1, 3 and 4 are not required when we are docked.
 \
 \ This section covers the following:
 \
@@ -19786,7 +19813,8 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  ROL INWK+1             \ Set bit 2 of x_hi to the C flag, which is random, so
  ROL INWK+1             \ this randomly moves us slightly off-centre
 
-\ No main game loop 3, 4
+                        \ Fall through into part 5 (parts 3 and 4 are not
+                        \ required when we are docked)
 
 \ ******************************************************************************
 \
@@ -21619,9 +21647,7 @@ ENDIF
  LDA #200               \ X, and return from the subroutine using a tail call
  JMP OSBYTE
 
-\?
- JSR GTNME
-
+ JSR GTNME              \ This code appears to be unused
  RTS
 
 \ ******************************************************************************
@@ -22479,23 +22505,32 @@ ENDIF
                         \ so jump to DK4 to scan for other keys, using a tail
                         \ call so we can return from the subroutine there
 
-\ Very different DOKEY
+\ ******************************************************************************
+\
+\       Name: DOKEY
+\       Type: Subroutine
+\   Category: Keyboard
+\    Summary: Scan for the joystick
+\
+\ ******************************************************************************
 
 .DOKEY
 
- LDA JSTK
+ LDA JSTK               \ ????
  BEQ DK9
 
- LDX #&01
+ LDX #1
  JSR DKS2
 
- ORA #&01
+ ORA #1
  STA JSTX
- LDX #&02
+ LDX #2
  JSR DKS2
 
  EOR JSTGY
  STA JSTY
+
+                        \ Fall through into DK4 to scan for other keys
 
 \ ******************************************************************************
 \
@@ -22516,6 +22551,10 @@ ENDIF
 \
 \   * If this is a space view, scan for secondary flight keys and update the
 \     relevant bytes in the key logger
+\
+\ Other entry points:
+\
+\   DK9                 Set the Bitstik configuration option to the value in A
 \
 \ ******************************************************************************
 
@@ -22627,7 +22666,7 @@ ENDIF
 
 .DK9
 
- STA BSTK
+ STA BSTK               \ ????
  BEQ DK4
 
 \ ******************************************************************************
@@ -25793,8 +25832,8 @@ ENDMACRO
  CMP XX4                \ If XX4 > the visibility distance, where XX4 contains
  BCC LL79-3             \ the ship's z-distance reduced to 0-31 (which we set in
                         \ part 2), then this edge is too far away to be visible,
-                        \ so jump down to LL78 (via LL79-3) to move on to the next
-                        \ edge
+                        \ so jump down to LL78 (via LL79-3) to move on to the
+                        \ next edge
 
  INY                    \ Increment Y to point to byte #1
 
@@ -29030,10 +29069,10 @@ ENDMACRO
  ERND 10
  EQUB VE
 
- ETOK 140               \ Token 141:    "[21-25] [16-21] FOR [61-65] AND [61-65]"
- ETOK 178               \
- ERND 10                \ Encoded as:   "[140][178][10?]"
- EQUB VE
+ ETOK 140               \ Token 141:    "[21-25] [16-21] FOR [61-65] AND
+ ETOK 178               \                [61-65]"
+ ERND 10                \
+ EQUB VE                \ Encoded as:   "[140][178][10?]"
 
  ERND 11                \ Token 142:    "[51-55] BY [56-60]"
  ECHR ' '               \
@@ -31288,14 +31327,23 @@ ENDMACRO
  EQUB 120               \ Token 36: a random extended token between 120 and 124
  EQUB 125               \ Token 37: a random extended token between 125 and 129
 
+ EQUB &45, &4E          \ This data appears to be unused
+ EQUB &44, &2D
  EQUB &45, &4E
- EQUB &44, &2D, &45, &4E, &44, &2D, &45, &4E
- EQUB &44, &52, &50, &53, &00, &8E, &11, &D8
- EQUB &00, &00, &06, &56, &52, &49, &45, &E6
+ EQUB &44, &2D
+ EQUB &45, &4E
+ EQUB &44, &52
+ EQUB &50, &53
+ EQUB &00, &8E
+ EQUB &11, &D8
+ EQUB &00, &00
+ EQUB &06, &56
+ EQUB &52, &49
+ EQUB &45, &E6
 
 \ ******************************************************************************
 \
-\ ELITE SHIP BLUEPRINTS FILE
+\ ELITE SHIP HANGER BLUEPRINTS FILE
 \
 \ ******************************************************************************
 
@@ -31625,254 +31673,240 @@ ENDMACRO
  FACE        0,       41,      -30,         31    \ Face 5
  FACE      -96,        0,        0,         31    \ Face 6
 
-        
+\ ******************************************************************************
+\
+\       Name: SHIP_SHUTTLE
+\       Type: Variable
+\   Category: Drawing ships
+\    Summary: Ship blueprint for a shuttle
+\
+\ ******************************************************************************
+
 .SHIP_SHUTTLE
 
- EQUB &0F
- EQUB &C4, &09
- EQUB &86
- EQUB &FE
- EQUB &6D
- EQUB &00
- EQUB &26
- EQUB &72
- EQUB &1E
- EQUB &00, &00
- EQUB &34
- EQUB &16
- EQUB &20
- EQUB &08
- EQUB &00
- EQUB &00
- EQUB &02
- EQUB &00
- 
-\ Vertices
+ EQUB 15                \ Max. canisters on demise = 15
+ EQUW 50 * 50           \ Targetable area          = 50 * 50
+ EQUB &86               \ Edges data offset (low)  = &0086
+ EQUB &FE               \ Faces data offset (low)  = &00FE
+ EQUB 109               \ Max. edge count          = (109 - 1) / 4 = 27
+ EQUB 0                 \ Gun vertex               = 0
+ EQUB 38                \ Explosion count          = 8, as (4 * n) + 6 = 38
+ EQUB 114               \ Number of vertices       = 114 / 6 = 19
+ EQUB 30                \ Number of edges          = 30
+ EQUW 0                 \ Bounty                   = 0
+ EQUB 52                \ Number of faces          = 52 / 4 = 13
+ EQUB 22                \ Visibility distance      = 22
+ EQUB 32                \ Max. energy              = 32
+ EQUB 8                 \ Max. speed               = 8
+ EQUB &00               \ Edges data offset (high) = &0086
+ EQUB &00               \ Faces data offset (high) = &00FE
+ EQUB 2                 \ Normals are scaled by    = 2^2 = 4
+ EQUB %00000000         \ Laser power              = 0
+                        \ Missiles                 = 0
 
- EQUB &00, &23, &2F, &5F, &FF, &FF
- EQUB &23, &00, &2F, &9F, &FF, &FF
- EQUB &00, &23, &2F, &1F, &FF, &FF
- EQUB &23, &00, &2F, &1F, &FF, &FF
- EQUB &28, &28, &35, &FF, &12, &39
+\VERTEX    x,    y,    z, face1, face2, face3, face4, visibility
+ VERTEX    0,  -35,   47,    15,    15,    15,    15,         31     \ Vertex 0
+ VERTEX  -35,    0,   47,    15,    15,    15,    15,         31     \ Vertex 1
+ VERTEX    0,   35,   47,    15,    15,    15,    15,         31     \ Vertex 2
+ VERTEX   35,    0,   47,    15,    15,    15,    15,         31     \ Vertex 3
+ VERTEX  -40,  -40,  -53,     2,     1,     9,     3,         31     \ Vertex 4
+ VERTEX  -40,   40,  -53,     4,     3,     9,     5,         31     \ Vertex 5
+ VERTEX   40,   40,  -53,     6,     5,     9,     7,         31     \ Vertex 6
+ VERTEX   40,  -40,  -53,     7,     1,     9,     8,         31     \ Vertex 7
+ VERTEX   10,    0,  -53,     9,     9,     9,     9,         16     \ Vertex 8
+ VERTEX    0,   -5,  -53,     9,     9,     9,     9,         16     \ Vertex 9
+ VERTEX  -10,    0,  -53,     9,     9,     9,     9,          8     \ Vertex 10
+ VERTEX    0,    5,  -53,     9,     9,     9,     9,          8     \ Vertex 11
+ VERTEX    0,  -17,   71,    10,     0,    12,    11,         16     \ Vertex 12
+ VERTEX    5,   -2,   61,    15,    15,     2,     0,          6     \ Vertex 13
+ VERTEX    7,   23,   49,     1,     0,     4,    15,          7     \ Vertex 14
+ VERTEX   21,    9,   49,     1,    10,    15,     3,          7     \ Vertex 15
+ VERTEX   -5,   -2,   61,    11,     6,     3,     2,          6     \ Vertex 16
+ VERTEX   -7,   23,   49,     8,    15,     0,    12,          7     \ Vertex 17
+ VERTEX  -21,    9,   49,    15,     4,     8,     1,          7     \ Vertex 18
 
- EQUB &28, &28, &35, &BF, &34, &59
- EQUB &28, &28, &35, &3F, &56, &79
- EQUB &28, &28, &35, &7F, &17, &89
- EQUB &0A, &00, &35, &30, &99, &99
- EQUB &00, &05, &35, &70, &99, &99
+\EDGE vertex1, vertex2, face1, face2, visibility
+ EDGE       0,       1,     2,     0,         31    \ Edge 0
+ EDGE       1,       2,    10,     4,         31    \ Edge 1
+ EDGE       2,       3,    11,     6,         31    \ Edge 2
+ EDGE       0,       3,    12,     8,         31    \ Edge 3
+ EDGE       0,       7,     8,     1,         31    \ Edge 4
+ EDGE       0,       4,     2,     1,         24    \ Edge 5
+ EDGE       1,       4,     3,     2,         31    \ Edge 6
+ EDGE       1,       5,     4,     3,         24    \ Edge 7
+ EDGE       2,       5,     5,     4,         31    \ Edge 8
+ EDGE       2,       6,     6,     5,         12    \ Edge 9
+ EDGE       3,       6,     7,     6,         31    \ Edge 10
+ EDGE       3,       7,     8,     7,         24    \ Edge 11
+ EDGE       4,       5,     9,     3,         31    \ Edge 12
+ EDGE       5,       6,     9,     5,         31    \ Edge 13
+ EDGE       6,       7,     9,     7,         31    \ Edge 14
+ EDGE       4,       7,     9,     1,         31    \ Edge 15
+ EDGE       0,      12,    12,     0,         16    \ Edge 16
+ EDGE       1,      12,    10,     0,         16    \ Edge 17
+ EDGE       2,      12,    11,    10,         16    \ Edge 18
+ EDGE       3,      12,    12,    11,         16    \ Edge 19
+ EDGE       8,       9,     9,     9,         16    \ Edge 20
 
- EQUB &0A, &00, &35, &A8, &99, &99
- EQUB &00, &05, &35, &28, &99, &99
- EQUB &00, &11, &47, &50, &0A, &BC
- EQUB &05, &02, &3D, &46, &FF, &02
- EQUB &07, &17, &31, &07, &01, &F4
+ EDGE       9,      10,     9,     9,          6    \ Edge 21
+ EDGE      10,      11,     9,     9,          8    \ Edge 22
+ EDGE       8,      11,     9,     9,          6    \ Edge 23
+ EDGE      13,      14,    11,    11,          4    \ Edge 24
+ EDGE      14,      15,    11,    11,          7    \ Edge 25
+ EDGE      13,      15,    11,    11,          6    \ Edge 26
+ EDGE      16,      17,    10,    10,          4    \ Edge 27
+ EDGE      17,      18,    10,    10,          7    \ Edge 28
+ EDGE      16,      18,    10,    10,          6    \ Edge 29
 
- EQUB &15, &09, &31, &07, &A1, &3F
- EQUB &05, &02, &3D, &C6, &6B, &23
- EQUB &07, &17, &31, &87, &F8, &C0
- EQUB &15, &09, &31, &87, &4F, &18
+\FACE normal_x, normal_y, normal_z, visibility
+ FACE     -110,     -110,       80,         31    \ Face 0
+ FACE        0,     -149,        7,         31    \ Face 1
+ FACE     -102,     -102,       46,         31    \ Face 2
+ FACE     -149,        0,        7,         31    \ Face 3
+ FACE     -102,      102,       46,         31    \ Face 4
+ FACE        0,      149,        7,         31    \ Face 5
+ FACE      102,      102,       46,         31    \ Face 6
+ FACE      149,        0,        7,         31    \ Face 7
+ FACE      102,     -102,       46,         31    \ Face 8
+ FACE        0,        0,     -213,         31    \ Face 9
+ FACE      -81,       81,      177,         31    \ Face 10
+ FACE       81,       81,      177,         31    \ Face 11
+ FACE      110,     -110,       80,         31    \ Face 12
 
-\ Edges
+\ ******************************************************************************
+\
+\       Name: SHIP_TRANSPORTER
+\       Type: Variable
+\   Category: Drawing ships
+\    Summary: Ship blueprint for a transporter
+\
+\ ******************************************************************************
 
- EQUB &1F, &02, &00, &04
- EQUB &1F, &4A, &04, &08
- EQUB &1F, &6B, &08, &0C
- EQUB &1F, &8C, &00, &0C
- EQUB &1F, &18, &00, &1C
-
- EQUB &18, &12, &00, &10
- EQUB &1F, &23, &04, &10
- EQUB &18, &34, &04, &14
- EQUB &1F, &45, &08, &14
- EQUB &0C, &56, &08, &18
-
- EQUB &1F, &67, &0C, &18
- EQUB &18, &78, &0C, &1C
- EQUB &1F, &39, &10, &14
- EQUB &1F, &59, &14, &18
- EQUB &1F, &79, &18, &1C
-
- EQUB &1F, &19, &10, &1C
- EQUB &10, &0C, &00, &30
- EQUB &10, &0A, &04, &30
- EQUB &10, &AB, &08, &30
- EQUB &10, &BC, &0C, &30
-
- EQUB &10, &99, &20, &24
- EQUB &06, &99, &24, &28
- EQUB &08, &99, &28, &2C
- EQUB &06, &99, &20, &2C
- EQUB &04, &BB, &34, &38
-
- EQUB &07, &BB, &38, &3C
- EQUB &06, &BB, &34, &3C
- EQUB &04, &AA, &40, &44
- EQUB &07, &AA, &44, &48
- EQUB &06, &AA, &40, &48
-
-\ Faces
-
- EQUB &DF, &6E, &6E, &50
- EQUB &5F, &00, &95, &07
- EQUB &DF, &66, &66, &2E
- EQUB &9F, &95, &00, &07
- EQUB &9F, &66, &66, &2E
-
- EQUB &1F, &00, &95, &07
- EQUB &1F, &66, &66, &2E
- EQUB &1F, &95, &00, &07
- EQUB &5F, &66, &66, &2E
- EQUB &3F, &00, &00, &D5
-
- EQUB &9F, &51, &51, &B1
- EQUB &1F, &51, &51, &B1
- EQUB &5F, &6E, &6E, &50
-        
 .SHIP_TRANSPORTER
 
- EQUB &00
- EQUB &C4, &09
- EQUB &F2
- EQUB &AA
- EQUB &91
- EQUB &30
- EQUB &1A
- EQUB &DE
- EQUB &2E
- EQUB &00, &00
- EQUB &38
- EQUB &10
- EQUB &20
- EQUB &0A
- EQUB &00
- EQUB &01
- EQUB &01 \ is 2 in include
- EQUB &00
- 
- \ Vertices
+ EQUB 0                 \ Max. canisters on demise = 0
+ EQUW 50 * 50           \ Targetable area          = 50 * 50
+ EQUB &F2               \ Edges data offset (low)  = &00F2
+ EQUB &AA               \ Faces data offset (low)  = &01AA
+ EQUB 145               \ Max. edge count          = (145 - 1) / 4 = 36
+ EQUB 48                \ Gun vertex               = 48
+ EQUB 26                \ Explosion count          = 5, as (4 * n) + 6 = 26
+ EQUB 222               \ Number of vertices       = 222 / 6 = 37
+ EQUB 46                \ Number of edges          = 46
+ EQUW 0                 \ Bounty                   = 0
+ EQUB 56                \ Number of faces          = 56 / 4 = 14
+ EQUB 16                \ Visibility distance      = 16
+ EQUB 32                \ Max. energy              = 32
+ EQUB 10                \ Max. speed               = 10
+ EQUB &00               \ Edges data offset (high) = &00F2
+ EQUB &01               \ Faces data offset (high) = &01AA
+ EQUB 1                 \ Normals are scaled by    = 2^1 = 2
+ EQUB %00000000         \ Laser power              = 0
+                        \ Missiles                 = 0
 
- EQUB &00, &13, &33, &3F, &06, &77
- EQUB &33, &07, &33, &BF, &01, &77
- EQUB &39, &07, &33, &FF, &01, &22
- EQUB &33, &11, &33, &FF, &02, &33
- EQUB &33, &11, &33, &7F, &03, &44
+\VERTEX    x,    y,    z, face1, face2, face3, face4, visibility
+ VERTEX    0,   19,  -51,     6,     0,     7,     7,         31     \ Vertex 0
+ VERTEX  -51,    7,  -51,     1,     0,     7,     7,         31     \ Vertex 1
+ VERTEX  -57,   -7,  -51,     1,     0,     2,     2,         31     \ Vertex 2
+ VERTEX  -51,  -17,  -51,     2,     0,     3,     3,         31     \ Vertex 3
+ VERTEX   51,  -17,  -51,     3,     0,     4,     4,         31     \ Vertex 4
+ VERTEX   57,   -7,  -51,     4,     0,     5,     5,         31     \ Vertex 5
+ VERTEX   51,    7,  -51,     5,     0,     6,     6,         31     \ Vertex 6
+ VERTEX    0,   12,   24,    15,    15,    15,    15,         18     \ Vertex 7
+ VERTEX  -60,   -2,   24,     7,     1,     9,     8,         31     \ Vertex 8
+ VERTEX  -66,  -17,   24,     2,     1,     9,     3,         31     \ Vertex 9
+ VERTEX   66,  -17,   24,     4,     3,    10,     5,         31     \ Vertex 10
+ VERTEX   60,   -2,   24,     6,     5,    11,    10,         31     \ Vertex 11
+ VERTEX  -22,   -5,   61,     9,     8,    13,    12,         31     \ Vertex 12
+ VERTEX  -27,  -17,   61,     9,     3,    13,    13,         31     \ Vertex 13
+ VERTEX   27,  -17,   61,    10,     3,    13,    13,         31     \ Vertex 14
+ VERTEX   22,   -5,   61,    11,    10,    13,    12,         31     \ Vertex 15
+ VERTEX  -10,   11,    5,     7,     7,     7,     7,          6     \ Vertex 16
+ VERTEX  -36,    5,    5,     7,     7,     7,     7,          6     \ Vertex 17
+ VERTEX  -10,   13,  -14,     7,     7,     7,     7,          6     \ Vertex 18
+ VERTEX  -36,    7,  -14,     7,     7,     7,     7,          6     \ Vertex 19
+ VERTEX  -23,   12,  -29,     7,     7,     7,     7,          6     \ Vertex 20
+ VERTEX  -23,   10,  -14,     7,     7,     7,     7,          6     \ Vertex 21
+ VERTEX   10,   15,  -29,     6,     6,     6,     6,          6     \ Vertex 22
+ VERTEX   36,    9,  -29,     6,     6,     6,     6,          6     \ Vertex 23
+ VERTEX   23,   10,  -14,     6,     6,     6,     6,          6     \ Vertex 24
+ VERTEX   10,   12,   -6,     6,     6,     6,     6,          6     \ Vertex 25
+ VERTEX   36,    6,   -6,     6,     6,     6,     6,          6     \ Vertex 26
+ VERTEX   23,    7,   16,     6,     6,     6,     6,          6     \ Vertex 27
+ VERTEX   23,    9,   -6,     6,     6,     6,     6,          6     \ Vertex 28
+ VERTEX  -33,  -17,  -26,     3,     3,     3,     3,          5     \ Vertex 29
+ VERTEX  -33,  -17,   33,     3,     3,     3,     3,          5     \ Vertex 30
+ VERTEX   33,  -17,  -26,     3,     3,     3,     3,          5     \ Vertex 31
+ VERTEX   33,  -17,   33,     3,     3,     3,     3,          5     \ Vertex 32
+ VERTEX  -25,   -6,  -51,     0,     0,     0,     0,          7     \ Vertex 33
+ VERTEX   26,   -6,  -51,     0,     0,     0,     0,          7     \ Vertex 34
+ VERTEX   17,    6,  -51,     0,     0,     0,     0,          4     \ Vertex 35
+ VERTEX  -17,    6,  -51,     0,     0,     0,     0,          4     \ Vertex 36
 
- EQUB &39, &07, &33, &7F, &04, &55
- EQUB &33, &07, &33, &3F, &05, &66
- EQUB &00, &0C, &18, &12, &FF, &FF
- EQUB &3C, &02, &18, &DF, &17, &89
- EQUB &42, &11, &18, &DF, &12, &39
+\EDGE vertex1, vertex2, face1, face2, visibility
+ EDGE       0,       1,     7,     0,         31    \ Edge 0
+ EDGE       1,       2,     1,     0,         31    \ Edge 1
+ EDGE       2,       3,     2,     0,         31    \ Edge 2
+ EDGE       3,       4,     3,     0,         31    \ Edge 3
+ EDGE       4,       5,     4,     0,         31    \ Edge 4
+ EDGE       5,       6,     5,     0,         31    \ Edge 5
+ EDGE       0,       6,     6,     0,         31    \ Edge 6
+ EDGE       0,       7,     7,     6,         15    \ Edge 7
+ EDGE       1,       8,     7,     1,         31    \ Edge 8
+ EDGE       2,       9,     2,     1,         10    \ Edge 9
+ EDGE       3,       9,     3,     2,         31    \ Edge 10
+ EDGE       4,      10,     4,     3,         31    \ Edge 11
+ EDGE       5,      10,     5,     4,         10    \ Edge 12
+ EDGE       6,      11,     6,     5,         31    \ Edge 13
+ EDGE       7,       8,     8,     7,         16    \ Edge 14
+ EDGE       8,       9,     9,     1,         16    \ Edge 15
+ EDGE      10,      11,    10,     5,         16    \ Edge 16
+ EDGE       7,      11,    11,     6,         16    \ Edge 17
+ EDGE       7,      15,    12,    11,         18    \ Edge 18
+ EDGE       7,      12,    12,     8,         18    \ Edge 19
+ EDGE       8,      12,     9,     8,         16    \ Edge 20
+ EDGE       9,      13,     9,     3,         31    \ Edge 21
+ EDGE      10,      14,    10,     3,         31    \ Edge 22
+ EDGE      11,      15,    11,    10,         16    \ Edge 23
+ EDGE      12,      13,    13,     9,         31    \ Edge 24
+ EDGE      13,      14,    13,     3,         31    \ Edge 25
+ EDGE      14,      15,    13,    10,         31    \ Edge 26
+ EDGE      12,      15,    13,    12,         31    \ Edge 27
+ EDGE      16,      17,     7,     7,          6    \ Edge 28
+ EDGE      18,      19,     7,     7,          6    \ Edge 29
+ EDGE      19,      20,     7,     7,          6    \ Edge 30
+ EDGE      18,      20,     7,     7,          6    \ Edge 31
+ EDGE      20,      21,     7,     7,          6    \ Edge 32
+ EDGE      22,      23,     6,     6,          6    \ Edge 33
+ EDGE      23,      24,     6,     6,          6    \ Edge 34
+ EDGE      24,      22,     6,     6,          6    \ Edge 35
+ EDGE      25,      26,     6,     6,          6    \ Edge 36
+ EDGE      26,      27,     6,     6,          6    \ Edge 37
+ EDGE      25,      27,     6,     6,          6    \ Edge 38
+ EDGE      27,      28,     6,     6,          6    \ Edge 39
+ EDGE      29,      30,     3,     3,          5    \ Edge 40
+ EDGE      31,      32,     3,     3,          5    \ Edge 41
+ EDGE      33,      34,     0,     0,          7    \ Edge 42
+ EDGE      34,      35,     0,     0,          4    \ Edge 43
+ EDGE      35,      36,     0,     0,          4    \ Edge 44
+ EDGE      36,      33,     0,     0,          4    \ Edge 45
 
- EQUB &42, &11, &18, &5F, &34, &5A
- EQUB &3C, &02, &18, &5F, &56, &AB
- EQUB &16, &05, &3D, &DF, &89, &CD
- EQUB &1B, &11, &3D, &DF, &39, &DD
- EQUB &1B, &11, &3D, &5F, &3A, &DD
+\FACE normal_x, normal_y, normal_z, visibility
+ FACE        0,        0,     -103,         31    \ Face 0
+ FACE     -111,       48,       -7,         31    \ Face 1
+ FACE     -105,      -63,      -21,         31    \ Face 2
+ FACE        0,      -34,        0,         31    \ Face 3
+ FACE      105,      -63,      -21,         31    \ Face 4
+ FACE      111,       48,       -7,         31    \ Face 5
+ FACE        8,       32,        3,         31    \ Face 6
+ FACE       -8,       32,        3,         31    \ Face 7
+ FACE       -8,       34,       11,         18    \ Face 8
+ FACE      -75,       32,       79,         31    \ Face 9
+ FACE       75,       32,       79,         31    \ Face 10
+ FACE        8,       34,       11,         18    \ Face 11
+ FACE        0,       38,       17,         31    \ Face 12
+ FACE        0,        0,      121,         31    \ Face 13
 
- EQUB &16, &05, &3D, &5F, &AB, &CD
- EQUB &0A, &0B, &05, &86, &77, &77
- EQUB &24, &05, &05, &86, &77, &77
- EQUB &0A, &0D, &0E, &A6, &77, &77
- EQUB &24, &07, &0E, &A6, &77, &77
-
- EQUB &17, &0C, &1D, &A6, &77, &77
- EQUB &17, &0A, &0E, &A6, &77, &77
- EQUB &0A, &0F, &1D, &26, &66, &66
- EQUB &24, &09, &1D, &26, &66, &66
- EQUB &17, &0A, &0E, &26, &66, &66
-
- EQUB &0A, &0C, &06, &26, &66, &66
- EQUB &24, &06, &06, &26, &66, &66
- EQUB &17, &07, &10, &06, &66, &66
- EQUB &17, &09, &06, &26, &66, &66
- EQUB &21, &11, &1A, &E5, &33, &33
-
- EQUB &21, &11, &21, &C5, &33, &33
- EQUB &21, &11, &1A, &65, &33, &33
- EQUB &21, &11, &21, &45, &33, &33
- EQUB &19, &06, &33, &E7, &00, &00
- EQUB &1A, &06, &33, &67, &00, &00
-
- EQUB &11, &06, &33, &24, &00, &00
- EQUB &11, &06, &33, &A4, &00, &00
-
-\ Edges
-
- EQUB &1F, &07, &00, &04
- EQUB &1F, &01, &04, &08
- EQUB &1F, &02, &08, &0C
- EQUB &1F, &03, &0C, &10
- EQUB &1F, &04, &10, &14
-
- EQUB &1F, &05, &14, &18
- EQUB &1F, &06, &00, &18
- EQUB &0F, &67, &00, &1C
- EQUB &1F, &17, &04, &20
- EQUB &0A, &12, &08, &24
-
- EQUB &1F, &23, &0C, &24
- EQUB &1F, &34, &10, &28
- EQUB &0A, &45, &14, &28
- EQUB &1F, &56, &18, &2C
- EQUB &10, &78, &1C, &20
-
- EQUB &10, &19, &20, &24
- EQUB &10, &5A, &28, &2C
- EQUB &10, &6B, &1C, &2C
- EQUB &12, &BC, &1C, &3C
- EQUB &12, &8C, &1C, &30
-
- EQUB &10, &89, &20, &30
- EQUB &1F, &39, &24, &34
- EQUB &1F, &3A, &28, &38
- EQUB &10, &AB, &2C, &3C
- EQUB &1F, &9D, &30, &34
-
- EQUB &1F, &3D, &34, &38
- EQUB &1F, &AD, &38, &3C
- EQUB &1F, &CD, &30, &3C
- EQUB &06, &77, &40, &44
- EQUB &06, &77, &48, &4C
-
- EQUB &06, &77, &4C, &50
- EQUB &06, &77, &48, &50
- EQUB &06, &77, &50, &54
- EQUB &06, &66, &58, &5C
- EQUB &06, &66, &5C, &60
-
- EQUB &06, &66, &60, &58
- EQUB &06, &66, &64, &68
- EQUB &06, &66, &68, &6C
- EQUB &06, &66, &64, &6C
- EQUB &06, &66, &6C, &70
-
- EQUB &05, &33, &74, &78
- EQUB &05, &33, &7C, &80
- EQUB &07, &00, &84, &88
- EQUB &04, &00, &88, &8C
- EQUB &04, &00, &8C, &90
-
- EQUB &04, &00, &90, &84
-
-\ Faces
-
- EQUB &3F, &00, &00, &67
- EQUB &BF, &6F, &30, &07
- EQUB &FF, &69, &3F, &15
- EQUB &5F, &00, &22, &00
- EQUB &7F, &69, &3F, &15
-
- EQUB &3F, &6F, &30, &07
- EQUB &1F, &08, &20, &03
- EQUB &9F, &08, &20, &03
- EQUB &92, &08, &22, &0B
- EQUB &9F, &4B, &20, &4F
-
- EQUB &1F, &4B, &20, &4F
- EQUB &12, &08, &22, &0B
- EQUB &1F, &00, &26, &11
- EQUB &1F, &00, &00, &79
-        
 \ ******************************************************************************
 \
 \       Name: SHIP_COBRA_MK_3
@@ -32155,89 +32189,87 @@ ENDMACRO
  FACE        0,      -32,        0,         31    \ Face 5
  FACE        0,        0,      -48,         31    \ Face 6
 
- 
+\ ******************************************************************************
+\
+\       Name: SHIP_KRAIT
+\       Type: Variable
+\   Category: Drawing ships
+\    Summary: Ship blueprint for a Krait
+\
+\ ******************************************************************************
+
 .SHIP_KRAIT
 
- EQUB &01
- EQUB &10, &0E
- EQUB &7A
- EQUB &CE
- EQUB &55
- EQUB &00
- EQUB &12
- EQUB &66
- EQUB &15
- EQUB &64, &00
- EQUB &18
- EQUB &14
- EQUB &50
- EQUB &1E
- EQUB &00
- EQUB &00
- EQUB &02 \ is 1 in include
- EQUB &10
- 
-\ Vertices
+ EQUB 1                 \ Max. canisters on demise = 1
+ EQUW 60 * 60           \ Targetable area          = 60 * 60
+ EQUB &7A               \ Edges data offset (low)  = &007A
+ EQUB &CE               \ Faces data offset (low)  = &00CE
+ EQUB 85                \ Max. edge count          = (85 - 1) / 4 = 21
+ EQUB 0                 \ Gun vertex               = 0
+ EQUB 18                \ Explosion count          = 3, as (4 * n) + 6 = 18
+ EQUB 102               \ Number of vertices       = 102 / 6 = 17
+ EQUB 21                \ Number of edges          = 21
+ EQUW 100               \ Bounty                   = 100
+ EQUB 24                \ Number of faces          = 24 / 4 = 6
+ EQUB 20                \ Visibility distance      = 20
+ EQUB 80                \ Max. energy              = 80
+ EQUB 30                \ Max. speed               = 30
+ EQUB &00               \ Edges data offset (high) = &007A
+ EQUB &00               \ Faces data offset (high) = &00CE
+ EQUB 2                 \ Normals are scaled by    = 2^2 = 4
+ EQUB %00010000         \ Laser power              = 2
+                        \ Missiles                 = 0
 
- EQUB &00, &00, &60, &1F, &01, &23
- EQUB &00, &12, &30, &3F, &03, &45
- EQUB &00, &12, &30, &7F, &12, &45
- EQUB &5A, &00, &03, &3F, &01, &44
- EQUB &5A, &00, &03, &BF, &23, &55
+\VERTEX    x,    y,    z, face1, face2, face3, face4, visibility
+ VERTEX    0,    0,   96,     1,      0,    3,     2,         31    \ Vertex 0
+ VERTEX    0,   18,  -48,     3,      0,    5,     4,         31    \ Vertex 1
+ VERTEX    0,  -18,  -48,     2,      1,    5,     4,         31    \ Vertex 2
+ VERTEX   90,    0,   -3,     1,      0,    4,     4,         31    \ Vertex 3
+ VERTEX  -90,    0,   -3,     3,      2,    5,     5,         31    \ Vertex 4
+ VERTEX   90,    0,   87,     1,     0,     1,     1,         28     \ Vertex 5
+ VERTEX  -90,    0,   87,     3,     2,     3,     3,         28     \ Vertex 6
+ VERTEX    0,    5,   53,     0,      0,    3,     3,          9    \ Vertex 7
+ VERTEX    0,    7,   38,     0,      0,    3,     3,          6    \ Vertex 8
+ VERTEX  -18,    7,   19,     3,      3,    3,     3,          9    \ Vertex 9
+ VERTEX   18,    7,   19,     0,      0,    0,     0,          9    \ Vertex 10
+ VERTEX   18,   11,  -39,     4,      4,    4,     4,          8    \ Vertex 11
+ VERTEX   18,  -11,  -39,     4,      4,    4,     4,          8    \ Vertex 12
+ VERTEX   36,    0,  -30,     4,      4,    4,     4,          8    \ Vertex 13
+ VERTEX  -18,   11,  -39,     5,      5,    5,     5,          8    \ Vertex 14
+ VERTEX  -18,  -11,  -39,     5,      5,    5,     5,          8    \ Vertex 15
+ VERTEX  -36,    0,  -30,     5,      5,    5,     5,          8    \ Vertex 16
 
- EQUB &5A, &00, &57, &1C, &01, &11
- EQUB &5A, &00, &57, &9C, &23, &33
- EQUB &00, &05, &35, &09, &00, &33
- EQUB &00, &07, &26, &06, &00, &33
- EQUB &12, &07, &13, &89, &33, &33
+\EDGE vertex1, vertex2, face1, face2, visibility
+ EDGE       0,       1,     3,     0,         31    \ Edge 0
+ EDGE       0,       2,     2,     1,         31    \ Edge 1
+ EDGE       0,       3,     1,     0,         31    \ Edge 2
+ EDGE       0,       4,     3,     2,         31    \ Edge 3
+ EDGE       1,       4,     5,     3,         31    \ Edge 4
+ EDGE       4,       2,     5,     2,         31    \ Edge 5
+ EDGE       2,       3,     4,     1,         31    \ Edge 6
+ EDGE       3,       1,     4,     0,         31    \ Edge 7
+ EDGE       3,       5,     1,     0,         28    \ Edge 8
+ EDGE       4,       6,     3,     2,         28    \ Edge 9
+ EDGE       1,       2,     5,     4,          5    \ Edge 10
+ EDGE       7,      10,     0,     0,          9    \ Edge 11
+ EDGE       8,      10,     0,     0,          6    \ Edge 12
+ EDGE       7,       9,     3,     3,          9    \ Edge 13
+ EDGE       8,       9,     3,     3,          6    \ Edge 14
+ EDGE      11,      13,     4,     4,          8    \ Edge 15
+ EDGE      13,      12,     4,     4,          8    \ Edge 16
+ EDGE      12,      11,     4,     4,          7    \ Edge 17
+ EDGE      14,      15,     5,     5,          7    \ Edge 18
+ EDGE      15,      16,     5,     5,          8    \ Edge 19
+ EDGE      16,      14,     5,     5,          8    \ Edge 20
 
- EQUB &12, &07, &13, &09, &00, &00
- EQUB &12, &0B, &27, &28, &44, &44
- EQUB &12, &0B, &27, &68, &44, &44
- EQUB &24, &00, &1E, &28, &44, &44
- EQUB &12, &0B, &27, &A8, &55, &55
+\FACE normal_x, normal_y, normal_z, visibility
+ FACE        7,       48,        6,         31    \ Face 0
+ FACE        7,      -48,        6,         31    \ Face 1
+ FACE       -7,      -48,        6,         31    \ Face 2
+ FACE       -7,       48,        6,         31    \ Face 3
+ FACE       77,        0,     -154,         31    \ Face 4
+ FACE      -77,        0,     -154,         31    \ Face 5
 
- EQUB &12, &0B, &27, &E8, &55, &55
- EQUB &24, &00, &1E, &A8, &55, &55
-
-\ Edges
-
- EQUB &1F, &03, &00, &04
- EQUB &1F, &12, &00, &08
- EQUB &1F, &01, &00, &0C
- EQUB &1F, &23, &00, &10
- EQUB &1F, &35, &04, &10
-
- EQUB &1F, &25, &10, &08
- EQUB &1F, &14, &08, &0C
- EQUB &1F, &04, &0C, &04
- EQUB &1C, &01, &0C, &14
- EQUB &1C, &23, &10, &18
-
- EQUB &05, &45, &04, &08
- EQUB &09, &00, &1C, &28
- EQUB &06, &00, &20, &28
- EQUB &09, &33, &1C, &24
- EQUB &06, &33, &20, &24
-
- EQUB &08, &44, &2C, &34
- EQUB &08, &44, &34, &30
- EQUB &07, &44, &30, &2C
- EQUB &07, &55, &38, &3C
- EQUB &08, &55, &3C, &40
-
- EQUB &08, &55, &40, &38
-
-\ Faces
-
- EQUB &1F, &07, &30, &06
- EQUB &5F, &07, &30, &06
- EQUB &DF, &07, &30, &06
- EQUB &9F, &07, &30, &06
- EQUB &3F, &4D, &00, &9A
-
- EQUB &BF, &4D, &00, &9A
-        
 \ ******************************************************************************
 \
 \       Name: SHIP_CONSTRICTOR

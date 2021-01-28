@@ -1875,8 +1875,6 @@ LOAD% = &11E3
 
  EQUB &4B, &11
 
-.L11EE
-
  JMP L11D5
 
 .L11F1
@@ -4491,10 +4489,9 @@ NEXT
 
 .FLKB
 
- LDA #&0F
+ LDA #15
  TAX
  JMP OSBYTE
-
 \ ******************************************************************************
 \
 \       Name: NLIN3
@@ -10521,10 +10518,10 @@ NEXT
 
 .AN2
 
- LDA K%+NI%+36          \ Set bit 2 of the NEWB flags in byte #36 of the second ship in the ship
- ORA #%00000100         \ data workspace at K%, which is reserved for the sun or
- STA K%+NI%+36          \ the space station (in this case it's the latter), to
-                        \ make it hostile
+ LDA K%+NI%+36          \ Set bit 2 of the NEWB flags in byte #36 of the second
+ ORA #%00000100         \ ship in the ship data workspace at K%, which is
+ STA K%+NI%+36          \ reserved for the sun or the space station (in this
+                        \ case it's the latter), to make it hostile
 
  RTS                    \ Return from the subroutine
 
@@ -13329,11 +13326,17 @@ NEXT
                         \ the centre point to (Y, 191), and return from
                         \ the subroutine using a tail call
 
-\ Junk, same as in T.CODE
-
- EQUB &8C, &E7, &8D, &ED, &8A, &E6, &C1, &C8
- EQUB &C8, &8B, &E0, &8A, &E6, &D6, &C5, &C6
- EQUB &C1, &CA, &95, &9D, &9C, &97
+ EQUB &8C, &E7          \ This data appears to be unused (the same block appears
+ EQUB &8D, &ED          \ in the docked code)
+ EQUB &8A, &E6
+ EQUB &C1, &C8
+ EQUB &C8, &8B
+ EQUB &E0, &8A
+ EQUB &E6, &D6
+ EQUB &C5, &C6
+ EQUB &C1, &CA
+ EQUB &95, &9D
+ EQUB &9C, &97
 
 \ ******************************************************************************
 \
@@ -15811,7 +15814,6 @@ NEXT
 
  JSR TT111
  JMP TTX111
-
 \ ******************************************************************************
 \
 \       Name: TT151
@@ -21315,7 +21317,8 @@ NEXT
  CPY LSP                \ If Y >= LSP then we have reached the end of the line
  BCS WP1                \ heap and have finished redrawing the planet (as LSP
                         \ points to the end of the heap), so jump to WP1 to
-                        \ reset the line heap
+                        \ reset the line heap, returning from the subroutine
+                        \ using a tail call
 
  LDA LSY2,Y             \ Set A to the y-coordinate of the current heap entry
 
@@ -21354,6 +21357,14 @@ NEXT
  INY                    \ Increment the loop counter to point to the next point
 
  JMP WPL1               \ Loop back to WPL1 for the next point in the heap
+\ ******************************************************************************
+\
+\       Name: WP1
+\       Type: Subroutine
+\   Category: Drawing planets
+\    Summary: Reset the ball line heap
+\
+\ ******************************************************************************
 
 .WP1
 
@@ -22855,7 +22866,7 @@ NEXT
                         \ Finally, fall through into ZINF to reset the INWK
                         \ ship workspace
 
- JSR U%
+ JSR U%                 \ ????
 
 \ ******************************************************************************
 \
@@ -24191,7 +24202,6 @@ NEXT
 
  EQUS "L.D.MO0"
  EQUB 13
-
 \ ******************************************************************************
 \
 \       Name: ZERO
@@ -25675,10 +25685,11 @@ NEXT
 .DK14
 
  STA KY3,X              \ Store A in either KY3 or KY4, depending on whether
-                        \ the updated roll rate is increasing (KY3) or decreasing
-                        \ (KY4)
+                        \ the updated roll rate is increasing (KY3) or
+                        \ decreasing (KY4)
 
- LDA JSTX               \ Fetch A from JSTX so the next instruction has no effect
+ LDA JSTX               \ Fetch A from JSTX so the next instruction has no
+                        \ effect
 
 .DK12
 
@@ -25688,7 +25699,8 @@ NEXT
                         \ the results from DOCKIT
 
  LDA #128               \ Set A = 128, which indicates no change in pitch when
-                        \ stored in JSTX (i.e. the centre of the pitch indicator)
+                        \ stored in JSTX (i.e. the centre of the pitch
+                        \ indicator)
 
  LDX #0                 \ Set X = 0, so we "press" KY5 below ("X", decrease
                         \ pitch)
@@ -25713,7 +25725,8 @@ NEXT
                         \ decrease the pitch) or positive (in which case we
                         \ "press" KY6, "S", to increase the pitch)
 
- LDA JSTY               \ Fetch A from JSTY so the next instruction has no effect
+ LDA JSTY               \ Fetch A from JSTY so the next instruction has no
+                        \ effect
 
 .DK13
 
@@ -29131,8 +29144,8 @@ ENDMACRO
  CMP XX4                \ If XX4 > the visibility distance, where XX4 contains
  BCC LL79-3             \ the ship's z-distance reduced to 0-31 (which we set in
                         \ part 2), then this edge is too far away to be visible,
-                        \ so jump down to LL78 (via LL79-3) to move on to the next
-                        \ edge
+                        \ so jump down to LL78 (via LL79-3) to move on to the
+                        \ next edge
 
  INY                    \ Increment Y to point to byte #1
 
