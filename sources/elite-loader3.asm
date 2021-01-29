@@ -23,9 +23,6 @@
 
 INCLUDE "sources/elite-header.h.asm"
 
-CODE% = &1900
-LOAD% = &1900
-
 NETV = &224             \ The NETV vector that we intercept as part of the copy
                         \ protection
 
@@ -49,8 +46,6 @@ N% = 67                 \ N% is set to the number of bytes in the VDU table, so
 VEC = &7FFE             \ VEC is where we store the original value of the IRQ1
                         \ vector, and it matches the value in elite-source.asm
 
-L0001   = $0001
-
 ZP = &70                \ Temporary storage, used all over the place
 
 P = &72                 \ Temporary storage, used all over the place
@@ -64,6 +59,9 @@ T = &75                 \ Temporary storage, used all over the place
 SC = &76                \ Used to store the screen address while plotting pixels
 
 BLPTR = &78             \ Gets set as part of the obfuscation code
+
+CODE% = &1900           \ The address where this file (the third loader) loads
+LOAD% = &1900
 
 ORG CODE%
 
@@ -276,7 +274,7 @@ ORG CODE%
 
  SEI
  LDA VIA+$44
- STA L0001
+ STA &0001
  LDA #&39
  STA VIA+$4E
  LDA #&7F
@@ -333,13 +331,13 @@ ORG CODE%
 
 .L1A89
 
- LDA L1B4F,X
- STA L0D7A,X
+ LDA CATDISC,X
+ STA CATD,X
  DEX
  BPL L1A89
 
  LDA SC
- STA L0D92
+ STA CATBLOCK
 
  LDX #&43
  LDY #&19
@@ -418,28 +416,28 @@ ORG CODE%
 \ Gets copied from &1B4F to &0D7A by loop at L1A89 (35 bytes),
 \ is called by D and T to load from disc
 
-.L1B4F
+.CATDISC
 
 ORG &0D7A
 
-.L0D7A
+.CATD
 
- DEC L0D92+8            \ Decrement sector number from 1 to 0
- DEC L0D92+2            \ Decrement load address from &0F00 to &0E00
+ DEC CATBLOCK+8            \ Decrement sector number from 1 to 0
+ DEC CATBLOCK+2            \ Decrement load address from &0F00 to &0E00
 
- JSR L0D89
+ JSR CATL
 
- INC L0D92+8            \ Increment sector number back to 1
- INC L0D92+2            \ Increment load address back to &0F00
+ INC CATBLOCK+8            \ Increment sector number back to 1
+ INC CATBLOCK+2            \ Increment load address back to &0F00
 
-.L0D89
+.CATL
 
  LDA #127
- LDX #LO(L0D92)
- LDY #HI(L0D92)
+ LDX #LO(CATBLOCK)
+ LDY #HI(CATBLOCK)
  JMP OSWORD
 
-.L0D92
+.CATBLOCK
 
  EQUB 0                 \ 0 = Drive = 0
  EQUD &00000F00         \ 1 = Data address = &0F00
@@ -450,9 +448,9 @@ ORG &0D7A
  EQUB %00100001         \ 9 = Load 1 sector of 256 bytes
  EQUB 0
 
-COPYBLOCK L0D7A, P%, L1B4F
+COPYBLOCK CATD, P%, CATDISC
 
-ORG L1B4F + P% - L0D7A
+ORG CATDISC + P% - CATD
 
 .L1B72
 
@@ -546,7 +544,7 @@ ORG L1B4F + P% - L0D7A
  LDA P                  \             = r1^2
  STA ZP
 
- LDA #&4B               \ ????
+ LDA #&4B               \ ???? Copy protection
  STA L19D2+1
 
  JSR DORND              \ Set A and X to random numbers, say A = r2
@@ -720,7 +718,7 @@ ORG L1B4F + P% - L0D7A
  STA ZP+1               \ Set ZP+1 = A
                         \          = r5^2 / 256
 
- LDA #&29               \ ????
+ LDA #&29               \ ???? Copy protection
  STA L19D2+2
 
  JSR DORND              \ Set A and X to random numbers, say A = r6
@@ -826,16 +824,18 @@ ORG L1B4F + P% - L0D7A
 
  BNE PLL3               \ Loop back to PLL3 until CNT3+1 = 0
 
- LDA #&00               \ ????
+ LDA #&00               \ Set ZP(1 0) = &6300
  STA ZP
  LDA #&63
  STA ZP+1
- LDA #&62
+
+ LDA #&62               \ Set P(1 0) = &2A62
  STA P
  LDA #&2A
  STA P+1
- LDX #&08
- JSR MVPG
+
+ LDX #8                 \ Call MVPG with X = 8 to copy 8 pages of memory from
+ JSR MVPG               \ the address in P(1 0) to the address in ZP(1 0)
 
 \ ******************************************************************************
 \
@@ -988,7 +988,8 @@ ORG L1B4F + P% - L0D7A
  LSR A
  LSR A
 
- LSR BLPTR+1            \ ????
+ LSR BLPTR+1            \ Halve the high byte of BLPTR(1 0), as part of the copy
+                        \ protection
 
  ORA #&60               \ Set ZP+1 = &60 + A >> 3
  STA ZP+1

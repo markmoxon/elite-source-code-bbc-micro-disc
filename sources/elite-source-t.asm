@@ -126,6 +126,28 @@ VE = &57                \ The obfuscation byte used to hide the extended tokens
 LL = 30                 \ The length of lines (in characters) of justified text
                         \ in the extended tokens system
 
+QQ18 = &0400            \ The address of the text token table
+
+SNE = &07C0             \ The address of the sine lookup table
+
+ACT = &07E0             \ The address of the arctan lookup table
+
+QQ16_FLIGHT = &0880     \ The address of the two-letter text token table in the
+                        \ flight code
+
+CATD = &0D7A            \ The address of the CATD routine that is put in place
+                        \ by the third loader
+
+NA% = &1181             \ The address of data block for the last saved commander
+
+CHK2 = &11D3            \ The address of the second checksum byte for the saved
+                        \ commander data file
+
+CHK = &11D4             \ The address of the first checksum byte for the saved
+                        \ commander data file
+
+SHIP_MISSILE = &7F00    \ The address of the missile ship blueprint
+
 \ ******************************************************************************
 \
 \       Name: ZP
@@ -1712,15 +1734,6 @@ NT% = SVC + 2 - TP      \ This sets the variable NT% to the size of the current
                         \ processor code is used to store the CATF flag, not
                         \ this one)
 
-QQ18 = &0400
-SNE = &07C0
-ACT = &07E0
-QQ16_FLIGHT = &0880
-NA% = &1181
-CHK2 = &11D3
-CHK = &11D4
-SHIP_MISSILE = &7F00
-
 \ ******************************************************************************
 \
 \       Name: K%
@@ -1863,7 +1876,9 @@ ORG &0E00
 
 .CPIR
 
- SKIP 1                 \ The pirate counter, used when spawning ships
+ SKIP 1                 \ A counter used when spawning pirates, to work our way
+                        \ through the list of pirate ship blueprints until we
+                        \ find one that has been loaded
 
 PRINT "WP workspace from  ", ~WP," to ", ~P%
 
@@ -1878,16 +1893,37 @@ LOAD% = &11E3
 
 ORG CODE%
 
+LOAD_A% = LOAD%
+
+\ ******************************************************************************
+\
+\       Name: Main entry point
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: Decrypt and run the docked code
+\
+\ ******************************************************************************
+
  JMP DOENTRY
  JMP DOBEGIN
  JMP CHPR
 
- EQUB &4B, &11
+ EQUW &114B
+
  EQUB &4C
 
 .BRKV
 
  EQUW &11D5
+
+\ ******************************************************************************
+\
+\       Name: INBAY
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: 
+\
+\ ******************************************************************************
 
 .INBAY
 
@@ -1895,6 +1931,15 @@ ORG CODE%
  LDY #0
  JSR &8888
  JMP SCRAM
+
+\ ******************************************************************************
+\
+\       Name: DOBEGIN
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: 
+\
+\ ******************************************************************************
 
 .DOBEGIN
 
@@ -1907,7 +1952,7 @@ ORG CODE%
  STY SC
  LDX #&13
 
-.L1207
+.scrl
 
  STX SCH
  TYA
@@ -1915,11 +1960,15 @@ ORG CODE%
  EOR #&33
  STA (SC),Y
  DEY
- BNE &1207
+ BNE scrl
 
  INX
+ 
+ 
  CPX #&60
- BNE &1207
+  
+ 
+ BNE scrl
 
  JMP BRKBK
 
@@ -1935,7 +1984,7 @@ ORG CODE%
 
 .DOENTRY
 
- JSR scramble           \ ????
+ JSR scramble           \ Decrypt the newly loaded code
 
  JSR RES2               \ Reset a number of flight variables and workspaces
 
@@ -2072,6 +2121,15 @@ ORG CODE%
  JMP BAY                \ If we get here them we didn't start or any missions,
                         \ so jump to BAY to go to the docking bay (i.e. show the
                         \ Status Mode screen)
+
+\ ******************************************************************************
+\
+\       Name: SCRAM
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: 
+\
+\ ******************************************************************************
 
 .SCRAM
 
@@ -2229,7 +2287,7 @@ ORG CODE%
 \
 \ Arguments:
 \
-\   A                   The recursive token to be printed, in the range 1-???
+\   A                   The recursive token to be printed, in the range 1-255
 \
 \ Returns:
 \
@@ -4024,9 +4082,28 @@ NEXT
 
 \ ******************************************************************************
 \
+\ Save output/ELTA.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE A"
+PRINT "Assembled at ", ~CODE%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_A%
+
+PRINT "S.ELTA ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_A%
+\SAVE "output/T.ELTA.bin", CODE%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE B FILE
 \
 \ ******************************************************************************
+
+CODE_B% = P%
+LOAD_B% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
@@ -5846,10 +5923,10 @@ NEXT
                         \ and draw a horizontal line at pixel row 19 to box
                         \ in the title
 
- LDA #205               \ ????
+ LDA #205               \ Print extended token 205 ("DOCKED")
  JSR DETOK
 
- JSR TT67
+ JSR TT67               \ Print a newline
 
  LDA #125               \ Print recursive token 125, which prints the next
  JSR spc                \ three lines of the Status Mode screen:
@@ -7188,7 +7265,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  STY YSAV2              \ them at the end (so they don't get changed by this
  STX XSAV2              \ routine)
 
-.CHPR2
+.RRNEW
 
  LDY QQ17               \ Load the QQ17 flag, which contains the text printing
                         \ flags
@@ -7443,11 +7520,9 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ the next instruction, so presumably we didn't need to
                         \ preserve it and this and the PHA above have no effect
 
- LDA K3                 \ Set A to the character to be printed, though again
-                        \ this has no effect, as the following call to RR4 does
-                        \ the exact same thing
+ LDA K3                 \ Set A to the character to be printed
 
- JMP CHPR2              \ ???? I added this label myself
+ JMP RRNEW              \ Jump back to RRNEW to print the character
 
 .RR3
 
@@ -7491,7 +7566,8 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ above - so load the Y-th byte from P(2 1), which will
                         \ contain the bitmap for the Y-th row of the character
 
- ORA (SC),Y             \ ????
+ ORA (SC),Y             \ OR this value with the current contents of screen
+                        \ memory, so the pixels we want to draw are set
 
  STA (SC),Y             \ Store the Y-th byte at the screen address for this
                         \ character location
@@ -8149,8 +8225,8 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ vertical bar (i.e. A is acting as a mask on the
                         \ 4-pixel colour byte)
 
- JMP DLL12              \ Jump to DLL12 to skip the following and move on to the
-                        \ drawing ????
+ JMP DLL12              \ Jump to DLL12 to skip the code for drawing a blank,
+                        \ and move on to drawing the indicator
 
 .DLL11
 
@@ -8321,9 +8397,28 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
 \ ******************************************************************************
 \
+\ Save output/ELTB.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE B"
+PRINT "Assembled at ", ~CODE_B%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_B%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_B%
+
+PRINT "S.ELTB ", ~CODE_B%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_B%
+\SAVE "versions/cassette/output/T.ELTB.bin", CODE_B%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE C FILE
 \
 \ ******************************************************************************
+
+CODE_C% = P%
+LOAD_C% = LOAD% +P% - CODE%
 
 \ ******************************************************************************
 \
@@ -8352,6 +8447,18 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \ Ths ship's y-coordinate is calculated in the has1 routine from the size of
 \ its targetable area. Ships of type 0 are not shown.
 \
+\ Note that ship numbers are for the ship hanger blueprints at XX21 in the
+\ docked code, rather than the full set of ships in the flight code. They are:
+\
+\   1 = Cargo canister
+\   2 = Shuttle
+\   3 = Transporter
+\   4 = Cobra Mk III
+\   5 = Python
+\   6 = Viper
+\   7 = Krait
+\   8 = Constrictor
+\
 \ ******************************************************************************
 
 .HATB
@@ -8360,11 +8467,11 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \
                         \ Shuttle (left) and Transporter (right)
 
- EQUB 2                 \ Ship type = 2 = ????
+ EQUB 2                 \ Ship type in the hanger = 2 = Shuttle
  EQUB %01010100         \ x_hi = %01010100 = 84, z_hi   = 1     -> x = -84
  EQUB %00111011         \ z_lo = %00111011 = 59, x_sign = 1        z = +315
 
- EQUB 3                 \ Ship type = 3 = ????
+ EQUB 3                 \ Ship type in the hanger = 3 = Transporter
  EQUB %10000010         \ x_hi = %10000010 = 130, z_hi   = 1    -> x = +130
  EQUB %10110000         \ z_lo = %10110000 = 176, x_sign = 0       z = +432
 
@@ -8377,30 +8484,30 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ Three cargo canisters (left, far right and forward,
                         \ right)
 
- EQUB 1                 \ Ship type = 1 = ????
+ EQUB 1                 \ Ship type in the hanger = 1 = Cargo canister
  EQUB %01010000         \ x_hi = %01010000 = 80, z_hi   = 1     -> x = -80
  EQUB %00010001         \ z_lo = %00010001 = 17, x_sign = 1        z = +273
 
- EQUB 1                 \ Ship type = 1 = ????
+ EQUB 1                 \ Ship type in the hanger = 1 = Cargo canister
  EQUB %11010001         \ x_hi = %11010001 = 209, z_hi = 2      -> x = +209
  EQUB %00101000         \ z_lo = %00101000 =  40, x_sign = 0       z = +552
 
- EQUB 1                 \ Ship type = 1 = ????
+ EQUB 1                 \ Ship type in the hanger = 1 = Cargo canister
  EQUB %01000000         \ x_hi = %01000000 = 64, z_hi   = 1     -> x = +64
  EQUB %00000110         \ z_lo = %00000110 = 6,  x_sign = 0        z = +262
 
                         \ Hanger group for X = 18
                         \
-                        \ Viper (right) and Krait (left)
+                        \ Transporter (right) and Cobra Mk III (left)
                         \
                         \ (This group consists of a Transporter and Cobra Mk III
                         \ in the disc version)
 
- EQUB 3                 \ Ship type = 3 = ????
+ EQUB 3                 \ Ship type in the hanger = 3 = Transporter
  EQUB %01100000         \ x_hi = %01100000 =  96, z_hi   = 1    -> x = +96
  EQUB %10010000         \ z_lo = %10010000 = 144, x_sign = 0       z = +400
 
- EQUB 4                 \ Ship type = 4 = ????
+ EQUB 4                 \ Ship type in the hanger = 4 = Cobra Mk III
  EQUB %00010000         \ x_hi = %00010000 =  16, z_hi   = 1    -> x = -16
  EQUB %11010001         \ z_lo = %11010001 = 209, x_sign = 1       z = +465
 
@@ -8412,11 +8519,11 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \
                         \ Viper (right and forward) and Krait (left)
 
- EQUB 6                 \ Ship type = 6 = ????
+ EQUB 6                 \ Ship type in the hanger = 6 = Viper
  EQUB %01010001         \ x_hi = %01010001 =  81, z_hi  = 2     -> x = +81
  EQUB %11111000         \ z_lo = %11111000 = 248, x_sign = 0       z = +760
 
- EQUB 7                 \ Ship type = 7 = ????
+ EQUB 7                 \ Ship type in the hanger = 7 = Krait
  EQUB %01100000         \ x_hi = %01100000 = 96,  z_hi   = 1    -> x = -96
  EQUB %01110101         \ z_lo = %01110101 = 117, x_sign = 1       z = +373
 
@@ -8429,8 +8536,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \       Name: HALL
 \       Type: Subroutine
 \   Category: Ship hanger
-\    Summary: Draw the ships in the ship hanger, then draw the hanger by sending
-\             an OSWORD 248 command to the I/O processor
+\    Summary: Draw the ships in the ship hanger, then draw the hanger
 \
 \ ------------------------------------------------------------------------------
 \
@@ -8448,7 +8554,10 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
 .HALL
 
- JSR UNWISE             \ Call UNWISE to ????
+ JSR UNWISE             \ Call UNWISE to switch the main line-drawing routine
+                        \ between EOR and OR logic (in this case, switching it
+                        \ to OR logic so that it overwrites anything that's
+                        \ on-screen)
 
  LDA #0                 \ Clear the top part of the screen, draw a white border,
  JSR TT66               \ and set the current view type in QQ11 to 0 (space
@@ -8551,14 +8660,18 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
  JSR DORND              \ Set XX15+2 = random number 0-7
  AND #7                 \
- STA XX15+2             \ which is the ship type of ????
+ STA XX15+2             \ which is either 0 (no ships in the hanger) or one of
+                        \ the first 7 ship types in the ship hanger blueprints
+                        \ table, i.e. a cargo canister, shuttle, transporter,
+                        \ Cobra Mk III, Python, Viper or Krait
 
  JSR HAS1               \ Call HAS1 to draw this ship in the hanger, with the
                         \ the following properties:
                         \
                         \   * Random x-coordinate from -63 to +63
                         \
-                        \   * Randomly chosen Sidewinder, Mamba, Krait or Adder
+                        \   * Randomly chosen cargo canister, shuttle,
+                        \     transporter, Cobra Mk III, Python, Viper or Krait
                         \
                         \   * Random z-coordinate from +256 to +639
 
@@ -8568,21 +8681,28 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
 .HA9
 
- STY YSAV               \ ????
+ STY YSAV               \ Set YSAV = 0 to indicate that there is only one ship
+                        \ (so the HANGER routine knows not to draw between the
+                        \ ships)
 
- JSR UNWISE             \ Call UNWISE to ????
+ JSR UNWISE             \ Call UNWISE to switch the main line-drawing routine
+                        \ between EOR and OR logic (in this case, switching it
+                        \ back to EOR logic so that we can erase anything we
+                        \ draw on-screen)
+
+                        \ Fall through into HANGER to draw the hanger background
 
 \ ******************************************************************************
 \
 \       Name: HANGER
 \       Type: Subroutine
 \   Category: Ship hanger
-\    Summary: Implement the OSWORD 248 command (display the ship hanger)
+\    Summary: Display the ship hanger
 \
 \ ------------------------------------------------------------------------------
 \
-\ This command is sent after the ships in the hanger have been drawn, so all it
-\ has to do is draw the hanger's background.
+\ This routine is called after the ships in the hanger have been drawn, so all
+\ it has to do is draw the hanger's background.
 \
 \ The hanger background is made up of two parts:
 \
@@ -8644,12 +8764,15 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ screen, so Y is now the horizontal pixel row of the
                         \ line we want to draw to display the hanger floor
 
- LSR A                  \ ????
+ LSR A                  \ Set A = A >> 3
  LSR A
  LSR A
 
-        ORA     #$60
-        STA     SCH
+ ORA #&60               \ Each character row in Elite's screen mode takes up one
+                        \ page in memory (256 bytes), so we now OR with &60 to
+                        \ get the page containing the line
+
+ STA SCH                \ Store the screen page in the high byte of SC(1 0)
 
  LDA P                  \ Set the low byte of SC(1 0) to the y-coordinate mod 7,
  AND #7                 \ which determines the pixel row in the character block
@@ -8665,7 +8788,10 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ screen, going right until we bump into something
                         \ already on-screen, at which point stop drawing
 
- LDA     #$04           \ ????
+ LDA #%00000100         \ Now to draw the same line but from the right edge of
+                        \ the screen, so set a pixel mask in A to check the
+                        \ sixth pixel of the last byte, so we skip the 2-pixel
+                        \ scren border at the right edge of the screen
 
  LDY #248               \ Set Y = 248 so the call to HAS3 starts drawing the
                         \ line in the last byte of the screen row, at the right
@@ -8675,20 +8801,33 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ screen, going left until we bump into something
                         \ already on-screen, at which point stop drawing
 
- LDY     YSAV           \ ????
+ LDY YSAV               \ Fetch the value of YSAV, which gets set to 0 in the
+                        \ HALL routine above if there is only one ship
 
- BEQ HA2                \ If byte #2 is zero, jump to HA2 to skip the following
+ BEQ HA2                \ If YSAV is zero, jump to HA2 to skip the following
                         \ as there is only one ship in the hanger
+
                         
                         \ If we get here then there are multiple ships in the
                         \ hanger, so we also need to draw the horizontal line in
                         \ the gap between the ships
 
-        JSR HAS2
+ JSR HAS2               \ Call HAS2 to a line to the right, starting with the
+                        \ third pixel of the pixel row at screen address SC(1 0)
 
-        LDY     #$80
-        LDA     #$40
-        JSR HAS3
+ LDY #128               \ We now draw the line from the centre of the screen
+                        \ to the left. SC(1 0) points to the start address of
+                        \ the screen row, so we set Y to 128 so the call to
+                        \ HAS3 starts drawing from halfway along the row (i.e.
+                        \ from the centre of the screen)
+
+ LDA #%01000000         \ We want to start drawing from the second pixel, to
+                        \ avoid the border, so we set a pixel mask accordingly
+
+ JSR HAS3               \ Call HAS3, which draws a line from the halfway point
+                        \ across the left half of the screen, going left until
+                        \ we bump into something already on-screen, at which
+                        \ point it stops drawing
 
 .HA2
 
@@ -8711,14 +8850,20 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
 .HAL6
 
-        LDX     #$60    \ ????
-        STX     SCH
-        STA     XSAV
+ LDX #&60               \ Set the high byte of SC(1 0) to &60, the high byte of
+ STX SCH                \ the start of screen
 
- AND #%11111000         \ 
- STA SC                 \ ????
+ STA XSAV               \ Store this value in XSAV, so we can retrieve it later
 
- LDX #%10000000         \ Set a mask in X to the first pixel in ????
+ AND #%11111000         \ Each character block contains 8 pixel rows, so to get
+                        \ the address of the first byte in the character block
+                        \ that we need to draw into, as an offset from the start
+                        \ of the row, we clear bits 0-2
+
+ STA SC                 \ Set the low byte of SC(1 0) to this value, so SC(1 0)
+                        \ now points to the address where the line starts
+
+ LDX #%10000000         \ Set a mask in X to the first pixel the 8-pixel byte
 
  LDY #1                 \ We are going to start drawing the line from the second
                         \ pixel from the top (to avoid drawing on the 1-pixel
@@ -8736,8 +8881,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  TXA                    \ Copy the pixel mask to A again
 
  ORA (SC),Y             \ OR the byte with the current contents of screen
-                        \ memory, so the pixel we want is set to red (because
-                        \ we know the bits are already 0 from the above test)
+                        \ memory, so the pixel we want is set
 
  STA (SC),Y             \ Store the updated pixel in screen memory
 
@@ -8747,7 +8891,8 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  CPY #8                 \ Loop back to HAL7 to draw this next pixel until we
  BNE HAL7               \ have drawn all 8 in the character block
 
- INC SC+1               \ ????
+ INC SC+1               \ Point SC(1 0) to the next page in memory, i.e. the
+                        \ next character row
 
  LDY #0                 \ Set Y = 0 to point to the first row in this character
                         \ block
@@ -8864,21 +9009,38 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  BEQ HA1                \ If Y = 0, return from the subroutine (as HA1 contains
                         \ an RTS)
 
-        LDX     #$04    \ ????
-.HAL51                  \ My label name
-        INX
-        INX
+                        \ We now work our way through the ship blueprints table
+                        \ for the hanger, counting valid blueprints until we
+                        \ have found the Y-th valid blueprint (we do this as the
+                        \ hanger blueprint table at XX21 is not fully populated,
+                        \ so the Y-th ship is not necessarily at position Y)
+
+ LDX #4                 \ We can start looking from ship blueprint 3, because we
+                        \ don't show ship 1 (missile) or ship 2 (space station)
+                        \ in the hanger. Setting X to 4, which then gets
+                        \ incremented to 6, will start us at XX21(5 4), which is
+                        \ the address of ship blueprint 3 (escape pod)
+
+.hloop
+
+ INX                    \ Increment X by 2 to point to the next blueprint in the
+ INX                    \ table
 
  LDA XX21-2,X           \ Set XX0(1 0) to the X-th address in the ship blueprint
  STA XX0                \ address lookup table at XX21, so XX0(1 0) now points
  LDA XX21-1,X           \ to the blueprint for the ship we need to draw
  STA XX0+1
 
- BEQ HAL51              \ If the high byte of the blueprint address is 0, then
-                        \ ????
+ BEQ hloop              \ If the high byte of the blueprint address is 0, then
+                        \ the blueprint for this ship is not available, so jump
+                        \ back to hloop to try the next ship along in the table
 
-        DEY             \ ????
-        BNE     HAL51
+ DEY                    \ We have found a valid blueprint, so decrement the ship
+                        \ number that we are looking for in Y
+
+ BNE hloop              \ If Y is not yet zero, we still haven't found the Y-th
+                        \ valid blueprint, so loop back to hloop to try the next
+                        \ ship along in the table
 
  LDY #1                 \ Set Q = ship byte #1
  LDA (XX0),Y
@@ -8930,7 +9092,10 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
 .HAS2
 
- LDA #%00100000         \ Set A to ????
+ LDA #%00100000         \ Set A to the pixel pattern for a mode 4 character row
+                        \ byte with the third pixel set, so we start drawing the
+                        \ horizontal line just to the right of the 2-pixel
+                        \ border along the edge of the screen
 
 .HAL2
 
@@ -8965,7 +9130,8 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  ADC #7                 \ to the next character block along
  TAY
 
- LDA #%10000000         \ Reset the pixel mask in A to ????
+ LDA #%10000000         \ Reset the pixel mask in A to the first pixel in the
+                        \ new 8-pixel character block
 
  BCC HAL2               \ If the above addition didn't overflow, jump back to
                         \ HAL2 to keep drawing the line in the next character
@@ -9026,7 +9192,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  SBC #8                 \ to the next character block to the left
  TAY
 
- LDA #%00000001         \ Set a mask in A to ????
+ LDA #%00000001         \ Set a mask in A to the last pixel in the 8-pixel byte
 
  BCS HAS3               \ If the above subtraction didn't underflow, jump back
                         \ to HAS3 to keep drawing the line in the next character
@@ -9039,14 +9205,19 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \       Name: UNWISE
 \       Type: Subroutine
 \   Category: Ship hanger
-\    Summary: 
+\    Summary: Switch the main line-drawing routine between EOR and OR logic
 \
 \ ------------------------------------------------------------------------------
 \
-\ This routine does nothing in the 6502 Second Processor version of Elite. It
-\ does have a function in the disc version, so the authors presumably just
-\ cleared out the UNWISE routine for the Second Processor version, rather than
-\ unplumbing it from the code.
+\ This routine modifies the instructions in the main line-drawing routine at
+\ LOIN/LL30, flipping the drawing logic between the default EOR logic (which
+\ merges with whatever is already on screen, allowing us to erase anything we
+\ draw for animation purposes) and OR logic (which overwrites the screen,
+\ ignoring anything that's already there). We want to use OR logic for drawing
+\ the ship hanger, as it looks better and we don't need to animate it).
+\
+\ The routine name, UNWISE, sums up this approach - if anything goes wrong, the
+\ results would be messy.
 \
 \ Other entry points:
 \
@@ -9056,18 +9227,21 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
 .UNWISE
 
-        LDA     &17EF   \ ????
-        EOR     #$40
-        STA     &17EF
-        LDA     &181B
-        EOR     #$40
-        STA     &181B
-        LDA     &189A
-        EOR     #$40
-        STA     &189A
-        LDA     &18C6
-        EOR     #$40
-        STA     &18C6
+ LDA LIL2+2             \ Flip bit 6 of LIL2+2 to change the EOR (SC),Y in LIL2
+ EOR #%01000000         \ to an ORA (SC),Y (or back again)
+ STA LIL2+2
+
+ LDA LIL3+2             \ Flip bit 6 of LIL3+2 to change the EOR (SC),Y in LIL3
+ EOR #%01000000         \ to an ORA (SC),Y (or back again)
+ STA LIL3+2
+
+ LDA LIL5+2             \ Flip bit 6 of LIL2+2 to change the EOR (SC),Y in LIL5
+ EOR #%01000000         \ to an ORA (SC),Y (or back again)
+ STA LIL5+2
+
+ LDA LIL6+2             \ Flip bit 6 of LIL2+2 to change the EOR (SC),Y in LIL6
+ EOR #%01000000         \ to an ORA (SC),Y (or back again)
+ STA LIL6+2
 
 .HA1
 
@@ -9126,10 +9300,10 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  LDA #48                \ Call the NOISE routine with A = 48 to make the sound
  JSR NOISE              \ of the ship launching from the station
 
- LDA #8                 \ Set the step size for the hyperspace rings to 8, so
+ LDA #8                 \ Set the step size for the launch tunnel rings to 8, so
                         \ there are fewer sections in the rings and they are
                         \ quite polygonal (compared to the step size of 4 used
-                        \ in the much rounder launch rings)
+                        \ in the much rounder hyperspace rings)
 
                         \ Fall through into HFS2 to draw the launch tunnel rings
 
@@ -9235,8 +9409,18 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
  RTS                    \ Return from the subroutine
 
- EQUB &8C, &E7          \ This data appears to be unused (the same block appears
- EQUB &8D, &ED          \ in the flight code)
+\ ******************************************************************************
+\
+\       Name: Unused block
+\       Type: Variable
+\   Category: Utility routines
+\    Summary: This data appears to be unused (the same block appears in both the
+\             flight and docked code)
+\
+\ ******************************************************************************
+
+ EQUB &8C, &E7
+ EQUB &8D, &ED
  EQUB &8A, &E6
  EQUB &C1, &C8
  EQUB &C8, &8B
@@ -9302,8 +9486,8 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  LDX XX+1               \ And then doing the high bytes
  STX S
 
- LDX ALP1               \ ???? Has no effect, as P is about to be overwritten
- STX P
+ LDX ALP1               \ This repeats the first two instructions of MLS1, which
+ STX P                  \ is presumably unintentional (though it has no effect)
 
                         \ Fall through into MLS1 to calculate (A P) = A * ALP1
 
@@ -11647,8 +11831,8 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
 .CLYNS
 
-        LDA     #$FF    \ ????
-        STA     DTW2
+ LDA #%11111111         \ Set DTW2 = %11111111 to denote that we are not
+ STA DTW2               \ currently printing a word
 
  LDA #20                \ Move the text cursor to row 20, near the bottom of
  STA YC                 \ the screen
@@ -11792,7 +11976,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ page in memory (256 bytes), so we now OR with &60 to
                         \ get the page containing the dash (see the comments in
                         \ routine TT26 for more discussion about calculating
-                        \ screen memory addresses
+                        \ screen memory addresses)
 
  STA SCH                \ Store the screen page in the high byte of SC(1 0)
 
@@ -11885,9 +12069,28 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
 \ ******************************************************************************
 \
+\ Save output/ELTC.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE C"
+PRINT "Assembled at ", ~CODE_C%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_C%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_C%
+
+PRINT "S.ELTC ", ~CODE_C%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_C%
+\SAVE "output/T.ELTC.bin", CODE_C%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE D FILE
 \
 \ ******************************************************************************
+
+CODE_D% = P%
+LOAD_D% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
@@ -14512,11 +14715,11 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  BMI Ghy                \ If it is, then the galactic hyperdrive has been
                         \ activated, so jump to Ghy to process it
 
-        LDA     QQ11
-        BEQ     TTH111
+ LDA QQ11
+ BEQ TTH111
 
-        AND     #$C0
-        BEQ     zZ+1
+ AND #&C0
+ BEQ zZ+1
 
  JSR hm                 \ Set the system closest to galactic coordinates (QQ9,
                         \ QQ10) as the selected system
@@ -15338,20 +15541,28 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
 .TT110
 
- LDX #&3F               \ ????
+ LDX #63                \ Before loading the flight code, we need to copy the
+                        \ two-letter token table from QQ16 to QQ16_FLIGHT, so
+                        \ we set a counter in X for the 64 bytes in the table
 
-.L2E94
+.eny1
 
- LDA QQ16,X
- STA QQ16_FLIGHT,X
- DEX
- BPL &2E94
+ LDA QQ16,X             \ Copy the X-th byte of QQ16 to the X-th byte of
+ STA QQ16_FLIGHT,X      \ QQ16_FLIGHT
 
- JSR &0D7A
+ DEX                    \ Decrement the loop counter
 
- LDX #LO(RDLI)
+ BPL eny1               \ Loop back to copy the next byte until we have copied
+                        \ the whole table
+
+ JSR CATD               \ Call CATD to reload the disc catalogue
+
+ LDX #LO(RDLI)          \ Set (Y X) to point to RDLI ("R.D.CODE")
  LDY #HI(RDLI)
- JMP OSCLI
+
+ JMP OSCLI              \ Call OSCLI to run the OS command in RDLI, which *RUNs
+                        \ the main flight code in D.CODE, returning from the
+                        \ subroutine using a tail call
 
 \ ******************************************************************************
 \
@@ -15501,10 +15712,21 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
  RTS                    \ Return from the subroutine
 
+\ ******************************************************************************
+\
+\       Name: RDLI
+\       Type: Variable
+\   Category: Utility routines
+\    Summary: The OS command string for loading the docked code in the disc
+\             version of Elite
+\
+\ ******************************************************************************
+
 .RDLI
 
  EQUS "R.D.CODE"
  EQUB 13
+
 \ ******************************************************************************
 \
 \       Name: EQSHP
@@ -16186,13 +16408,13 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \
 \ ******************************************************************************
 
- NOP                    \ ????
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
+ NOP                    \ In the first version of disc Elite, there was a nasty
+ NOP                    \ bug where buying a laser that you already owned gave
+ NOP                    \ you a refund of the laser's worth without removing the
+ NOP                    \ laser, so you could keep doing this to get as many
+ NOP                    \ credits as you liked. This was quickly fixed by
+ NOP                    \ replacing the incorrect code with NOPs, which is what
+ NOP                    \ we have here
  NOP
  NOP
 
@@ -16257,9 +16479,28 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
 \ ******************************************************************************
 \
+\ Save output/ELTD.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE D"
+PRINT "Assembled at ", ~CODE_D%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_D%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_D%
+
+PRINT "S.ELTD ", ~CODE_D%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_D%
+\SAVE "output/T.ELTD.bin", CODE_D%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE E FILE
 \
 \ ******************************************************************************
+
+CODE_E% = P%
+LOAD_E% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
@@ -16366,7 +16607,8 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
 .cmn
 
- JSR MT19               \ ????
+ JSR MT19               \ Call MT19 to capitalise the next letter (i.e. set
+                        \ Sentence Case for this word only)
 
  LDY #0                 \ Set up a counter in Y, starting from 0
 
@@ -19167,7 +19409,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
  TYA                    \ Copy Y to A
 
- TAX                    \ Copy A to X
+ TAX                    \ Copy A to X, to X contains the joystick roll value
 
  LDA JSTY               \ Fetch the joystick pitch, ranging from 1 to 255 with
                         \ 128 as the centre point, and fall through into TJS1 to
@@ -19228,25 +19470,29 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  BNE P%+3
  DEY
 
- STX T                  \ ????
+ STX T                  \ Set T to the value of X, which contains the joystick
+                        \ roll value
 
- LDX #0
- JSR DKS4
- BPL TJe
+ LDX #0                 \ Scan the keyboard to see if the SHIFT key is currently
+ JSR DKS4               \ being pressed, returning the result in A and X
 
- ASL T
- ASL T
- TYA
+ BPL TJe                \ If SHIFT is not being pressed, skip to TJe
+
+ ASL T                  \ SHIFT is being held down, so quadruple the value of T
+ ASL T                  \ (i.e. SHIFT moves the cursor at four times the speed
+                        \ when using the joystick)
+
+ TYA                    \ Fetch the joystick pitch value from Y into A
 
  ASL A                  \ SHIFT is being held down, so quadruple the value of A
  ASL A                  \ (i.e. SHIFT moves the cursor at four times the speed
-                        \ when using the keyboard)
+                        \ when using the joystick)
 
  TAY                    \ Transfer the amended value of A back into Y
 
 .TJe
 
- LDX T
+ LDX T                  \ Fetch the amended value of T back into X
 
  LDA KL                 \ Set A to the value of KL (the key pressed)
 
@@ -19282,9 +19528,28 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
 \ ******************************************************************************
 \
+\ Save output/ELTE.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE E"
+PRINT "Assembled at ", ~CODE_E%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_E%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_E%
+
+PRINT "S.ELTE ", ~CODE_E%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_E%
+\SAVE "output/T.ELTE.bin", CODE_E%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE F FILE
 \
 \ ******************************************************************************
+
+CODE_F% = P%
+LOAD_F% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
@@ -19368,8 +19633,8 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \
 \     * ECMA - Turn E.C.M. off
 \
-\
 \     * ALP1, ALP2 - Set roll signs to 0
+\
 \ It then recharges the shields and energy banks, and falls through into RES2.
 \
 \ ******************************************************************************
@@ -19860,8 +20125,8 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  LDA QQ11               \ If this is a space view, skip the following two
  BEQ P%+7               \ instructions (i.e. jump to JSR TT17 below)
 
- LDY #2                 \ ????
- JSR DELAY
+ LDY #2                 \ Wait for 2/50 of a second (0.04 seconds), to slow the
+ JSR DELAY              \ main loop down a bit
 
  JSR TT17               \ Scan the keyboard for the cursor keys or joystick,
                         \ returning the cursor's delta values in X and Y and
@@ -20005,11 +20270,16 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  CMP #&54               \ If "H" was not pressed, jump to NWDAV5 to skip the
  BNE NWDAV5             \ following
 
- JSR CLYNS              \ ????
- LDA #$0F
- STA XC
- LDA #$CD
- JMP DETOK
+ JSR CLYNS              \ "H" was pressed, so clear the bottom three text rows
+                        \ of the upper screen, and move the text cursor to
+                        \ column 1 on row 21, i.e. the start of the top row of
+                        \ the three bottom rows
+
+ LDA #15                \ Move the text cursor to column 15 (the middle of the
+ STA XC                 \ screen)
+
+ LDA #205               \ Print extended token 205 ("DOCKED") and return from
+ JMP DETOK              \ the subroutine using a tail call
 
 .NWDAV5
 
@@ -20184,7 +20454,8 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
  DEC brkd               \ Decrement the brkd counter
 
- BNE BR1                \ ????
+ BNE BR1                \ If the brkd counter is non-zero, jump to BR1 to
+                        \ restart the game
 
 \ ******************************************************************************
 \
@@ -20212,7 +20483,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
 .BEGIN
 
- JSR BRKBK              \ ????
+ JSR BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
 
  LDX #(CATF-COMC)       \ We start by zeroing all the configuration variables
                         \ between COMC and CATF, to set them to their default
@@ -20288,13 +20559,16 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  CMP #&44               \ Did we press "Y"? If not, jump to QU5, otherwise
  BNE QU5                \ continue on to load a new commander
 
- JSR DFAULT             \ ????
+ JSR DFAULT             \ Call DFAULT to reset the current commander data block
+                        \ to the last saved commander
 
- JSR SVE
+ JSR SVE                \ Call SVE to load a new commander into the last saved
+                        \ commander data block
 
 .QU5
 
- JSR DFAULT             \ ????
+ JSR DFAULT             \ Call DFAULT to reset the current commander data block
+                        \ to the last saved commander
 
  JSR msblob             \ Reset the dashboard's missile indicators so none of
                         \ them are targeted
@@ -20460,14 +20734,14 @@ ENDIF
  LDA #96                \ Set nosev_z hi = 96 (96 is the value of unity in the
  STA INWK+14            \ rotation vector)
 
-        LDA     K2+4    \ ????
-        CMP     #&DB
-        BEQ     tiwe
+ LDA K2+4               \ ????
+ CMP #&DB
+ BEQ tiwe
 
-        LDA     #$10
-        STA     &36B8
-        LDA     #$FE
-        STA     &36B9
+ LDA #&10
+ STA &36B8
+ LDA #&FE
+ STA &36B9
 
 .tiwe
 
@@ -20749,7 +21023,7 @@ ENDIF
 
 .GTNMEW
 
- LDY #8                 \ ????
+ LDY #8                 \ Wait for 8/50 of a second (0.16 seconds)
  JSR DELAY
 
 .GTNME
@@ -20815,8 +21089,9 @@ ENDIF
 
 .MT26
 
- LDA #&81               \ ????
- STA VIA+&4E
+ LDA #%10000001         \ Clear 6522 System VIA interrupt enable register IER
+ STA VIA+&4E            \ (SHEILA &4E) bit 1 (i.e. enable the CA2 interrupt,
+                        \ which comes from the keyboard)
 
  JSR FLKB               \ Call FLKB to flush the keyboard buffer
 
@@ -20833,8 +21108,9 @@ ENDIF
  LDY #0                 \ ESCAPE was pressed, so set Y = 0 (as the OSWORD call
                         \ returns the length of the entered string in Y)
 
- LDA #&01               \ ????
- STA VIA+&4E
+ LDA #%00000001         \ Set 6522 System VIA interrupt enable register IER
+ STA VIA+&4E            \ (SHEILA &4E) bit 1 (i.e. disable the CA2 interrupt,
+                        \ which comes from the keyboard)
 
  JMP FEED               \ Jump to FEED to print a newline, returning from the
                         \ subroutine using a tail call
@@ -21059,8 +21335,8 @@ ENDIF
  JSR DETOK              \ prints the boxed-out title "DRIVE {drive number}
                         \ CATALOGUE"
 
- LDA #1                 \ ????
- STA CATF
+ LDA #1                 \ Set the CATF flag to 1, so that the TT26 routine will
+ STA CATF               \ print out the disc catalogue correctly
 
  STA XC                 \ Move the text cursor to column 1
 
@@ -21072,7 +21348,8 @@ ENDIF
  JSR OSCLI              \ Call OSCLI to execute the OS command at (Y X), which
                         \ catalogues the disc
 
- DEC CATF               \ ????
+ DEC CATF               \ Decrement the CATF flag back to 0, so the TT26 routine
+                        \ reverts to standard formatting
 
  CLC                    \ Clear the C flag
 
@@ -22516,19 +22793,21 @@ ENDIF
 
 .DOKEY
 
- LDA JSTK               \ ????
- BEQ DK9
+ LDA JSTK               \ If JSTK is zero, then we are configured to use the
+ BEQ DK9                \ keyboard rather than the joystick, so jump to DK9 to
+                        \ make sure the Bitstik is disabled as well (DK9 then
+                        \ jumps to DK4 below)
 
- LDX #1
- JSR DKS2
+ LDX #1                 \ Call DKS2 to fetch the value of ADC channel 1 (the
+ JSR DKS2               \ joystick X value) into (A X), and OR A with 1. This
+ ORA #1                 \ ensures that the high byte is at least 1, and then we
+ STA JSTX               \ store the result in JSTX
 
- ORA #1
- STA JSTX
- LDX #2
- JSR DKS2
-
- EOR JSTGY
- STA JSTY
+ LDX #2                 \ Call DKS2 to fetch the value of ADC channel 2 (the
+ JSR DKS2               \ joystick Y value) into (A X), and EOR A with JSTGY.
+ EOR JSTGY              \ JSTGY will be &FF if the game is configured to
+ STA JSTY               \ reverse the joystick Y channel, so this EOR does
+                        \ exactly that, and then we store the result in JSTY
 
                         \ Fall through into DK4 to scan for other keys
 
@@ -22621,7 +22900,7 @@ ENDIF
  CPX #&70               \ If ESCAPE is not being pressed, skip over the next
  BNE P%+5               \ instruction
 
- JMP BR1                \ ????
+ JMP BR1                \ Jump to BR1 to restart the game
 
  CPX #&64               \ If "B" is not being pressed, skip to DK7
  BNE nobit
@@ -22666,8 +22945,12 @@ ENDIF
 
 .DK9
 
- STA BSTK               \ ????
- BEQ DK4
+ STA BSTK               \ DK9 is called from DOKEY using a BEQ, so we know A is
+                        \ 0, so this disables the Bitstik and switched to
+                        \ keyboard or joystick
+
+ BEQ DK4                \ Jump back to DK4 in DOKEY (this BEQ is effectively a
+                        \ JMP as A is always zero)
 
 \ ******************************************************************************
 \
@@ -23352,16 +23635,35 @@ ENDMACRO
 
 \ ******************************************************************************
 \
+\ Save output/ELTF.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE F"
+PRINT "Assembled at ", ~CODE_F%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_F%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_F%
+
+PRINT "S.ELTF ", ~CODE_F%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_F%
+\SAVE "output/T.ELTF.bin", CODE_F%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE G FILE
 \
 \ ******************************************************************************
+
+CODE_G% = P%
+LOAD_G% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
 \       Name: SHPPT
 \       Type: Subroutine
 \   Category: Drawing ships
-\    Summary: Draw a distant ship as a point rather than a full wireframe
+\    Summary: Draw a distant ship as a point in the middle of the screen
 \
 \ ******************************************************************************
 
@@ -23370,9 +23672,14 @@ ENDMACRO
  JSR EE51               \ Call EE51 to remove the ship's wireframe from the
                         \ screen, if there is one
 
- LDA #&60               \ ????
- CMP #&BE
- BCS nono
+ LDA #Y                 \ Set A = the y-coordinate of a dot halfway down the
+                        \ screen
+
+ CMP #Y*2-2             \ If the y-coordinate is bigger than the y-coordinate of
+ BCS nono               \ the bottom of the screen, jump to nono as the ship's
+                        \ dot is off the bottom of the space view. This will
+                        \ never happen, but this code is copied from the flight
+                        \ code, where A can contain any y-coordinate
 
  LDY #2                 \ Call Shpt with Y = 2 to set up bytes 1-4 in the ship
  JSR Shpt               \ lines space, aborting the call to LL9 if the dot is
@@ -23381,8 +23688,8 @@ ENDMACRO
 
  LDY #6                 \ Set Y to 6 for the next call to Shpt
 
- LDA #&60
- ADC #1
+ LDA #Y                 \ Set A = #Y + 1 (so this is the second row of the
+ ADC #1                 \ two-pixel-high dot halfway down the screen)
 
  JSR Shpt               \ Call Shpt with Y = 6 to set up bytes 5-8 in the ship
                         \ lines space, aborting the call to LL9 if the dot is
@@ -23427,7 +23734,7 @@ ENDMACRO
  INY
  STA (XX19),Y
 
- LDA #&80               \ ????
+ LDA #X                 \ Set A = x-coordinate of the middle of the screen
 
  DEY                    \ Store A in byte Y+1 of the ship line heap
  STA (XX19),Y
@@ -27078,9 +27385,28 @@ ENDMACRO
 
 \ ******************************************************************************
 \
+\ Save output/ELTG.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE G"
+PRINT "Assembled at ", ~CODE_G%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_G%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_G%
+
+PRINT "S.ELTG ", ~CODE_G%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_G%
+\SAVE "output/T.ELTG.bin", CODE_G%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE H FILE
 \
 \ ******************************************************************************
+
+CODE_H% = P%
+LOAD_H% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
@@ -31343,9 +31669,28 @@ ENDMACRO
 
 \ ******************************************************************************
 \
+\ Save output/ELTH.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE H"
+PRINT "Assembled at ", ~CODE_H%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_H%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_H%
+
+PRINT "S.ELTH ", ~CODE_H%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_H%
+\SAVE "output/T.ELTH.bin", CODE_H%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE SHIP HANGER BLUEPRINTS FILE
 \
 \ ******************************************************************************
+
+CODE_SHIPS% = P%
+LOAD_SHIPS% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
@@ -31399,6 +31744,8 @@ ENDMACRO
 \    Summary: Ship blueprints default NEWB flags for the ship hanger
 \
 \ ******************************************************************************
+
+.E%
 
  EQUB %00000000         \ Missile
  EQUB 0
@@ -32360,6 +32707,22 @@ ENDMACRO
  FACE        0,      -27,        0,         31    \ Face 9
 
  SKIP 171
+
+\ ******************************************************************************
+\
+\ Save output/SHIPS.bin
+\
+\ ******************************************************************************
+
+PRINT "SHIPS"
+PRINT "Assembled at ", ~CODE_SHIPS%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_SHIPS%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_SHIPS%
+
+PRINT "S.SHIPS ", ~CODE_B%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_SHIPS%
+\SAVE "output/SHIPS.bin", CODE_SHIPS%, P%, LOAD%
 
 \ ******************************************************************************
 \

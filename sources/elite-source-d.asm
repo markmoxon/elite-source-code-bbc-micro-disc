@@ -116,6 +116,23 @@ f7 = &16                \ Internal key number for red key f7 (Market Price)
 f8 = &76                \ Internal key number for red key f8 (Status Mode)
 f9 = &77                \ Internal key number for red key f9 (Inventory)
 
+QQ18 = &0400            \ The address of the text token table
+
+SNE = &07C0             \ The address of the sine lookup table
+
+ACT = &07E0             \ The address of the arctan lookup table
+
+QQ16 = &0880            \ The address of the two-letter text token table
+
+CATD = &0D7A            \ The address of the CATD routine that is put in place
+                        \ by the third loader
+
+XX21 = &5600            \ The address of the ship blueprints lookup table, where
+                        \ the chosen ship blueprints file is loaded
+
+E% = &563E              \ The address of the default NEWB ship bytes within the
+                        \ loaded ship blueprints file
+
 \ ******************************************************************************
 \
 \       Name: ZP
@@ -1702,13 +1719,6 @@ NT% = SVC + 2 - TP      \ This sets the variable NT% to the size of the current
                         \ processor code is used to store the CATF flag, not
                         \ this one)
 
-QQ18 = &0400
-SNE = &07C0
-ACT = &07E0
-QQ16 = &0880
-XX21 = &5600
-E% = &563E
-
 \ ******************************************************************************
 \
 \       Name: K%
@@ -1851,7 +1861,9 @@ ORG &0E00
 
 .CPIR
 
- SKIP 1                 \ The pirate counter, used when spawning ships
+ SKIP 1                 \ A counter used when spawning pirates, to work our way
+                        \ through the list of pirate ship blueprints until we
+                        \ find one that has been loaded
 
 PRINT "WP workspace from  ", ~WP," to ", ~P%
 
@@ -1861,40 +1873,66 @@ PRINT "WP workspace from  ", ~WP," to ", ~P%
 \
 \ ******************************************************************************
 
-L0D7A = &0D7A
-L11D5 = &11D5
-
 CODE% = &11E3
 LOAD% = &11E3
 
  ORG CODE%
 
+LOAD_A% = LOAD%
+
+\ ******************************************************************************
+\
+\       Name: Main entry point
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: Decrypt and run the flight code
+\
+\ ******************************************************************************
+
  JMP scramble
  JMP scramble
  JMP TT26
 
- EQUB &4B, &11
+ EQUW &114B
 
- JMP L11D5
+ JMP &11D5
 
-.L11F1
+\ ******************************************************************************
+\
+\       Name: INBAY
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: 
+\
+\ ******************************************************************************
+
+.INBAY
 
  LDX #&F8
  LDY #&11
  JSR OSCLI
 
-.L11F8
+\ ******************************************************************************
+\
+\       Name: LTLI
+\       Type: Variable
+\   Category: Loader
+\    Summary: 
+\
+\ ******************************************************************************
+
+.LTLI
 
  EQUS "L.T.CODE"
  EQUB 13
 
 .scramble
 
- LDY #&00
+ LDY #0
  STY SC
  LDX #&13
 
-.L1207
+.scrl
 
  STX SCH
  TYA
@@ -1902,24 +1940,52 @@ LOAD% = &11E3
  EOR #&33
  STA (SC),Y
  DEY
- BNE L1207
+ BNE scrl
 
  INX
+ 
+ 
  CPX #&56
- BNE L1207
+ 
+ 
+ BNE scrl
 
+ 
  JMP RSHIPS
+
+\ ******************************************************************************
+\
+\       Name: DOENTRY
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: 
+\
+\ ******************************************************************************
 
 .DOENTRY
 
  LDA #&52
- STA L11F8
+ STA LTLI
+
+\ ******************************************************************************
+\
+\       Name: DEATH2
+\       Type: Subroutine
+\   Category: Start and end
+\    Summary: Reset most of the game and restart from the title screen
+\
+\ ******************************************************************************
 
 .DEATH2
 
- JSR RES2
- JSR L0D7A
- BNE L11F1
+ JSR RES2               \ Reset a number of flight variables and workspaces
+                        \ and fall through into the entry code for the game
+                        \ to restart from the title screen
+
+ JSR CATD               \ Call CATD to reload the disc catalogue
+
+ BNE INBAY              \ Jump to INBAY to load the docked code (this BNE is
+                        \ effectively a JMP)
 
 \ ******************************************************************************
 \
@@ -2094,10 +2160,11 @@ LOAD% = &11E3
  LDA BSTK               \ If BSTK = 0 then the Bitstik is not configured, so
  BEQ BS2                \ jump to BS2 to skip the following
 
-        LDX     #$03        \ ????
-        LDA     #$80
-        JSR     OSBYTE
-        TYA
+ LDX #3                 \ Call OSBYTE 128 to fetch the 16-bit value from ADC
+ LDA #128               \ channel 3 (the Bitstik rotation value), returning the
+ JSR OSBYTE             \ value in (Y X)
+
+ TYA                    \ Copy Y to A, so the result is now in (A X)
 
  LSR A                  \ Divide A by 4
  LSR A
@@ -2753,7 +2820,7 @@ LOAD% = &11E3
  LDA XX15+2             \ Set A to the z-axis of the vector
 
  CMP #86                \ 4. If z-axis < 86, jump to MA62 to fail docking, as
- BCC MA62               \ we are not in the ???? degree safe cone of approach
+ BCC MA62               \ we are not in the 26.3 degree safe cone of approach
 
  LDA INWK+16            \ 5. If |roofv_x_hi| < 80, jump to MA62 to fail docking,
  AND #%01111111         \ as the slot is more than 36.6 degrees from horizontal
@@ -2765,10 +2832,14 @@ LOAD% = &11E3
                         \ If we arrive here, either the docking computer has
                         \ been activated, or we just docked successfully
 
-        JSR     RES2   \????
+ JSR RES2               \ Reset a number of flight variables and workspaces
 
-        LDA     #&08
-        JSR     HFS2
+ LDA #8                 \ Set the step size for the launch tunnel rings to 8, so
+                        \ there are fewer sections in the rings and they are
+                        \ quite polygonal (compared to the step size of 4 used
+                        \ in the much rounder hyperspace rings)
+
+ JSR HFS2               \ Call HFS2 to draw the launch tunnel rings
 
  JMP DOENTRY            \ Go to the docking bay (i.e. show the ship hanger)
 
@@ -3656,9 +3727,28 @@ LOAD% = &11E3
 
 \ ******************************************************************************
 \
+\ Save output/ELTA.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE A"
+PRINT "Assembled at ", ~CODE%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_A%
+
+PRINT "S.ELTA ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_A%
+\SAVE "output/D.ELTA.bin", CODE%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE B FILE
 \
 \ ******************************************************************************
+
+CODE_B% = P%
+LOAD_B% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
@@ -7626,7 +7716,7 @@ NEXT
                         \
                         \ and so on
 
- INC XC                 \ ????
+ INC XC                 \ Move the text cursor to the right by 1 column
 
  LDA YC                 \ Fetch YC, the y-coordinate (row) of the text cursor
 
@@ -8351,8 +8441,8 @@ NEXT
                         \ vertical bar (i.e. A is acting as a mask on the
                         \ 4-pixel colour byte)
 
- JMP DLL12              \ Jump to DLL12 to skip the following and move on to the
-                        \ drawing ????
+ JMP DLL12              \ Jump to DLL12 to skip the code for drawing a blank,
+                        \ and move on to drawing the indicator
 
 .DLL11
 
@@ -8488,9 +8578,28 @@ NEXT
 
 \ ******************************************************************************
 \
+\ Save output/ELTB.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE B"
+PRINT "Assembled at ", ~CODE_B%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_B%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_B%
+
+PRINT "S.ELTB ", ~CODE_B%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_B%
+\SAVE "versions/cassette/output/D.ELTB.bin", CODE_B%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE C FILE
 \
 \ ******************************************************************************
+
+CODE_C% = P%
+LOAD_C% = LOAD% +P% - CODE%
 
 \ ******************************************************************************
 \
@@ -9317,8 +9426,10 @@ NEXT
 
  TAX                    \ Copy A into X so we can retrieve it below
 
- JSR nroll              \ ????
- STA INWK+30
+ JSR nroll              \ Call nroll to calculate the value of the ship's pitch
+                        \ counter
+
+ STA INWK+30            \ Store the result in the ship's pitch counter
 
 .TA11
 
@@ -9338,10 +9449,15 @@ NEXT
 
  TAX                    \ Copy A into X so we can retrieve it below
 
- EOR INWK+30
- JSR nroll              \ ????
+ EOR INWK+30            \ Give A the correct sign of the dot product * the
+                        \ current pitch direction (i.e. the sign is negative if
+                        \ the pitch counter and dot product have different
+                        \ signs, positive if they have the same sign)
 
- STA INWK+29
+ JSR nroll              \ Call nroll to calculate the value of the ship's pitch
+                        \ counter
+
+ STA INWK+29            \ Store the result in the ship's roll counter
 
 .TA12
 
@@ -9418,21 +9534,30 @@ NEXT
                         \ the direction of XX15
 
 .nroll
-        EOR     #$80
-        AND     #$80
-        STA     T
-        TXA
-        ASL     A
-        CMP     RAT2
-        BCC     nroll2
 
-        LDA     RAT
-        ORA     T
-        RTS
+ EOR #%10000000         \ Give the ship's pitch counter the opposite sign to the
+ AND #%10000000         \ dot product result, with a value of 0, and store it in
+ STA T                  \ T
+
+ TXA                    \ Retrieve the original value of A from X
+
+ ASL A                  \ Shift A left to double it and drop the sign bit
+
+ CMP RAT2               \ If A < RAT2, skip to nroll2 (so if RAT2 = 0, we always
+ BCC nroll2             \ set the pitch counter to RAT)
+
+ LDA RAT                \ Set the magnitude of the ship's pitch counter to RAT
+ ORA T                  \ (we already set the sign above and stored it in T)
+
+ RTS                    \ Return from the subroutine
 
 .nroll2
-        LDA     T
-        RTS
+
+ LDA T                  \ Set A to the value we stored in T above, which has a
+                        \ value of 0 and the opposite sign to the dot product
+                        \ result
+
+ RTS                    \ Return from the subroutine
 
 \ ******************************************************************************
 \
@@ -10664,9 +10789,12 @@ NEXT
                         \ new child ship (in this way, the child inherits things
                         \ like location from the parent)
 
-        LDA     NEWB    \ ????
-        AND     #$1C
-        STA     NEWB
+ LDA NEWB               \ Clear bits 0-1 and 5-7 of the ship's NEWB flags,
+ AND #%00011100         \ leaving only the hostile, pirate and docking flags
+ STA NEWB               \ (so the child inherits these flags from the parent,
+                        \ meaning pirates spawn pirates, angry ships spawn
+                        \ angry ships, and ships that are docking spawn ships
+                        \ that are also docking)
 
  LDA TYPE               \ Fetch the ship type of the parent into A
 
@@ -10868,10 +10996,10 @@ NEXT
  LDA #48                \ Call the NOISE routine with A = 48 to make the sound
  JSR NOISE              \ of the ship launching from the station
 
- LDA #8                 \ Set the step size for the hyperspace rings to 8, so
+ LDA #8                 \ Set the step size for the launch tunnel rings to 8, so
                         \ there are fewer sections in the rings and they are
                         \ quite polygonal (compared to the step size of 4 used
-                        \ in the much rounder launch rings)
+                        \ in the much rounder hyperspace rings)
 
                         \ Fall through into HFS2 to draw the launch tunnel rings
 
@@ -13326,8 +13454,18 @@ NEXT
                         \ the centre point to (Y, 191), and return from
                         \ the subroutine using a tail call
 
- EQUB &8C, &E7          \ This data appears to be unused (the same block appears
- EQUB &8D, &ED          \ in the docked code)
+\ ******************************************************************************
+\
+\       Name: Unused block
+\       Type: Variable
+\   Category: Utility routines
+\    Summary: This data appears to be unused (the same block appears in both the
+\             flight and docked code)
+\
+\ ******************************************************************************
+
+ EQUB &8C, &E7
+ EQUB &8D, &ED
  EQUB &8A, &E6
  EQUB &C1, &C8
  EQUB &C8, &8B
@@ -13340,9 +13478,28 @@ NEXT
 
 \ ******************************************************************************
 \
+\ Save output/ELTC.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE C"
+PRINT "Assembled at ", ~CODE_C%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_C%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_C%
+
+PRINT "S.ELTC ", ~CODE_C%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_C%
+\SAVE "output/D.ELTC.bin", CODE_C%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE D FILE
 \
 \ ******************************************************************************
+
+CODE_D% = P%
+LOAD_D% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
@@ -15473,10 +15630,10 @@ NEXT
  BMI Ghy                \ If it is, then the galactic hyperdrive has been
                         \ activated, so jump to Ghy to process it
 
-        LDA     QQ11
-        BNE     P%+5
+ LDA QQ11
+ BNE P%+5
 
-        JMP     TTH111
+ JMP TTH111
 
  JSR hm                 \ Set the system closest to galactic coordinates (QQ9,
                         \ QQ10) as the selected system
@@ -16434,8 +16591,8 @@ NEXT
 
 .MJP
 
- LDA #3                 \ ????
- JSR SHIPinA
+ LDA #3                 \ Call SHIPinA to load ship blueprints file D, which is
+ JSR SHIPinA            \ one of the two files that contain Thargoids
 
  LDA #3                 \ Clear the top part of the screen, draw a white border,
  JSR TT66               \ and set the current view type in QQ11 to 3
@@ -16540,7 +16697,7 @@ NEXT
                         \ and set up data blocks and slots for the planet and
                         \ sun
 
- JSR LSHIPS             \ ????
+ JSR LSHIPS             \ Call LSHIPS to load a new ship blueprints file
 
  LDA QQ11               \ If the current view in QQ11 is not a space view (0) or
  AND #%00111111         \ one of the charts (64 or 128), return from the
@@ -16576,7 +16733,7 @@ NEXT
 .TT110
 
  LDX QQ12               \ If we are not docked (QQ12 = 0) then jump to NLUNCH
- BEQ NLUNCH
+ BEQ NLUNCH             \ to skip the launch tunnel and setup process
 
  JSR LAUN               \ Show the space station launch tunnel
 
@@ -16791,9 +16948,28 @@ NEXT
 
 \ ******************************************************************************
 \
+\ Save output/ELTD.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE D"
+PRINT "Assembled at ", ~CODE_D%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_D%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_D%
+
+PRINT "S.ELTD ", ~CODE_D%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_D%
+\SAVE "output/D.ELTD.bin", CODE_D%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE E FILE
 \
 \ ******************************************************************************
+
+CODE_E% = P%
+LOAD_E% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
@@ -18820,7 +18996,7 @@ NEXT
                         \ page in memory (256 bytes), so we now OR with &60 to
                         \ get the page containing the dash (see the comments in
                         \ routine TT26 for more discussion about calculating
-                        \ screen memory addresses
+                        \ screen memory addresses)
 
  STA SCH                \ Store the screen page in the high byte of SC(1 0)
 
@@ -22022,7 +22198,7 @@ NEXT
 
  TYA                    \ Copy Y to A
 
- TAX                    \ Copy A to X
+ TAX                    \ Copy A to X, to X contains the joystick roll value
 
  LDA JSTY               \ Fetch the joystick pitch, ranging from 1 to 255 with
                         \ 128 as the centre point, and fall through into TJS1 to
@@ -22618,9 +22794,28 @@ NEXT
 
 \ ******************************************************************************
 \
+\ Save output/ELTE.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE E"
+PRINT "Assembled at ", ~CODE_E%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_E%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_E%
+
+PRINT "S.ELTE ", ~CODE_E%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_E%
+\SAVE "output/D.ELTE.bin", CODE_E%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE F FILE
 \
 \ ******************************************************************************
+
+CODE_F% = P%
+LOAD_F% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
@@ -22751,8 +22946,8 @@ NEXT
 \
 \     * ECMA - Turn E.C.M. off
 \
-\
 \     * ALP1, ALP2 - Set roll signs to 0
+\
 \ It then recharges the shields and energy banks, and falls through into RES2.
 \
 \ ******************************************************************************
@@ -22832,7 +23027,7 @@ NEXT
 
  STA MCNT               \ Reset MCNT (the main loop counter) to 0
 
- STA QQ22+1             \ ????
+ STA QQ22+1             \ Set the on-screen hyperspace counter to 0
 
  LDA #3                 \ Reset DELTA (speed) to 3
  STA DELTA
@@ -22866,7 +23061,7 @@ NEXT
                         \ Finally, fall through into ZINF to reset the INWK
                         \ ship workspace
 
- JSR U%                 \ ????
+ JSR U%                 \ Call U% to clear the key logger
 
 \ ******************************************************************************
 \
@@ -23134,7 +23329,7 @@ NEXT
                         \ set), giving the ship one missile
 
  AND #15                \ Set the ship speed to our random number, set to a
- ORA #16                \ minimum of 16 and a maximum of 15 ????
+ ORA #16                \ minimum of 16 and a maximum of 31
  STA INWK+27
 
  JSR DORND              \ Set A and X to random numbers, plus the C flag
@@ -23278,9 +23473,13 @@ NEXT
  BVS MTT4               \ If V flag is set (50% chance), jump up to MTT4 to
                         \ spawn a trader
 
- NOP                    \ ????
- NOP
- NOP
+ NOP                    \ In the first version of disc Elite, asteroids never
+ NOP                    \ appeared. It turned out that the authors had put in a
+ NOP                    \ jump to force traders to spawn, so they could test
+                        \ that part of the code, but had forgotten to remove it,
+                        \ so this was fixed in later versions by replacing the
+                        \ JMP instruction with NOPs... and this is where that
+                        \ was done
 
  ORA #%01101111         \ Take the random number in A and set bits 0-3 and 5-6,
  STA INWK+29            \ so the result has a 50% chance of being positive or
@@ -23552,23 +23751,36 @@ NEXT
  AND #7                 \ Reduce A to a random number in the range 0-7, though
                         \ with a bigger chance of a smaller number in this range
 
-        STA     CPIR    \ ????
-.L40C8
-        LDA     CPIR
- ADC #PACK              \ #PACK is set to #SH3, the ship type for a Sidewinder,
-                        \ so this sets our new ship type to one of the pack
+ STA CPIR               \ Set CPIR to this random number in the range 0-7
+
+.more
+
+ LDA CPIR               \ #PACK is set to #SH3, the ship type for a Sidewinder,
+ ADC #PACK              \ so this sets our new ship type to one of the pack
                         \ hunters, namely a Sidewinder, Mamba, Krait, Adder,
                         \ Gecko, Cobra Mk I, Worm or Cobra Mk III (pirate)
-        JSR     NWSHP
 
-        BCS     L40D7
+ JSR NWSHP              \ Try adding a new ship of type A to the local bubble
 
-        DEC     CPIR
-        BPL     L40C8
+ BCS P%+7               \ If the ship was successfully added, skip the following
+                        \ two instructions
 
-.L40D7
-        DEC     XX13
-        BPL     mt3
+ DEC CPIR               \ The ship wasn't added, which might be because the ship
+                        \ blueprint for this ship type isn't in the currently
+                        \ loaded ship blueprints file, so decrement CPIR to
+                        \ point to the previous ship type, so we can try
+                        \ spawning that type of pirate instead
+
+ BPL more               \ Loop back to more to have another go at spawning this
+                        \ pirate, until we have tried spawning a Sidewinder
+                        \ CPIR is 0, in which case give up and move on to the
+                        \ next pirate to spawn
+
+ DEC XX13               \ Decrement the pirate counter
+
+ BPL mt3                \ If we need more pirates, loop back up to mt3,
+                        \ otherwise we are done spawning, so fall through into
+                        \ the end of the main loop at MLOOP
 
 \ ******************************************************************************
 \
@@ -23618,8 +23830,8 @@ NEXT
  LSR A                  \ and bit 0 of QQ11 is 1 (the current view is type 1),
  BCS P%+7               \ then skip the following two instructions
 
- LDY #2                 \ ????
- JSR DELAY
+ LDY #2                 \ Wait for 2/50 of a second (0.04 seconds), to slow the
+ JSR DELAY              \ main loop down a bit
 
  JSR TT17               \ Scan the keyboard for the cursor keys or joystick,
                         \ returning the cursor's delta values in X and Y and
@@ -24144,64 +24356,132 @@ NEXT
 
  JMP DEATH2             \ Jump to DEATH2 to reset and restart the game
 
+\ ******************************************************************************
+\
+\       Name: RSHIPS
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: Launch from the station, load a new set of ship blueprints and
+\             jump into the main game loop
+\
+\ ******************************************************************************
+
 .RSHIPS
 
- JSR LSHIPS
+ JSR LSHIPS             \ Call LSHIPS to load a new ship blueprints file
 
- JSR RESET
+ JSR RESET              \ Call RESET to reset most variables
 
- LDA #&FF
- STA QQ12
- STA QQ11
- LDA #&20
- JMP FRCE
+ LDA #&FF               \ Set QQ1 to &FF to indicate we are docked, so when
+ STA QQ12               \ we reach TT110 after calling FRCE below, it skips the
+                        \ launch tunnel 
+
+ STA QQ11               \ Set the view number to a non-zero value, so when we
+                        \ reach LOOK1 after calling FRCE below, it sets up a
+                        \ new space view
+
+ LDA #f0                \ Jump into the main game loop at FRCE, setting the key
+ JMP FRCE               \ "pressed" to red key f0 (so we launch from the
+                        \ station)
+
+\ ******************************************************************************
+\
+\       Name: LSHIPS
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: Load a new ship blueprints file
+\
+\ ******************************************************************************
 
 .LSHIPS
 
- JSR THERE
+ JSR THERE              \ Call THERE to see if we are in the Constrictor's
+                        \ system in mission 1
 
- LDA #&06
- BCS SHIPinA
+ LDA #6                 \ Set A to the number of the ship blueprints file
+                        \ containing the Constrictor (ship blueprints file G)
 
- JSR DORND
+ BCS SHIPinA            \ If the C flag is set then we are in the
+                        \ Constrictor's system, so skip to 
 
- AND #&03
- LDX gov
- CPX #&03
+ JSR DORND              \ Set A and X to random numbers and reduce A to a
+ AND #3                 \ random number in the range 0-3 (i.e. just bits 0-1)
+
+ LDX gov                \ If the system's government type is 0-2 (anarchy,
+ CPX #3                 \ feudal or multi-government), shift a 0 into bit 0 of
+ ROL A                  \ A, otherwise shift a 1
+
+ LDX tek                \ If the system's tech level is 0-9, shift a 0 into bit
+ CPX #10                \ 0 of A, otherwise shift a 1
  ROL A
- LDX tek
- CPX #&0A
- ROL A
- TAX
- LDA TP
- AND #&0C
- CMP #&08
- BNE L427D
 
- TXA
- AND #&01
- ORA #&02
- TAX
+                        \ By this point, A is:
+                        \
+                        \   * Bit 0    = 0 for low tech level (Coriolis station)
+                        \                1 for high tech level (Dodo station)
+                        \   * Bit 1    = 0 for more dangerous systems
+                        \                1 for safer systems
+                        \   * Bit 2    = random
+                        \   * Bit 3    = random
+                        \   * Bits 4-7 = 0
+                        \
+                        \ So A is in the range 0-15, which corresponds to the
+                        \ appropriate ship blueprints file (where 0 is file
+                        \ D.MOA and 15 is file D.MOP)
 
-.L427D
+ TAX                    \ Store A in X so we can retrieve it after the mission 2
+                        \ progress check
 
- TXA
+ LDA TP                 \ If mission 2 has started and we have picked up the
+ AND #%00001100         \ plans, then bits 2-3 of TP will be %10, so this jumps
+ CMP #%00001000         \ to TPnot8 if this is not the case
+ BNE TPnot8
+
+ TXA                    \ Retrieve the value of A we calculated above
+
+ AND #%00000001         \ We have picked up the plans in mission 2 so we need to
+ ORA #%00000010         \ load a ship blueprints file containing Thargoids, so
+                        \ set A to either 
+
+ TAX                    \ Store the amended A in X again
+
+.TPnot8
+
+ TXA                    \ Retrieve the value of A we calculated above
 
 .SHIPinA
 
- CLC
- ADC #&41
- STA L428E+6
- JSR L0D7A
+ CLC                    \ Convert A from 0-15 to 'A' to 'P'
+ ADC #'A'
 
- LDX #&8E
- LDY #&42
- JMP OSCLI
+ STA SHIPI+6            \ Store the letter of the ship blueprints file we want
+                        \ in the sixth byte of the command string at SHIPI, so
+                        \ it overwrites the "0" in "D.MO0" with the file letter
+                        \ to load, from D.MOA to D.MOP
 
-.L428E
+ JSR CATD               \ Call CATD to reload the disc catalogue
+
+ LDX #LO(SHIPI)         \ Set (Y X) to point to the OS command at SHIPI, which
+ LDY #HI(SHIPI)         \ loads the relevant ship blueprints file
+
+ JMP OSCLI              \ Call OSCLI to execute the OS command at (Y X), which
+                        \ loads the relevant ship blueprints file, and return
+                        \ from the subroutine using a tail call
+
+\ ******************************************************************************
+\
+\       Name: SHIPI
+\       Type: Variable
+\   Category: Loader
+\    Summary: The OS command string for loading a ship blueprints file
+\
+\ ******************************************************************************
+
+.SHIPI
 
  EQUS "L.D.MO0"
  EQUB 13
+
 \ ******************************************************************************
 \
 \       Name: ZERO
@@ -24260,15 +24540,12 @@ NEXT
 .ZES1
 
  STX SC+1               \ We want to zero-fill page X, so store this in the
-                        \ high byte of SC, so the 16-bit address in SC and
-                        \ SC+1 is now pointing to the SC-th byte of page X
+                        \ high byte of SC, so SC(1 0) is now pointing to page X
 
  LDA #0                 \ If we set Y = SC = 0 and fall through into ZES2
  STA SC                 \ below, then we will zero-fill 255 bytes starting from
-                        \ SC - in other words, we will zero-fill the whole of
-                        \ page X
-
- TAY                    \ ????
+ TAY                    \ SC, then SC + 255, and then the rest of the page - in
+                        \ other words, we will zero-fill the whole of page X
 
 \ ******************************************************************************
 \
@@ -24279,7 +24556,7 @@ NEXT
 \
 \ ------------------------------------------------------------------------------
 \
-\ Zero-fill from address (X SC) + Y to (X SC) + &FF.
+\ Zero-fill from address (X SC) to (X SC) + Y.
 \
 \ Arguments:
 \
@@ -24287,7 +24564,7 @@ NEXT
 \                       the zero-fill
 \
 \   Y                   The offset from (X SC) where we start zeroing, counting
-\                       up to to &FF
+\                       down to 0
 \
 \   SC                  The low byte (i.e. the offset into the page) of the
 \                       starting point of the zero-fill
@@ -24305,7 +24582,7 @@ NEXT
  STA (SC),Y             \ Zero the Y-th byte of the block pointed to by SC,
                         \ so that's effectively the Y-th byte before SC
 
- DEY                    \ ????
+ DEY                    \ Decrement the loop counter
 
  BNE ZEL1               \ Loop back to zero the next byte
 
@@ -26640,9 +26917,28 @@ ENDMACRO
 
 \ ******************************************************************************
 \
+\ Save output/ELTF.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE F"
+PRINT "Assembled at ", ~CODE_F%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_F%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_F%
+
+PRINT "S.ELTF ", ~CODE_F%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_F%
+\SAVE "output/D.ELTF.bin", CODE_F%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE G FILE
 \
 \ ******************************************************************************
+
+CODE_G% = P%
+LOAD_G% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
@@ -30390,9 +30686,28 @@ ENDMACRO
 
 \ ******************************************************************************
 \
+\ Save output/ELTG.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE G"
+PRINT "Assembled at ", ~CODE_G%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_G%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_G%
+
+PRINT "S.ELTG ", ~CODE_G%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_G%
+\SAVE "output/D.ELTG.bin", CODE_G%, P%, LOAD%
+
+\ ******************************************************************************
+\
 \ ELITE H FILE
 \
 \ ******************************************************************************
+
+CODE_H% = P%
+LOAD_H% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
@@ -32610,6 +32925,22 @@ ENDMACRO
                         \ at the start of each screen refresh)
 
  RTS                    \ Return from the subroutine
+
+\ ******************************************************************************
+\
+\ Save output/ELTH.bin
+\
+\ ******************************************************************************
+
+PRINT "ELITE H"
+PRINT "Assembled at ", ~CODE_H%
+PRINT "Ends at ", ~P%
+PRINT "Code size is ", ~(P% - CODE_H%)
+PRINT "Execute at ", ~LOAD%
+PRINT "Reload at ", ~LOAD_H%
+
+PRINT "S.ELTH ", ~CODE_H%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_H%
+\SAVE "output/D.ELTH.bin", CODE_H%, P%, LOAD%
 
 \ ******************************************************************************
 \
