@@ -23,6 +23,9 @@
 
 INCLUDE "sources/elite-header.h.asm"
 
+_IB_DISC                = (_RELEASE = 1)
+_STH_DISC               = (_RELEASE = 2)
+
 \ ******************************************************************************
 \
 \ Configuration variables
@@ -1897,37 +1900,42 @@ LOAD_A% = LOAD%
 
 \ ******************************************************************************
 \
-\       Name: Main entry point
-\       Type: Subroutine
-\   Category: Loader
-\    Summary: Decrypt and run the docked code
+\       Name: S%
+\       Type: Workspace
+\    Address: &11E3 to &11F0
+\   Category: Workspaces
+\    Summary: Entry points and vector addresses in the main docked code
 \
 \ ******************************************************************************
 
- JMP DOENTRY
- JMP DOBEGIN
- JMP CHPR
+.S%
 
- EQUW &114B
+ JMP DOENTRY            \ Decrypt the main flight code and dock at the station
 
- EQUB &4C
+ JMP DOBEGIN            \ Decrypt the main flight code and start a new game
+
+ JMP CHPR               \ WRCHV handler
+
+ EQUW &114B             \ IRQ1V handler (points to IRQ1)
+
+ EQUB &4C               \ A JMP instruction
 
 .BRKV
 
- EQUW &11D5
+ EQUW &11D5             \ BRKV handler (points to BRBR)
 
 \ ******************************************************************************
 \
 \       Name: INBAY
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: 
+\    Summary: This routine is unused and is never run
 \
 \ ******************************************************************************
 
 .INBAY
 
- LDX #0
+ LDX #0                 \ This code is never run, and seems to have no effect
  LDY #0
  JSR &8888
  JMP SCRAM
@@ -1937,41 +1945,74 @@ LOAD_A% = LOAD%
 \       Name: DOBEGIN
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: 
+\    Summary: Decrypt the main docked code, initialise the configuration
+\             variables and start the game
 \
 \ ******************************************************************************
 
 .DOBEGIN
 
- JSR scramble
- JMP BEGIN
+ JSR scramble           \ Decrypt the main docked code between &1300 and &5FFF
+
+ JMP BEGIN              \ Jump to BEGIN to initialise the configuration
+                        \ variables and start the game
+
+\ ******************************************************************************
+\
+\       Name: scramble
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: Decrypt the main docked code between &1300 and &5FFF and 
+\             the main game loop
+\
+\ ******************************************************************************
 
 .scramble
 
- LDY #0
- STY SC
- LDX #&13
+ LDY #0                 \ We're going to work our way through a large number of
+                        \ encrypted bytes, so we set Y to 0 to be the index of
+                        \ the current byte within its page in memory
+
+ STY SC                 \ Set the low byte of SC(1 0) to 0
+
+ LDX #&13               \ Set X to &13 to be the page number of the current
+                        \ byte, so we start the decryption with the first byte
+                        \ of page &13
 
 .scrl
 
- STX SCH
- TYA
- EOR (SC),Y
- EOR #&33
- STA (SC),Y
- DEY
- BNE scrl
+ STX SCH                \ Set the high byte of SC(1 0) to X, so SC(1 0) now
+                        \ points to the first byte of page X
 
- INX
+ TYA                    \ Set A to Y, so A now contains the index of the current
+                        \ byte within its page
+
+ EOR (SC),Y             \ EOR the current byte with its index within the page
+ 
+ EOR #&33               \ EOR the current byte with &33
+
+ STA (SC),Y             \ Update the current byte
+ 
+                        \ The current byte is in page X at offset Y, and SC(1 0)
+                        \ points to the first byte of page X, so we just did
+                        \  this:
+                        \
+                        \   (X Y) = (X Y) EOR Y EOR &33
+
+ DEY                    \ Decrement the index in Y to point to the next byte
+
+ BNE scrl               \ Loop back to scrl to decrypt the next byte until we
+                        \ have done the whole page
+
+ INX                    \ Increment X to point to the next page in memory
  
  
- CPX #&60
-  
+ CPX #&60               \ Loop back to scrl to decrypt the next page until we
+ BNE scrl               \ reach the start of page &60
+
+ JMP BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
+                        \ and return from the subroutine using a tail call
  
- BNE scrl
-
- JMP BRKBK
-
 \ ******************************************************************************
 \
 \       Name: DOENTRY
@@ -2127,15 +2168,18 @@ LOAD_A% = LOAD%
 \       Name: SCRAM
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: 
+\    Summary: Decrypt the main docked code, reset the flight variables and start
+\             the game
 \
 \ ******************************************************************************
 
 .SCRAM
 
- JSR scramble
- JSR RES2
- JMP TT170
+ JSR scramble           \ Decrypt the main docked code between &1300 and &5FFF
+
+ JSR RES2               \ Reset a number of flight variables and workspaces
+
+ JMP TT170              \ Jump to TT170 to start the game
 
 \ ******************************************************************************
 \
@@ -4909,11 +4953,21 @@ LOAD_B% = LOAD% + P% - CODE%
 
  RTS                    \ Return from the subroutine
 
+\ ******************************************************************************
+\
+\       Name: FLKB
+\       Type: Subroutine
+\   Category: Keyboard
+\    Summary: Flush the keyboard buffer
+\
+\ ******************************************************************************
+
 .FLKB
 
- LDA #15
- TAX
- JMP OSBYTE
+ LDA #15                \ Call OSBYTE with A = 15 and X <> 0 to flush the input
+ TAX                    \ buffer and return from the subroutine using a tail
+ JMP OSBYTE             \ call
+
 \ ******************************************************************************
 \
 \       Name: NLIN3
@@ -14715,16 +14769,23 @@ LOAD_D% = LOAD% + P% - CODE%
  BMI Ghy                \ If it is, then the galactic hyperdrive has been
                         \ activated, so jump to Ghy to process it
 
- LDA QQ11
- BEQ TTH111
+ LDA QQ11               \ If the current view is 0 (i.e. the space view) then
+ BEQ TTX110             \ jump to TTX110, which calls TT111 to set the current
+                        \ system to the nearest system to (QQ9, QQ10), and jumps
+                        \ back into this routine at TTX111 below
 
- AND #&C0
- BEQ zZ+1
+ AND #%11000000         \ If neither bits 6 or 7 of the view number are set - so
+ BEQ zZ+1               \ this is neither the Short-range or Long-range Chart -
+                        \ then return from the subroutine (as zZ+1 contains an
+                        \ RTS)
 
  JSR hm                 \ Set the system closest to galactic coordinates (QQ9,
                         \ QQ10) as the selected system
 
 .TTX111
+
+                        \ If we get here then the current view is either the
+                        \ space view or a chart
 
  LDA QQ8                \ If both bytes of the distance to the selected system
  ORA QQ8+1              \ in QQ8 are zero, return from the subroutine (as zZ+1
@@ -14797,10 +14858,26 @@ LOAD_D% = LOAD% + P% - CODE%
                         \ left corner of the screen, and return from the
                         \ subroutine using a tail call
 
-.TTH111
+\ ******************************************************************************
+\
+\       Name: TTX110
+\       Type: Subroutine
+\   Category: Flight
+\    Summary: Set the current system to the nearest system and return to hyp
+\
+\ ******************************************************************************
 
- JSR TT111
- JMP TTX111
+.TTX110
+
+                        \ This routine is only called from the hyp routine, and
+                        \ it jumps back into hyp at label TTX111
+
+ JSR TT111              \ Call TT111 to set the current system to the nearest
+                        \ system to (QQ9, QQ10), and put the seeds of the
+                        \ nearest system into QQ15 to QQ15+5
+
+ JMP TTX111             \ Return to TTX111 in the hyp routine
+
 \ ******************************************************************************
 \
 \       Name: Ghy
@@ -15716,9 +15793,8 @@ LOAD_D% = LOAD% + P% - CODE%
 \
 \       Name: RDLI
 \       Type: Variable
-\   Category: Utility routines
-\    Summary: The OS command string for loading the docked code in the disc
-\             version of Elite
+\   Category: Loader
+\    Summary: The OS command string for loading the flight code file D.CODE
 \
 \ ******************************************************************************
 
@@ -16408,6 +16484,8 @@ LOAD_D% = LOAD% + P% - CODE%
 \
 \ ******************************************************************************
 
+IF _STH_DISC
+
  NOP                    \ In the first version of disc Elite, there was a nasty
  NOP                    \ bug where buying a laser that you already owned gave
  NOP                    \ you a refund of the laser's worth without removing the
@@ -16418,10 +16496,29 @@ LOAD_D% = LOAD% + P% - CODE%
  NOP
  NOP
 
-\.ref2                  \ These instructions are commented out in the original
-\LDY #18                \ source, but they would jump to pres in the EQSHP
-\JMP pres               \ routine with Y = 18, which would show the error:
-                        \ "{cr}all caps}EQUIPMENT: {sentence case} PRESENT"
+.refund
+
+ STA T1                 \ Store A in T1 so we can retrieve it later
+
+ LDA LASER,X            \ If there is no laser in view X (i.e. the laser power
+ BEQ ref3               \ is zero), jump to ref3 to skip the refund code
+
+ELIF _IB_DISC
+
+                        \ In the first version of disc Elite, there was a nasty
+                        \ bug where buying a laser that you already owned gave
+                        \ you a refund of the laser's worth without removing the
+                        \ laser, so you could keep doing this to get as many
+                        \ credits as you liked. This was quickly fixed by
+                        \ replacing the incorrect code with NOPs, but the
+                        \ version on Ian Bell's website contains this bug, and
+                        \ this is the section responsible for the problem
+
+.ref2
+
+ LDY #187               \ Print out the error: "LASER PRESENT" and refund the
+ JMP pres               \ value of the laser (which we shouldn't do, so this is
+                        \ the main cause of the refund bug)
 
 .refund
 
@@ -16430,9 +16527,10 @@ LOAD_D% = LOAD% + P% - CODE%
  LDA LASER,X            \ If there is no laser in view X (i.e. the laser power
  BEQ ref3               \ is zero), jump to ref3 to skip the refund code
 
- \CMP T1                \ These instructions are commented out in the original
- \BEQ ref2              \ source, but they would jump to ref2 above if we were
-                        \ trying to replace a laser with one of the same type
+ CMP T1                 \ If we are trying to replace a laser with one of the
+ BEQ ref2               \ same type, jump up ref2 above
+
+ENDIF
 
  LDY #4                 \ If the current laser has power #POW (pulse laser),
  CMP #POW               \ jump to ref1 with Y = 4 (the item number of a pulse
@@ -19409,7 +19507,7 @@ LOAD_E% = LOAD% + P% - CODE%
 
  TYA                    \ Copy Y to A
 
- TAX                    \ Copy A to X, to X contains the joystick roll value
+ TAX                    \ Copy A to X, so X contains the joystick roll value
 
  LDA JSTY               \ Fetch the joystick pitch, ranging from 1 to 255 with
                         \ 128 as the centre point, and fall through into TJS1 to
@@ -19719,6 +19817,8 @@ LOAD_F% = LOAD% + P% - CODE%
  STA BET2+1             \ pitch sign) to positive, i.e. pitch and roll negative
 
  STA MCNT               \ Reset MCNT (the main loop counter) to 0
+
+.modify
 
  LDA #3                 \ Reset DELTA (speed) to 3
  STA DELTA
@@ -20685,9 +20785,19 @@ ENDIF
 
 .tZ
 
+IF _STH_DISC
+
  ORA #32                \ Set bit 5 of A to denote thet this is the disc version
                         \ with the refund bug fixed (before the bug was fixed
                         \ the version number was 4)
+
+ELIF _IB_DISC
+
+ ORA #4                 \ Set bit 2 of A to denote thet this is the disc version
+                        \ but before the refund bug was fixed (after the bug was
+                        \ fixed the version number was changed to 32)
+
+ENDIF
 
  STA COK                \ Store the updated competition flags in COK
 
@@ -20734,14 +20844,14 @@ ENDIF
  LDA #96                \ Set nosev_z hi = 96 (96 is the value of unity in the
  STA INWK+14            \ rotation vector)
 
- LDA K2+4               \ ????
- CMP #&DB
+ LDA K2+4               \ ???? Copy protection, checks location &9F for the
+ CMP #&DB               \ value &DB and crashes the game if it doesn't match
  BEQ tiwe
 
- LDA #&10
- STA &36B8
- LDA #&FE
- STA &36B9
+ LDA #&10               \ Modify the STA DELTA instruction in RES2 to &10 &FE,
+ STA modify+2           \ which is a BPL P%-2 instruction, to create an infinite
+ LDA #&FE               \ loop and hang the game
+ STA modify+3
 
 .tiwe
 
@@ -31653,6 +31763,8 @@ ENDMACRO
  EQUB 120               \ Token 36: a random extended token between 120 and 124
  EQUB 125               \ Token 37: a random extended token between 125 and 129
 
+IF _STH_DISC
+
  EQUB &45, &4E          \ This data appears to be unused
  EQUB &44, &2D
  EQUB &45, &4E
@@ -31666,6 +31778,24 @@ ENDMACRO
  EQUB &06, &56
  EQUB &52, &49
  EQUB &45, &E6
+
+ELIF _IB_DISC
+
+ EQUB &45, &4E          \ This data appears to be unused
+ EQUB &44, &2D
+ EQUB &45, &4E
+ EQUB &44, &2D
+ EQUB &45, &4E
+ EQUB &44, &8E
+ EQUB &13, &1C
+ EQUB &00, &00
+ EQUB &73, &56
+ EQUB &52, &49
+ EQUB &53, &00
+ EQUB &8E, &13
+ EQUB &34, &B3
+
+ENDIF
 
 \ ******************************************************************************
 \

@@ -23,6 +23,9 @@
 
 INCLUDE "sources/elite-header.h.asm"
 
+_IB_DISC                = (_RELEASE = 1)
+_STH_DISC               = (_RELEASE = 2)
+
 \ ******************************************************************************
 \
 \ Configuration variables
@@ -1882,42 +1885,50 @@ LOAD_A% = LOAD%
 
 \ ******************************************************************************
 \
-\       Name: Main entry point
-\       Type: Subroutine
-\   Category: Loader
-\    Summary: Decrypt and run the flight code
+\       Name: S%
+\       Type: Workspace
+\    Address: &11E3 to &11F0
+\   Category: Workspaces
+\    Summary: Entry points and vector addresses in the main flight code
 \
 \ ******************************************************************************
 
- JMP scramble
- JMP scramble
- JMP TT26
+.S%
 
- EQUW &114B
+ JMP scramble           \ Decrypt the main flight code and join the main game
+                        \ loop
 
- JMP &11D5
+ JMP scramble           \ Decrypt the main flight code and start a new game
+
+ JMP TT26               \ WRCHV handler
+
+ EQUW &114B             \ IRQ1 handler
+
+ JMP &11D5              \ BRBR handler
 
 \ ******************************************************************************
 \
 \       Name: INBAY
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: 
+\    Summary: Load and run the main docked code in T.CODE
 \
 \ ******************************************************************************
 
 .INBAY
 
- LDX #&F8
- LDY #&11
- JSR OSCLI
+ LDX #LO(LTLI)          \ Set (Y X) to point to LTLI ("L.T.CODE", which gets
+ LDY #HI(LTLI)          \ modified to "R.T.CODE" in the DOENTRY routine)
+
+ JSR OSCLI              \ Call OSCLI to run the OS command in LTLI, which *RUNs
+                        \ the main docked code in T.CODE
 
 \ ******************************************************************************
 \
 \       Name: LTLI
 \       Type: Variable
 \   Category: Loader
-\    Summary: 
+\    Summary: The OS command string for loading the docked code file T.CODE
 \
 \ ******************************************************************************
 
@@ -1926,46 +1937,79 @@ LOAD_A% = LOAD%
  EQUS "L.T.CODE"
  EQUB 13
 
+\ ******************************************************************************
+\
+\       Name: scramble
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: Decrypt the main flight code between &1300 and &55FF and jump into
+\             the main game loop
+\
+\ ******************************************************************************
+
 .scramble
 
- LDY #0
- STY SC
- LDX #&13
+ LDY #0                 \ We're going to work our way through a large number of
+                        \ encrypted bytes, so we set Y to 0 to be the index of
+                        \ the current byte within its page in memory
+
+ STY SC                 \ Set the low byte of SC(1 0) to 0
+
+ LDX #&13               \ Set X to &13 to be the page number of the current
+                        \ byte, so we start the decryption with the first byte
+                        \ of page &13
 
 .scrl
 
- STX SCH
- TYA
- EOR (SC),Y
- EOR #&33
- STA (SC),Y
- DEY
- BNE scrl
+ STX SCH                \ Set the high byte of SC(1 0) to X, so SC(1 0) now
+                        \ points to the first byte of page X
 
- INX
- 
- 
- CPX #&56
- 
- 
- BNE scrl
+ TYA                    \ Set A to Y, so A now contains the index of the current
+                        \ byte within its page
 
+ EOR (SC),Y             \ EOR the current byte with its index within the page
  
- JMP RSHIPS
+ EOR #&33               \ EOR the current byte with &33
 
+ STA (SC),Y             \ Update the current byte
+ 
+                        \ The current byte is in page X at offset Y, and SC(1 0)
+                        \ points to the first byte of page X, so we just did
+                        \  this:
+                        \
+                        \   (X Y) = (X Y) EOR Y EOR &33
+
+ DEY                    \ Decrement the index in Y to point to the next byte
+
+ BNE scrl               \ Loop back to scrl to decrypt the next byte until we
+                        \ have done the whole page
+
+ INX                    \ Increment X to point to the next page in memory
+ 
+ 
+ CPX #&56               \ Loop back to scrl to decrypt the next page until we
+ BNE scrl               \ reach the start of page &56
+
+ JMP RSHIPS             \ Call RSHIPS to launch from the station, load a new set
+                        \ of ship blueprints and jump into the main game loop
+ 
+ 
 \ ******************************************************************************
 \
 \       Name: DOENTRY
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: 
+\    Summary: Load and run the docked code
 \
 \ ******************************************************************************
 
 .DOENTRY
 
- LDA #&52
- STA LTLI
+ LDA #'R'               \ Modify the command in LTLI from "L.T.CODE" to
+ STA LTLI               \ "R.T.CODE" so it *RUNs the code rather than loading it
+
+                        \ Fall into DEATH2 to reset most variables and *RUN the
+                        \ docked code
 
 \ ******************************************************************************
 \
@@ -4577,11 +4621,21 @@ NEXT
 
  RTS                    \ Return from the subroutine
 
+\ ******************************************************************************
+\
+\       Name: FLKB
+\       Type: Subroutine
+\   Category: Keyboard
+\    Summary: Flush the keyboard buffer
+\
+\ ******************************************************************************
+
 .FLKB
 
- LDA #15
- TAX
- JMP OSBYTE
+ LDA #15                \ Call OSBYTE with A = 15 and X <> 0 to flush the input
+ TAX                    \ buffer and return from the subroutine using a tail
+ JMP OSBYTE             \ call
+
 \ ******************************************************************************
 \
 \       Name: NLIN3
@@ -15630,15 +15684,18 @@ LOAD_D% = LOAD% + P% - CODE%
  BMI Ghy                \ If it is, then the galactic hyperdrive has been
                         \ activated, so jump to Ghy to process it
 
- LDA QQ11
- BNE P%+5
-
- JMP TTH111
+ LDA QQ11               \ If the current view is 0 (i.e. the space view) then
+ BNE P%+5               \ jump to TTX110, which calls TT111 to set the current
+ JMP TTX110             \ system to the nearest system to (QQ9, QQ10), and jumps
+                        \ back into this routine at TTX111 below
 
  JSR hm                 \ Set the system closest to galactic coordinates (QQ9,
                         \ QQ10) as the selected system
 
 .TTX111
+
+                        \ If we get here then the current view is either the
+                        \ space view or a chart
 
  LDA QQ8                \ If both bytes of the distance to the selected system
  ORA QQ8+1              \ in QQ8 are zero, return from the subroutine (as zZ+1
@@ -15967,10 +16024,26 @@ LOAD_D% = LOAD% + P% - CODE%
  LDA #'?'               \ Print a question mark and return from the
  JMP TT27               \ subroutine using a tail call
 
-.TTH111
+\ ******************************************************************************
+\
+\       Name: TTX110
+\       Type: Subroutine
+\   Category: Flight
+\    Summary: Set the current system to the nearest system and return to hyp
+\
+\ ******************************************************************************
 
- JSR TT111
- JMP TTX111
+.TTX110
+
+                        \ This routine is only called from the hyp routine, and
+                        \ it jumps back into hyp at label TTX111
+
+ JSR TT111              \ Call TT111 to set the current system to the nearest
+                        \ system to (QQ9, QQ10), and put the seeds of the
+                        \ nearest system into QQ15 to QQ15+5
+
+ JMP TTX111             \ Return to TTX111 in the hyp routine
+
 \ ******************************************************************************
 \
 \       Name: TT151
@@ -22198,7 +22271,7 @@ LOAD_E% = LOAD% + P% - CODE%
 
  TYA                    \ Copy Y to A
 
- TAX                    \ Copy A to X, to X contains the joystick roll value
+ TAX                    \ Copy A to X, so X contains the joystick roll value
 
  LDA JSTY               \ Fetch the joystick pitch, ranging from 1 to 255 with
                         \ 128 as the centre point, and fall through into TJS1 to
@@ -23473,6 +23546,8 @@ LOAD_F% = LOAD% + P% - CODE%
  BVS MTT4               \ If V flag is set (50% chance), jump up to MTT4 to
                         \ spawn a trader
 
+IF _STH_DISC
+
  NOP                    \ In the first version of disc Elite, asteroids never
  NOP                    \ appeared. It turned out that the authors had put in a
  NOP                    \ jump to force traders to spawn, so they could test
@@ -23480,6 +23555,19 @@ LOAD_F% = LOAD% + P% - CODE%
                         \ so this was fixed in later versions by replacing the
                         \ JMP instruction with NOPs... and this is where that
                         \ was done
+
+ELIF _IB_DISC
+
+ JMP MTT4               \ In the first version of disc Elite, asteroids never
+                        \ appeared. It turned out that the authors had put in a
+                        \ jump to force traders to spawn, so they could test
+                        \ that part of the code, but had forgotten to remove it,
+                        \ so this was fixed in later versions by replacing the
+                        \ JMP instruction with NOPs. The version on Ian Bell's
+                        \ site still contains the test jump, so asteroids never
+                        \ appear in this version
+
+ENDIF
 
  ORA #%01101111         \ Take the random number in A and set bits 0-3 and 5-6,
  STA INWK+29            \ so the result has a 50% chance of being positive or

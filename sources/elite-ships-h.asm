@@ -1,6 +1,6 @@
 \ ******************************************************************************
 \
-\ DISC ELITE SHIP BLUEPRINTS FILE C
+\ DISC ELITE SHIP BLUEPRINTS FILE H
 \
 \ Elite was written by Ian Bell and David Braben and is copyright Acornsoft 1984
 \
@@ -17,7 +17,7 @@
 \
 \ This source file produces the following binary file:
 \
-\   * output/D.MOC.bin
+\   * output/D.MOH.bin
 \
 \ ******************************************************************************
 
@@ -41,7 +41,7 @@ ORG CODE%
 \       Name: XX21
 \       Type: Variable
 \   Category: Drawing ships
-\    Summary: Ship blueprints lookup table for the D.MOC file
+\    Summary: Ship blueprints lookup table for the D.MOH file
 \  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
@@ -49,18 +49,18 @@ ORG CODE%
 .XX21
 
  EQUW SHIP_MISSILE      \ MSL  =  1 = Missile
- EQUW SHIP_CORIOLIS     \ SST  =  2 = Coriolis space station
+ EQUW SHIP_DODO         \ SST  =  2 = Dodo space station
  EQUW SHIP_ESCAPE_POD   \ ESC  =  3 = Escape pod
  EQUW 0
  EQUW SHIP_CANISTER     \ OIL  =  5 = Cargo canister
  EQUW 0
  EQUW SHIP_ASTEROID     \ AST  =  7 = Asteroid
  EQUW SHIP_SPLINTER     \ SPL  =  8 = Splinter
+ EQUW SHIP_SHUTTLE      \ SHU  =  9 = Shuttle
  EQUW 0
  EQUW 0
- EQUW SHIP_COBRA_MK_3   \ CYL  = 11 = Cobra Mk III
+ EQUW SHIP_PYTHON       \        12 = Python
  EQUW 0
- EQUW SHIP_BOA          \        13 = Boa
  EQUW 0
  EQUW 0
  EQUW SHIP_VIPER        \ COPS = 16 = Viper
@@ -71,13 +71,13 @@ ORG CODE%
  EQUW 0
  EQUW 0
  EQUW 0
+ EQUW SHIP_COBRA_MK_3_P \ CYL2 = 24 = Cobra Mk III (pirate)
  EQUW 0
  EQUW 0
  EQUW 0
  EQUW 0
  EQUW 0
- EQUW SHIP_THARGOID     \ THG  = 29 = Thargoid
- EQUW SHIP_THARGON      \ TGL  = 30 = Thargon
+ EQUW 0
  EQUW 0
 
 \ ******************************************************************************
@@ -85,25 +85,25 @@ ORG CODE%
 \       Name: E%
 \       Type: Variable
 \   Category: Drawing ships
-\    Summary: Ship blueprints default NEWB flags for the D.MOC file
+\    Summary: Ship blueprints default NEWB flags for the D.MOH file
 \
 \ ******************************************************************************
 
 .E%
 
  EQUB %00000000         \ Missile
- EQUB %00000000         \ Coriolis space station
+ EQUB %00000000         \ Dodo space station
  EQUB %00000001         \ Escape pod                                      Trader
  EQUB 0
  EQUB %00000000         \ Cargo canister
  EQUB 0
  EQUB %00000000         \ Asteroid
  EQUB %00000000         \ Splinter
+ EQUB %00100001         \ Shuttle                               Trader, innocent
  EQUB 0
  EQUB 0
- EQUB %10100000         \ Cobra Mk III                      Innocent, escape pod
+ EQUB %10100000         \ Python                            Innocent, escape pod
  EQUB 0
- EQUB %10100000         \ Boa                               Innocent, escape pod
  EQUB 0
  EQUB 0
  EQUB %11000010         \ Viper                   Bounty hunter, cop, escape pod
@@ -114,13 +114,13 @@ ORG CODE%
  EQUB 0
  EQUB 0
  EQUB 0
+ EQUB %10001100         \ Cobra Mk III (pirate)      Hostile, pirate, escape pod
  EQUB 0
  EQUB 0
  EQUB 0
  EQUB 0
  EQUB 0
- EQUB %00001100         \ Thargoid                               Hostile, pirate
- EQUB %00000100         \ Thargon                                        Hostile
+ EQUB 0
  EQUB 0
 
 \ ******************************************************************************
@@ -295,98 +295,110 @@ ENDMACRO
 
 \ ******************************************************************************
 \
-\       Name: SHIP_CORIOLIS
+\       Name: SHIP_DODO
 \       Type: Variable
 \   Category: Drawing ships
-\    Summary: Ship blueprint for a Coriolis space station
+\    Summary: Ship blueprint for a Dodecahedron ("Dodo")space station
 \
 \ ******************************************************************************
 
-.SHIP_CORIOLIS
+.SHIP_DODO
 
  EQUB 0                 \ Max. canisters on demise = 0
- EQUW 160 * 160         \ Targetable area          = 160 * 160
- EQUB &74               \ Edges data offset (low)  = &0074
- EQUB &E4               \ Faces data offset (low)  = &00E4
- EQUB 85                \ Max. edge count          = (85 - 1) / 4 = 21
+ EQUW 180 * 180         \ Targetable area          = 180 * 180
+ EQUB &A4               \ Edges data offset (low)  = &00A4
+ EQUB &2C               \ Faces data offset (low)  = &012C
+ EQUB 97                \ Max. edge count          = (97 - 1) / 4 = 24
  EQUB 0                 \ Gun vertex               = 0
  EQUB 54                \ Explosion count          = 12, as (4 * n) + 6 = 54
- EQUB 96                \ Number of vertices       = 96 / 6 = 16
- EQUB 28                \ Number of edges          = 28
+ EQUB 144               \ Number of vertices       = 144 / 6 = 24
+ EQUB 34                \ Number of edges          = 34
  EQUW 0                 \ Bounty                   = 0
- EQUB 56                \ Number of faces          = 56 / 4 = 14
- EQUB 120               \ Visibility distance      = 120
+ EQUB 48                \ Number of faces          = 48 / 4 = 12
+ EQUB 125               \ Visibility distance      = 125
  EQUB 240               \ Max. energy              = 240
  EQUB 0                 \ Max. speed               = 0
- EQUB &00               \ Edges data offset (high) = &0074
- EQUB &00               \ Faces data offset (high) = &00E4
+ EQUB &00               \ Edges data offset (high) = &00A4
+ EQUB &01               \ Faces data offset (high) = &012C
  EQUB 0                 \ Normals are scaled by    = 2^0 = 1
- EQUB %00000110         \ Laser power              = 0
-                        \ Missiles                 = 6
+ EQUB %00000000         \ Laser power              = 0
+                        \ Missiles                 = 0
 
 \VERTEX    x,    y,    z, face1, face2, face3, face4, visibility
- VERTEX  160,    0,  160,     0,      1,    2,     6,         31    \ Vertex 0
- VERTEX    0,  160,  160,     0,      2,    3,     8,         31    \ Vertex 1
- VERTEX -160,    0,  160,     0,      3,    4,     7,         31    \ Vertex 2
- VERTEX    0, -160,  160,     0,      1,    4,     5,         31    \ Vertex 3
- VERTEX  160, -160,    0,     1,      5,    6,    10,         31    \ Vertex 4
- VERTEX  160,  160,    0,     2,      6,    8,    11,         31    \ Vertex 5
- VERTEX -160,  160,    0,     3,      7,    8,    12,         31    \ Vertex 6
- VERTEX -160, -160,    0,     4,      5,    7,     9,         31    \ Vertex 7
- VERTEX  160,    0, -160,     6,     10,   11,    13,         31    \ Vertex 8
- VERTEX    0,  160, -160,     8,     11,   12,    13,         31    \ Vertex 9
- VERTEX -160,    0, -160,     7,      9,   12,    13,         31    \ Vertex 10
- VERTEX    0, -160, -160,     5,      9,   10,    13,         31    \ Vertex 11
- VERTEX   10,  -30,  160,     0,      0,    0,     0,         30    \ Vertex 12
- VERTEX   10,   30,  160,     0,      0,    0,     0,         30    \ Vertex 13
- VERTEX  -10,   30,  160,     0,      0,    0,     0,         30    \ Vertex 14
- VERTEX  -10,  -30,  160,     0,      0,    0,     0,         30    \ Vertex 15
+ VERTEX    0,  150,  196,     1,      0,    5,     5,         31    \ Vertex 0
+ VERTEX  143,   46,  196,     1,      0,    2,     2,         31    \ Vertex 1
+ VERTEX   88, -121,  196,     2,      0,    3,     3,         31    \ Vertex 2
+ VERTEX  -88, -121,  196,     3,      0,    4,     4,         31    \ Vertex 3
+ VERTEX -143,   46,  196,     4,      0,    5,     5,         31    \ Vertex 4
+ VERTEX    0,  243,   46,     5,      1,    6,     6,         31    \ Vertex 5
+ VERTEX  231,   75,   46,     2,      1,    7,     7,         31    \ Vertex 6
+ VERTEX  143, -196,   46,     3,      2,    8,     8,         31    \ Vertex 7
+ VERTEX -143, -196,   46,     4,      3,    9,     9,         31    \ Vertex 8
+ VERTEX -231,   75,   46,     5,      4,   10,    10,         31    \ Vertex 9
+ VERTEX  143,  196,  -46,     6,      1,    7,     7,         31    \ Vertex 10
+ VERTEX  231,  -75,  -46,     7,      2,    8,     8,         31    \ Vertex 11
+ VERTEX    0, -243,  -46,     8,      3,    9,     9,         31    \ Vertex 12
+ VERTEX -231,  -75,  -46,     9,      4,   10,    10,         31    \ Vertex 13
+ VERTEX -143,  196,  -46,     6,      5,   10,    10,         31    \ Vertex 14
+ VERTEX   88,  121, -196,     7,      6,   11,    11,         31    \ Vertex 15
+ VERTEX  143,  -46, -196,     8,      7,   11,    11,         31    \ Vertex 16
+ VERTEX    0, -150, -196,     9,      8,   11,    11,         31    \ Vertex 17
+ VERTEX -143,  -46, -196,    10,      9,   11,    11,         31    \ Vertex 18
+ VERTEX  -88,  121, -196,    10,      6,   11,    11,         31    \ Vertex 19
+ VERTEX  -16,   32,  196,     0,      0,    0,     0,         30    \ Vertex 20
+ VERTEX  -16,  -32,  196,     0,      0,    0,     0,         30    \ Vertex 21
+ VERTEX   16,   32,  196,     0,      0,    0,     0,         23    \ Vertex 22
+ VERTEX   16,  -32,  196,     0,      0,    0,     0,         23    \ Vertex 23
 
 \EDGE vertex1, vertex2, face1, face2, visibility
- EDGE       0,       3,     0,     1,         31    \ Edge 0
- EDGE       0,       1,     0,     2,         31    \ Edge 1
- EDGE       1,       2,     0,     3,         31    \ Edge 2
- EDGE       2,       3,     0,     4,         31    \ Edge 3
- EDGE       3,       4,     1,     5,         31    \ Edge 4
- EDGE       0,       4,     1,     6,         31    \ Edge 5
- EDGE       0,       5,     2,     6,         31    \ Edge 6
- EDGE       5,       1,     2,     8,         31    \ Edge 7
- EDGE       1,       6,     3,     8,         31    \ Edge 8
- EDGE       2,       6,     3,     7,         31    \ Edge 9
- EDGE       2,       7,     4,     7,         31    \ Edge 10
- EDGE       3,       7,     4,     5,         31    \ Edge 11
- EDGE       8,      11,    10,    13,         31    \ Edge 12
- EDGE       8,       9,    11,    13,         31    \ Edge 13
- EDGE       9,      10,    12,    13,         31    \ Edge 14
- EDGE      10,      11,     9,    13,         31    \ Edge 15
- EDGE       4,      11,     5,    10,         31    \ Edge 16
- EDGE       4,       8,     6,    10,         31    \ Edge 17
- EDGE       5,       8,     6,    11,         31    \ Edge 18
- EDGE       5,       9,     8,    11,         31    \ Edge 19
- EDGE       6,       9,     8,    12,         31    \ Edge 20
- EDGE       6,      10,     7,    12,         31    \ Edge 21
- EDGE       7,      10,     7,     9,         31    \ Edge 22
- EDGE       7,      11,     5,     9,         31    \ Edge 23
- EDGE      12,      13,     0,     0,         30    \ Edge 24
- EDGE      13,      14,     0,     0,         30    \ Edge 25
- EDGE      14,      15,     0,     0,         30    \ Edge 26
- EDGE      15,      12,     0,     0,         30    \ Edge 27
+ EDGE       0,       1,     1,     0,         31    \ Edge 0
+ EDGE       1,       2,     2,     0,         31    \ Edge 1
+ EDGE       2,       3,     3,     0,         31    \ Edge 2
+ EDGE       3,       4,     4,     0,         31    \ Edge 3
+ EDGE       4,       0,     5,     0,         31    \ Edge 4
+ EDGE       5,      10,     6,     1,         31    \ Edge 5
+ EDGE      10,       6,     7,     1,         31    \ Edge 6
+ EDGE       6,      11,     7,     2,         31    \ Edge 7
+ EDGE      11,       7,     8,     2,         31    \ Edge 8
+ EDGE       7,      12,     8,     3,         31    \ Edge 9
+ EDGE      12,       8,     9,     3,         31    \ Edge 10
+ EDGE       8,      13,     9,     4,         31    \ Edge 11
+ EDGE      13,       9,    10,     4,         31    \ Edge 12
+ EDGE       9,      14,    10,     5,         31    \ Edge 13
+ EDGE      14,       5,     6,     5,         31    \ Edge 14
+ EDGE      15,      16,    11,     7,         31    \ Edge 15
+ EDGE      16,      17,    11,     8,         31    \ Edge 16
+ EDGE      17,      18,    11,     9,         31    \ Edge 17
+ EDGE      18,      19,    11,    10,         31    \ Edge 18
+ EDGE      19,      15,    11,     6,         31    \ Edge 19
+ EDGE       0,       5,     5,     1,         31    \ Edge 20
+ EDGE       1,       6,     2,     1,         31    \ Edge 21
+ EDGE       2,       7,     3,     2,         31    \ Edge 22
+ EDGE       3,       8,     4,     3,         31    \ Edge 23
+ EDGE       4,       9,     5,     4,         31    \ Edge 24
+ EDGE      10,      15,     7,     6,         31    \ Edge 25
+ EDGE      11,      16,     8,     7,         31    \ Edge 26
+ EDGE      12,      17,     9,     8,         31    \ Edge 27
+ EDGE      13,      18,    10,     9,         31    \ Edge 28
+ EDGE      14,      19,    10,     6,         31    \ Edge 29
+ EDGE      20,      21,     0,     0,         30    \ Edge 30
+ EDGE      21,      23,     0,     0,         20    \ Edge 31
+ EDGE      23,      22,     0,     0,         23    \ Edge 32
+ EDGE      22,      20,     0,     0,         20    \ Edge 33
 
 \FACE normal_x, normal_y, normal_z, visibility
- FACE        0,        0,      160,         31    \ Face 0
- FACE      107,     -107,      107,         31    \ Face 1
- FACE      107,      107,      107,         31    \ Face 2
- FACE     -107,      107,      107,         31    \ Face 3
- FACE     -107,     -107,      107,         31    \ Face 4
- FACE        0,     -160,        0,         31    \ Face 5
- FACE      160,        0,        0,         31    \ Face 6
- FACE     -160,        0,        0,         31    \ Face 7
- FACE        0,      160,        0,         31    \ Face 8
- FACE     -107,     -107,     -107,         31    \ Face 9
- FACE      107,     -107,     -107,         31    \ Face 10
- FACE      107,      107,     -107,         31    \ Face 11
- FACE     -107,      107,     -107,         31    \ Face 12
- FACE        0,        0,     -160,         31    \ Face 13
+ FACE        0,        0,      196,         31    \ Face 0
+ FACE      103,      142,       88,         31    \ Face 1
+ FACE      169,      -55,       89,         31    \ Face 2
+ FACE        0,     -176,       88,         31    \ Face 3
+ FACE     -169,      -55,       89,         31    \ Face 4
+ FACE     -103,      142,       88,         31    \ Face 5
+ FACE        0,      176,      -88,         31    \ Face 6
+ FACE      169,       55,      -89,         31    \ Face 7
+ FACE      103,     -142,      -88,         31    \ Face 8
+ FACE     -103,     -142,      -88,         31    \ Face 9
+ FACE     -169,       55,      -89,         31    \ Face 10
+ FACE        0,        0,     -196,         31    \ Face 11
 
 \ ******************************************************************************
 \
@@ -436,6 +448,7 @@ ENDMACRO
  EDGE       0,       2,     3,     1,         31    \ Edge 4
  EDGE       3,       1,     2,     0,         31    \ Edge 5
 
+\FACE normal_x, normal_y, normal_z, visibility
  FACE       52,        0,     -122,         31    \ Face 0
  FACE       39,      103,       30,         31    \ Face 1
  FACE       39,     -103,       30,         31    \ Face 2
@@ -642,206 +655,189 @@ ENDMACRO
 
 \ ******************************************************************************
 \
-\       Name: SHIP_COBRA_MK_3
+\       Name: SHIP_SHUTTLE
 \       Type: Variable
 \   Category: Drawing ships
-\    Summary: Ship blueprint for a Cobra Mk III
+\    Summary: Ship blueprint for a shuttle
 \
 \ ******************************************************************************
 
-.SHIP_COBRA_MK_3
+.SHIP_SHUTTLE
 
- EQUB 3                 \ Max. canisters on demise = 3
- EQUW 95 * 95           \ Targetable area          = 95 * 95
- EQUB &BC               \ Edges data offset (low)  = &00BC
- EQUB &54               \ Faces data offset (low)  = &0154
- EQUB 153               \ Max. edge count          = (153 - 1) / 4 = 38
- EQUB 84                \ Gun vertex               = 84 / 4 = 21
- EQUB 42                \ Explosion count          = 9, as (4 * n) + 6 = 42
- EQUB 168               \ Number of vertices       = 168 / 6 = 28
- EQUB 38                \ Number of edges          = 38
- EQUW 0                 \ Bounty                   = 0
- EQUB 52                \ Number of faces          = 52 / 4 = 13
- EQUB 50                \ Visibility distance      = 50
- EQUB 150               \ Max. energy              = 150
- EQUB 28                \ Max. speed               = 28
- EQUB &00               \ Edges data offset (high) = &00BC
- EQUB &01               \ Faces data offset (high) = &0154
- EQUB 1                 \ Normals are scaled by    = 2^1 = 2
- EQUB %00010011         \ Laser power              = 2
-                        \ Missiles                 = 3
-
-\VERTEX    x,    y,    z, face1, face2, face3, face4, visibility
- VERTEX   32,    0,   76,    15,     15,   15,    15,         31    \ Vertex 0
- VERTEX  -32,    0,   76,    15,     15,   15,    15,         31    \ Vertex 1
- VERTEX    0,   26,   24,    15,     15,   15,    15,         31    \ Vertex 2
- VERTEX -120,   -3,   -8,     3,      7,   10,    10,         31    \ Vertex 3
- VERTEX  120,   -3,   -8,     4,      8,   12,    12,         31    \ Vertex 4
- VERTEX  -88,   16,  -40,    15,     15,   15,    15,         31    \ Vertex 5
- VERTEX   88,   16,  -40,    15,     15,   15,    15,         31    \ Vertex 6
- VERTEX  128,   -8,  -40,     8,      9,   12,    12,         31    \ Vertex 7
- VERTEX -128,   -8,  -40,     7,      9,   10,    10,         31    \ Vertex 8
- VERTEX    0,   26,  -40,     5,      6,    9,     9,         31    \ Vertex 9
- VERTEX  -32,  -24,  -40,     9,     10,   11,    11,         31    \ Vertex 10
- VERTEX   32,  -24,  -40,     9,     11,   12,    12,         31    \ Vertex 11
- VERTEX  -36,    8,  -40,     9,      9,    9,     9,         20    \ Vertex 12
- VERTEX   -8,   12,  -40,     9,      9,    9,     9,         20    \ Vertex 13
- VERTEX    8,   12,  -40,     9,      9,    9,     9,         20    \ Vertex 14
- VERTEX   36,    8,  -40,     9,      9,    9,     9,         20    \ Vertex 15
- VERTEX   36,  -12,  -40,     9,      9,    9,     9,         20    \ Vertex 16
- VERTEX    8,  -16,  -40,     9,      9,    9,     9,         20    \ Vertex 17
- VERTEX   -8,  -16,  -40,     9,      9,    9,     9,         20    \ Vertex 18
- VERTEX  -36,  -12,  -40,     9,      9,    9,     9,         20    \ Vertex 19
- VERTEX    0,    0,   76,     0,     11,   11,    11,          6    \ Vertex 20
- VERTEX    0,    0,   90,     0,     11,   11,    11,         31    \ Vertex 21
- VERTEX  -80,   -6,  -40,     9,      9,    9,     9,          8    \ Vertex 22
- VERTEX  -80,    6,  -40,     9,      9,    9,     9,          8    \ Vertex 23
- VERTEX  -88,    0,  -40,     9,      9,    9,     9,          6    \ Vertex 24
- VERTEX   80,    6,  -40,     9,      9,    9,     9,          8    \ Vertex 25
- VERTEX   88,    0,  -40,     9,      9,    9,     9,          6    \ Vertex 26
- VERTEX   80,   -6,  -40,     9,      9,    9,     9,          8    \ Vertex 27
-
-\EDGE vertex1, vertex2, face1, face2, visibility
- EDGE       0,       1,     0,    11,         31    \ Edge 0
- EDGE       0,       4,     4,    12,         31    \ Edge 1
- EDGE       1,       3,     3,    10,         31    \ Edge 2
- EDGE       3,       8,     7,    10,         31    \ Edge 3
- EDGE       4,       7,     8,    12,         31    \ Edge 4
- EDGE       6,       7,     8,     9,         31    \ Edge 5
- EDGE       6,       9,     6,     9,         31    \ Edge 6
- EDGE       5,       9,     5,     9,         31    \ Edge 7
- EDGE       5,       8,     7,     9,         31    \ Edge 8
- EDGE       2,       5,     1,     5,         31    \ Edge 9
- EDGE       2,       6,     2,     6,         31    \ Edge 10
- EDGE       3,       5,     3,     7,         31    \ Edge 11
- EDGE       4,       6,     4,     8,         31    \ Edge 12
- EDGE       1,       2,     0,     1,         31    \ Edge 13
- EDGE       0,       2,     0,     2,         31    \ Edge 14
- EDGE       8,      10,     9,    10,         31    \ Edge 15
- EDGE      10,      11,     9,    11,         31    \ Edge 16
- EDGE       7,      11,     9,    12,         31    \ Edge 17
- EDGE       1,      10,    10,    11,         31    \ Edge 18
- EDGE       0,      11,    11,    12,         31    \ Edge 19
- EDGE       1,       5,     1,     3,         29    \ Edge 20
- EDGE       0,       6,     2,     4,         29    \ Edge 21
- EDGE      20,      21,     0,    11,          6    \ Edge 22
- EDGE      12,      13,     9,     9,         20    \ Edge 23
- EDGE      18,      19,     9,     9,         20    \ Edge 24
- EDGE      14,      15,     9,     9,         20    \ Edge 25
- EDGE      16,      17,     9,     9,         20    \ Edge 26
- EDGE      15,      16,     9,     9,         19    \ Edge 27
- EDGE      14,      17,     9,     9,         17    \ Edge 28
- EDGE      13,      18,     9,     9,         19    \ Edge 29
- EDGE      12,      19,     9,     9,         19    \ Edge 30
- EDGE       2,       9,     5,     6,         30    \ Edge 31
- EDGE      22,      24,     9,     9,          6    \ Edge 32
- EDGE      23,      24,     9,     9,          6    \ Edge 33
- EDGE      22,      23,     9,     9,          8    \ Edge 34
- EDGE      25,      26,     9,     9,          6    \ Edge 35
- EDGE      26,      27,     9,     9,          6    \ Edge 36
- EDGE      25,      27,     9,     9,          8    \ Edge 37
-
-\FACE normal_x, normal_y, normal_z, visibility
- FACE        0,       62,       31,         31    \ Face 0
- FACE      -18,       55,       16,         31    \ Face 1
- FACE       18,       55,       16,         31    \ Face 2
- FACE      -16,       52,       14,         31    \ Face 3
- FACE       16,       52,       14,         31    \ Face 4
- FACE      -14,       47,        0,         31    \ Face 5
- FACE       14,       47,        0,         31    \ Face 6
- FACE      -61,      102,        0,         31    \ Face 7
- FACE       61,      102,        0,         31    \ Face 8
- FACE        0,        0,      -80,         31    \ Face 9
- FACE       -7,      -42,        9,         31    \ Face 10
- FACE        0,      -30,        6,         31    \ Face 11
- FACE        7,      -42,        9,         31    \ Face 12
-
-\ ******************************************************************************
-\
-\       Name: SHIP_BOA
-\       Type: Variable
-\   Category: Drawing ships
-\    Summary: Ship blueprint for a Boa
-\
-\ ******************************************************************************
-
-.SHIP_BOA
-
- EQUB 5                 \ Max. canisters on demise = 5
- EQUW 70 * 70           \ Targetable area          = 70 * 70
- EQUB &62               \ Edges data offset (low)  = &0062
- EQUB &C2               \ Faces data offset (low)  = &00C2
- EQUB 89                \ Max. edge count          = (89 - 1) / 4 = 22
+ EQUB 15                \ Max. canisters on demise = 15
+ EQUW 50 * 50           \ Targetable area          = 50 * 50
+ EQUB &86               \ Edges data offset (low)  = &0086
+ EQUB &FE               \ Faces data offset (low)  = &00FE
+ EQUB 109               \ Max. edge count          = (109 - 1) / 4 = 27
  EQUB 0                 \ Gun vertex               = 0
  EQUB 38                \ Explosion count          = 8, as (4 * n) + 6 = 38
- EQUB 78                \ Number of vertices       = 78 / 6 = 13
- EQUB 24                \ Number of edges          = 24
+ EQUB 114               \ Number of vertices       = 114 / 6 = 19
+ EQUB 30                \ Number of edges          = 30
+ EQUW 0                 \ Bounty                   = 0
+ EQUB 52                \ Number of faces          = 52 / 4 = 13
+ EQUB 22                \ Visibility distance      = 22
+ EQUB 32                \ Max. energy              = 32
+ EQUB 8                 \ Max. speed               = 8
+ EQUB &00               \ Edges data offset (high) = &0086
+ EQUB &00               \ Faces data offset (high) = &00FE
+ EQUB 2                 \ Normals are scaled by    = 2^2 = 4
+ EQUB %00000000         \ Laser power              = 0
+                        \ Missiles                 = 0
+
+\VERTEX    x,    y,    z, face1, face2, face3, face4, visibility
+ VERTEX    0,  -17,   23,    15,     15,   15,    15,         31    \ Vertex 0
+ VERTEX  -17,    0,   23,    15,     15,   15,    15,         31    \ Vertex 1
+ VERTEX    0,   18,   23,    15,     15,   15,    15,         31    \ Vertex 2
+ VERTEX   18,    0,   23,    15,     15,   15,    15,         31    \ Vertex 3
+ VERTEX  -20,  -20,  -27,     2,      1,    9,     3,         31    \ Vertex 4
+ VERTEX  -20,   20,  -27,     4,      3,    9,     5,         31    \ Vertex 5
+ VERTEX   20,   20,  -27,     6,      5,    9,     7,         31    \ Vertex 6
+ VERTEX   20,  -20,  -27,     7,      1,    9,     8,         31    \ Vertex 7
+ VERTEX    5,    0,  -27,     9,      9,    9,     9,         16    \ Vertex 8
+ VERTEX    0,   -2,  -27,     9,      9,    9,     9,         16    \ Vertex 9
+ VERTEX   -5,    0,  -27,     9,      9,    9,     9,          9    \ Vertex 10
+ VERTEX    0,    3,  -27,     9,      9,    9,     9,          9    \ Vertex 11
+ VERTEX    0,   -9,   35,    10,      0,   12,    11,         16    \ Vertex 12
+ VERTEX    3,   -1,   31,    15,     15,    2,     0,          7    \ Vertex 13
+ VERTEX    4,   11,   25,     1,      0,    4,    15,          8    \ Vertex 14
+ VERTEX   11,    4,   25,     1,     10,   15,     3,          8    \ Vertex 15
+ VERTEX   -3,   -1,   31,    11,      6,    3,     2,          7    \ Vertex 16
+ VERTEX   -3,   11,   25,     8,     15,    0,    12,          8    \ Vertex 17
+ VERTEX  -10,    4,   25,    15,      4,    8,     1,          8    \ Vertex 18
+
+\EDGE vertex1, vertex2, face1, face2, visibility
+ EDGE       0,       1,     2,     0,         31    \ Edge 0
+ EDGE       1,       2,    10,     4,         31    \ Edge 1
+ EDGE       2,       3,    11,     6,         31    \ Edge 2
+ EDGE       0,       3,    12,     8,         31    \ Edge 3
+ EDGE       0,       7,     8,     1,         31    \ Edge 4
+ EDGE       0,       4,     2,     1,         24    \ Edge 5
+ EDGE       1,       4,     3,     2,         31    \ Edge 6
+ EDGE       1,       5,     4,     3,         24    \ Edge 7
+ EDGE       2,       5,     5,     4,         31    \ Edge 8
+ EDGE       2,       6,     6,     5,         12    \ Edge 9
+ EDGE       3,       6,     7,     6,         31    \ Edge 10
+ EDGE       3,       7,     8,     7,         24    \ Edge 11
+ EDGE       4,       5,     9,     3,         31    \ Edge 12
+ EDGE       5,       6,     9,     5,         31    \ Edge 13
+ EDGE       6,       7,     9,     7,         31    \ Edge 14
+ EDGE       4,       7,     9,     1,         31    \ Edge 15
+ EDGE       0,      12,    12,     0,         16    \ Edge 16
+ EDGE       1,      12,    10,     0,         16    \ Edge 17
+ EDGE       2,      12,    11,    10,         16    \ Edge 18
+ EDGE       3,      12,    12,    11,         16    \ Edge 19
+ EDGE       8,       9,     9,     9,         16    \ Edge 20
+ EDGE       9,      10,     9,     9,          7    \ Edge 21
+ EDGE      10,      11,     9,     9,          9    \ Edge 22
+ EDGE       8,      11,     9,     9,          7    \ Edge 23
+ EDGE      13,      14,    11,    11,          5    \ Edge 24
+ EDGE      14,      15,    11,    11,          8    \ Edge 25
+ EDGE      13,      15,    11,    11,          7    \ Edge 26
+ EDGE      16,      17,    10,    10,          5    \ Edge 27
+ EDGE      17,      18,    10,    10,          8    \ Edge 28
+ EDGE      16,      18,    10,    10,          7    \ Edge 29
+
+\FACE normal_x, normal_y, normal_z, visibility
+ FACE      -55,      -55,       40,         31    \ Face 0
+ FACE        0,      -74,        4,         31    \ Face 1
+ FACE      -51,      -51,       23,         31    \ Face 2
+ FACE      -74,        0,        4,         31    \ Face 3
+ FACE      -51,       51,       23,         31    \ Face 4
+ FACE        0,       74,        4,         31    \ Face 5
+ FACE       51,       51,       23,         31    \ Face 6
+ FACE       74,        0,        4,         31    \ Face 7
+ FACE       51,      -51,       23,         31    \ Face 8
+ FACE        0,        0,     -107,         31    \ Face 9
+ FACE      -41,       41,       90,         31    \ Face 10
+ FACE       41,       41,       90,         31    \ Face 11
+ FACE       55,      -55,       40,         31    \ Face 12
+
+\ ******************************************************************************
+\
+\       Name: SHIP_PYTHON
+\       Type: Variable
+\   Category: Drawing ships
+\    Summary: Ship blueprint for a Python
+\
+\ ******************************************************************************
+
+.SHIP_PYTHON
+
+ EQUB 5                 \ Max. canisters on demise = 5
+ EQUW 80 * 80           \ Targetable area          = 80 * 80
+ EQUB &56               \ Edges data offset (low)  = &0056
+ EQUB &BE               \ Faces data offset (low)  = &00BE
+ EQUB 85                \ Max. edge count          = (85 - 1) / 4 = 21
+ EQUB 0                 \ Gun vertex               = 0
+ EQUB 42                \ Explosion count          = 9, as (4 * n) + 6 = 42
+ EQUB 66                \ Number of vertices       = 66 / 6 = 11
+ EQUB 26                \ Number of edges          = 26
  EQUW 0                 \ Bounty                   = 0
  EQUB 52                \ Number of faces          = 52 / 4 = 13
  EQUB 40                \ Visibility distance      = 40
  EQUB 250               \ Max. energy              = 250
- EQUB 24                \ Max. speed               = 24
- EQUB &00               \ Edges data offset (high) = &0062
- EQUB &00               \ Faces data offset (high) = &00C2
+ EQUB 20                \ Max. speed               = 20
+ EQUB &00               \ Edges data offset (high) = &0056
+ EQUB &00               \ Faces data offset (high) = &00BE
  EQUB 0                 \ Normals are scaled by    = 2^0 = 1
- EQUB %00011100         \ Laser power              = 3
-                        \ Missiles                 = 4
+ EQUB %00011011         \ Laser power              = 3
+                        \ Missiles                 = 3
 
 \VERTEX    x,    y,    z, face1, face2, face3, face4, visibility
- VERTEX    0,    0,   93,    15,     15,   15,    15,         31    \ Vertex 0
- VERTEX    0,   40,  -87,     2,      0,    3,     3,         24    \ Vertex 1
- VERTEX   38,  -25,  -99,     1,      0,    4,     4,         24    \ Vertex 2
- VERTEX  -38,  -25,  -99,     2,      1,    5,     5,         24    \ Vertex 3
- VERTEX  -38,   40,  -59,     3,      2,    9,     6,         31    \ Vertex 4
- VERTEX   38,   40,  -59,     3,      0,   11,     6,         31    \ Vertex 5
- VERTEX   62,    0,  -67,     4,      0,   11,     8,         31    \ Vertex 6
- VERTEX   24,  -65,  -79,     4,      1,   10,     8,         31    \ Vertex 7
- VERTEX  -24,  -65,  -79,     5,      1,   10,     7,         31    \ Vertex 8
- VERTEX  -62,    0,  -67,     5,      2,    9,     7,         31    \ Vertex 9
- VERTEX    0,    7, -107,     2,      0,   10,    10,         22    \ Vertex 10
- VERTEX   13,   -9, -107,     1,      0,   10,    10,         22    \ Vertex 11
- VERTEX  -13,   -9, -107,     2,      1,   12,    12,         22    \ Vertex 12
+ VERTEX    0,    0,  224,     0,      1,    2,     3,         31    \ Vertex 0
+ VERTEX    0,   48,   48,     0,      1,    4,     5,         31    \ Vertex 1
+ VERTEX   96,    0,  -16,    15,     15,   15,    15,         31    \ Vertex 2
+ VERTEX  -96,    0,  -16,    15,     15,   15,    15,         31    \ Vertex 3
+ VERTEX    0,   48,  -32,     4,      5,    8,     9,         31    \ Vertex 4
+ VERTEX    0,   24, -112,     9,      8,   12,    12,         31    \ Vertex 5
+ VERTEX  -48,    0, -112,     8,     11,   12,    12,         31    \ Vertex 6
+ VERTEX   48,    0, -112,     9,     10,   12,    12,         31    \ Vertex 7
+ VERTEX    0,  -48,   48,     2,      3,    6,     7,         31    \ Vertex 8
+ VERTEX    0,  -48,  -32,     6,      7,   10,    11,         31    \ Vertex 9
+ VERTEX    0,  -24, -112,    10,     11,   12,    12,         31    \ Vertex 10
 
 \EDGE vertex1, vertex2, face1, face2, visibility
- EDGE       0,       5,    11,     6,         31    \ Edge 0
- EDGE       0,       7,    10,     8,         31    \ Edge 1
- EDGE       0,       9,     9,     7,         31    \ Edge 2
- EDGE       0,       4,     9,     6,         29    \ Edge 3
- EDGE       0,       6,    11,     8,         29    \ Edge 4
- EDGE       0,       8,    10,     7,         29    \ Edge 5
- EDGE       4,       5,     6,     3,         31    \ Edge 6
- EDGE       5,       6,    11,     0,         31    \ Edge 7
- EDGE       6,       7,     8,     4,         31    \ Edge 8
- EDGE       7,       8,    10,     1,         31    \ Edge 9
- EDGE       8,       9,     7,     5,         31    \ Edge 10
- EDGE       4,       9,     9,     2,         31    \ Edge 11
- EDGE       1,       4,     3,     2,         24    \ Edge 12
- EDGE       1,       5,     3,     0,         24    \ Edge 13
- EDGE       3,       9,     5,     2,         24    \ Edge 14
- EDGE       3,       8,     5,     1,         24    \ Edge 15
- EDGE       2,       6,     4,     0,         24    \ Edge 16
- EDGE       2,       7,     4,     1,         24    \ Edge 17
- EDGE       1,      10,     2,     0,         22    \ Edge 18
- EDGE       2,      11,     1,     0,         22    \ Edge 19
- EDGE       3,      12,     2,     1,         22    \ Edge 20
- EDGE      10,      11,    12,     0,         14    \ Edge 21
- EDGE      11,      12,    12,     1,         14    \ Edge 22
- EDGE      12,      10,    12,     2,         14    \ Edge 23
+ EDGE       0,       8,     2,     3,         31    \ Edge 0
+ EDGE       0,       3,     0,     2,         31    \ Edge 1
+ EDGE       0,       2,     1,     3,         31    \ Edge 2
+ EDGE       0,       1,     0,     1,         31    \ Edge 3
+ EDGE       2,       4,     9,     5,         31    \ Edge 4
+ EDGE       1,       2,     1,     5,         31    \ Edge 5
+ EDGE       2,       8,     7,     3,         31    \ Edge 6
+ EDGE       1,       3,     0,     4,         31    \ Edge 7
+ EDGE       3,       8,     2,     6,         31    \ Edge 8
+ EDGE       2,       9,     7,    10,         31    \ Edge 9
+ EDGE       3,       4,     4,     8,         31    \ Edge 10
+ EDGE       3,       9,     6,    11,         31    \ Edge 11
+ EDGE       3,       5,     8,     8,          7    \ Edge 12
+ EDGE       3,      10,    11,    11,          7    \ Edge 13
+ EDGE       2,       5,     9,     9,          7    \ Edge 14
+ EDGE       2,      10,    10,    10,          7    \ Edge 15
+ EDGE       2,       7,     9,    10,         31    \ Edge 16
+ EDGE       3,       6,     8,    11,         31    \ Edge 17
+ EDGE       5,       6,     8,    12,         31    \ Edge 18
+ EDGE       5,       7,     9,    12,         31    \ Edge 19
+ EDGE       7,      10,    12,    10,         31    \ Edge 20
+ EDGE       6,      10,    11,    12,         31    \ Edge 21
+ EDGE       4,       5,     8,     9,         31    \ Edge 22
+ EDGE       9,      10,    10,    11,         31    \ Edge 23
+ EDGE       1,       4,     4,     5,         31    \ Edge 24
+ EDGE       8,       9,     6,     7,         31    \ Edge 25
 
 \FACE normal_x, normal_y, normal_z, visibility
- FACE       43,       37,      -60,         31    \ Face 0
- FACE        0,      -45,      -89,         31    \ Face 1
- FACE      -43,       37,      -60,         31    \ Face 2
- FACE        0,       40,        0,         31    \ Face 3
- FACE       62,      -32,      -20,         31    \ Face 4
- FACE      -62,      -32,      -20,         31    \ Face 5
- FACE        0,       23,        6,         31    \ Face 6
- FACE      -23,      -15,        9,         31    \ Face 7
- FACE       23,      -15,        9,         31    \ Face 8
- FACE      -26,       13,       10,         31    \ Face 9
- FACE        0,      -31,       12,         31    \ Face 10
- FACE       26,       13,       10,         31    \ Face 11
- FACE        0,        0,     -107,         14    \ Face 12
+ FACE      -27,       40,       11,        31    \ Face 0
+ FACE       27,       40,       11,        31    \ Face 1
+ FACE      -27,      -40,       11,        31    \ Face 2
+ FACE       27,      -40,       11,        31    \ Face 3
+ FACE      -19,       38,        0,        31    \ Face 4
+ FACE       19,       38,        0,        31    \ Face 5
+ FACE      -19,      -38,        0,        31    \ Face 6
+ FACE       19,      -38,        0,        31    \ Face 7
+ FACE      -25,       37,      -11,        31    \ Face 8
+ FACE       25,       37,      -11,        31    \ Face 9
+ FACE       25,      -37,      -11,        31    \ Face 10
+ FACE      -25,      -37,      -11,        31    \ Face 11
+ FACE        0,        0,     -112,        31    \ Face 12
 
 \ ******************************************************************************
 \
@@ -1074,161 +1070,126 @@ ENDMACRO
 
 \ ******************************************************************************
 \
-\       Name: SHIP_THARGOID
+\       Name: SHIP_COBRA_MK_3_P
 \       Type: Variable
 \   Category: Drawing ships
-\    Summary: Ship blueprint for a Thargoid mothership
+\    Summary: Ship blueprint for a Cobra Mk III (pirate)
 \
 \ ******************************************************************************
 
-.SHIP_THARGOID
+.SHIP_COBRA_MK_3_P
 
- EQUB 0                 \ Max. canisters on demise = 0
- EQUW 99 * 99           \ Targetable area          = 99 * 99
- EQUB &8C               \ Edges data offset (low)  = &008C
- EQUB &F4               \ Faces data offset (low)  = &00F4
- EQUB 101               \ Max. edge count          = (101 - 1) / 4 = 25
- EQUB 60                \ Gun vertex               = 60 / 4 = 15
- EQUB 38                \ Explosion count          = 8, as (4 * n) + 6 = 38
- EQUB 120               \ Number of vertices       = 120 / 6 = 20
- EQUB 26                \ Number of edges          = 26
- EQUW 500               \ Bounty                   = 500
- EQUB 40                \ Number of faces          = 40 / 4 = 10
- EQUB 55                \ Visibility distance      = 55
- EQUB 240               \ Max. energy              = 240
- EQUB 39                \ Max. speed               = 39
- EQUB &00               \ Edges data offset (high) = &008C
- EQUB &00               \ Faces data offset (high) = &00F4
- EQUB 2                 \ Normals are scaled by    = 2^2 = 4
- EQUB %00010110         \ Laser power              = 2
-                        \ Missiles                 = 6
+ EQUB 1                 \ Max. canisters on demise = 1
+ EQUW 95 * 95           \ Targetable area          = 95 * 95
+ EQUB &BC               \ Edges data offset (low)  = &00BC
+ EQUB &54               \ Faces data offset (low)  = &0154
+ EQUB 153               \ Max. edge count          = (153 - 1) / 4 = 38
+ EQUB 84                \ Gun vertex               = 84 / 4 = 21
+ EQUB 42                \ Explosion count          = 9, as (4 * n) + 6 = 42
+ EQUB 168               \ Number of vertices       = 168 / 6 = 28
+ EQUB 38                \ Number of edges          = 38
+ EQUW 175               \ Bounty                   = 175
+ EQUB 52                \ Number of faces          = 52 / 4 = 13
+ EQUB 50                \ Visibility distance      = 50
+ EQUB 150               \ Max. energy              = 150
+ EQUB 28                \ Max. speed               = 28
+ EQUB &00               \ Edges data offset (high) = &00BC
+ EQUB &01               \ Faces data offset (high) = &0154
+ EQUB 1                 \ Normals are scaled by    = 2^1 = 2
+ EQUB %00010010         \ Laser power              = 2
+                        \ Missiles                 = 2
 
 \VERTEX    x,    y,    z, face1, face2, face3, face4, visibility
- VERTEX   32,  -48,   48,     0,      4,    8,     8,         31    \ Vertex 0
- VERTEX   32,  -68,    0,     0,      1,    4,     4,         31    \ Vertex 1
- VERTEX   32,  -48,  -48,     1,      2,    4,     4,         31    \ Vertex 2
- VERTEX   32,    0,  -68,     2,      3,    4,     4,         31    \ Vertex 3
- VERTEX   32,   48,  -48,     3,      4,    5,     5,         31    \ Vertex 4
- VERTEX   32,   68,    0,     4,      5,    6,     6,         31    \ Vertex 5
- VERTEX   32,   48,   48,     4,      6,    7,     7,         31    \ Vertex 6
- VERTEX   32,    0,   68,     4,      7,    8,     8,         31    \ Vertex 7
- VERTEX  -24, -116,  116,     0,      8,    9,     9,         31    \ Vertex 8
- VERTEX  -24, -164,    0,     0,      1,    9,     9,         31    \ Vertex 9
- VERTEX  -24, -116, -116,     1,      2,    9,     9,         31    \ Vertex 10
- VERTEX  -24,    0, -164,     2,      3,    9,     9,         31    \ Vertex 11
- VERTEX  -24,  116, -116,     3,      5,    9,     9,         31    \ Vertex 12
- VERTEX  -24,  164,    0,     5,      6,    9,     9,         31    \ Vertex 13
- VERTEX  -24,  116,  116,     6,      7,    9,     9,         31    \ Vertex 14
- VERTEX  -24,    0,  164,     7,      8,    9,     9,         31    \ Vertex 15
- VERTEX  -24,   64,   80,     9,      9,    9,     9,         30    \ Vertex 16
- VERTEX  -24,   64,  -80,     9,      9,    9,     9,         30    \ Vertex 17
- VERTEX  -24,  -64,  -80,     9,      9,    9,     9,         30    \ Vertex 18
- VERTEX  -24,  -64,   80,     9,      9,    9,     9,         30    \ Vertex 19
+ VERTEX   32,    0,   76,    15,     15,   15,    15,         31    \ Vertex 0
+ VERTEX  -32,    0,   76,    15,     15,   15,    15,         31    \ Vertex 1
+ VERTEX    0,   26,   24,    15,     15,   15,    15,         31    \ Vertex 2
+ VERTEX -120,   -3,   -8,     3,      7,   10,    10,         31    \ Vertex 3
+ VERTEX  120,   -3,   -8,     4,      8,   12,    12,         31    \ Vertex 4
+ VERTEX  -88,   16,  -40,    15,     15,   15,    15,         31    \ Vertex 5
+ VERTEX   88,   16,  -40,    15,     15,   15,    15,         31    \ Vertex 6
+ VERTEX  128,   -8,  -40,     8,      9,   12,    12,         31    \ Vertex 7
+ VERTEX -128,   -8,  -40,     7,      9,   10,    10,         31    \ Vertex 8
+ VERTEX    0,   26,  -40,     5,      6,    9,     9,         31    \ Vertex 9
+ VERTEX  -32,  -24,  -40,     9,     10,   11,    11,         31    \ Vertex 10
+ VERTEX   32,  -24,  -40,     9,     11,   12,    12,         31    \ Vertex 11
+ VERTEX  -36,    8,  -40,     9,      9,    9,     9,         20    \ Vertex 12
+ VERTEX   -8,   12,  -40,     9,      9,    9,     9,         20    \ Vertex 13
+ VERTEX    8,   12,  -40,     9,      9,    9,     9,         20    \ Vertex 14
+ VERTEX   36,    8,  -40,     9,      9,    9,     9,         20    \ Vertex 15
+ VERTEX   36,  -12,  -40,     9,      9,    9,     9,         20    \ Vertex 16
+ VERTEX    8,  -16,  -40,     9,      9,    9,     9,         20    \ Vertex 17
+ VERTEX   -8,  -16,  -40,     9,      9,    9,     9,         20    \ Vertex 18
+ VERTEX  -36,  -12,  -40,     9,      9,    9,     9,         20    \ Vertex 19
+ VERTEX    0,    0,   76,     0,     11,   11,    11,          6    \ Vertex 20
+ VERTEX    0,    0,   90,     0,     11,   11,    11,         31    \ Vertex 21
+ VERTEX  -80,   -6,  -40,     9,      9,    9,     9,          8    \ Vertex 22
+ VERTEX  -80,    6,  -40,     9,      9,    9,     9,          8    \ Vertex 23
+ VERTEX  -88,    0,  -40,     9,      9,    9,     9,          6    \ Vertex 24
+ VERTEX   80,    6,  -40,     9,      9,    9,     9,          8    \ Vertex 25
+ VERTEX   88,    0,  -40,     9,      9,    9,     9,          6    \ Vertex 26
+ VERTEX   80,   -6,  -40,     9,      9,    9,     9,          8    \ Vertex 27
 
 \EDGE vertex1, vertex2, face1, face2, visibility
- EDGE       0,       7,     4,     8,         31    \ Edge 0
- EDGE       0,       1,     0,     4,         31    \ Edge 1
- EDGE       1,       2,     1,     4,         31    \ Edge 2
- EDGE       2,       3,     2,     4,         31    \ Edge 3
- EDGE       3,       4,     3,     4,         31    \ Edge 4
- EDGE       4,       5,     4,     5,         31    \ Edge 5
- EDGE       5,       6,     4,     6,         31    \ Edge 6
- EDGE       6,       7,     4,     7,         31    \ Edge 7
- EDGE       0,       8,     0,     8,         31    \ Edge 8
- EDGE       1,       9,     0,     1,         31    \ Edge 9
- EDGE       2,      10,     1,     2,         31    \ Edge 10
- EDGE       3,      11,     2,     3,         31    \ Edge 11
- EDGE       4,      12,     3,     5,         31    \ Edge 12
- EDGE       5,      13,     5,     6,         31    \ Edge 13
- EDGE       6,      14,     6,     7,         31    \ Edge 14
- EDGE       7,      15,     7,     8,         31    \ Edge 15
- EDGE       8,      15,     8,     9,         31    \ Edge 16
- EDGE       8,       9,     0,     9,         31    \ Edge 17
- EDGE       9,      10,     1,     9,         31    \ Edge 18
- EDGE      10,      11,     2,     9,         31    \ Edge 19
- EDGE      11,      12,     3,     9,         31    \ Edge 20
- EDGE      12,      13,     5,     9,         31    \ Edge 21
- EDGE      13,      14,     6,     9,         31    \ Edge 22
- EDGE      14,      15,     7,     9,         31    \ Edge 23
- EDGE      16,      17,     9,     9,         30    \ Edge 24
- EDGE      18,      19,     9,     9,         30    \ Edge 25
+ EDGE       0,       1,     0,    11,         31    \ Edge 0
+ EDGE       0,       4,     4,    12,         31    \ Edge 1
+ EDGE       1,       3,     3,    10,         31    \ Edge 2
+ EDGE       3,       8,     7,    10,         31    \ Edge 3
+ EDGE       4,       7,     8,    12,         31    \ Edge 4
+ EDGE       6,       7,     8,     9,         31    \ Edge 5
+ EDGE       6,       9,     6,     9,         31    \ Edge 6
+ EDGE       5,       9,     5,     9,         31    \ Edge 7
+ EDGE       5,       8,     7,     9,         31    \ Edge 8
+ EDGE       2,       5,     1,     5,         31    \ Edge 9
+ EDGE       2,       6,     2,     6,         31    \ Edge 10
+ EDGE       3,       5,     3,     7,         31    \ Edge 11
+ EDGE       4,       6,     4,     8,         31    \ Edge 12
+ EDGE       1,       2,     0,     1,         31    \ Edge 13
+ EDGE       0,       2,     0,     2,         31    \ Edge 14
+ EDGE       8,      10,     9,    10,         31    \ Edge 15
+ EDGE      10,      11,     9,    11,         31    \ Edge 16
+ EDGE       7,      11,     9,    12,         31    \ Edge 17
+ EDGE       1,      10,    10,    11,         31    \ Edge 18
+ EDGE       0,      11,    11,    12,         31    \ Edge 19
+ EDGE       1,       5,     1,     3,         29    \ Edge 20
+ EDGE       0,       6,     2,     4,         29    \ Edge 21
+ EDGE      20,      21,     0,    11,          6    \ Edge 22
+ EDGE      12,      13,     9,     9,         20    \ Edge 23
+ EDGE      18,      19,     9,     9,         20    \ Edge 24
+ EDGE      14,      15,     9,     9,         20    \ Edge 25
+ EDGE      16,      17,     9,     9,         20    \ Edge 26
+ EDGE      15,      16,     9,     9,         19    \ Edge 27
+ EDGE      14,      17,     9,     9,         17    \ Edge 28
+ EDGE      13,      18,     9,     9,         19    \ Edge 29
+ EDGE      12,      19,     9,     9,         19    \ Edge 30
+ EDGE       2,       9,     5,     6,         30    \ Edge 31
+ EDGE      22,      24,     9,     9,          6    \ Edge 32
+ EDGE      23,      24,     9,     9,          6    \ Edge 33
+ EDGE      22,      23,     9,     9,          8    \ Edge 34
+ EDGE      25,      26,     9,     9,          6    \ Edge 35
+ EDGE      26,      27,     9,     9,          6    \ Edge 36
+ EDGE      25,      27,     9,     9,          8    \ Edge 37
 
 \FACE normal_x, normal_y, normal_z, visibility
- FACE      103,      -60,       25,         31    \ Face 0
- FACE      103,      -60,      -25,         31    \ Face 1
- FACE      103,      -25,      -60,         31    \ Face 2
- FACE      103,       25,      -60,         31    \ Face 3
- FACE       64,        0,        0,         31    \ Face 4
- FACE      103,       60,      -25,         31    \ Face 5
- FACE      103,       60,       25,         31    \ Face 6
- FACE      103,       25,       60,         31    \ Face 7
- FACE      103,      -25,       60,         31    \ Face 8
- FACE      -48,        0,        0,         31    \ Face 9
+ FACE        0,       62,       31,         31    \ Face 0
+ FACE      -18,       55,       16,         31    \ Face 1
+ FACE       18,       55,       16,         31    \ Face 2
+ FACE      -16,       52,       14,         31    \ Face 3
+ FACE       16,       52,       14,         31    \ Face 4
+ FACE      -14,       47,        0,         31    \ Face 5
+ FACE       14,       47,        0,         31    \ Face 6
+ FACE      -61,      102,        0,         31    \ Face 7
+ FACE       61,      102,        0,         31    \ Face 8
+ FACE        0,        0,      -80,         31    \ Face 9
+ FACE       -7,      -42,        9,         31    \ Face 10
+ FACE        0,      -30,        6,         31    \ Face 11
+ FACE        7,      -42,        9,         31    \ Face 12
 
 \ ******************************************************************************
 \
-\       Name: SHIP_THARGON
-\       Type: Variable
-\   Category: Drawing ships
-\    Summary: Ship blueprint for a Thargon
-\
-\ ------------------------------------------------------------------------------
-\
-\ The ship blueprint for the Thargon reuses the edges data from the cargo
-\ canister, so the edges data offset is negative.
+\ Save output/D.MOH.bin
 \
 \ ******************************************************************************
 
-.SHIP_THARGON
-
- EQUB 0 + (15 << 4)     \ Max. canisters on demise = 0
-                        \ Market item when scooped = 15 + 1 = 16 (Alien items)
- EQUW 40 * 40           \ Targetable area          = 40 * 40
- EQUB LO(SHIP_CANISTER_EDGES - SHIP_THARGON)    \ Edges data = canister
- EQUB &50               \ Faces data offset (low)  = &0050
- EQUB 65                \ Max. edge count          = (65 - 1) / 4 = 16
- EQUB 0                 \ Gun vertex               = 0
- EQUB 18                \ Explosion count          = 3, as (4 * n) + 6 = 18
- EQUB 60                \ Number of vertices       = 60 / 6 = 10
- EQUB 15                \ Number of edges          = 15
- EQUW 50                \ Bounty                   = 50
- EQUB 28                \ Number of faces          = 28 / 4 = 7
- EQUB 20                \ Visibility distance      = 20
- EQUB 20                \ Max. energy              = 20
- EQUB 30                \ Max. speed               = 30
- EQUB HI(SHIP_CANISTER_EDGES - SHIP_THARGON)    \ Edges data = canister
- EQUB &00               \ Faces data offset (high) = &0050
- EQUB 2                 \ Normals are scaled by    = 2^2 = 4
- EQUB %00010000         \ Laser power              = 2
-                        \ Missiles                 = 0
-
-\VERTEX    x,    y,    z, face1, face2, face3, face4, visibility
- VERTEX   -9,    0,   40,     1,      0,    5,     5,         31    \ Vertex 0
- VERTEX   -9,  -38,   12,     1,      0,    2,     2,         31    \ Vertex 1
- VERTEX   -9,  -24,  -32,     2,      0,    3,     3,         31    \ Vertex 2
- VERTEX   -9,   24,  -32,     3,      0,    4,     4,         31    \ Vertex 3
- VERTEX   -9,   38,   12,     4,      0,    5,     5,         31    \ Vertex 4
- VERTEX    9,    0,   -8,     5,      1,    6,     6,         31    \ Vertex 5
- VERTEX    9,  -10,  -15,     2,      1,    6,     6,         31    \ Vertex 6
- VERTEX    9,   -6,  -26,     3,      2,    6,     6,         31    \ Vertex 7
- VERTEX    9,    6,  -26,     4,      3,    6,     6,         31    \ Vertex 8
- VERTEX    9,   10,  -15,     5,      4,    6,     6,         31    \ Vertex 9
-
-\FACE normal_x, normal_y, normal_z, visibility
- FACE      -36,        0,        0,         31    \ Face 0
- FACE       20,       -5,        7,         31    \ Face 1
- FACE       46,      -42,      -14,         31    \ Face 2
- FACE       36,        0,     -104,         31    \ Face 3
- FACE       46,       42,      -14,         31    \ Face 4
- FACE       20,        5,        7,         31    \ Face 5
- FACE       36,        0,        0,         31    \ Face 6
-
-\ ******************************************************************************
-\
-\ Save output/D.MOC.bin
-\
-\ ******************************************************************************
-
-PRINT "S.D.MOC ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
-SAVE "output/D.MOC.bin", CODE%, CODE% + &A00
+PRINT "S.D.MOH ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
+SAVE "output/D.MOH.bin", CODE%, CODE% + &A00
 

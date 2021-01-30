@@ -436,6 +436,7 @@ ENDMACRO
  EDGE       0,       2,     3,     1,         31    \ Edge 4
  EDGE       3,       1,     2,     0,         31    \ Edge 5
 
+\FACE normal_x, normal_y, normal_z, visibility
  FACE       52,        0,     -122,         31    \ Face 0
  FACE       39,      103,       30,         31    \ Face 1
  FACE       39,     -103,       30,         31    \ Face 2
