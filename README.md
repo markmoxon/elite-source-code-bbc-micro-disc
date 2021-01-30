@@ -61,7 +61,7 @@ If you want to browse the source in an IDE, you might find the following useful.
 
 * The most interesting files are in the [sources](sources) folder:
 
-  * The main game's source code is in the [elite-source-d.asm](sources/elite-source.asm) file (for flight) and [elite-source-t.asm](sources/elite-source-t.asm) (for when we're docked) - this is the motherlode and probably contains all the stuff you're interested in.
+  * The main game's source code is in the [elite-source-flight.asm](sources/elite-source-flight.asm) and [elite-source-docked.asm](sources/elite-source-docked.asm) files (for when we're in-flight or docked) - this is the motherlode and probably contains all the stuff you're interested in.
 
   * The game's loader is in the [elite-loader1.asm](sources/elite-loader1.asm), [elite-loader2.asm](sources/elite-loader2.asm) and [elite-loader3.asm](sources/elite-loader3.asm) files - these are mainly concerned with setup and copy protection.
 
