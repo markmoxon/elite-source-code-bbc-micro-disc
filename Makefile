@@ -25,7 +25,7 @@ build:
 	echo _RELEASE=$(rel-disc) >> sources/elite-header.h.asm
 	echo _REMOVE_CHECKSUMS=TRUE >> sources/elite-header.h.asm
 	echo _MATCH_EXTRACTED_BINARIES=FALSE >> sources/elite-header.h.asm
-	$(BEEBASM) -i sources/elite-words.asm -v > output/compile.txt
+	$(BEEBASM) -i sources/elite-text-tokens.asm -v > output/compile.txt
 	$(BEEBASM) -i sources/elite-missile.asm -v >> output/compile.txt
 	$(BEEBASM) -i sources/elite-loader1.asm -v >> output/compile.txt
 	$(BEEBASM) -i sources/elite-loader2.asm -v >> output/compile.txt
@@ -57,7 +57,7 @@ encrypt:
 	echo _RELEASE=$(rel-disc) >> sources/elite-header.h.asm
 	echo _REMOVE_CHECKSUMS=FALSE >> sources/elite-header.h.asm
 	echo _MATCH_EXTRACTED_BINARIES=TRUE >> sources/elite-header.h.asm
-	$(BEEBASM) -i sources/elite-words.asm -v > output/compile.txt
+	$(BEEBASM) -i sources/elite-text-tokens.asm -v > output/compile.txt
 	$(BEEBASM) -i sources/elite-missile.asm -v >> output/compile.txt
 	$(BEEBASM) -i sources/elite-loader1.asm -v >> output/compile.txt
 	$(BEEBASM) -i sources/elite-loader2.asm -v >> output/compile.txt
