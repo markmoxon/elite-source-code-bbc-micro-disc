@@ -23,6 +23,9 @@
 
 INCLUDE "sources/elite-header.h.asm"
 
+_IB_DISC                = (_RELEASE = 1)
+_STH_DISC               = (_RELEASE = 2)
+
 ZP = &01                \ Temporary storage, used all over the place
 
 OSWRCH = &FFEE          \ The address for the OSWRCH routine
@@ -33,44 +36,53 @@ OSCLI = &FFF7           \ The address for the OSCLI routine
 CODE% = &2F00
 LOAD% = &2F00
 
+ORG CODE%
+
 \ ******************************************************************************
 \
 \       Name: run
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: Copy protection (disabled)
+\    Summary: Entry point
 \
 \ ******************************************************************************
-
-ORG CODE%
 
 .run
 
  JMP ENTRY              \ Jump over the copy protection to disable it
 
-.L2F03
+\ ******************************************************************************
+\
+\       Name: PROT1
+\       Type: Subroutine
+\   Category: Copy protection
+\    Summary: 
+\
+\ ******************************************************************************
+
+.PROT1
 
  LDA run
 
-.L2F06
+.PROTL1
 
  EOR run,X
  STA run,X
  INX
- BNE L2F06
+ BNE PROTL1
 
-.L2F0F
+.PROT1a
 
- INC L2F03+1
- BEQ L2F1E
+ INC PROT1+1
+ BEQ PROT1b
 
- LDA L2F03+1
+ LDA PROT1+1
  CMP #&1E
- BEQ L2F0F
+ BEQ PROT1a
 
  JMP run
 
-.L2F1E
+.PROT1b
 
  BIT &020B
  BPL run
@@ -160,22 +172,22 @@ ORG CODE%
                         \ following, which has been disabled (so perhaps this
                         \ was part of the copy protection)
 
-.L2F74
+.LOOP1
 
- LDA L2FF5,Y            \ Fetch the Y-th byte from L2FF5
+ LDA BLOCK2,Y           \ Fetch the Y-th byte from BLOCK2
 
- NOP                    \ This instruction has been disabled, so this lopp does
+ NOP                    \ This instruction has been disabled, so this loop does
                         \ nothing
 
  INY                    \ Increment the loop counter
 
  CPY #9                 \ Loop back to do the next byte until we have done 9 of
- BNE L2F74              \ them
+ BNE LOOP1              \ them
 
  LDY #0                 \ We are now going to send the 12 VDU bytes in the table
                         \ at B% to OSWRCH to switch to mode 7
 
-.LOOP
+.LOOP2
 
  LDA B%,Y               \ Pass the Y-th byte of the B% table to OSWRCH
  JSR OSWRCH
@@ -183,7 +195,7 @@ ORG CODE%
  INY                    \ Increment the loop counter
 
  CPY #12                \ Loop back for the next byte until we have done all 10
- BNE LOOP               \ of them
+ BNE LOOP2              \ of them
 
 .command
 
@@ -216,35 +228,35 @@ ORG CODE%
 
 \ ******************************************************************************
 \
-\       Name: 
+\       Name: PROT2
 \       Type: Subroutine
 \   Category: Copy protection
 \    Summary: Load hidden file from disc
 \
 \ ******************************************************************************
 
-.L2FA4
+.PROT2
 
- JSR L2FB8
+ JSR PROT2a
 
  JMP command            \ Jump to command to load and run the next part of the
                         \ loader
 
- LDA #2                 \ Set PARAMS1+8 = 2, so the next OSWORD command seeks
- STA PARAMS1+8          \ track 2 on the disc
+ LDA #2                 \ Set PARAMS1+8 = 2, which is the track number in the
+ STA PARAMS1+8          \ OSWORD parameter block
 
- LDA #127               \ Call OSWORD with A = 127 and (Y X) = PARAMS1
- LDX #LO(PARAMS1)
+ LDA #127               \ Call OSWORD with A = 127 and (Y X) = PARAMS1 to seek
+ LDX #LO(PARAMS1)       \ disc track 2
  LDY #HI(PARAMS1)
  JMP OSWORD
 
-.L2FB8
+.PROT2a
 
- STA PARAMS2+7          \ Set PARAMS2+7 = A, so the next OSWORD command seeks
-                        \ track A on the disc
+ STA PARAMS2+7          \ Set PARAMS2+7 = A, which is the track number in the
+                        \ OSWORD parameter block
 
- LDA #127               \ Call OSWORD with A = 127 and (Y X) = PARAMS2
- LDX #LO(PARAMS2)
+ LDA #127               \ Call OSWORD with A = 127 and (Y X) = PARAMS2 to seek
+ LDX #LO(PARAMS2)       \ the disc track given in A
  LDY #HI(PARAMS2)
  JMP OSWORD
 
@@ -264,18 +276,18 @@ ORG CODE%
  EQUB 23, 0, 10, 32     \ Set 6845 register R10 = 32
  EQUB 0, 0, 0           \
  EQUB 0, 0, 0           \ This is the "cursor start" register, which sets the
-                        \ cursor start line at 0 with a fast blink rate
+                        \ cursor start line at 0, so it turns the cursor off
 
 \ ******************************************************************************
 \
-\       Name: 
+\       Name: BLOCK1
 \       Type: Variable
 \   Category: Copy protection
 \    Summary: 
 \
 \ ******************************************************************************
 
-.L2FD0
+.BLOCK1
 
  EQUB &00, &00, &FF, &00, &57
  EQUB &FF, &FF, &03, &53, &26, &F6, &29, &00
@@ -333,14 +345,14 @@ ORG CODE%
 
 \ ******************************************************************************
 \
-\       Name: 
+\       Name: BLOCK2
 \       Type: Variable
 \   Category: Copy protection
 \    Summary: 
 \
 \ ******************************************************************************
 
-.L2FF5
+.BLOCK2
 
  EQUB &19, &7A, &02, &01, &EC, &19, &00, &56
  EQUB &FF, &00, &00

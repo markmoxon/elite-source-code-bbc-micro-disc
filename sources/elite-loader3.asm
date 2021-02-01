@@ -23,13 +23,18 @@
 
 INCLUDE "sources/elite-header.h.asm"
 
+_IB_DISC                = (_RELEASE = 1)
+_STH_DISC               = (_RELEASE = 2)
+
+Q% = _REMOVE_CHECKSUMS  \ Set Q% to TRUE to max out the default commander, FALSE
+                        \ for the standard default commander (this is set to
+                        \ TRUE if checksums are disabled, just for convenience)
+
 NETV = &224             \ The NETV vector that we intercept as part of the copy
                         \ protection
 
 IRQ1V = &204            \ The IRQ1V vector that we intercept to implement the
                         \ split-sceen mode
-
-INDV2 = &0232
 
 OSWRCH = &FFEE          \ The address for the OSWRCH routine
 OSBYTE = &FFF4          \ The address for the OSBYTE routine
@@ -42,6 +47,19 @@ VIA = &FE00             \ Memory-mapped space for accessing internal hardware,
 
 N% = 67                 \ N% is set to the number of bytes in the VDU table, so
                         \ we can loop through them below
+
+VSCAN = 57              \ Defines the split position in the split-screen mode
+
+POW = 15                \ Pulse laser power
+
+Mlas = 50               \ Mining laser power
+
+Armlas = INT(128.5+1.5*POW) \ Military laser power
+
+DL = &8B
+LASCT = &0346
+HFX = &0348
+ESCP = &0386
 
 VEC = &7FFE             \ VEC is where we store the original value of the IRQ1
                         \ vector, and it matches the value in elite-source.asm
@@ -162,24 +180,87 @@ ORG CODE%
  EQUB 23, 0, 10, 32     \ Set 6845 register R10 = 32
  EQUB 0, 0, 0           \
  EQUB 0, 0, 0           \ This is the "cursor start" register, which sets the
-                        \ cursor start line at 0 with a fast blink rate
+                        \ cursor start line at 0, so it turns the cursor off
 
- EQUB &01, &01, &00, &6F, &F8
- EQUB &04, &01, &08, &08, &FE, &00, &FF, &7E
- EQUB &2C, &02, &01, &0E, &EE, &FF, &2C, &20
- EQUB &32, &06, &01, &00, &FE, &78, &7E, &03
- EQUB &01, &01, &FF, &FD, &11, &20, &80, &01
- EQUB &00, &00, &FF, &01, &01, &04, &01, &04
- EQUB &F8, &2C, &04, &06, &08, &16, &00, &00
- EQUB &81, &7E, &00
+\ ******************************************************************************
+\
+\       Name: E%
+\       Type: Variable
+\   Category: Sound
+\    Summary: Sound envelope definitions
+\
+\ ------------------------------------------------------------------------------
+\
+\ This table contains the sound envelope data, which is passed to OSWORD by the
+\ FNE macro to create the four sound envelopes used in-game. Refer to chapter 30
+\ of the BBC Micro User Guide for details of sound envelopes and what all the
+\ parameters mean.
+\
+\ The envelopes are as follows:
+\
+\   * Envelope 1 is the sound of our own laser firing
+\
+\   * Envelope 2 is the sound of lasers hitting us, or hyperspace
+\
+\   * Envelope 3 is the first sound in the two-part sound of us dying, or the
+\     second sound in the two-part sound of us making hitting or killing an
+\     enemy ship
+\
+\   * Envelope 4 is the sound of E.C.M. firing
+\
+\ ******************************************************************************
 
-.L197B
+.E%
 
- JSR L1B72
+ EQUB 1, 1, 0, 111, -8, 4, 1, 8, 8, -2, 0, -1, 126, 44
+ EQUB 2, 1, 14, -18, -1, 44, 32, 50, 6, 1, 0, -2, 120, 126
+ EQUB 3, 1, 1, -1, -3, 17, 32, 128, 1, 0, 0, -1, 1, 1
+ EQUB 4, 1, 4, -8, 44, 4, 6, 8, 22, 0, 0, -127, 126, 0
 
- LDA #144
- LDX #255
- JSR OSB
+\ ******************************************************************************
+\
+\       Name: FNE
+\       Type: Macro
+\   Category: Sound
+\    Summary: Macro definition for defining a sound envelope
+\
+\ ------------------------------------------------------------------------------
+\
+\ The following macro is used to define the four sound envelopes used in the
+\ game. It uses OSWORD 8 to create an envelope using the 14 parameters in the
+\ the I%-th block of 14 bytes at location E%. This OSWORD call is the same as
+\ BBC BASIC's ENVELOPE command.
+\
+\ See variable E% for more details of the envelopes themselves.
+\
+\ ******************************************************************************
+
+MACRO FNE I%
+
+  LDX #LO(E%+I%*14)     \ Set (Y X) to point to the I%-th set of envelope data
+  LDY #HI(E%+I%*14)     \ in E%
+
+  LDA #8                \ Call OSWORD with A = 8 to set up sound envelope I%
+  JSR OSWORD
+
+ENDMACRO
+
+\ ******************************************************************************
+\
+\       Name: Elite loader (Part 1 of 3)
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: 
+\
+\ ******************************************************************************
+
+.ENTRY
+
+ JSR PROT1              \ ???? Copy protection
+
+ LDA #144               \ Call OSBYTE with A = 144 and Y = 255 to turn the
+ LDX #255               \ screen interlace off (equivalent to a *TV 255, 255
+ JSR OSB                \ command)
 
  LDA #LO(B%)            \ Set the low byte of ZP(1 0) to point to the VDU code
  STA ZP                 \ table at B%
@@ -203,215 +284,332 @@ ORG CODE%
 
  JSR PLL1               \ Call PLL1 to draw Saturn
 
- LDA #16
- LDX #3
+ LDA #16                \ Call OSBYTE with A = 16 and X = 3 to set the ADC to
+ LDX #3                 \ sample 3 channels from the joystick/Bitstik
  JSR OSBYTE
 
- LDA #&60
- STA INDV2
- LDA #&02
- STA NETV+1
+ LDA #&60               \ Store an RTS instruction in location &232
+ STA &232
+
+ LDA #&2                \ Point the NETV vector to &232, which we just filled
+ STA NETV+1             \ with an RTS
  LDA #&32
  STA NETV
 
- LDA #190
+ LDA #190               \ Call OSBYTE with A = 190, X = 8 and Y = 0 to set the
+ LDX #8                 \ ADC conversion type to 8 bits, for the joystick
+ JSR OSB
+
+ LDA #200               \ Call OSBYTE with A = 200, X = 0 and Y = 0 to enable
+ LDX #0                 \ the ESCAPE key and disable memory clearing if the
+ JSR OSB                \ BREAK key is pressed
+
+ LDA #13                \ Call OSBYTE with A = 13, X = 0 and Y = 0 to disable
+ LDX #0                 \ the "output buffer empty" event
+ JSR OSB
+
+ LDA #225               \ Call OSBYTE with A = 225, X = 128 and Y = 0 to set
+ LDX #128               \ the function keys to return ASCII codes for SHIFT-fn
+ JSR OSB                \ keys (i.e. add 128)
+
+ LDA #12                \ Set A = 12 and  X = 0 to pretend that this is an to
+ LDX #0                 \ innocent call to OSBYTE to reset the keyboard delay
+                        \ and auto-repeat rate to the default, when in reality
+                        \ the OSB address in the next instruction gets modified
+                        \ to point to OSBmod
+
+.OSBjsr
+
+ JSR OSB                \ This JSR gets modified by code inserted into PLL1 so
+                        \ that it points to OSBmod instead of OSB, so this
+                        \ actually calls OSBmod to calculate some checksums
+
+ LDA #13                \ Call OSBYTE with A = 13, X = 2 and Y = 0 to disable
+ LDX #2                 \ the "character entering buffer" event
+ JSR OSB
+
+ LDA #4                 \ Call OSBYTE with A = 4, X = 1 and Y = 0 to disable
+ LDX #1                 \ cursor editing, so the cursor keys return ASCII values
+ JSR OSB                \ and can therefore be used in-game
+
+ LDA #9                 \ Call OSBYTE with A = 9, X = 0 and Y = 0 to disable
+ LDX #0                 \ flashing colours
+ JSR OSB
+
+ JSR PROT5              \ ???? Copy protection
+
+ LDA #&00               \ Set the following:
+ STA ZP                 \
+ LDA #&11               \   ZP(1 0) = &1100
+ STA ZP+1               \   P(1 0) = COMMON
+ LDA #LO(COMMON)
+ STA P
+ LDA #HI(COMMON)
+ STA P+1
+
+ JSR MVPG               \ Call MVPG to move and decrypt a page of memory from
+                        \ COMMON to &1100-&11FF
+
+ LDA #&00               \ Set the following:
+ STA ZP                 \
+ LDA #&78               \   ZP(1 0) = &7800
+ STA ZP+1               \   P(1 0) = DIALS
+ LDA #LO(DIALS)         \   X = 8
+ STA P
+ LDA #HI(DIALS)
+ STA P+1
  LDX #8
- JSR OSB
 
- LDA #200
- LDX #0
- JSR OSB
+ JSR MVBL               \ Call MVBL to move and decrypt 8 pages of memory from
+                        \ DIALS to &7800-&7FFF
 
- LDA #13
- LDX #0
- JSR OSB
+ SEI                    \ Disable interrupts while we set up our interrupt
+                        \ handler to support the split-screen mode
 
- LDA #225
- LDX #128
- JSR OSB
+ LDA VIA+&44            \ Read the 6522 System VIA T1C-L timer 1 low-order
+ STA &0001              \ counter (SHEILA &44), which increments 1000 times a
+                        \ second so this will be pretty random, and store it in
+                        \ &0001 among the random number seeds at &0000
 
- LDA #12
- LDX #0
+ LDA #%00111001         \ Set 6522 System VIA interrupt enable register IER
+ STA VIA+&4E            \ (SHEILA &4E) bits 0 and 3-5 (i.e. disable the Timer1,
+                        \ CB1, CB2 and CA2 interrupts from the System VIA)
 
-.L19D2
+ LDA #%01111111         \ Set 6522 User VIA interrupt enable register IER
+ STA VIA+&6E            \ (SHEILA &6E) bits 0-7 (i.e. disable all hardware
+                        \ interrupts from the User VIA)
 
- JSR OSB
-
- LDA #13
- LDX #2
- JSR OSB
-
- LDA #4
- LDX #1
- JSR OSB
-
- LDA #9
- LDX #0
- JSR OSB
-
- JSR L1CE2
-
- LDA #&00
- STA ZP
- LDA #&11
- STA ZP+1
- LDA #&62
- STA P
- LDA #&29
- STA P+1
- JSR MVPG
-
- LDA #&00
- STA ZP
- LDA #&78
- STA ZP+1
- LDA #&4B
- STA P
- LDA #&1D
- STA P+1
- LDX #&08
- JSR MVBL
-
- SEI
- LDA VIA+$44
- STA &0001
- LDA #&39
- STA VIA+$4E
- LDA #&7F
- STA VIA+&6E
- LDA IRQ1V
+ LDA IRQ1V              \ Copy the current IRQ1V vector address into VEC(1 0)
  STA VEC
  LDA IRQ1V+1
  STA VEC+1
- LDA #&4B
- STA IRQ1V
- LDA #&11
+
+ LDA #LO(IRQ1)          \ Set the IRQ1V vector to IRQ1, so IRQ1 is now the
+ STA IRQ1V              \ interrupt handler
+ LDA #HI(IRQ1)
  STA IRQ1V+1
- LDA #&39
- STA VIA+&45
- CLI
- LDA #&00
- STA ZP
- LDA #&61
- STA ZP+1
- LDA #&62
+
+ LDA #VSCAN             \ Set 6522 System VIA T1C-L timer 1 high-order counter
+ STA VIA+&45            \ (SHEILA &45) to VSCAN (57) to start the T1 counter
+                        \ counting down from 14622 at a rate of 1 MHz
+
+ CLI                    \ Re-enable interrupts
+
+ LDA #&00               \ Set the following:
+ STA ZP                 \
+ LDA #&61               \   ZP(1 0) = &6100
+ STA ZP+1               \   P(1 0) = ASOFT
+ LDA #LO(ASOFT)
  STA P
- LDA #&2B
+ LDA #HI(ASOFT)
  STA P+1
- JSR MVPG
 
- LDA #&63
- STA ZP+1
- LDA #&62
+ JSR MVPG               \ Call MVPG to move and decrypt a page of memory from
+                        \ ASOFT to &6100-&61FF
+
+ LDA #&63               \ Set the following:
+ STA ZP+1               \
+ LDA #LO(ELITE)         \   ZP(1 0) = &6300
+ STA P                  \   P(1 0) = ELITE
+ LDA #HI(ELITE)
+ STA P+1
+
+ JSR MVPG               \ Call MVPG to move and decrypt a page of memory from
+                        \ ELITE to &6300-&63FF
+
+ LDA #&76               \ Set the following:
+ STA ZP+1               \
+ LDA #LO(CpASOFT)       \   ZP(1 0) = &7600
+ STA P                  \   P(1 0) = CpASOFT
+ LDA #HI(CpASOFT)
+ STA P+1
+
+ JSR MVPG               \ Call MVPG to move and decrypt a page of memory from
+                        \ CpASOFT to &7600-&76FF
+
+ LDA #&00               \ Set the following:
+ STA ZP                 \
+ LDA #&04               \   ZP(1 0) = &0400
+ STA ZP+1               \   P(1 0) = WORDS
+ LDA #LO(WORDS)         \   X = 4
  STA P
- LDA #&2A
+ LDA #HI(WORDS)
  STA P+1
- JSR MVPG
+ LDX #4
 
- LDA #&76
- STA ZP+1
- LDA #&62
- STA P
- LDA #&2C
- STA P+1
- JSR MVPG
+ JSR MVBL               \ Call MVBL to move and decrypt 4 pages of memory from
+                        \ WORDS to &0400-&07FF
 
- LDA #&00
- STA ZP
- LDA #&04
- STA ZP+1
- LDA #&4B
- STA P
- LDA #&25
- STA P+1
- LDX #&04
- JSR MVBL
+ LDX #35                \ We now want to copy the disc catalogue routine from
+                        \ CATDISC to CATD, so set a counter in X for the 36
+                        \ bytes to copy
 
- LDX #35
+.LOOP2
 
-.L1A89
-
- LDA CATDISC,X
+ LDA CATDISC,X          \ Copy the X-th byte of CATDISC to the X-th byte of CATD
  STA CATD,X
- DEX
- BPL L1A89
 
- LDA SC
+ DEX                    \ Decrement the loop counter
+
+ BPL LOOP2              \ Loop back to copy the next byte until they are all
+                        \ done
+
+ LDA SC                 \ ????
  STA CATBLOCK
 
- LDX #&43
- LDY #&19
- LDA #8
- JSR OSWORD
+ FNE 0                  \ Set up sound envelopes 0-3 using the FNE macro
+ FNE 1
+ FNE 2
+ FNE 3
 
- LDX #&51
- LDY #&19
- LDA #8
- JSR OSWORD
+ LDX #LO(MESS1)         \ Set (Y X) to point to MESS1 ("DIR E")
+ LDY #HI(MESS1)
 
- LDX #&5F
- LDY #&19
- LDA #8
- JSR OSWORD
+ JSR OSCLI              \ Call OSCLI to run the OS command in MESS1, which
+                        \ changes the disc directory to E
 
- LDX #&6D
- LDY #&19
- LDA #8
- JSR OSWORD
-
- LDX #&44
- LDY #&1D
- JSR OSCLI
-
- LDA #&00
- STA ZP
- LDA #&0B
- STA ZP+1
- LDA #&ED
+ LDA #&00               \ Set the following:
+ STA ZP                 \
+ LDA #&0B               \   ZP(1 0) = &0B00
+ STA ZP+1               \   P(1 0) = &1AED LOD2
+ LDA #LO(LOD2)
  STA P
- LDA #&1A
+ LDA #HI(LOD2)
  STA P+1
 
- LDY #&00
+ LDY #0                 \ We want to move one page of memory, so set Y as a byte
+                        \ counter
 
-.L1AD4
+.LOOP3
 
- LDA (P),Y
- EOR #&18
- STA (ZP),Y
- DEY
- BNE L1AD4
+ LDA (P),Y              \ Fetch the Y-th byte of the P(1 0) memory block
 
- JMP &0B00
+ EOR #&18               \ Decrypt it by EOR'ing with &18
 
-.L1AE0
+ STA (ZP),Y             \ Store the decrypted result in the Y-th byte of the
+                        \ ZP(1 0) memory block
+
+ DEY                    \ Decrement the byte counter
+
+ BNE LOOP3              \ Loop back to copy the next byte until we have done a
+                        \ whole page of 256 bytes
+
+ JMP &0B00              \ Jump to the start of the routine we just decrypted
+
+\ ******************************************************************************
+\
+\       Name: PROT2
+\       Type: Subroutine
+\   Category: Copy protection
+\    Summary: 
+\
+\ ******************************************************************************
+
+.PROT2
 
  CLC
- LDY #&00
+ LDY #0
 
-.L1AE3
+.PROT2a
 
  ADC PLL1,Y
- EOR L197B,Y
+ EOR ENTRY,Y
  DEY
- BNE L1AE3
+ BNE PROT2a
 
  RTS
 
- EQUB &BA, &2F, &B8, &13, &38, &EF, &E7, &B1
- EQUB &F6, &95
+\ ******************************************************************************
+\
+\       Name: 
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: 
+\
+\ This block (LOD2 &1AED to &1B4E) needs EOR'ing with &18 by elite-checksum.py
+\
+\ code block, org &0B00, eor'd with &18, gets copied to &0B00 by above, called
+\ at end of this loader
+\
+\ ******************************************************************************
 
- EQUB &1A, &1A, &B1, &09, &95, &1B, &1A, &B1
- EQUB &F1, &95, &16, &1A, &B1, &09, &95, &17
- EQUB &1A, &20, &B8, &18, &9C, &68, &BA, &09
- EQUB &92, &9E, &69, &69, &68, &90, &C8, &E1
- EQUB &F0, &F8, &4C, &88, &EC, &D5, &E7, &4D
- EQUB &C8, &E6, &54, &FE, &09, &54, &36, &4C
- EQUB &36, &5B, &57, &5C, &5D, &15, &5C, &77
- EQUB &7D, &6B, &38, &61, &77, &6D, &6A, &38
- EQUB &75, &77, &6C, &70, &7D, &6A, &38, &73
- EQUB &76, &77, &6F, &38, &61, &77, &6D, &38
- EQUB &7C, &77, &38, &6C, &70, &71, &6B, &27
+.LOD2
+
+ORG &0B00
+
+.LOADER2
+
+ LDX #&37
+ LDY #&0B
+ JSR &FFF7
+ LDA #&EE
+ STA &0202
+ LDA #&11
+ STA &0203
+ LDA #&E9
+ STA &020E
+ LDA #&11
+ STA &020F
+ SEC
+ LDY #&00
+ STY &70
+ LDX #&11
+ TXA
+
+.l1
+
+ STX &71
+ ADC (&70),Y
+ DEY
+ BNE l1
+ INX
+ CPX #&54
+ BCC l1
+ CMP &55FF
+
+.l2
+
+ BNE l2
+ JMP &11E6
+
+.L0B37
+
+ EQUB &4C, &2E, &54
+ EQUB &2E, &43, &4F
+ EQUB &44
+ EQUB &45, &0D
+ EQUB &44
+ EQUB &6F
+ EQUB &65, &73
+ EQUB &20, &79, &6F
+ EQUB &75, &72
+ EQUB &20, &6D, &6F
+ EQUB &74
+ EQUB &68
+ EQUB &65, &72
+ EQUB &20, &6B, &6E
+ EQUB &6F
+ EQUB &77
+ EQUB &20, &79, &6F
+ EQUB &75, &20
+ EQUB &64
+ EQUB &6F
+ EQUB &20, &74, &68
+ EQUB &69, &73
+ EQUB &3F
+
+COPYBLOCK LOADER2, P%, LOD2
+
+ORG LOD2 + P% - LOADER2
+
+\ ******************************************************************************
+\
+\       Name: CATDISC
+\       Type: Subroutine
+\   Category: Copy protection
+\    Summary: Load disc sectors 0 and 1 to &0E00 and &0F00 respectively
+\
+\ ******************************************************************************
 
 \ Gets copied from &1B4F to &0D7A by loop at L1A89 (35 bytes),
 \ is called by D and T to load from disc
@@ -422,18 +620,18 @@ ORG &0D7A
 
 .CATD
 
- DEC CATBLOCK+8            \ Decrement sector number from 1 to 0
- DEC CATBLOCK+2            \ Decrement load address from &0F00 to &0E00
+ DEC CATBLOCK+8         \ Decrement sector number from 1 to 0
+ DEC CATBLOCK+2         \ Decrement load address from &0F00 to &0E00
 
- JSR CATL
+ JSR CATL               \ Call CATL to load disc sector 1 to &0E00
 
- INC CATBLOCK+8            \ Increment sector number back to 1
- INC CATBLOCK+2            \ Increment load address back to &0F00
+ INC CATBLOCK+8         \ Increment sector number back to 1
+ INC CATBLOCK+2         \ Increment load address back to &0F00
 
 .CATL
 
- LDA #127
- LDX #LO(CATBLOCK)
+ LDA #127               \ Call OSWORD with A = 127 and (Y X) = CATBLOCK to
+ LDX #LO(CATBLOCK)      \ load disc sector 1 to &0F00
  LDY #HI(CATBLOCK)
  JMP OSWORD
 
@@ -452,27 +650,36 @@ COPYBLOCK CATD, P%, CATDISC
 
 ORG CATDISC + P% - CATD
 
-.L1B72
+\ ******************************************************************************
+\
+\       Name: PROT1
+\       Type: Subroutine
+\   Category: Copy protection
+\    Summary: 
+\
+\ ******************************************************************************
+
+.PROT1
 
  LDA #&55
  LDX #&40
 
-.L1B76
+.PROT1a
 
- JSR L1AE0
+ JSR PROT2
 
  DEX
- BPL L1B76
+ BPL PROT1a
 
  STA RAND+2
  ORA #&00
- BPL L1B85
+ BPL PROT1b
 
  LSR BLPTR
 
-.L1B85
+.PROT1b
 
- JMP L1CCF
+ JMP PROT4
 
  EQUB &AC
 
@@ -544,8 +751,10 @@ ORG CATDISC + P% - CATD
  LDA P                  \             = r1^2
  STA ZP
 
- LDA #&4B               \ ???? Copy protection
- STA L19D2+1
+ LDA #LO(OSBmod)        \ As part of the copy protection, the JSR OSB
+ STA OSBjsr+1           \ instruction at OSBjsr gets modified to point to OSBmod
+                        \ instead of OSB, and this is where we modify the low
+                        \ byte of the destination address
 
  JSR DORND              \ Set A and X to random numbers, say A = r2
 
@@ -718,8 +927,10 @@ ORG CATDISC + P% - CATD
  STA ZP+1               \ Set ZP+1 = A
                         \          = r5^2 / 256
 
- LDA #&29               \ ???? Copy protection
- STA L19D2+2
+ LDA #HI(OSBmod)        \ As part of the copy protection, the JSR OSB
+ STA OSBjsr+2           \ instruction at OSBjsr gets modified to point to OSBmod
+                        \ instead of OSB, and this is where we modify the high
+                        \ byte of the destination address
 
  JSR DORND              \ Set A and X to random numbers, say A = r6
 
@@ -1039,7 +1250,16 @@ ORG CATDISC + P% - CATD
  EQUB %00000010
  EQUB %00000001
 
-.L1CCF
+\ ******************************************************************************
+\
+\       Name: PROT4
+\       Type: Subroutine
+\   Category: Copy protection
+\    Summary: 
+\
+\ ******************************************************************************
+
+.PROT4
 
  LDA RAND+2
  EOR BLPTR
@@ -1103,7 +1323,16 @@ ORG CATDISC + P% - CATD
 
  EQUW &0333             \ The number of iterations of the PLL3 loop (819)
 
-.L1CE2
+\ ******************************************************************************
+\
+\       Name: PROT5
+\       Type: Subroutine
+\   Category: Copy protection
+\    Summary: 
+\
+\ ******************************************************************************
+
+.PROT5
 
  LDA BLPTR
  AND BLPTR+1
@@ -1112,9 +1341,18 @@ ORG CATDISC + P% - CATD
  STA BLPTR
  RTS
 
-.L1CEC
+\ ******************************************************************************
+\
+\       Name: PROT6
+\       Type: Subroutine
+\   Category: Copy protection
+\    Summary: 
+\
+\ ******************************************************************************
 
- JMP L1CEC
+.PROT6
+
+ JMP PROT6
 
 \ ******************************************************************************
 \
@@ -1218,33 +1456,26 @@ ORG CATDISC + P% - CATD
  JMP OSBYTE             \ using a tail call (so we can call OSB to call OSBYTE
                         \ for when we know we want Y set to 0)
 
- EQUB &0E
+ EQUB &0E               \ This byte appears to be unused
 
 \ ******************************************************************************
 \
 \       Name: MVPG
 \       Type: Subroutine
 \   Category: Utility routines
-\    Summary: Move and decrypt a multi-page block of memory from one location to
-\             another
+\    Summary: Decrypt and move a page of memory
 \
 \ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
-\   P(1 0)              The source address of the block to move
+\   P(1 0)              The source address of the page to move
 \
-\   ZP(1 0)             The destination address of the block to move
-\
-\   X                   Number of pages of memory to move (1 page = 256 bytes)
+\   ZP(1 0)             The destination address of the page to move
 \
 \ ******************************************************************************
 
 .MVPG
-
-                        \ This subroutine is called from below to copy one page
-                        \ of memory from the address in P(1 0) to the address
-                        \ in ZP(1 0)
 
  LDY #0                 \ We want to move one page of memory, so set Y as a byte
                         \ counter
@@ -1265,7 +1496,26 @@ ORG CATDISC + P% - CATD
 
  RTS                    \ Return from the subroutine
 
- EQUB &0E
+ EQUB &0E               \ This byte appears to be unused
+
+\ ******************************************************************************
+\
+\       Name: MVBL
+\       Type: Subroutine
+\   Category: Utility routines
+\    Summary: Decrypt and move a multi-page block of memory
+\
+\ ------------------------------------------------------------------------------
+\
+\ Arguments:
+\
+\   P(1 0)              The source address of the block to move
+\
+\   ZP(1 0)             The destination address of the block to move
+\
+\   X                   Number of pages of memory to move (1 page = 256 bytes)
+\
+\ ******************************************************************************
 
 .MVBL
 
@@ -1285,554 +1535,625 @@ ORG CATDISC + P% - CATD
 
  RTS                    \ Return from the subroutine
 
- EQUB &2A, &44, &49, &52, &20
- EQUB &45, &0D, &55, &25, &22, &21, &22, &21
- EQUB &21, &25, &55, &A5, &A3, &A1, &A3, &A7
- EQUB &A3, &A5, &55, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &5A, &55, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &5A, &55, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &5A, &55, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &5A, &55, &33, &01, &65, &25, &25
- EQUB &25, &25, &55, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &55, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &55, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &55
+\ ******************************************************************************
+\
+\       Name: MESS1
+\       Type: Variable
+\   Category: Loader
+\    Summary: The OS command string for changing the disc directory to E
+\
+\ ******************************************************************************
 
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &55
- EQUB &33, &01, &65, &65, &65, &65, &25, &55
- EQUB &A7, &A5, &A3, &A5, &A3, &A5, &A3, &55
- EQUB &33, &F7, &D5, &95, &95, &B5, &B5, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &F0, &5A, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &F0, &5A, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &F0, &5A, &55
- EQUB &A5, &A5, &A5, &A5, &A5, &F0, &5A, &55
- EQUB &A5, &A3, &A1, &A3, &A7, &A3, &A5, &55
- EQUB &B5, &BB, &BF, &BB, &BD, &BD, &B5, &25
- EQUB &22, &20, &20, &22, &20, &25, &25, &A5
- EQUB &A3, &A1, &A3, &A7, &A3, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &25
- EQUB &25, &25, &25, &25, &25, &25, &25, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A4, &A3, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A3, &A5, &A5
- EQUB &A5, &A5, &A5, &A4, &A9, &A7, &A5, &A5
- EQUB &A5, &A5, &A5, &A3, &2D, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &AE, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A2, &A5, &A7, &A5, &A5
- EQUB &A5, &A5, &A5, &AF, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A8, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A1, &2F, &A7, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A9, &A4, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &AD, &A6, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &25
- EQUB &25, &27, &25, &25, &25, &25, &65, &A5
- EQUB &A5, &AC, &A5, &A5, &A3, &A5, &A3, &B5
- EQUB &B5, &B1, &B5, &B5, &B5, &B5, &B5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &87, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &0F, &5A, &2D
- EQUB &2D, &A5, &A5, &A5, &2D, &0F, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &0F, &5A, &A5
- EQUB &A5, &A3, &A0, &A2, &A3, &A0, &A5, &B5
- EQUB &B5, &B1, &B1, &B1, &B1, &B3, &B5, &25
- EQUB &23, &21, &23, &21, &21, &25, &25, &A5
- EQUB &AF, &AF, &AF, &AF, &A1, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &3C, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &87, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &E1, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &3C, &5A, &25
- EQUB &25, &25, &25, &25, &25, &25, &25, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A4, &A7, &A5
- EQUB &A5, &A5, &A6, &A1, &AD, &A5, &A5, &A4
- EQUB &A3, &AD, &A7, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &AF, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &AF, &A4, &A5, &A7, &A5, &A1
- EQUB &A5, &AD, &AF, &A5, &A5, &A5, &A5, &87
- EQUB &A5, &A5, &AF, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &2F, &A5, &A5, &87, &A5, &A7
- EQUB &A5, &A7, &AD, &A7, &A5, &A7, &A5, &A5
- EQUB &A5, &A5, &AF, &A5, &A5, &87, &A5, &87
- EQUB &A5, &A5, &2F, &A5, &A5, &A5, &A5, &A4
- EQUB &A5, &A5, &AF, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &AD, &A7, &A1, &A5, &A7, &A5, &A5
- EQUB &A5, &A5, &AF, &A5, &A5, &A5, &A5, &AD
- EQUB &A6, &A5, &AF, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &AD, &A3, &A4, &A5, &A5, &A5, &E5
- EQUB &E5, &C5, &85, &95, &BD, &A1, &A7, &A5
- EQUB &A3, &A5, &A3, &A5, &55, &A5, &A5, &95
- EQUB &95, &F7, &F7, &33, &55, &B5, &B5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &87, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &E1, &5A, &2D
- EQUB &2D, &A5, &A5, &A5, &2D, &3C, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &87, &5A, &A5
- EQUB &A3, &A0, &A0, &A0, &A3, &A5, &A5, &B5
- EQUB &B3, &B1, &B1, &B1, &B3, &B5, &B5, &25
- EQUB &23, &21, &21, &21, &23, &25, &25, &A5
- EQUB &AB, &A1, &A1, &A1, &A1, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &2D, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &2D, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &2D, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &2D, &5A, &25
- EQUB &25, &25, &25, &25, &25, &25, &25, &A5
- EQUB &A1, &A1, &AD, &AF, &A5, &AD, &A5, &A5
- EQUB &A5, &A5, &A5, &AF, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &AF, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &AF, &A5, &A7, &A5, &A1
- EQUB &A5, &AD, &A5, &AF, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &AF, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &AF, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &AF, &A5, &A5, &A5, &A7
- EQUB &2D, &A7, &A5, &8D, &D5, &A7, &A5, &A5
- EQUB &2D, &A5, &A5, &AF, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &AF, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &AF, &A5, &A5, &A5, &A4
- EQUB &A5, &A5, &A5, &AF, &A5, &A5, &A5, &A5
- EQUB &A5, &AD, &A5, &AF, &A5, &A7, &A5, &A5
- EQUB &A5, &A5, &A5, &AF, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &AF, &A5, &A5, &A5, &A7
- EQUB &A4, &A4, &A5, &AF, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &AD, &A5, &AD, &A5, &AD, &B5
- EQUB &B5, &B5, &B5, &B5, &B5, &B5, &B5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A5
- EQUB &A4, &A6, &A4, &A4, &A6, &A5, &A5, &B5
- EQUB &B5, &B5, &B5, &B5, &BD, &B5, &B5, &25
- EQUB &21, &21, &21, &21, &23, &25, &25, &A5
- EQUB &AB, &A1, &A1, &A1, &A1, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &3C, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &87, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &E1, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &2D, &5A, &25
- EQUB &25, &25, &25, &25, &25, &25, &25, &AD
- EQUB &A1, &A1, &A7, &A7, &A4, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &AD, &AF, &A1, &A5
- EQUB &A5, &A5, &A5, &A4, &A5, &AF, &A5, &A1
- EQUB &A5, &AD, &A5, &A5, &A5, &AF, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &AF, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &AF, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &AF, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &AF, &A5, &A7
- EQUB &A5, &A7, &A5, &A7, &A5, &AF, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &AF, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &AF, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &AF, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &AF, &A5, &A4
- EQUB &A5, &A5, &A5, &A5, &A5, &AF, &A5, &A5
- EQUB &A5, &AD, &A5, &A1, &A5, &AF, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &AF, &A4, &A5
- EQUB &A4, &A4, &A6, &A7, &A1, &AD, &A5, &AD
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &B5
- EQUB &B5, &B5, &B5, &B5, &B5, &B5, &B5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A6
- EQUB &A5, &A6, &A7, &A6, &A5, &A5, &A5, &BD
- EQUB &BD, &BD, &B5, &BD, &B5, &B5, &B5, &25
- EQUB &22, &20, &22, &20, &20, &25, &25, &A5
- EQUB &A1, &A1, &A1, &A1, &A3, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &3C, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &B4, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &B4, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &25
- EQUB &25, &25, &25, &25, &25, &25, &25, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A7
- EQUB &A4, &A5, &A5, &A5, &A5, &A5, &A5, &A1
- EQUB &AD, &A1, &A4, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &AD, &A3, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A9, &A4, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &AF, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A8, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A3, &A7
- EQUB &A5, &A7, &A5, &A7, &A5, &A7, &AE, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A0, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &AF, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A0, &AD, &A5
- EQUB &A5, &A5, &A5, &A5, &A6, &AD, &A5, &A5
- EQUB &A5, &A5, &A5, &A3, &A5, &A5, &A5, &A4
- EQUB &A5, &A6, &A9, &A5, &A5, &A5, &A5, &A7
- EQUB &AD, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &B5
- EQUB &B5, &B5, &B5, &B5, &B5, &B5, &B5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &5A, &A6
- EQUB &A5, &A6, &A5, &A6, &A5, &A5, &A7, &BD
- EQUB &BD, &BD, &BD, &BD, &B5, &B5, &B5, &25
- EQUB &25, &75, &22, &20, &25, &25, &55, &A5
- EQUB &A5, &65, &89, &A9, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &25
- EQUB &25, &25, &25, &65, &01, &33, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &96, &87, &96, &87, &96, &A5, &55, &A5
- EQUB &0F, &87, &87, &87, &1E, &A5, &55, &A5
- EQUB &87, &87, &87, &87, &0F, &A5, &55, &A5
- EQUB &4B, &E1, &E1, &E1, &E1, &A5, &55, &A5
- EQUB &4B, &2D, &69, &2D, &4B, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &B5
- EQUB &B5, &B5, &B5, &95, &F7, &33, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &55, &A7
- EQUB &A7, &A7, &A6, &A5, &A5, &A5, &55, &B5
- EQUB &BD, &BD, &BD, &BD, &B5, &B5, &55, &A5
- EQUB &E5, &A3, &DF, &7F, &F4, &A5, &AF, &C3
- EQUB &BD, &A5, &A5, &81, &AB, &A7, &89, &A5
- EQUB &A5, &A7, &A5, &A5, &A5, &E1, &BA, &B5
- EQUB &97, &AD, &AD, &81, &FA, &84, &F1, &AD
- EQUB &AD, &81, &BA, &97, &D1, &AD, &AD, &81
- EQUB &3A, &95, &D3, &AD, &AD, &81, &7A, &B5
- EQUB &C0, &AD, &AD, &89, &9A, &D1, &2D, &AD
- EQUB &AD, &89, &DA, &F1, &2D, &AD, &AD, &89
- EQUB &5A, &C0, &2D, &AD, &AD, &89, &1A, &D3
- EQUB &2D, &A9, &A9, &89, &8D, &D1, &2D, &A9
- EQUB &A9, &89, &CD, &F1, &2D, &A9, &A9, &89
- EQUB &4D, &C0, &2D, &A9, &A9, &89, &0D, &D3
- EQUB &2D, &AD, &AD, &A9, &0D, &D3, &D2, &AD
- EQUB &AD, &A9, &4D, &C0, &C3, &AD, &AD, &A9
- EQUB &8D, &D1, &D2, &AD, &AD, &A9, &CD, &F1
- EQUB &F0, &BA, &84, &A5, &A1, &BA, &97, &A5
- EQUB &AD, &BA, &95, &A5, &A9, &BA, &B5, &A5
- EQUB &B5, &BA, &81, &A1, &AD, &BA, &F4, &A1
- EQUB &B5, &BA, &C5, &A9, &B5, &BA, &D6, &AD
- EQUB &A9, &BA, &D1, &AD, &B1, &BA, &F1, &A1
- EQUB &BD, &BA, &C0, &B5, &B9, &BA, &D3, &A9
- EQUB &85, &BA, &23, &B9, &85, &BA, &22, &B1
- EQUB &85, &BA, &21, &B1, &BD, &BA, &20, &BD
- EQUB &B9, &AD, &20, &BD, &8D, &AD, &22, &B1
- EQUB &81, &AD, &22, &85, &95, &AD, &20, &B9
- EQUB &89, &AD, &D1, &81, &99, &AD, &F1, &8D
- EQUB &E5, &AD, &D3, &95, &91, &AD, &C0, &89
- EQUB &9D, &3A, &E5, &A5, &B5, &FA, &A5, &E5
- EQUB &B5, &BA, &E5, &A5, &B5, &BA, &A5, &E5
- EQUB &B5, &BA, &85, &A5, &A5, &FA, &A5, &85
- EQUB &A5, &3A, &85, &A5, &A5, &BA, &A5, &05
- EQUB &CB, &A5, &A5, &E5, &A1, &A1, &A5, &E9
- EQUB &97, &81, &A5, &A6, &C5, &CE, &0C, &D2
- EQUB &A5, &C1, &C9, &10, &D4, &C8, &CB, &14
- EQUB &D2, &A5, &C2, &17, &C7, &97, &85, &A5
- EQUB &0A, &10, &C8, &D2, &1F, &DF, &8A, &A5
- EQUB &D5, &DF, &D5, &1A, &CB, &A5, &D6, &18
- EQUB &03, &A5, &84, &A6, &0D, &D4, &CD, &C3
- EQUB &D2, &A6, &20, &D5, &A5, &0A, &C2, &0E
- EQUB &D2, &18, &06, &A5, &C7, &C1, &18, &C5
- EQUB &D3, &CA, &D2, &D3, &12, &CA, &A5, &18
- EQUB &C5, &CE, &A6, &A5, &C7, &10, &12, &05
- EQUB &A6, &A5, &D6, &C9, &1F, &A6, &A5, &0D
- EQUB &0A, &CA, &DF, &A6, &A5, &D3, &C8, &CF
- EQUB &D2, &A5, &D0, &CF, &C3, &D1, &A6, &A5
- EQUB &1C, &1D, &11, &D2, &DF, &A5, &1D, &0C
- EQUB &C5, &CE, &DF, &A5, &C0, &C3, &D3, &C2
- EQUB &06, &A5, &CB, &D3, &CA, &11, &AB, &24
- EQUB &A5, &0B, &C5, &D2, &17, &1F, &3F, &A5
- EQUB &7D, &CB, &D3, &C8, &1B, &D2, &A5, &C5
- EQUB &19, &C0, &1E, &16, &C7, &C5, &DF, &A5
- EQUB &C2, &C3, &CB, &C9, &C5, &12, &C5, &DF
- EQUB &A5, &C5, &1F, &D6, &1F, &17, &C3, &A6
- EQUB &4D, &17, &C3, &A5, &D5, &CE, &CF, &D6
- EQUB &A5, &D6, &78, &C2, &D3, &C5, &D2, &A5
- EQUB &A6, &13, &D5, &16, &A5, &CE, &D3, &CB
- EQUB &1D, &A6, &C5, &C9, &CA, &19, &CF, &06
- EQUB &A5, &CE, &DF, &D6, &16, &D5, &D6, &C7
- EQUB &03, &A6, &A5, &D5, &CE, &1F, &D2, &A6
- EQUB &4C, &27, &A5, &0B, &4D, &1D, &03, &A5
- EQUB &D6, &C9, &D6, &D3, &CA, &17, &CF, &19
- EQUB &A5, &C1, &78, &D5, &D5, &A6, &3C, &CF
- EQUB &D0, &CF, &D2, &DF, &A5, &C3, &C5, &19
- EQUB &C9, &CB, &DF, &A5, &A6, &CA, &CF, &C1
- EQUB &CE, &D2, &A6, &DF, &C3, &0C, &D5, &A5
- EQUB &1A, &C5, &CE, &A8, &07, &10, &CA, &A5
- EQUB &C5, &C7, &D5, &CE, &A5, &A6, &00, &89
- EQUB &CF, &19, &A5, &FC, &27, &87, &A5, &D2
- EQUB &0C, &05, &D2, &A6, &CA, &C9, &4D, &A5
- EQUB &EC, &A6, &CC, &C7, &CB, &CB, &1E, &A5
- EQUB &D4, &1D, &05, &A5, &D5, &D2, &A5, &36
- EQUB &A6, &C9, &C0, &A6, &A5, &D5, &C3, &89
- EQUB &A5, &A6, &C5, &0C, &C1, &C9, &80, &A5
- EQUB &C3, &1C, &CF, &D6, &A5, &C0, &C9, &C9
- EQUB &C2, &A5, &1A, &DE, &11, &CA, &0F, &A5
- EQUB &12, &0B, &C9, &C7, &C5, &11, &10, &D5
- EQUB &A5, &D5, &13, &10, &D5, &A5, &CA, &CF
- EQUB &1C, &1F, &A9, &D1, &0A, &0F, &A5, &CA
- EQUB &D3, &DE, &D3, &18, &0F, &A5, &C8, &0C
- EQUB &C5, &C9, &11, &C5, &D5, &A5, &7D, &D6
- EQUB &D3, &D2, &16, &D5, &A5, &0D, &C5, &CE
- EQUB &0A, &16, &DF, &A5, &C7, &CA, &CA, &C9
- EQUB &DF, &D5, &A5, &C0, &CF, &08, &0C, &CB
- EQUB &D5, &A5, &C0, &D3, &D4, &D5, &A5, &CB
- EQUB &0A, &16, &06, &D5, &A5, &C1, &C9, &CA
- EQUB &C2, &A5, &D6, &CA, &17, &0A, &D3, &CB
- EQUB &A5, &05, &CB, &AB, &4D, &19, &0F, &A5
- EQUB &06, &CF, &14, &A6, &F9, &D5, &A5, &8A
- EQUB &B7, &B6, &86, &B3, &86, &A5, &A6, &C5
- EQUB &D4, &A5, &CA, &0C, &05, &A5, &C0, &CF
- EQUB &16, &03, &A5, &D5, &0D, &89, &A5, &C1
- EQUB &08, &14, &A5, &D4, &1E, &A5, &DF, &C3
- EQUB &89, &C9, &D1, &A5, &C4, &CA, &D3, &C3
- EQUB &A5, &C4, &13, &C5, &CD, &A5, &90, &A5
- EQUB &D5, &CA, &CF, &CB, &DF, &A5, &C4, &D3
- EQUB &C1, &AB, &C3, &DF, &1E, &A5, &CE, &1F
- EQUB &C8, &1E, &A5, &C4, &19, &DF, &A5, &C0
- EQUB &17, &A5, &C0, &D3, &D4, &D4, &DF, &A5
- EQUB &78, &C2, &14, &D2, &A5, &C0, &78, &C1
- EQUB &A5, &CA, &CF, &02, &D4, &C2, &A5, &CA
- EQUB &C9, &C4, &4D, &16, &A5, &00, &D4, &C2
- EQUB &A5, &CE, &D3, &CB, &1D, &C9, &CF, &C2
- EQUB &A5, &C0, &C3, &CA, &0A, &C3, &A5, &0A
- EQUB &D5, &C3, &C5, &D2, &A5, &2D, &12, &0B
- EQUB &0E, &A5, &C5, &C9, &CB, &A5, &7D, &CB
- EQUB &1D, &C2, &16, &A5, &A6, &C2, &0F, &D2
- EQUB &78, &DF, &1E, &A5, &D4, &C9, &A5, &28
- EQUB &A6, &A6, &36, &8A, &A6, &3C, &A6, &A6
- EQUB &A6, &28, &A6, &20, &A6, &C0, &1F, &A6
- EQUB &D5, &C7, &07, &8A, &8C, &A5, &C0, &D4
- EQUB &19, &D2, &A5, &08, &0C, &A5, &07, &C0
- EQUB &D2, &A5, &18, &C1, &CE, &D2, &A5, &FF
- EQUB &CA, &C9, &D1, &81, &A5, &E5, &97, &7A
- EQUB &A7, &A5, &C3, &DE, &D2, &12, &A6, &A5
- EQUB &D6, &D3, &CA, &D5, &C3, &3D, &A5, &15
- EQUB &C7, &CB, &3D, &A5, &C0, &D3, &C3, &CA
- EQUB &A5, &CB, &1B, &D5, &CF, &07, &A5, &65
- EQUB &48, &A6, &C4, &C7, &DF, &A5, &C3, &A8
- EQUB &C5, &A8, &CB, &A8, &23, &A5, &E0, &E1
- EQUB &D5, &A5, &E0, &EE, &D5, &A5, &EF, &A6
- EQUB &D5, &C5, &C9, &C9, &D6, &D5, &A5, &0F
- EQUB &C5, &C7, &D6, &C3, &A6, &D6, &C9, &C2
- EQUB &A5, &FF, &C4, &C9, &CB, &C4, &A5, &FF
- EQUB &28, &A5, &C2, &C9, &C5, &CD, &0A, &C1
- EQUB &A6, &51, &A5, &FC, &A6, &3B, &A5, &CB
- EQUB &CF, &CA, &CF, &D2, &0C, &DF, &A6, &3D
- EQUB &A5, &CB, &0A, &0A, &C1, &A6, &3D, &A5
- EQUB &43, &BC, &86, &A5, &0A, &7D, &0A, &C1
- EQUB &A6, &EC, &A5, &14, &16, &C1, &DF, &A6
- EQUB &A5, &C1, &C7, &13, &C5, &11, &C5, &A5
- EQUB &F5, &A6, &C9, &C8, &A5, &C7, &89, &A5
- EQUB &83, &07, &C1, &06, &A6, &4D, &17, &0E
- EQUB &BC, &A5, &7A, &A6, &82, &8A, &8A, &8A
- EQUB &80, &99, &A6, &23, &8F, &84, &8A, &3B
- EQUB &23, &8F, &85, &8A, &C5, &19, &0B, &11
- EQUB &19, &8F, &A5, &CF, &1A, &CB, &A5, &A5
- EQUB &CA, &CA, &A5, &12, &11, &C8, &C1, &BC
- EQUB &A5, &A6, &19, &A6, &A5, &8A, &8E, &49
- EQUB &CB, &14, &D2, &BC, &80, &A5, &C5, &07
- EQUB &1D, &A5, &C9, &C0, &C0, &14, &C2, &16
- EQUB &A5, &C0, &D3, &C1, &CF, &11, &10, &A5
- EQUB &CE, &0C, &CB, &07, &D5, &D5, &A5, &CB
- EQUB &C9, &4D, &CA, &DF, &A6, &90, &A5, &2A
- EQUB &A5, &2D, &A5, &C7, &C4, &C9, &10, &A6
- EQUB &2D, &A5, &7D, &D6, &C3, &D2, &14, &D2
- EQUB &A5, &C2, &1D, &05, &78, &0E, &A5, &C2
- EQUB &C3, &C7, &C2, &CA, &DF, &A5, &AB, &AB
- EQUB &AB, &AB, &A6, &C3, &A6, &CA, &A6, &CF
- EQUB &A6, &D2, &A6, &C3, &A6, &AB, &AB, &AB
- EQUB &AB, &A5, &D6, &08, &D5, &14, &D2, &A5
- EQUB &8E, &C1, &C7, &CB, &C3, &A6, &C9, &10
- EQUB &D4, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &BC, &97, &EF, &C7, &DC, &2B, &07, &10
- EQUB &63, &70, &47, &48, &50, &5E, &5A, &5A
- EQUB &5A, &5E, &50, &48, &47, &70, &63, &10
- EQUB &07, &2B, &DC, &C7, &EF, &97, &BC, &A5
- EQUB &A4, &A6, &A1, &A0, &A3, &AD, &AC, &AF
- EQUB &AE, &A9, &A8, &AA, &B5, &B4, &B7, &B6
- EQUB &B1, &B0, &B3, &B2, &BD, &BC, &BC, &BF
- EQUB &BE, &B9, &B8, &B8, &BB, &BA, &BA, &38
- EQUB &A0, &00, &84, &70, &A9, &0F, &85, &71
- EQUB &71, &70, &C8, &D0, &FB, &C9, &CF, &EA
- EQUB &EA, &A9, &DB, &85
+.MESS1
 
- EQUB &9F
-
- EQUB &60, &71, &61, &31, &21, &50, &40, &10
- EQUB &00, &D3, &C3, &93, &83, &44, &54, &14
- EQUB &04, &55, &45, &15, &05, &75, &65, &35
- EQUB &25, &D2, &C2, &92, &82, &0C, &BB, &20
- EQUB &2E, &28, &E1, &5B, &0C, &9C, &28, &E0
- EQUB &5B, &08, &ED, &A6, &75, &E7, &0C, &AD
- EQUB &28, &85, &5B, &1C, &B5, &B4, &28, &84
- EQUB &5B, &2D, &B5, &52, &08, &E3, &A6, &55
- EQUB &A6, &6B, &E3, &A6, &CD, &0D, &08, &E4
- EQUB &5B, &00, &59, &E5, &3D, &ED, &05, &AE
- EQUB &0C, &A7, &89, &E8, &5B, &75, &63, &F5
- EQUB &B7, &AF, &28, &85, &5B, &08, &23, &A6
- EQUB &75, &AB, &1C, &A5, &B4, &28, &84, &5B
- EQUB &2D, &B5, &52, &CD, &0D, &C9, &5B, &DA
- EQUB &05, &A2, &1C, &AD, &B4, &28, &84, &5B
- EQUB &2D, &B5, &52, &95, &4B, &9F, &95, &8B
- EQUB &E0, &8B, &EF, &E4, &E8, &E0, &F6, &EA
- EQUB &EB, &A8, &A5, &B1, &08, &EF, &FF, &ED
- EQUB &A7, &F6, &12, &A5, &A5, &A6, &4D, &E3
- EQUB &A5, &A5, &AA, &A5, &A5, &A5, &A5, &A5
- EQUB &B3, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A6, &A5, &B5
- EQUB &AA, &B4, &A5, &A6, &B9, &AB, &A5, &A5
- EQUB &AF, &A5, &B4, &9F, &A2, &AC, &AD, &A5
- EQUB &A5, &A5, &A5, &25, &0F, &A6, &05, &A5
- EQUB &0C, &A8, &85, &4B, &5A, &6D, &14, &58
- EQUB &75, &5D, &55, &5B, &C1, &FA, &C4, &D1
- EQUB &D1, &D7, &CC, &C7, &D0, &D1, &C0, &D6
- EQUB &A5, &61, &81, &CF, &E6, &C2, &C0, &D1
- EQUB &D7, &C1, &CC, &D6, &C6, &A5, &13, &99
- EQUB &63, &A5, &A5, &A5, &A5, &A5, &A5, &A2
- EQUB &9A, &A5, &A5, &A5, &A6, &BA, &5A, &5A
- EQUB &5A, &A5, &AA, &DA, &5A, &5A, &5A, &5A
- EQUB &5A, &A5, &5A, &5A, &5A, &5A, &45, &25
- EQUB &5A, &A5, &5A, &45, &A5, &5A, &A5, &A5
- EQUB &5A, &A5, &5A, &A5, &A5, &5B, &A5, &A5
- EQUB &5B, &A5, &5A, &A5, &A5, &A5, &A5, &A6
- EQUB &AA, &A5, &44, &A2, &AA, &9A, &5A, &5A
- EQUB &5A, &A5, &5A, &5A, &5A, &5A, &5A, &5A
- EQUB &5A, &A5, &5A, &5B, &59, &55, &45, &65
- EQUB &5A, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &5A, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &5A, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &26, &A5, &9A, &A5, &A5, &A5, &A5, &A5
- EQUB &5A, &A5, &5A, &AA, &AA, &AA, &AA, &BA
- EQUB &5A, &A5, &5A, &5A, &5A, &5A, &5A, &5A
- EQUB &5A, &A5, &5A, &59, &59, &59, &59, &5B
- EQUB &5A, &A5, &5A, &A5, &A5, &A5, &A5, &A5
- EQUB &5A, &A5, &22, &A5, &A5, &A5, &A5, &A5
- EQUB &45, &A5, &5A, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &5A, &DA, &DA, &9A, &BA, &AA
- EQUB &A2, &A5, &5A, &5A, &5A, &5A, &5A, &5A
- EQUB &5A, &A5, &5A, &65, &45, &5D, &59, &5B
- EQUB &5A, &A5, &45, &A5, &A5, &A5, &A5, &A5
- EQUB &25, &A5, &5A, &9A, &BA, &A2, &A4, &A5
- EQUB &A5, &A5, &5A, &5A, &5A, &5A, &5A, &DA
- EQUB &BA, &A5, &5A, &45, &5D, &5A, &5A, &5A
- EQUB &5A, &A5, &5A, &A5, &A5, &5A, &65, &55
- EQUB &5A, &A5, &59, &A5, &A5, &5A, &A5, &A5
- EQUB &5A, &A5, &A5, &A5, &A5, &25, &A5, &A5
- EQUB &5A, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &5B, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A2, &A5, &A5, &A5, &A5, &A6, &BA, &5D
- EQUB &66, &A5, &A5, &AA, &D9, &5A, &AA, &D9
- EQUB &55, &A5, &9A, &2A, &D9, &54, &2A, &9A
- EQUB &9A, &A5, &65, &2A, &D9, &55, &65, &BA
- EQUB &55, &A5, &5A, &3A, &A5, &A5, &A6, &2A
- EQUB &A2, &A5, &A4, &BA, &D9, &5D, &44, &62
- EQUB &5B, &A5, &5B, &BA, &D9, &5D, &54, &46
- EQUB &A2, &A5, &BA, &9B, &D9, &5A, &5E, &55
- EQUB &44, &A5, &59, &9B, &D9, &55, &45, &5D
- EQUB &5D, &A5, &9B, &9B, &DA, &DA, &D9, &D9
- EQUB &59, &A5, &D9, &D9, &1B, &5B, &5B, &9B
- EQUB &9A, &A5, &9A, &D9, &9B, &AA, &A5, &BA
- EQUB &A6, &A5, &45, &D9, &A5, &5D, &BA, &AA
- EQUB &5A, &A5, &DA, &5D, &9B, &BA, &2A, &62
- EQUB &A5, &A5, &26, &5D, &9B, &BA, &22, &46
- EQUB &DA, &A5, &5A, &5D, &9B, &AA, &62, &54
- EQUB &45, &A5, &6A, &A5, &A5, &5B, &45, &5D
- EQUB &DB, &A5, &5A, &BA, &A6, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &45, &D9, &BA, &A6
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &25, &55
- EQUB &DB, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A4, &A6
- EQUB &A2, &A5, &A5, &A4, &AB, &9D, &45, &66
- EQUB &22, &A5, &9D, &66, &AB, &9D, &45, &39
- EQUB &44, &A5, &D9, &1D, &A5, &A6, &A2, &9D
- EQUB &65, &A5, &D5, &D5, &45, &65, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A4, &A6, &AA, &B9
- EQUB &9C, &A5, &9A, &42, &7B, &58, &D6, &42
- EQUB &62, &A5, &A5, &A5, &DB, &6B, &24, &9C
- EQUB &44, &A5, &A5, &A5, &9A, &42, &4B, &7B
- EQUB &5D, &A5, &A5, &A5, &9A, &DA, &D5, &55
- EQUB &45, &A5, &A5, &A5, &3A, &38, &98, &98
- EQUB &9C, &A5, &A5, &A5, &62, &4B, &42, &65
- EQUB &6A, &A5, &A5, &A5, &56, &A2, &42, &D6
- EQUB &44, &A5, &A5, &A4, &54, &1C, &19, &19
- EQUB &5D, &A5, &54, &65, &44, &5D, &55, &D5
- EQUB &DD, &A5, &65, &45, &59, &D5, &9D, &99
- EQUB &AA, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &25, &A5, &D5, &D9, &AB, &A2, &A6, &A4
- EQUB &A6, &A5, &D9, &D2, &98, &A2, &25, &45
- EQUB &59, &A5, &DB, &1E, &7B, &56, &9C, &99
- EQUB &D9, &A5, &AB, &22, &46, &56, &7B, &52
- EQUB &BA, &A5, &A5, &25, &45, &5D, &5A, &26
- EQUB &25, &A5, &A5, &A5, &A5, &A5, &A5, &25
- EQUB &45, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &A5, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &55, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &55, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &55, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &55, &25, &25, &25, &25, &65, &01
- EQUB &33, &55, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &55, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &55, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &55, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &55, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &55, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &55, &A5, &96, &87, &96, &87, &96
- EQUB &A5, &55, &A5, &0F, &87, &87, &87, &1E
- EQUB &A5, &55, &A5, &87, &87, &87, &87, &0F
- EQUB &A5, &55, &A5, &4B, &E1, &E1, &E1, &E1
- EQUB &A5, &55, &A5, &4B, &2D, &69, &2D, &4B
- EQUB &A5, &55, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &55, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &55, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &55, &A5, &A5, &A5, &A5, &A5, &A5
- EQUB &A5, &55, &A5, &A5, &A5, &A5, &A5
+ EQUS "*DIR E"
+ EQUB 13
 
 \ ******************************************************************************
 \
-\ Save output/ELITE4.bin
+\       Name: Elite loader (Part 2 of 3)
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: Include binaries for recursive tokens, Missile blueprint and
+\             images
+\
+\ ------------------------------------------------------------------------------
+\
+\ The loader bundles a number of binary files in with the loader code, and moves
+\ them to their correct memory locations in part 1 above.
+\
+\ There are two files containing code:
+\
+\   * WORDS.bin contains the recursive token table, which is moved to &0400
+\     before the main game is loaded
+\
+\   * MISSILE.bin contains the missile ship blueprint, which gets moved to &7F00
+\     before the main game is loaded
+\
+\ and one file containing an image, which is moved into screen memory by the
+\ loader:
+\
+\   * P.DIALS.bin contains the dashboard, which gets moved to screen address
+\     &7800, which is the starting point of the four-colour mode 5 portion at
+\     the bottom of the split screen
+\
+\ There are three other image binaries bundled into the loder, which are
+\ described in part 3 below.
+\
+\ ******************************************************************************
+
+.DIALS
+
+ INCBIN "binaries/P.DIALS.bin"
+
+.SHIP_MISSILE
+
+ INCBIN "output/MISSILE.bin"
+
+.WORDS
+
+ INCBIN "output/WORDS.bin"
+
+\ ******************************************************************************
+\
+\       Name: OSBmod
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: 
+\
+\ ******************************************************************************
+
+\ &294B, JSR OSB above gets modified to jump here, so disassemble
+
+.OSBmod
+
+ SEC
+ LDY #0
+ STY &70
+ LDA #$0F
+ STA &71
+
+.L2954
+
+ ADC (&70),Y
+ INY
+ BNE L2954
+
+ CMP #&CF
+
+ NOP
+ NOP
+
+ LDA #219               \ Store 219 in location &9F. This gets checked by the
+ STA &9F                \ TITLE routine in the main docked code as part of the
+                        \ copy protection (the game hangs if it doesn't match)
+
+ RTS
+
+\ ******************************************************************************
+\
+\       Name: COMMON
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: 
+\
+\ &2962-&2A61 to &1100-&11FF
+\ IRQ1 etc. - this is code
+\ Need to EOR this, commander file and BRBR1 with &A5 in elite-checksum.py
+\
+\ ******************************************************************************
+
+.COMMON
+
+ORG &1100
+
+\ ******************************************************************************
+\
+\       Name: TVT1
+\       Type: Variable
+\   Category: Screen mode
+\    Summary: Palette data for space and the two dashboard colour schemes
+\
+\ ------------------------------------------------------------------------------
+\
+\ Palette bytes for use with the split-screen mode (see IRQ1 below for more
+\ details).
+\
+\ Palette data is given as a set of bytes, with each byte mapping a logical
+\ colour to a physical one. In each byte, the logical colour is given in bits
+\ 4-7 and the physical colour in bits 0-3. See p.379 of the Advanced User Guide
+\ for details of how palette mapping works, as in modes 4 and 5 we have to do
+\ multiple palette commands to change the colours correctly, and the physical
+\ colour value is EOR'd with 7, just to make things even more confusing.
+\
+\ Similarly, the palette at TVT1+16 is for the monochrome space view, where
+\ logical colour 1 is mapped to physical colour 0 EOR 7 = 7 (white), and
+\ logical colour 0 is mapped to physical colour 7 EOR 7 = 0 (black). Each of
+\ these mappings requires six calls to SHEILA &21 - see p.379 of the Advanced
+\ User Guide for an explanation.
+\
+\ The mode 5 palette table has two blocks which overlap. The block used depends
+\ on whether or not we have an escape pod fitted. The block at TVT1 is used for
+\ the standard dashboard colours, while TVT1+8 is used for the dashboard when an
+\ escape pod is fitted. The colours are as follows:
+\
+\                 Normal (TVT1)     Escape pod (TVT1+8)
+\
+\   Colour 0      Black             Black
+\   Colour 1      Red               Red
+\   Colour 2      Yellow            White
+\   Colour 3      Green             Cyan
+\
+\ ******************************************************************************
+
+.TVT1
+
+ EQUB &D4, &C4          \ This block of palette data is used to create two
+ EQUB &94, &84          \ palettes used in three different places, all of them
+ EQUB &F5, &E5          \ redefining four colours in mode 5:
+ EQUB &B5, &A5          \
+                        \ 12 bytes from TVT1 (i.e. the first 6 rows): applied
+ EQUB &76, &66          \ when the T1 timer runs down at the switch from the
+ EQUB &36, &26          \ space view to the dashboard, so this is the standard
+                        \ dashboard palette
+ EQUB &E1, &F1          \
+ EQUB &B1, &A1          \ 8 bytes from TVT1+8 (i.e. the last 4 rows): applied
+                        \ when the T1 timer runs down at the switch from the
+                        \ space view to the dashboard, and we have an escape
+                        \ pod fitted, so this is the escape pod dashboard
+                        \ palette
+                        \
+                        \ 8 bytes from TVT1+8 (i.e. the last 4 rows): applied
+                        \ at vertical sync in LINSCN when HFX is non-zero, to
+                        \ create the hyperspace effect in LINSCN (where the
+                        \ whole screen is switched to mode 5 at vertical sync)
+
+ EQUB &F0, &E0          \ 12 bytes of palette data at TVT1+16, used to set the
+ EQUB &B0, &A0          \ mode 4 palette in LINSCN when we hit vertical sync,
+ EQUB &D0, &C0          \ so the palette is set to monochrome when we start to
+ EQUB &90, &80          \ draw the first row of the screen
+ EQUB &77, &67
+ EQUB &37, &27
+
+\ ******************************************************************************
+\
+\       Name: IRQ1
+\       Type: Subroutine
+\   Category: Screen mode
+\    Summary: The main screen-mode interrupt handler (IRQ1V points here)
+\  Deep dive: The split-screen mode
+\
+\ ------------------------------------------------------------------------------
+\
+\ The main interrupt handler, which implements Elite's split-screen mode (see
+\ the deep dive on "The split-screen mode" for details).
+\
+\ IRQ1V is set to point to IRQ1 by elite-loader.asm.
+\
+\ ******************************************************************************
+
+.LINSCN
+
+                        \ This is called from the interrupt handler below, at
+                        \ the start of each vertical sync (i.e. when the screen
+                        \ refresh starts)
+
+ LDA #30                \ Set the line scan counter to a non-zero value, so
+ STA DL                 \ routines like WSCAN can set DL to 0 and then wait for
+                        \ it to change to non-zero to catch the vertical sync
+
+ STA VIA+&44            \ Set 6522 System VIA T1C-L timer 1 low-order counter
+                        \ (SHEILA &44) to 30
+
+ LDA #VSCAN             \ Set 6522 System VIA T1C-L timer 1 high-order counter
+ STA VIA+&45            \ (SHEILA &45) to VSCAN (57) to start the T1 counter
+                        \ counting down from 14622 at a rate of 1 MHz
+
+ LDA HFX                \ If HFX is non-zero, jump to VNT1 to set the mode 5
+ BNE VNT1               \ palette instead of switching to mode 4, which will
+                        \ have the effect of blurring and colouring the top
+                        \ screen. This is how the white hyperspace rings turn
+                        \ to colour when we do a hyperspace jump, and is
+                        \ triggered by setting HFX to 1 in routine LL164
+
+ LDA #%00001000         \ Set the Video ULA control register (SHEILA &20) to
+ STA VIA+&20            \ %00001000, which is the same as switching to mode 4
+                        \ (i.e. the top part of the screen) but with no cursor
+
+.VNT3
+
+ LDA TVT1+16,Y          \ Copy the Y-th palette byte from TVT1+16 to SHEILA &21
+ STA VIA+&21            \ to map logical to actual colours for the bottom part
+                        \ of the screen (i.e. the dashboard)
+
+ DEY                    \ Decrement the palette byte counter
+
+ BPL VNT3               \ Loop back to VNT3 until we have copied all the
+                        \ palette bytes
+
+ LDA LASCT              \ Decrement the value of LASCT, but if we go too far
+ BEQ P%+5               \ and it becomes negative, bump it back up again (this
+ DEC LASCT              \ controls the pulsing of pulse lasers)
+
+ PLA                    \ Otherwise restore Y from the stack
+ TAY
+
+ LDA VIA+&41            \ Read 6522 System VIA input register IRA (SHEILA &41)
+
+ LDA &FC                \ Set A to the interrupt accumulator save register,
+                        \ which restores A to the value it had on entering the
+                        \ interrupt
+
+ RTI                    \ Return from interrupts, so this interrupt is not
+                        \ passed on to the next interrupt handler, but instead
+                        \ the interrupt terminates here
+
+.IRQ1
+
+ TYA                    \ Store Y on the stack
+ PHA
+
+ LDY #11                \ Set Y as a counter for 12 bytes, to use when setting
+                        \ the dashboard palette below
+
+ LDA #%00000010         \ Read the 6522 System VIA status byte bit 1 (SHEILA
+ BIT VIA+&4D            \ &4D), which is set if vertical sync has occurred on
+                        \ the video system
+
+ BNE LINSCN             \ If we are on the vertical sync pulse, jump to LINSCN
+                        \ to set up the timers to enable us to switch the
+                        \ screen mode between the space view and dashboard
+
+ BVC jvec               \ Read the 6522 System VIA status byte bit 6, which is
+                        \ set if timer 1 has timed out. We set the timer in
+                        \ LINSCN above, so this means we only run the next bit
+                        \ if the screen redraw has reached the boundary between
+                        \ the space view and the dashboard. Otherwise bit 6 is
+                        \ clear and we aren't at the boundary, so we jump to
+                        \ jvec to pass control to the next interrupt handler
+
+ ASL A                  \ Double the value in A to 4
+
+ STA VIA+&20            \ Set the Video ULA control register (SHEILA &20) to
+                        \ %00000100, which is the same as switching to mode 5,
+                        \ (i.e. the bottom part of the screen) but with no
+                        \ cursor
+
+ LDA ESCP               \ If an escape pod is fitted, jump to VNT1 to set the
+ BNE VNT1               \ mode 5 palette differently (so the dashboard is a
+                        \ different colour if we have an escape pod)
+
+ LDA TVT1,Y             \ Copy the Y-th palette byte from TVT1 to SHEILA &21
+ STA VIA+&21            \ to map logical to actual colours for the bottom part
+                        \ of the screen (i.e. the dashboard)
+
+ DEY                    \ Decrement the palette byte counter
+
+ BPL P%-7               \ Loop back to the LDA TVT1,Y instruction until we have
+                        \ copied all the palette bytes
+
+.jvec
+
+ PLA                    \ Restore Y from the stack
+ TAY
+
+ JMP (VEC)              \ Jump to the address in VEC, which was set to the
+                        \ original IRQ1V vector by elite-loader.asm, so this
+                        \ instruction passes control to the next interrupt
+                        \ handler
+
+.VNT1
+
+ LDY #7                 \ Set Y as a counter for 8 bytes
+
+ LDA TVT1+8,Y           \ Copy the Y-th palette byte from TVT1+8 to SHEILA &21
+ STA VIA+&21            \ to map logical to actual colours for the bottom part
+                        \ of the screen (i.e. the dashboard)
+
+ DEY                    \ Decrement the palette byte counter
+
+ BPL VNT1+2             \ Loop back to the LDA TVT1+8,Y instruction until we
+                        \ have copied all the palette bytes
+
+ BMI jvec               \ Jump up to jvec to pass control to the next interrupt
+                        \ handler (this BMI is effectively a JMP as we didn't
+                        \ loop back with the BPL above, so BMI is always true)
+
+.S1%
+
+ EQUS ":0.E."           \ The drive and directory number used when saving or
+                        \ loading a commander file
+                        \
+                        \ The drive part of this string (the "0") is updated
+                        \ with the chosen drive in the QUS1 routine, but the
+                        \ directory part (the "E") is fixed
+
+\ ******************************************************************************
+\
+\       Name: NA%
+\       Type: Variable
+\   Category: Save and load
+\    Summary: The data block for the last saved commander
+\
+\ ------------------------------------------------------------------------------
+\
+\ Contains the last saved commander data, with the name at NA% and the data at
+\ NA%+8 onwards. The size of the data block is given in NT% (which also includes
+\ the two checksum bytes that follow this block. This block is initially set up
+\ with the default commander, which can be maxed out for testing purposes by
+\ setting Q% to TRUE.
+\
+\ The commander's name is stored at NA%, and can be up to 7 characters long
+\ (the DFS filename limit). It is terminated with a carriage return character,
+\ ASCII 13.
+\
+\ The offset of each byte within a saved commander file is also shown as #0, #1
+\ and so on, so the kill tally, for example, is in bytes #71 and #72 of the
+\ saved file. The related variable name from the current commander block is
+\ also shown.
+\
+\ ******************************************************************************
+
+.NA%
+
+ EQUS "JAMESON"         \ The current commander name, which defaults to JAMESON
+ EQUB 13                \
+                        \ The commander name can be up to 7 characters (the DFS
+                        \ limit for file names), and is terminated by a carriage
+                        \ return
+
+                        \ NA%+8 is the start of the commander data block
+                        \
+                        \ This block contains the last saved commander data
+                        \ block. As the game is played it uses an identical
+                        \ block at location TP to store the current commander
+                        \ state, and that block is copied here when the game is
+                        \ saved. Conversely, when the game starts up, the block
+                        \ here is copied to TP, which restores the last saved
+                        \ commander when we die
+                        \
+                        \ The initial state of this block defines the default
+                        \ commander. Q% can be set to TRUE to give the default
+                        \ commander lots of credits and equipment
+
+ EQUB 0                 \ TP = Mission status, #0
+                        \
+                        \ Note that this byte must not have bit 7 set, or
+                        \ loading this commander will cause the game to restart
+
+ EQUB 20                \ QQ0 = current system X-coordinate (Lave), #1
+ EQUB 173               \ QQ1 = current system Y-coordinate (Lave), #2
+
+ EQUW &5A4A             \ QQ21 = Seed s0 for system 0, galaxy 0 (Tibedied), #3-4
+ EQUW &0248             \ QQ21 = Seed s1 for system 0, galaxy 0 (Tibedied), #5-6
+ EQUW &B753             \ QQ21 = Seed s2 for system 0, galaxy 0 (Tibedied), #7-8
+
+IF Q%
+ EQUD &00CA9A3B         \ CASH = Amount of cash (100,000,000 Cr), #9-12
+ELSE
+ EQUD &E8030000         \ CASH = Amount of cash (100 Cr), #9-12
+ENDIF
+
+ EQUB 70                \ QQ14 = Fuel level, #13
+
+ EQUB 0                 \ COK = Competition flags, #14
+
+ EQUB 0                 \ GCNT = Galaxy number, 0-7, #15
+
+ EQUB POW+(128 AND Q%)  \ LASER = Front laser, #16
+
+ EQUB (POW+128) AND Q%  \ LASER+1 = Rear laser, #17
+
+ EQUB 0                 \ LASER+2 = Left laser, #18
+
+ EQUB 0                 \ LASER+3 = Right laser, #19
+
+ EQUW 0                 \ These bytes are unused (they were originally used for
+                        \ up/down lasers, but they were dropped), #20-21
+
+ EQUB 22+(15 AND Q%)    \ CRGO = Cargo capacity, #22
+
+ EQUD 0                 \ QQ20 = Contents of cargo hold (17 bytes), #23-39
+ EQUD 0
+ EQUD 0
+ EQUD 0
+ EQUB 0
+
+ EQUB Q%                \ ECM = E.C.M., #40
+
+ EQUB Q%                \ BST = Fuel scoops ("barrel status"), #41
+
+ EQUB Q% AND 127        \ BOMB = Energy bomb, #42
+
+ EQUB Q% AND 1          \ ENGY = Energy/shield level, #43
+
+ EQUB Q%                \ DKCMP = Docking computer, #44
+
+ EQUB Q%                \ GHYP = Galactic hyperdrive, #45
+
+ EQUB Q%                \ ESCP = Escape pod, #46
+
+ EQUD FALSE             \ These four bytes are unused, #47-50
+
+ EQUB 3+(Q% AND 1)      \ NOMSL = Number of missiles, #51
+
+ EQUB FALSE             \ FIST = Legal status ("fugitive/innocent status"), #52
+
+ EQUB 16                \ AVL = Market availability (17 bytes), #53-69
+ EQUB 15
+ EQUB 17
+ EQUB 0
+ EQUB 3
+ EQUB 28
+ EQUB 14
+ EQUB 0
+ EQUB 0
+ EQUB 10
+ EQUB 0
+ EQUB 17
+ EQUB 58
+ EQUB 7
+ EQUB 9
+ EQUB 8
+ EQUB 0
+
+ EQUB 0                 \ QQ26 = Random byte that changes for each visit to a
+                        \ system, for randomising market prices, #70
+
+ EQUW 0                 \ TALLY = Number of kills, #71-72
+
+ EQUB 128               \ SVC = Save count, #73
+
+\ ******************************************************************************
+\
+\       Name: CHK2
+\       Type: Variable
+\   Category: Save and load
+\    Summary: Second checksum byte for the saved commander data file
+\
+\ ------------------------------------------------------------------------------
+\
+\ Second commander checksum byte. If the default commander is changed, a new
+\ checksum will be calculated and inserted by the elite-checksum.py script.
+\
+\ The offset of this byte within a saved commander file is also shown (it's at
+\ byte #74).
+\
+\ ******************************************************************************
+
+.CHK2
+
+ EQUB &03 EOR &A9       \ The checksum value for the default commander, EOR'd
+                        \ with &A9 to make it harder to tamper with the checksum
+                        \ byte, #74
+
+\ ******************************************************************************
+\
+\       Name: CHK
+\       Type: Variable
+\   Category: Save and load
+\    Summary: First checksum byte for the saved commander data file
+\
+\ ------------------------------------------------------------------------------
+\
+\ Commander checksum byte. If the default commander is changed, a new checksum
+\ will be calculated and inserted by the elite-checksum.py script.
+\
+\ The offset of this byte within a saved commander file is also shown (it's at
+\ byte #75).
+\
+\ ******************************************************************************
+
+.CHK
+
+ EQUB &03               \ The checksum value for the default commander, #75
+
+\ ******************************************************************************
+\
+\       Name: BRBR1
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: Common break handler: prints a newline and the error message and
+\             hangs
+\
+\ ******************************************************************************
+
+.BRBR1
+
+ LDY #0
+
+ LDA #13
+
+.BRBRLOOP
+
+ JSR OSWRCH
+ INY
+ LDA (&FD),Y
+ BNE BRBRLOOP
+
+.BRBR1a
+
+ BEQ BRBR1a
+
+ EQUB &64, &5F, &61
+ EQUB &74, &74, &72
+ EQUB &69, &62, &75
+ EQUB &74, &65, &73
+ EQUB &00, &C4, &24
+ EQUB &6A, &43, &67
+ EQUB &65, &74, &72
+ EQUB &64, &69, &73
+ EQUB &63, &00, &B6
+ EQUB &3C, &C6
+
+COPYBLOCK TVT1, P%, COMMON
+
+ORG COMMON + P% - TVT1
+
+\ ******************************************************************************
+\
+\       Name: Elite loader (Part 3 of 3)
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: Include binaries for the loading screen images
+\
+\ ------------------------------------------------------------------------------
+\
+\ The loader bundles a number of binary files in with the loader code, and moves
+\ them to their correct memory locations in part 1 above.
+\
+\ This part includes three files containing images, which are all moved into
+\ screen memory by the loader:
+\
+\   * P.A-SOFT.bin contains the "ACORNSOFT" title across the top of the loading
+\     screen, which gets moved to screen address &6100, on the second character
+\     row of the monochrome mode 4 screen
+\
+\   * P.ELITE.bin contains the "ELITE" title across the top of the loading
+\     screen, which gets moved to screen address &6300, on the fourth character
+\     row of the monochrome mode 4 screen
+\
+\   * P.(C)ASFT.bin contains the "(C) Acornsoft 1984" title across the bottom
+\     of the loading screen, which gets moved to screen address &7600, the
+\     penultimate character row of the monochrome mode 4 screen, just above the
+\     dashboard
+\
+\ There are three other binaries bundled into the loder, which are part 2 above.
+\
+\ ******************************************************************************
+
+.ELITE
+
+ INCBIN "binaries/P.ELITE.bin"
+
+.ASOFT
+
+ INCBIN "binaries/P.A-SOFT.bin"
+
+.CpASOFT
+
+ INCBIN "binaries/P.(C)ASFT.bin"
+
+IF _MATCH_EXTRACTED_BINARIES
+
+IF _STH_DISC
+ INCBIN "extracted/sth/workspaces/loader3.bin"
+ELIF _IB_DISC
+ SKIP 158
+ENDIF
+
+ELSE
+
+ SKIP 158               \ These bytes are unused
+
+ENDIF
+
+\ ******************************************************************************
+\
+\ Save output/ELITE4.unprot.bin
 \
 \ ******************************************************************************
 
 PRINT "S.ELITE4 ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
-SAVE "output/ELITE4.bin", CODE%, P%, LOAD%
+SAVE "output/ELITE4.unprot.bin", CODE%, P%, LOAD%
 

@@ -12,6 +12,7 @@ It is a companion to the [bbcelite.com website](https://www.bbcelite.com), which
 
 My hope is that this repository and the [accompanying website](https://www.bbcelite.com) will be useful for those who want to learn more about Elite and what makes it tick. It is provided on an educational and non-profit basis, with the aim of helping people appreciate one of the most iconic games of the 8-bit era.
 
+
 ## Contents
 
 * [Acknowledgements](#acknowledgements)
@@ -28,6 +29,9 @@ My hope is that this repository and the [accompanying website](https://www.bbcel
   * [Mac and Linux](#mac-and-linux)
   * [Verifying the output](#verifying-the-output)
   * [Log files](#log-files)
+
+* [Building different release versions of Elite](#building-different-release-versions-of-elite)
+
 
 ## Acknowledgements
 
@@ -55,6 +59,7 @@ Under GitHub's rules, you have the right to read and fork this repository... but
 
 My hope is that the educational and non-profit intentions of this repository will enable it to stay hosted and available, but the original copyright holders do have the right to ask for it to be taken down, in which case I will comply without hesitation. I do hope, though, that along with the various other disassemblies and commentaries of this source, it will remain viable.
 
+
 ## Browsing the source in an IDE
 
 If you want to browse the source in an IDE, you might find the following useful.
@@ -78,6 +83,7 @@ If you want to browse the source in an IDE, you might find the following useful.
 * The source code is designed to be read at an 80-column width and with a monospaced font, just like in the good old days.
 
 I hope you enjoy exploring the inner-workings of BBC Elite as much as I have.
+
 
 ## Building Elite from the source
 
@@ -208,6 +214,39 @@ All the compiled binaries match the extracts, so we know we are producing the sa
 ### Log files
 
 During compilation, details of every step are output in a file called `compile.txt` in the `output` folder. If you have problems, it might come in handy, and it's a great reference if you need to know the addresses of labels and variables for debugging (or just snooping around).
+
+
+## Building different release versions of Elite
+
+This repository contains the source code for two different versions of Disc Elite:
+
+* The version from the Stairway to Hell archive
+
+* The version from the game disc on Ian Bell's website
+
+By default the build process builds the Stairway to Hell version, but you can build the source disc version by appending `release-disc=ib-disc` to the `make` command, like this on Windows:
+
+```
+make.bat encrypt verify release-disc=ib-disc
+```
+
+or this on a Mac or Linux:
+
+```
+make encrypt verify release-disc=ib-disc
+```
+
+You can also add `release-disc=sth`, though that's the default value so it isn't necessary.
+
+You can see the differences between the versions by searching the source code for `_STH_DISC` (for features in the Stairway to Hell version) or `_IB_DISC` (for features in the Ian Bell game disc). There are only a few differences:
+
+* The Ian Bell version contains the refund bug, which has been fixed in the Stairway to Hell version
+
+* The Ian Bell version never spawns asteroids, which has been fixed in the Stairway to Hell version
+
+* The Ian Bell version sets bit 2 of the competition flag in the commander file, while the Stairway to Hell version sets bit 5
+
+In other words, the Ian Bell is the very first release of the disc version of Elite, while the Stairway to Hell version has both bugs fixed and a bumper-up version number.
 
 ---
 

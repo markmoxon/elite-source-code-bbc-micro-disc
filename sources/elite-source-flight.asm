@@ -130,6 +130,12 @@ QQ16 = &0880            \ The address of the two-letter text token table
 CATD = &0D7A            \ The address of the CATD routine that is put in place
                         \ by the third loader
 
+IRQ1 = &114B            \ The address of the IRQ1 routine that implements the
+                        \ split screen interrupt handler, which IRQ1V points to
+
+BRBR1 = &11D5           \ The address of the main break handler, which BRKV
+                        \ points to
+
 XX21 = &5600            \ The address of the ship blueprints lookup table, where
                         \ the chosen ship blueprints file is loaded
 
@@ -1900,11 +1906,11 @@ LOAD_A% = LOAD%
 
  JMP scramble           \ Decrypt the main flight code and start a new game
 
- JMP TT26               \ WRCHV handler
+ JMP TT26               \ WRCHV is set to point here by elite-loader3.asm
 
- EQUW &114B             \ IRQ1 handler
+ EQUW IRQ1              \ IRQ1V is set to point here by elite-loader3.asm
 
- JMP &11D5              \ BRBR handler
+ JMP BRBR1              \ BRKV is set to point here by elite-loader3.asm
 
 \ ******************************************************************************
 \

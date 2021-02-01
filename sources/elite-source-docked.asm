@@ -141,6 +141,12 @@ QQ16_FLIGHT = &0880     \ The address of the two-letter text token table in the
 CATD = &0D7A            \ The address of the CATD routine that is put in place
                         \ by the third loader
 
+IRQ1 = &114B            \ The address of the IRQ1 routine that implements the
+                        \ split screen interrupt handler, which IRQ1V points to
+
+BRBR1 = &11D5           \ The address of the main break handler, which BRKV
+                        \ points to
+
 NA% = &1181             \ The address of data block for the last saved commander
 
 CHK2 = &11D3            \ The address of the second checksum byte for the saved
@@ -1914,15 +1920,15 @@ LOAD_A% = LOAD%
 
  JMP DOBEGIN            \ Decrypt the main flight code and start a new game
 
- JMP CHPR               \ WRCHV handler
+ JMP CHPR               \ WRCHV is set to point here by elite-loader3.asm
 
- EQUW &114B             \ IRQ1V handler (points to IRQ1)
+ EQUW IRQ1              \ IRQ1V is set to point here by elite-loader3.asm
 
- EQUB &4C               \ A JMP instruction
+ EQUB &4C               \ A JMP instruction, so this becomes JMP BRBR
 
 .BRKV
 
- EQUW &11D5             \ BRKV handler (points to BRBR)
+ EQUW BRBR1             \ BRKV is set to point here by elite-loader3.asm
 
 \ ******************************************************************************
 \
@@ -20787,15 +20793,15 @@ ENDIF
 
 IF _STH_DISC
 
- ORA #32                \ Set bit 5 of A to denote thet this is the disc version
-                        \ with the refund bug fixed (before the bug was fixed
-                        \ the version number was 4)
+ ORA #%00100000         \ Set bit 5 of A to denote that this is the disc version
+                        \ with the refund bug fixed (in versions before the bug
+                        \ was fixed, bit 2 is set)
 
 ELIF _IB_DISC
 
- ORA #4                 \ Set bit 2 of A to denote thet this is the disc version
-                        \ but before the refund bug was fixed (after the bug was
-                        \ fixed the version number was changed to 32)
+ ORA #%00000100         \ Set bit 2 of A to denote that this is the disc version
+                        \ but before the refund bug was fixed (in versions after
+                        \ the bug was fixed, bit 5 is set)
 
 ENDIF
 
@@ -20844,9 +20850,11 @@ ENDIF
  LDA #96                \ Set nosev_z hi = 96 (96 is the value of unity in the
  STA INWK+14            \ rotation vector)
 
- LDA K2+4               \ ???? Copy protection, checks location &9F for the
- CMP #&DB               \ value &DB and crashes the game if it doesn't match
- BEQ tiwe
+ LDA &9F                \ As part of the copy protection, location &9F is set to
+ CMP #219               \ 219 in the OSBmod routine in elite-loader3.asm. This
+ BEQ tiwe               \ jumps to tiwe if the value is unchanged, otherwise it
+                        \ crashes the game with the following (as presumably
+                        \ the game code has been tampered with)
 
  LDA #&10               \ Modify the STA DELTA instruction in RES2 to &10 &FE,
  STA modify+2           \ which is a BPL P%-2 instruction, to create an infinite
@@ -20923,9 +20931,8 @@ ENDIF
                         \ pointed to by the MOS error message pointer
 
  BNE P%-6               \ If the fetched character is non-zero, loop back to the
-                        \ JSR OSWRCH above to print the it, and keep looping
-                        \ until we fetch a zero (which marks the end of the
-                        \ message)
+                        \ JSR OSWRCH above to print it, and keep looping until
+                        \ we fetch a zero (which marks the end of the message)
 
 .BRBR2
 
