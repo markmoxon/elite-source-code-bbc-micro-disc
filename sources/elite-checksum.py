@@ -7,34 +7,52 @@
 # Written by Mark Moxon
 #
 # This script applies encryption and checksums to the compiled binary for the
-# main game code. It reads the unencrypted "D.CODE.decrypt.bin" and
-# "T.CODE.decrypt.bin" binaries and generates encrypted versions as "D.CODE" and
-# "T.CODE"
+# main game code. It reads these unencrypted binary files:
+#
+#   * output/ELITE4.unprot.bin
+#   * output/D.CODE.unprot.bin
+#   * output/T.CODE.unprot.bin
+#
+# and generates encrypted versions as follows:
+#
+#   * output/ELITE4.bin
+#   * output/D.CODE.bin
+#   * output/T.CODE.bin
 #
 # ******************************************************************************
 
-from __future__ import print_function
+import sys
+
+argv = sys.argv
+argc = len(argv)
+Encrypt = True
+
+if argc > 1 and argv[1] == '-u':
+    Encrypt = False
+
+print("Disc Elite Checksum")
+print("Encryption = ", Encrypt)
 
 # Configuration variables for ELITE4
 
 load_address = 0x1900
 
-# BEGIN block
+# TVT1code block
 scramble1_from = 0x2962
 scramble1_to = 0x2A62
 scramble1_eor = 0xA5
 
-# LOD2 block
+# LOADcode block
 scramble2_from = 0x1AED
 scramble2_to = 0x1B4F
 scramble2_eor = 0x18
 
-# DIALS and SHIP_MISSILE blocks
+# DIALS, SHIP_MISSILE and WORDS blocks
 scramble3_from = 0x1D4B
 scramble3_to = 0x294B
 scramble3_eor = 0xA5
 
-# ELITE, ASOFT, CpASOFT blocks and padding to the end of the file
+# ELITE, ASOFT and CpASOFT blocks, plus padding to the end of the file
 scramble4_from = 0x2A62
 scramble4_to = 0x2E00
 scramble4_eor = 0xA5
@@ -46,6 +64,26 @@ data_block = bytearray()
 elite_file = open('output/ELITE4.unprot.bin', 'rb')
 data_block.extend(elite_file.read())
 elite_file.close()
+
+# Commander data checksum
+
+na_per_cent_offset = 0x29E3 - load_address
+CH = 0x4B - 2
+CY = 0
+for i in range(CH, 0, -1):
+    CH = CH + CY + data_block[na_per_cent_offset + i + 7]
+    CY = (CH > 255) & 1
+    CH = CH % 256
+    CH = CH ^ data_block[na_per_cent_offset + i + 8]
+
+print("Commander checksum = ", CH)
+
+# Must have Commander checksum otherwise game will lock:
+
+if Encrypt:
+    checksum_offset = 0x2A35 - load_address
+    data_block[checksum_offset] = CH ^ 0xA9
+    data_block[checksum_offset + 1] = CH
 
 # EOR bytes in the various blocks
 
@@ -60,7 +98,6 @@ for n in range(scramble3_from, scramble3_to):
 
 for n in range(scramble4_from, scramble4_to):
     data_block[n - load_address] = data_block[n - load_address] ^ scramble4_eor
-
 # Write output file for 'ELITE4.bin'
 
 output_file = open('output/ELITE4.bin', 'wb')

@@ -32,18 +32,13 @@ _STH_DISC               = (_RELEASE = 2)
 \
 \ ******************************************************************************
 
-Q% = _REMOVE_CHECKSUMS  \ Set Q% to TRUE to max out the default commander, FALSE
-                        \ for the standard default commander (this is set to
-                        \ TRUE if checksums are disabled, just for convenience)
-
 LS% = &0CFF             \ The start of the descending ship line heap
 
 NOST = 18               \ The number of stardust particles in normal space (this
                         \ goes down to 3 in witchspace)
 
 NOSH = 12               \ The maximum number of ships in our local bubble of
-                        \ universe (counting from 0, so there are actually 13
-                        \ ship slots)
+                        \ universe
 
 NTY = 31                \ The number of different ship types
 
@@ -129,33 +124,40 @@ VE = &57                \ The obfuscation byte used to hide the extended tokens
 LL = 30                 \ The length of lines (in characters) of justified text
                         \ in the extended tokens system
 
-QQ18 = &0400            \ The address of the text token table
+QQ18 = &0400            \ The address of the text token table, as set in
+                        \ elite-loader3.asm
 
-SNE = &07C0             \ The address of the sine lookup table
+SNE = &07C0             \ The address of the sine lookup table, as set in
+                        \ elite-loader3.asm
 
-ACT = &07E0             \ The address of the arctan lookup table
+ACT = &07E0             \ The address of the arctan lookup table, as set in
+                        \ elite-loader3.asm
 
 QQ16_FLIGHT = &0880     \ The address of the two-letter text token table in the
-                        \ flight code
+                        \ flight code (this gets populated by the docked code at
+                        \ the start of the game)
 
 CATD = &0D7A            \ The address of the CATD routine that is put in place
-                        \ by the third loader
+                        \ by the third loader, as set in elite-loader3.asm
 
 IRQ1 = &114B            \ The address of the IRQ1 routine that implements the
-                        \ split screen interrupt handler, which IRQ1V points to
+                        \ split screen interrupt handler, as set in
+                        \ elite-loader3.asm
 
 BRBR1 = &11D5           \ The address of the main break handler, which BRKV
-                        \ points to
+                        \ points to as set in elite-loader3.asm
 
-NA% = &1181             \ The address of data block for the last saved commander
+NA% = &1181             \ The address of the data block for the last saved
+                        \ commander, as set in elite-loader3.asm
 
 CHK2 = &11D3            \ The address of the second checksum byte for the saved
-                        \ commander data file
+                        \ commander data file, as set in elite-loader3.asm
 
 CHK = &11D4             \ The address of the first checksum byte for the saved
-                        \ commander data file
+                        \ commander data file, as set in elite-loader3.asm
 
-SHIP_MISSILE = &7F00    \ The address of the missile ship blueprint
+SHIP_MISSILE = &7F00    \ The address of the missile ship blueprint, as set in
+                        \ elite-loader3.asm
 
 \ ******************************************************************************
 \
@@ -1924,11 +1926,12 @@ LOAD_A% = LOAD%
 
  EQUW IRQ1              \ IRQ1V is set to point here by elite-loader3.asm
 
- EQUB &4C               \ A JMP instruction, so this becomes JMP BRBR
+ JMP BRBR1              \ BRKV is set to point here by elite-loader3.asm
 
-.BRKV
-
- EQUW BRBR1             \ BRKV is set to point here by elite-loader3.asm
+BRKV = P% - 2           \ The address of the destination address in the above
+                        \ JMP BRBR1 instruction. This ensures that any code that
+                        \ updates BRKV will update this instruction instead of
+                        \ the actual vector
 
 \ ******************************************************************************
 \

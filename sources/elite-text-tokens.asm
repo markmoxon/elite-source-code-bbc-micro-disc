@@ -2,13 +2,30 @@
 \
 \ DISC ELITE RECURSIVE TEXT TOKEN FILE
 \
-\ Produces the binary file WORDS.bin that gets loaded by elite-loader3.asm.
+\ Elite was written by Ian Bell and David Braben and is copyright Acornsoft 1984
 \
-\ The recursive token table is loaded at &254B and is moved down to &0400 as
-\ part of elite-loader3.asm. The table binary also includes the sine and arctan
-\ tables, so the three parts end up as follows:
+\ The code on this site has been disassembled from the version released on Ian
+\ Bell's personal website at http://www.elitehomepage.org/
 \
-\   * Recursive token table:    QQ18 = &0400 to &07C0
+\ The commentary is copyright Mark Moxon, and any misunderstandings or mistakes
+\ in the documentation are entirely my fault
+\
+\ The terminology and notations used in this commentary are explained at
+\ https://www.bbcelite.com/about_site/terminology_used_in_this_commentary.html
+\
+\ ------------------------------------------------------------------------------
+\
+\ This source file produces the following binary file:
+\
+\   * output/WORDS.bin
+\
+\ This gets loaded as part of elite-loader3.asm and gets moved to &0400 during
+\ the loading process.
+\
+\ The binary file also includes the sine and arctan tables, so the three parts
+\ end up as follows:
+\
+\   * Recursive token table:    QQ18 = &0400 to &07FF
 \   * Sine lookup table:        SNE  = &07C0 to &07DF
 \   * Arctan lookup table:      ACT  = &07E0 to &07FF
 \

@@ -32,18 +32,13 @@ _STH_DISC               = (_RELEASE = 2)
 \
 \ ******************************************************************************
 
-Q% = _REMOVE_CHECKSUMS  \ Set Q% to TRUE to max out the default commander, FALSE
-                        \ for the standard default commander (this is set to
-                        \ TRUE if checksums are disabled, just for convenience)
-
 LS% = &0CFF             \ The start of the descending ship line heap
 
 NOST = 18               \ The number of stardust particles in normal space (this
                         \ goes down to 3 in witchspace)
 
 NOSH = 12               \ The maximum number of ships in our local bubble of
-                        \ universe (counting from 0, so there are actually 13
-                        \ ship slots)
+                        \ universe
 
 NTY = 31                \ The number of different ship types
 
@@ -119,22 +114,28 @@ f7 = &16                \ Internal key number for red key f7 (Market Price)
 f8 = &76                \ Internal key number for red key f8 (Status Mode)
 f9 = &77                \ Internal key number for red key f9 (Inventory)
 
-QQ18 = &0400            \ The address of the text token table
+QQ18 = &0400            \ The address of the text token table, as set in
+                        \ elite-loader3.asm
 
-SNE = &07C0             \ The address of the sine lookup table
+SNE = &07C0             \ The address of the sine lookup table, as set in
+                        \ elite-loader3.asm
 
-ACT = &07E0             \ The address of the arctan lookup table
+ACT = &07E0             \ The address of the arctan lookup table, as set in
+                        \ elite-loader3.asm
 
-QQ16 = &0880            \ The address of the two-letter text token table
+QQ16 = &0880            \ The address of the two-letter text token table in the
+                        \ flight code (this gets populated by the docked code at
+                        \ the start of the game)
 
 CATD = &0D7A            \ The address of the CATD routine that is put in place
-                        \ by the third loader
+                        \ by the third loader, as set in elite-loader3.asm
 
 IRQ1 = &114B            \ The address of the IRQ1 routine that implements the
-                        \ split screen interrupt handler, which IRQ1V points to
+                        \ split screen interrupt handler, as set in
+                        \ elite-loader3.asm
 
 BRBR1 = &11D5           \ The address of the main break handler, which BRKV
-                        \ points to
+                        \ points to as set in elite-loader3.asm
 
 XX21 = &5600            \ The address of the ship blueprints lookup table, where
                         \ the chosen ship blueprints file is loaded
@@ -1901,8 +1902,7 @@ LOAD_A% = LOAD%
 
 .S%
 
- JMP scramble           \ Decrypt the main flight code and join the main game
-                        \ loop
+ JMP scramble           \ Decrypt the main flight code and join the main loop
 
  JMP scramble           \ Decrypt the main flight code and start a new game
 
@@ -2232,8 +2232,6 @@ LOAD_A% = LOAD%
                         \ keyboard (so Bitstik users can still use the keyboard
                         \ for speed adjustments if they twist the stick to zero)
 
-.BS2
-
 \ ******************************************************************************
 \
 \       Name: Main flight loop (Part 3 of 16)
@@ -2264,6 +2262,8 @@ LOAD_A% = LOAD%
 \   * "A" to fire lasers
 \
 \ ******************************************************************************
+
+.BS2
 
  LDA KY2                \ If Space is being pressed, keep going, otherwise jump
  BEQ MA17               \ down to MA17 to skip the following
