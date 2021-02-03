@@ -52,7 +52,7 @@ VIA = &FE00             \ Memory-mapped space for accessing internal hardware,
                         \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
                         \ known as SHEILA)
 
-CODE% = &5700           \ The address where this file (the third loader) loads
+CODE% = &5700
 LOAD% = &5700
 
 ORG CODE%
@@ -112,7 +112,7 @@ ORG CODE%
 
 IF _REMOVE_CHECKSUMS
 
- NOP                    \ Disable the copy protection
+ NOP                    \ If we have disabled checksums, ignore the result in A
  NOP
 
 ELSE
@@ -146,7 +146,9 @@ ENDIF
  BEQ P%                 \ If A = 0 then enter an infinite loop, which hangs the
                         \ computer
 
- JMP &5A00              \ Otherwise jump to &5A00 ????
+ JMP &5A00              \ Otherwise we jump to &5A00, though I have no idea why,
+                        \ as we will only get here if the code has been altered
+                        \ in some way
 
 .notube
 
@@ -168,7 +170,8 @@ ENDIF
 \       Name: Elite loader (Part 2 of 4)
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: Jump straight to part 3
+\    Summary: Jump straight to part 3, as the copy protection code has been
+\             removed
 \
 \ ******************************************************************************
 
@@ -217,7 +220,7 @@ ENDIF
 \       Name: MESS1
 \       Type: Variable
 \   Category: Loader
-\    Summary: The OS command string for loading the third loader
+\    Summary: The OS command string for loading the ELITE4 loader
 \
 \ ******************************************************************************
 
@@ -233,7 +236,8 @@ ENDIF
 \       Name: Elite loader (Part 3 of 4)
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: Pause for a surprisingly long time (7.67 seconds)
+\    Summary: Pause for a surprisingly long time (7.67 seconds) so people can
+\             enjoy the Acornsoft loading screen
 \
 \ ******************************************************************************
 
@@ -299,13 +303,24 @@ ENDIF
 \       Name: LOADcode
 \       Type: Subroutine
 \   Category: Copy protection
-\    Summary: This code doesn't appear to be run
+\    Summary: LOAD routine, bundled up in the loader so it can be moved to &0400
+\             to be run
 \
 \ ******************************************************************************
 
 .LOADcode
 
 ORG &0400
+
+\ ******************************************************************************
+\
+\       Name: LOAD
+\       Type: Subroutine
+\   Category: Copy protection
+\    Summary: This code accesses the disc directly (not used in this version as
+\             disc protection is disabled)
+\
+\ ******************************************************************************
 
 .LOAD
 
@@ -368,7 +383,7 @@ ORG &0400
 
 .LOAD6
 
- STX T
+ STX &76                \ Store the drive number in &76 for retrieval in ELITE4
  LDA #&15
  LDX #&00
  JSR OSBYTE
@@ -555,14 +570,12 @@ ORG &0400
 
  EQUB &00
 
- EQUB &80 \ location &5973
+ EQUB &80               \ This is location &5973, as referenced by part 1
 
 .L055B
 
  EQUB &FF, &00, &00, &00, &00, &00, &00, &00
-
  EQUB &00, &00, &00, &00
-
  EQUB &00, &00, &00, &00, &00, &00, &00, &00
  EQUB &00, &00, &00, &00, &00, &00, &00, &00
  EQUB &00, &00, &00, &00, &00, &00, &00, &00
@@ -580,11 +593,11 @@ ORG &0400
  EQUB &00, &00, &00, &00, &00, &00, &00, &00
  EQUB &00, &00, &00, &00, &00, &00, &00, &00
 
- EQUB &00 \ location &5A00
+ EQUB &00               \ This is location &5A00, as referenced by part 1
 
  EQUB &00, &00, &00, &00, &00, &00, &00, &00
  EQUB &00, &00, &00, &00, &00, &00, &00, &00
- EQUB &00, &00, &00, &00, &00, &00, &00, &00 \ 5A18
+ EQUB &00, &00, &00, &00, &00, &00, &00, &00
 
 COPYBLOCK LOAD, P%, LOADcode
 
@@ -699,7 +712,8 @@ ORG LOADcode + P% - LOAD
 \       Name: PROT1
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: Various copy protection shenanigans
+\    Summary: Various copy protection shenanigans in preparation for showing
+\             the Acornspft loading screen
 \
 \ ******************************************************************************
 
@@ -843,39 +857,63 @@ ORG LOADcode + P% - LOAD
                         \ mode 7 graphics characters so the Electron can print
                         \ its own version of the Acornsoft loading screen
                         \ despite not having the BBC Micro's teletext mode 7
+                        \
+                        \ The comand to define a character is as follows:
+                        \
+                        \   VDU 23, n, b0, b1, b2, b3, b4, b5, b6, b7
+                        \
+                        \ where n is the character number and b0 through b7 are
+                        \ the bytes for each pixel row in the character (there
+                        \ are 8 rows of 8 pixels in a character)
+                        \
+                        \ So in the following, we perform the above command
+                        \ for each character using the values from the ECHAR
+                        \ table
 
- LDY #0
+ LDY #0                 \ Set Y to act as an index into the table at ECHAR
 
 .eloop
 
- LDX #7
+ LDX #7                 \ Set a counter in X for the 8 bytes we need to print
+                        \ from the table for each character definition (one byte
+                        \ per pixel row)
 
- LDA #&17               \ VDU 23
+ LDA #23                \ Print character 23 (i.e. VDU 23)
  JSR OSWRCH
 
- TYA                    \ VDU Y/8 EOR &E0
+ TYA                    \ We will increase Y by 8 for each character, so this
+ LSR A                  \ sets A = Y / 8 to give the character number, starting
+ LSR A                  \ from 0 and counting up by 1 for each new character
  LSR A
- LSR A
- LSR A
- ORA #&E0
- JSR OSWRCH
+
+ ORA #&E0               \ This adds &E0 to A, so our new character set starts
+                        \ with character number &E0, then character number &E1,
+                        \ and so on
+
+ JSR OSWRCH             \ Print the character number (so we have now done the
+                        \ VDU 23, n part of the command)
 
 .vloop
 
- LDA (ZP),Y
- JSR OSWRCH
+ LDA (ZP),Y             \ Print the Y-th byte from the ECHAR table (we set ZP to
+ JSR OSWRCH             \ point to ECHAR above)
 
- INY
- DEX
- BPL vloop
+ INY                    \ Increment the index to point to the next byte in the
+                        \ table
 
- CPY #&E0
- BNE eloop
+ DEX                    \ Decrement the byte counter
+
+ BPL vloop              \ Loop back until we have printed 8 characters
+
+ CPY #224               \ Loop back to do the next VDU 23 command until we have
+ BNE eloop              \ printed out the whole table
 
 .bbc
 
                         \ We now print the Acornsoft loading screen background
-                        \ using mode 7 graphics (or the "fake" Electron version)
+                        \ using mode 7 graphics (for the BBC Micro) or the
+                        \ "fake" characters we just defined (for the Electron
+                        \ version)
 
  LDA ZP                 \ Set ZP(1 0) = ZP(1 0) + LOGO - ECHAR
  CLC                    \             = ECHAR + LOGO - ECHAR
@@ -993,7 +1031,7 @@ ORG LOADcode + P% - LOAD
 
  EQUB 31, 15, 11        \ Move text cursor to 15, 11
 
- EQUS "E L I T E"
+ EQUS "E L I T E"       \ The name of the game
 
  NOP                    \ Marks the end of the VDU block
  
@@ -1113,7 +1151,7 @@ ORG LOADcode + P% - LOAD
 
  DEX                    \ Otherwise decrement the character counter in X
 
- BNE cloop             \ Loop back to print the next character until we have
+ BNE cloop              \ Loop back to print the next character until we have
                         \ done all 38 in this row
 
  BIT S                  \ If bit 7 of S is clear (this is a BBC Micro), skip the
@@ -1180,7 +1218,7 @@ ORG LOADcode + P% - LOAD
 \       Name: Unused copy protection routine
 \       Type: Subroutine
 \   Category: Copy protection
-\    Summary: This code doesn't appear to be run
+\    Summary: This code doesn't appear to be run in this version
 \
 \ ******************************************************************************
 

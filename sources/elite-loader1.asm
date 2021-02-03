@@ -56,7 +56,8 @@ ORG CODE%
 \       Name: PROT1
 \       Type: Subroutine
 \   Category: Copy protection
-\    Summary: ????
+\    Summary: Decrypt the loader code (not used in this version as encryption is
+\             disabled)
 \
 \ ******************************************************************************
 
@@ -64,25 +65,25 @@ ORG CODE%
 
  LDA run
 
-.PROTL1
+.p1a
 
  EOR run,X
  STA run,X
  INX
- BNE PROTL1
+ BNE p1a
 
-.PROT1a
+.p1b
 
  INC PROT1+1
- BEQ PROT1b
+ BEQ p1c
 
  LDA PROT1+1
  CMP #&1E
- BEQ PROT1a
+ BEQ p1b
 
  JMP run
 
-.PROT1b
+.p1c
 
  BIT &020B
  BPL run
@@ -108,10 +109,10 @@ ORG CODE%
 
  SEI                    \ Disable all interrupts
 
- CPX #1                 \ If X = 1 then this is OS 1.20, so jump to OS120
- BEQ OS120
+ CPX #1                 \ If X = 1 then this is OS 1.20, so jump to os120
+ BEQ os120
 
-.OS100
+.os100
 
  LDA &D941,Y            \ Copy the Y-th byte from the default vector table at
  STA &200               \ &D941 into location &0200 (this is surely supposed to
@@ -121,11 +122,11 @@ ORG CODE%
  INY                    \ Increment the loop counter
 
  CPY #54                \ Loop back to copy the next byte until we have copied
- BNE OS100              \ 54 bytes (27 vectors)
+ BNE os100              \ 54 bytes (27 vectors)
 
- BEQ VDONE              \ Jump down to VDONE to skip the OS 1.20 routine
+ BEQ disk               \ Jump down to disk to skip the OS 1.20 routine
 
-.OS120
+.os120
 
  LDA &FFB7              \ Set ZP(1 0) to the location stored in &FFB7-&FFB8,
  STA ZP                 \ which contains the address of the default vector table
@@ -145,7 +146,7 @@ ORG CODE%
  BNE ABCDEFG            \ Loop back for the next vector until we have done them
                         \ all
 
-.VDONE
+.disk
 
  CLI                    \ Re-enable interrupts
 
@@ -172,9 +173,9 @@ ORG CODE%
                         \ following, which has been disabled (so perhaps this
                         \ was part of the copy protection)
 
-.LOOP1
+.loop1
 
- LDA BLOCK2,Y           \ Fetch the Y-th byte from BLOCK2
+ LDA BLOCK,Y            \ Fetch the Y-th byte from BLOCK
 
  NOP                    \ This instruction has been disabled, so this loop does
                         \ nothing
@@ -182,12 +183,12 @@ ORG CODE%
  INY                    \ Increment the loop counter
 
  CPY #9                 \ Loop back to do the next byte until we have done 9 of
- BNE LOOP1              \ them
+ BNE loop1              \ them
 
  LDY #0                 \ We are now going to send the 12 VDU bytes in the table
                         \ at B% to OSWRCH to switch to mode 7
 
-.LOOP2
+.loop2
 
  LDA B%,Y               \ Pass the Y-th byte of the B% table to OSWRCH
  JSR OSWRCH
@@ -195,9 +196,9 @@ ORG CODE%
  INY                    \ Increment the loop counter
 
  CPY #12                \ Loop back for the next byte until we have done all 10
- BNE LOOP2              \ of them
+ BNE loop2              \ of them
 
-.LOAD
+.load3
 
  LDX #LO(MESS2)         \ Set (Y X) to point to MESS2 ("LOAD Elite3")
  LDY #HI(MESS2)
@@ -231,15 +232,16 @@ ORG CODE%
 \       Name: PROT2
 \       Type: Subroutine
 \   Category: Copy protection
-\    Summary: Load a hidden file from disc
+\    Summary: Load a hidden file from disc (not used in this version as disc
+\             protection is disabled)
 \
 \ ******************************************************************************
 
 .PROT2
 
- JSR PROT2a             \ ????
+ JSR p2                 \ Call p2 below
 
- JMP LOAD               \ Jump to LOAD to load and run the next part of the
+ JMP load3              \ Jump to load3 to load and run the next part of the
                         \ loader
 
  LDA #2                 \ Set PARAMS1+8 = 2, which is the track number in the
@@ -250,7 +252,7 @@ ORG CODE%
  LDY #HI(PARAMS1)
  JMP OSWORD
 
-.PROT2a
+.p2
 
  STA PARAMS2+7          \ Set PARAMS2+7 = A, which is the track number in the
                         \ OSWORD parameter block
@@ -278,21 +280,28 @@ ORG CODE%
  EQUB 0, 0, 0           \ This is the "cursor start" register, which sets the
                         \ cursor start line at 0, so it turns the cursor off
 
+ SKIP 2                 \ These bytes appear to be unused
+
 \ ******************************************************************************
 \
-\       Name: BLOCK1
+\       Name: PARAMS3
 \       Type: Variable
 \   Category: Copy protection
-\    Summary: ????
-\
-\ &2FD0 to &2FDC
+\    Summary: OSWORD parameter block for loading the ELITE3 loader file (not
+\             used in this version as disc protection is disabled)
 \
 \ ******************************************************************************
 
-.BLOCK1
-
- EQUB &00, &00, &FF, &00, &57
- EQUB &FF, &FF, &03, &53, &26, &F6, &29, &00
+.PARAMS3
+ 
+ EQUB &FF               \ 0 = Drive = &FF (previously used drive and density)
+ EQUD &FFFF5700         \ 1 = Data address (&FFFF5700)
+ EQUB 3                 \ 5 = Number of parameters = 3
+ EQUB &53               \ 6 = Command = &53 (read data)
+ EQUB 38                \ 7 = Track = 38
+ EQUB 246               \ 8 = Sector = 246
+ EQUB %00101001         \ 9 = Load 9 sectors of 256 bytes
+ EQUB 0                 \ 10 = The result of the OSWORD call is returned here
 
 \ ******************************************************************************
 \
@@ -300,6 +309,7 @@ ORG CODE%
 \       Type: Variable
 \   Category: Copy protection
 \    Summary: OSWORD parameter block for accessing a specific track on the disc
+\             (not used in this version as disc protection is disabled)
 \
 \ ******************************************************************************
 
@@ -310,7 +320,7 @@ ORG CODE%
  EQUB 1                 \ 5 = Number of parameters = 1
  EQUB &69               \ 6 = Command = &69 (seek track)
  EQUB 2                 \ 7 = Parameter = 2 (track number)
- EQUB &00               \ 8 = The result of the OSWORD call is returned here
+ EQUB 0                 \ 8 = The result of the OSWORD call is returned here
 
 \ ******************************************************************************
 \
@@ -318,6 +328,7 @@ ORG CODE%
 \       Type: Variable
 \   Category: Copy protection
 \    Summary: OSWORD parameter block for accessing a specific track on the disc
+\             (not used in this version as disc protection is disabled)
 \
 \ ******************************************************************************
 
@@ -347,16 +358,15 @@ ORG CODE%
 
 \ ******************************************************************************
 \
-\       Name: BLOCK2
+\       Name: BLOCK
 \       Type: Variable
 \   Category: Copy protection
-\    Summary: ????
-\
-\ &2FF5 to &2FFF
+\    Summary: These bytes are copied and decrypted by the loader routine (not
+\             used in this version as disc protection is disabled)
 \
 \ ******************************************************************************
 
-.BLOCK2
+.BLOCK
 
  EQUB &19, &7A, &02, &01, &EC, &19, &00, &56
  EQUB &FF, &00, &00

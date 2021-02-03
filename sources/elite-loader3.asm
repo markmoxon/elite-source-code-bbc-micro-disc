@@ -78,7 +78,7 @@ T = &75                 \ Temporary storage, used all over the place
 
 SC = &76                \ Used to store the screen address while plotting pixels
 
-BLPTR = &78             \ Gets set as part of the obfuscation code
+CHKSM = &78             \ Used in the copy protection code
 
 DL = &8B                \ The vertical sync flag, matching the address in the
                         \ main game code
@@ -95,7 +95,7 @@ ESCP = &0386            \ The flag that determines whether we have an escape pod
 S% = &11E3              \ The adress of the main entry point workspace in the
                         \ main game code
 
-CODE% = &1900           \ The address where this file (the third loader) loads
+CODE% = &1900
 LOAD% = &1900
 
 ORG CODE%
@@ -274,7 +274,7 @@ ENDMACRO
 
 .ENTRY
 
- JSR PROT1              \ Call PROT1 to do various copy protection checks
+ JSR PROT1              \ Call PROT1 to calculate checksums into CHKSM
 
  LDA #144               \ Call OSBYTE with A = 144 and Y = 255 to turn the
  LDX #255               \ screen interlace off (equivalent to a *TV 255, 255
@@ -290,7 +290,7 @@ ENDMACRO
                         \ at B% to OSWRCH to set up the special mode 4 screen
                         \ that forms the basis for the split-screen mode
 
-.LOOP
+.loop1
 
  LDA (ZP),Y             \ Pass the Y-th byte of the B% table to OSWRCH
  JSR OSWRCH
@@ -298,7 +298,7 @@ ENDMACRO
  INY                    \ Increment the loop counter
 
  CPY #N%                \ Loop back for the next byte until we have done them
- BNE LOOP               \ all (the number of bytes was set in N% above)
+ BNE loop1              \ all (the number of bytes was set in N% above)
 
  JSR PLL1               \ Call PLL1 to draw Saturn
 
@@ -354,7 +354,7 @@ ENDMACRO
  LDX #0                 \ flashing colours
  JSR OSB
 
- JSR PROT5              \ Call PROT5 to do various copy protection checks
+ JSR PROT3              \ Call PROT3 to do more checks on the CHKSM checksum
 
  LDA #&00               \ Set the following:
  STA ZP                 \
@@ -462,18 +462,18 @@ ENDMACRO
                         \ CATDcode to CATD, so set a counter in X for the 36
                         \ bytes to copy
 
-.LOOP2
+.loop2
 
  LDA CATDcode,X         \ Copy the X-th byte of CATDcode to the X-th byte of
  STA CATD,X             \ CATD
 
  DEX                    \ Decrement the loop counter
 
- BPL LOOP2              \ Loop back to copy the next byte until they are all
+ BPL loop2              \ Loop back to copy the next byte until they are all
                         \ done
 
- LDA SC                 \ Set the drive number in the CATD routine to SC ????
- STA CATBLOCK
+ LDA &76                \ Set the drive number in the CATD routine to the
+ STA CATBLOCK           \ contents of &76, which gets set in ELITE3
 
  FNE 0                  \ Set up sound envelopes 0-3 using the FNE macro
  FNE 1
@@ -495,10 +495,10 @@ ENDMACRO
  LDA #HI(LOADcode)
  STA P+1
 
- LDY #0                 \ We want to move one page of memory, so set Y as a byte
-                        \ counter
+ LDY #0                 \ We now want to move and decrypt one page of memory
+                        \ from LOADcode to LOAD, so set Y as a byte counter
 
-.LOOP3
+.loop3
 
  LDA (P),Y              \ Fetch the Y-th byte of the P(1 0) memory block
 
@@ -509,47 +509,68 @@ ENDMACRO
 
  DEY                    \ Decrement the byte counter
 
- BNE LOOP3              \ Loop back to copy the next byte until we have done a
+ BNE loop3              \ Loop back to copy the next byte until we have done a
                         \ whole page of 256 bytes
 
  JMP LOAD               \ Jump to the start of the routine we just decrypted
 
 \ ******************************************************************************
 \
-\       Name: PROT2
+\       Name: CHECK
 \       Type: Subroutine
 \   Category: Copy protection
-\    Summary: Calculate a checksum on the loader code
+\    Summary: Calculate a checksum from two 256-byte portions of the loader code
 \
 \ ******************************************************************************
 
-.PROT2
+.CHECK
 
- CLC
- LDY #0
+ CLC                    \ Clear the C flag for the addition below
 
-.PROT2a
+ LDY #0                 \ We are going to loop through 256 bytes, so set a byte
+                        \ counter in Y
 
- ADC PLL1,Y
- EOR ENTRY,Y
- DEY
- BNE PROT2a
+.p2
 
- RTS
+ ADC PLL1,Y             \ Set A = A + Y-th byte of PLL1
+
+ EOR ENTRY,Y            \ Set A = A EOR Y-th byte of ENTRY
+
+ DEY                    \ Decrement the byte counter
+
+ BNE p2                 \ Loop back to checksum the next byte
+
+ RTS                    \ Return from the subroutine
 
 \ ******************************************************************************
 \
 \       Name: LOADcode
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: Load the main docked code, set up various vectors, run a checksum
-\             and start the game
+\    Summary: Encrypted LOAD routine, bundled up in the loader so it can be
+\             moved to &0B00 to be run
+\
+\ ------------------------------------------------------------------------------
+\
+\ This section is encrypted by EOR'ing with &18. The encryption is done by the
+\ elite-checksum.py script, and decryption is done in part 1 above, at the same
+\ time as it is moved to &0B00.
 \
 \ ******************************************************************************
 
 .LOADcode
 
 ORG &0B00
+
+\ ******************************************************************************
+\
+\       Name: LOAD
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: Load the main docked code, set up various vectors, run a checksum
+\             and start the game
+\
+\ ******************************************************************************
 
 .LOAD
 
@@ -570,26 +591,51 @@ ORG &0B00
  LDA #HI(S%+6)
  STA WRCHV+1
 
- SEC                    \ Run a checksum on the docked game code
- LDY #0
- STY &70
+ SEC                    \ Set the C flag so the checksum we calculate in A
+                        \ starts with an initial value of 18 (17 plus carry)
 
- LDX #&11
- TXA
+ LDY #&00               \ Set Y = 0 to act as a byte pointer
+
+ STY ZP                 \ Set the low byte of ZP(1 0) to 0, so ZP(1 0) always
+                        \ points to the start of a page
+
+ LDX #&11               \ Set X = &11, so ZP(1 0) will point to &1100 when we
+                        \ stick X in ZP+1 below
+
+ TXA                    \ Set A = &11 = 17, to set the intial value of the
+                        \ checksum to 18 (17 plus carry)
 
 .l1
 
- STX &71
- ADC (&70),Y
- DEY
- BNE l1
+ STX ZP+1               \ Set the high byte of ZP(1 0) to the page number in X
 
- INX
- CPX #&54
- BCC l1
- CMP &55FF
+ ADC (ZP),Y             \ Set A = A + the Y-th byte of ZP(1 0)
 
- BNE P%
+ DEY                    \ Decrement the byte pointer
+
+ BNE l1                 \ Loop back to add the next byte until we have added the
+                        \ whole page
+
+ INX                    \ Increment the page number in X
+
+ CPX #&54               \ Loop back to checksum the next page until we have
+ BCC l1                 \ checked up to (but not including) page &54
+
+ CMP &55FF              \ Compare the checksum with the value in &55FF, which is
+                        \ in the docked file we just loaded, in the byte before
+                        \ the ship hanger blueprints at XX21
+
+IF _REMOVE_CHECKSUMS
+
+ NOP                    \ If we have disabled checksums, then ignore the result
+ NOP                    \ of the checksum comparison
+
+ELSE
+
+ BNE P%                 \ If the checksums don't match then enter an infinite
+                        \ loop, which hangs the computer
+
+ENDIF
 
  JMP S%+3               \ Jump to the second entry in the main docked code's S%
                         \ workspace to start a new game
@@ -599,24 +645,17 @@ ORG &0B00
  EQUS "L.T.CODE"
  EQUB 13
 
- EQUB &44
- EQUB &6F
- EQUB &65, &73
- EQUB &20, &79, &6F
- EQUB &75, &72
+ EQUB &44, &6F, &65     \ These bytes appear to be unused
+ EQUB &73, &20, &79
+ EQUB &6F, &75, &72
  EQUB &20, &6D, &6F
- EQUB &74
- EQUB &68
- EQUB &65, &72
- EQUB &20, &6B, &6E
- EQUB &6F
- EQUB &77
+ EQUB &74, &68, &65
+ EQUB &72, &20, &6B
+ EQUB &6E, &6F, &77
  EQUB &20, &79, &6F
- EQUB &75, &20
- EQUB &64
- EQUB &6F
- EQUB &20, &74, &68
- EQUB &69, &73
+ EQUB &75, &20, &64
+ EQUB &6F, &20, &74
+ EQUB &68, &69, &73
  EQUB &3F
 
 COPYBLOCK LOAD, P%, LOADcode
@@ -627,17 +666,30 @@ ORG LOADcode + P% - LOAD
 \
 \       Name: CATDcode
 \       Type: Subroutine
-\   Category: Copy protection
-\    Summary: Load disc sectors 0 and 1 to &0E00 and &0F00 respectively
-\
-\ Gets copied from &1B4F to &0D7A by loop at L1A89 (35 bytes),
-\ is called by D and T to load from disc
+\   Category: Save and load
+\    Summary: CATD routine, bundled up in the loader so it can be moved to &0D7A
+\             to be run
 \
 \ ******************************************************************************
 
 .CATDcode
 
 ORG &0D7A
+
+\ ******************************************************************************
+\
+\       Name: CATD
+\       Type: Subroutine
+\   Category: Save and load
+\    Summary: Load disc sectors 0 and 1 to &0E00 and &0F00 respectively
+\
+\ ------------------------------------------------------------------------------
+\
+\ This routine is copied to &0D7A in part 1 above. It is called by both the main
+\ docked code and the main flight code, just before the docked code, flight code
+\ or shup blueprint files are loaded.
+\
+\ ******************************************************************************
 
 .CATD
 
@@ -665,7 +717,7 @@ ORG &0D7A
  EQUB 0                 \ 7 = Track = 0
  EQUB 1                 \ 8 = Sector = 1
  EQUB %00100001         \ 9 = Load 1 sector of 256 bytes
- EQUB 0
+ EQUB 0                 \ 10 = The result of the OSWORD call is returned here
 
 COPYBLOCK CATD, P%, CATDcode
 
@@ -676,31 +728,39 @@ ORG CATDcode + P% - CATD
 \       Name: PROT1
 \       Type: Subroutine
 \   Category: Copy protection
-\    Summary: Part of the BLPTR copy protection checks
+\    Summary: Part of the CHKSM copy protection checksum calculation
 \
 \ ******************************************************************************
 
 .PROT1
 
- LDA #&55
- LDX #&40
+ LDA #85                \ We start by calculating a checksum in A, with an
+                        \ initial value of 85
 
-.PROT1a
+ LDX #64                \ The checksum calculation in CHECK gets run 65 times,
+                        \ so set a counter in X to count them
 
- JSR PROT2
+.p1a
 
- DEX
- BPL PROT1a
+ JSR CHECK              \ Call CHECK to calculate the checksum and add it to A
 
- STA RAND+2
- ORA #&00
- BPL PROT1b
+ DEX                    \ Decrement the loop counter
 
- LSR BLPTR
+ BPL p1a                \ Loop back until we have runnthe checksum 65 times
 
-.PROT1b
+ STA RAND+2             \ Store the checksum result in the random number seeds
+                        \ used to generate the Saturn
 
- JMP PROT4
+ ORA #0                 \ If bit 7 of the checksum is clear, skip to p1b
+ BPL p1b
+
+ LSR CHKSM              \ Bit 7 of the checksum is set, so shift the C flag that
+                        \ was returned by CHECK into bit 7 of CHKSM
+
+.p1b
+
+ JMP PROT2              \ Jump to PROT2 for more checksums, returning from the
+                        \ subroutine using a tail call
 
  EQUB &AC
 
@@ -1220,8 +1280,8 @@ ORG CATDcode + P% - CATD
  LSR A
  LSR A
 
- LSR BLPTR+1            \ Halve the high byte of BLPTR(1 0), as part of the copy
-                        \ protection
+ LSR CHKSM+1            \ Rotate the high byte of CHKSM+1 to the right, as part
+                        \ of the copy protection
 
  ORA #&60               \ Set ZP+1 = &60 + A >> 3
  STA ZP+1
@@ -1273,22 +1333,31 @@ ORG CATDcode + P% - CATD
 
 \ ******************************************************************************
 \
-\       Name: PROT4
+\       Name: PROT2
 \       Type: Subroutine
 \   Category: Copy protection
-\    Summary: Part of the BLPTR copy protection checks
+\    Summary: Part of the CHKSM copy protection checksum calculation
 \
 \ ******************************************************************************
 
-.PROT4
+.PROT2
 
- LDA RAND+2
- EOR BLPTR
- ASL A
- CMP #&93
- ROR A
- STA BLPTR
- BCC out
+ LDA RAND+2             \ Fetch the checksum we calculated in PROT1
+
+ EOR CHKSM              \ Set A = A EOR CHKSM
+
+ ASL A                  \ Shift A left, moving bit 7 into the C flag and
+                        \ clearing bit 0
+
+ CMP #147               \ If A >= 147, set the C flag, otherwise clear it
+
+ ROR A                  \ Shift A right, moving the C flag into bit 7 and
+                        \ clearing the C flag
+
+ STA CHKSM              \ Store the updated A in CHKSM
+
+ BCC out                \ Return from the subroutine (as we cleared the C flag
+                        \ above and out contains an RTS)
 
 \ ******************************************************************************
 \
@@ -1346,34 +1415,25 @@ ORG CATDcode + P% - CATD
 
 \ ******************************************************************************
 \
-\       Name: PROT5
+\       Name: PROT3
 \       Type: Subroutine
 \   Category: Copy protection
-\    Summary: Part of the BLPTR copy protection checks
+\    Summary: Part of the CHKSM copy protection checksum calculation
 \
 \ ******************************************************************************
 
-.PROT5
+.PROT3
 
- LDA BLPTR
- AND BLPTR+1
+ LDA CHKSM              \ Update the checksum
+ AND CHKSM+1
  ORA #&0C
  ASL A
- STA BLPTR
- RTS
+ STA CHKSM
 
-\ ******************************************************************************
-\
-\       Name: PROT6
-\       Type: Subroutine
-\   Category: Copy protection
-\    Summary: Crash the game as copy protection has detected an issue
-\
-\ ******************************************************************************
+ RTS                    \ Return from the subroutine
 
-.PROT6
-
- JMP PROT6
+ JMP P%                 \ This would hang the computer, but we never get here as
+                        \ the checksum code has been disabled
 
 \ ******************************************************************************
 \
@@ -1583,6 +1643,10 @@ ORG CATDcode + P% - CATD
 \ The loader bundles a number of binary files in with the loader code, and moves
 \ them to their correct memory locations in part 1 above.
 \
+\ This section is encrypted by EOR'ing with &A5. The encryption is done by the
+\ elite-checksum.py script, and decryption is done in part 1 above, at the same
+\ time as each block is moved to its correct location.
+\
 \ There are two files containing code:
 \
 \   * WORDS.bin contains the recursive token table, which is moved to &0400
@@ -1619,27 +1683,32 @@ ORG CATDcode + P% - CATD
 \
 \       Name: OSBmod
 \       Type: Subroutine
-\   Category: Loader
-\    Summary: Calculate a checksum
+\   Category: Copy protection
+\    Summary: Calculate a checksum on &0F00 to &0FFF (the test is disabled in
+\             this version)
 \
 \ ******************************************************************************
 
 .OSBmod
 
- SEC
- LDY #0
- STY &70
- LDA #$0F
- STA &71
+ SEC                    \ Set the C flag so the checksum we calculate in A
+                        \ starts with an initial value of 16 (15 plus carry)
 
-.L2954
+ LDY #&00               \ Set ZP(1 0) = &0F00
+ STY ZP                 \
+ LDA #&0F               \ and at the same time set a byte counter in Y and set
+ STA ZP+1               \ the intial value of the checksum to 16 (15 plus carry)
 
- ADC (&70),Y
- INY
- BNE L2954
+.osb1
 
- CMP #&CF
+ ADC (ZP),Y             \ Set A = A + the Y-th byte of ZP(1 0)
 
+ INY                    \ Increment the byte pointer
+
+ BNE osb1               \ Loop back to add the next byte until we have added the
+                        \ whole page
+
+ CMP #&CF               \ The checksum test has been disabled
  NOP
  NOP
 
@@ -1656,6 +1725,12 @@ ORG CATDcode + P% - CATD
 \   Category: Loader
 \    Summary: Code block at &1100-&11E2 that remains resident in both docked and
 \             flight mode (palettes, screen mode routine and commander data)
+\
+\ ------------------------------------------------------------------------------
+\
+\ This section is encrypted by EOR'ing with &A5. The encryption is done by the
+\ elite-checksum.py script, and decryption is done in part 1 above, at the same
+\ time as it is moved to &1000.
 \
 \ ******************************************************************************
 
@@ -2069,29 +2144,49 @@ ENDIF
 \       Name: BRBR1
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: Common break handler: prints a newline and the error message and
-\             hangs
+\    Summary: Loader break handler: print a newline and the error message, and
+\             then hang the computer
+\
+\ ------------------------------------------------------------------------------
+\
+\ This break handler is only used until the docked code has loaded and the scram
+\ routine has decrypted the code, at which point the break handler is changed to
+\ the main game break handler (which doesn't hang the computer on an error).
 \
 \ ******************************************************************************
 
 .BRBR1
 
- LDY #0
+                        \ The following loop prints out the null-terminated
+                        \ message pointed to by (&FD &FE), which is the MOS
+                        \ error message pointer - so this prints the error
+                        \ message on the next line
 
- LDA #13
+ LDY #0                 \ Set Y = 0 to act as a character counter
+
+ LDA #13                \ Set A = 13 so the first character printed is a
+                        \ carriage return
 
 .BRBRLOOP
 
- JSR OSWRCH
- INY
- LDA (&FD),Y
- BNE BRBRLOOP
+ JSR OSWRCH             \ Print the character in A (which contains a carriage
+                        \ return on the first loop iteration), and then any
+                        \ characters we fetch from the error message
 
-.BRBR1a
+ INY                    \ Increment the loop counter
 
- BEQ BRBR1a
+ LDA (&FD),Y            \ Fetch the Y-th byte of the block pointed to by
+                        \ (&FD &FE), so that's the Y-th character of the message
+                        \ pointed to by the MOS error message pointer
 
- EQUB &64, &5F, &61
+ BNE BRBRLOOP           \ If the fetched character is non-zero, loop back to the
+                        \ JSR OSWRCH above to print the it, and keep looping
+                        \ until we fetch a zero (which marks the end of the
+                        \ message)
+
+ BEQ P%                 \ Hang the computer as something has gone wrong
+
+ EQUB &64, &5F, &61     \ These bytes appear to be unused
  EQUB &74, &74, &72
  EQUB &69, &62, &75
  EQUB &74, &65, &73
@@ -2118,6 +2213,10 @@ ORG TVT1code + P% - TVT1
 \ The loader bundles a number of binary files in with the loader code, and moves
 \ them to their correct memory locations in part 1 above.
 \
+\ This section is encrypted by EOR'ing with &A5. The encryption is done by the
+\ elite-checksum.py script, and decryption is done in part 1 above, at the same
+\ time as each block is moved to its correct location.
+\
 \ This part includes three files containing images, which are all moved into
 \ screen memory by the loader:
 \
@@ -2134,7 +2233,8 @@ ORG TVT1code + P% - TVT1
 \     penultimate character row of the monochrome mode 4 screen, just above the
 \     dashboard
 \
-\ There are three other binaries bundled into the loder, which are part 2 above.
+\ There are three other binaries bundled into the loader, which are described in
+\ part 2 above.
 \
 \ ******************************************************************************
 
