@@ -40,53 +40,63 @@ ORG CODE%
 
 \ ******************************************************************************
 \
-\       Name: run
+\       Name: BEGIN
 \       Type: Subroutine
-\   Category: Loader
-\    Summary: Entry point
+\   Category: Copy protection
+\    Summary: Decrypt the loader code
 \
 \ ******************************************************************************
 
-.run
+.BEGIN
+
+IF _STH_DISC
 
  JMP ENTRY              \ Jump over the copy protection to disable it
 
-\ ******************************************************************************
-\
-\       Name: PROT1
-\       Type: Subroutine
-\   Category: Copy protection
-\    Summary: Decrypt the loader code (not used in this version as encryption is
-\             disabled)
-\
-\ ******************************************************************************
+ELIF _IB_DISC
 
-.PROT1
+IF _REMOVE_CHECKSUMS OR TRUE
 
- LDA run
+ JMP ENTRY              \ Jump over the copy protection to disable it
+
+ELSE
+
+ LDX p1c+1              \ Set X to the comporison value of the CMP instruction
+                        \ at p1c
+
+ENDIF
+
+ENDIF
+
+.p1
+
+ LDA BEGIN
 
 .p1a
 
- EOR run,X
- STA run,X
+ EOR BEGIN,X
+ STA BEGIN,X
  INX
  BNE p1a
 
 .p1b
 
- INC PROT1+1
- BEQ p1c
+ INC p1+1
+ BEQ p1d
 
- LDA PROT1+1
- CMP #&1E
- BEQ p1b
-
- JMP run
+ LDA p1+1
 
 .p1c
 
+ CMP #&1E
+ BEQ p1b
+
+ JMP BEGIN
+
+.p1d
+
  BIT &020B
- BPL run
+ BPL BEGIN
 
 \ ******************************************************************************
 \
@@ -229,7 +239,7 @@ ORG CODE%
 
 \ ******************************************************************************
 \
-\       Name: PROT2
+\       Name: LOAD
 \       Type: Subroutine
 \   Category: Copy protection
 \    Summary: Load a hidden file from disc (not used in this version as disc
@@ -237,7 +247,7 @@ ORG CODE%
 \
 \ ******************************************************************************
 
-.PROT2
+.LOAD
 
  JSR p2                 \ Call p2 below
 

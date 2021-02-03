@@ -603,7 +603,7 @@ COPYBLOCK LOAD, P%, LOADcode
 
 ORG LOADcode + P% - LOAD
 
- SKIP 487
+ SKIP 487               \ These bytes appear to be unused
 
 \ ******************************************************************************
 \

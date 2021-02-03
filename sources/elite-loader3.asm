@@ -762,7 +762,7 @@ ORG CATDcode + P% - CATD
  JMP PROT2              \ Jump to PROT2 for more checksums, returning from the
                         \ subroutine using a tail call
 
- EQUB &AC
+ EQUB &AC               \ This byte appears to be unused
 
 \ ******************************************************************************
 \
@@ -2260,7 +2260,7 @@ ENDIF
 
 ELSE
 
- SKIP 158               \ These bytes are unused
+ SKIP 158               \ These bytes appear to be unused
 
 ENDIF
 
