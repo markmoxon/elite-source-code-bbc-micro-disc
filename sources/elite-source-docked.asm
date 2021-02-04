@@ -16515,19 +16515,24 @@ IF _STH_DISC
 ELIF _IB_DISC
 
                         \ In the first version of disc Elite, there was a nasty
-                        \ bug where buying a laser that you already owned gave
-                        \ you a refund of the laser's worth without removing the
-                        \ laser, so you could keep doing this to get as many
-                        \ credits as you liked. This was quickly fixed by
-                        \ replacing the incorrect code with NOPs, but the
+                        \ bug where buying a laser that you already owned
+                        \ affected your credit balance. This was quickly fixed
+                        \ by replacing the incorrect code with NOPs, but the
                         \ version on Ian Bell's website contains this bug, and
                         \ this is the section responsible for the problem
 
 .ref2
 
  LDY #187               \ Print out the error: "LASER PRESENT" and refund the
- JMP pres               \ value of the laser (which we shouldn't do, so this is
-                        \ the main cause of the refund bug)
+ JMP pres               \ value of the laser, returning from the subroutine
+                        \ using a tail call. This is the cause of the refund
+                        \ bug, as pres is called with the laser power in A
+                        \ rather than the item number, so the prx routine
+                        \ fetches a refund price from a location well outside
+                        \ the prxs table. This means that depending on which
+                        \ type of laser you are attempting to buy, your credit
+                        \ level will go up or down, when it shouldn't change at
+                        \ all
 
 .refund
 

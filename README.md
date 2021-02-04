@@ -248,6 +248,8 @@ You can see the differences between the versions by searching the source code fo
 
 In other words, the Ian Bell is the very first release of the disc version of Elite, while the Stairway to Hell version has both bugs fixed and a bumper-up version number.
 
+Note that the differences between the versions implemented in this project only extend those in the main game code. The version on Ian Bell's site also contains a whole load of copy protection that differs from the disabled copy protection code in the Stairway to Hell version, and it also contains two more binary files (`ELITE5` and `ELITE6`), plus a `!BOOT` file that contains even more copy protection code. I haven't disassembled the loader files from this version as that's a whole different rabbit hole, so if you build the Ian Bell version with `make encrypt verify`, the compiled loader binaries will not match those extracted from the original disc. The main binaries will match, however, which is the interesting part from a digital archaeology perspective, as that's where the bug fixes live.
+
 ---
 
 Right on, Commanders!

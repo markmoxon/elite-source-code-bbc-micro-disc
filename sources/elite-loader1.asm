@@ -53,35 +53,33 @@ ORG CODE%
 
 .BEGIN
 
-IF _STH_DISC
-
  JMP ENTRY              \ Jump over the copy protection to disable it
 
-ELIF _IB_DISC
+                        \ The version on Ian Bell's site has an encrypted ELITE2
+                        \ loader, so in that version, the loader starts with the
+                        \ following LDX instruction rather than a JMP. However,
+                        \ that version also contains a load of disc protection
+                        \ which the BeebAsm version doesn't include, so for now
+                        \ the differences in the ib-disc release build are
+                        \ restricted to the main game code rather than the
+                        \ loader, but here's a breakdown of the decryption code
+                        \ for those interested in the protection
 
-IF _REMOVE_CHECKSUMS OR TRUE
-
- JMP ENTRY              \ Jump over the copy protection to disable it
-
-ELSE
-
- LDX p1c+1              \ Set X to the comparison value from the CMP instruction
+\LDX p1c+1              \ Set X to the comparison value from the CMP instruction
                         \ below, which has the value p1d - BEGIN, which we use
                         \ as the offset of the first byte to decrypt (so we
                         \ decrypt from p1d onwards)
 
-ENDIF
-
-ENDIF
-
 .p1
 
  LDA BEGIN              \ Fetch the first byte from BEGIN to act as the initial
-                        \ seed for the rolling EOR process
+                        \ seed for the rolling EOR process (this address gets
+                        \ modified by the following to work through the whole
+                        \ decryption routine)
 
 .p1a
 
- EOR BEGIN,X            \ Set A = A EOR the X-th byte the loader
+ EOR BEGIN,X            \ Set A = A EOR the X-th byte of the loader
 
  STA BEGIN,X            \ Store the decrypted byte in the X-th byte the loader
 
@@ -106,16 +104,26 @@ ENDIF
 
 .p1c
 
- CMP #(p1d - BEGIN)     \ If we have worked our way through all the bytes in the
- BEQ p1b                \ decryption routine, using each of them in turn as a
-                        \ decryption seed, loop back to p1b to keep incrementing
-                        \ but without decrypting (so this means we first decrypt
-                        \ using the contents of BEGIN as the seed, then BEGIN+1,
-                        \ then BEGIN+2, all the way to p1d-1, at which point we
-                        \ stop decrypting)
+ CMP #(p1d - BEGIN)     \ If we have used all the bytes from the decryption
+ BEQ p1b                \ routine as seeds, skip one byte and then continue on
+                        \ to keep using seeds until we have done the whole page.
+                        \ This means we decrypt using the following seeds:
+                        \
+                        \   * The contents of BEGIN
+                        \   * The contents of BEGIN+1
+                        \   * The contents of BEGIN+2
+                        \   ...
+                        \   * The contents of p1d-1
+                        \   * The contents of p1d+1
+                        \   ...
+                        \   * The contents of BEGIN+254
+                        \   * The contents of BEGIN+255
+                        \
+                        \ and then we are done
 
  JMP BEGIN              \ Otherwise look up to BEGIN to do another decryption
-                        \ run, but starting one byte later than the previous run
+                        \ run, but using the next byte of the decryption routine
+                        \ as the seed
 
 .p1d
 
