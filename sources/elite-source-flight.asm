@@ -24495,8 +24495,8 @@ ENDIF
  LDA #6                 \ Set A to the number of the ship blueprints file
                         \ containing the Constrictor (ship blueprints file G)
 
- BCS SHIPinA            \ If the C flag is set then we are in the
-                        \ Constrictor's system, so skip to 
+ BCS SHIPinA            \ If the C flag is set then we are in the Constrictor's
+                        \ system, so skip to SHIPinA
 
  JSR DORND              \ Set A and X to random numbers and reduce A to a
  AND #3                 \ random number in the range 0-3 (i.e. just bits 0-1)
