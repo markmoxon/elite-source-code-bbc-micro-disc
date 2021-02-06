@@ -31842,7 +31842,7 @@ LOAD_SHIPS% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprints lookup table for the ship hanger
-\  Deep dive: Ship blueprints
+\  Deep dive: Ship blueprints in the disc version
 \
 \ ******************************************************************************
 
