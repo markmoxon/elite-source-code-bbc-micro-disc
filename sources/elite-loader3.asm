@@ -276,9 +276,9 @@ ENDMACRO
 
  JSR PROT1              \ Call PROT1 to calculate checksums into CHKSM
 
- LDA #144               \ Call OSBYTE with A = 144 and Y = 255 to turn the
- LDX #255               \ screen interlace off (equivalent to a *TV 255, 255
- JSR OSB                \ command)
+ LDA #144               \ Call OSBYTE with A = 144, X = 255 and Y = 0 to move
+ LDX #255               \ the screen down one line and turn screen interlace on
+ JSR OSB
 
  LDA #LO(B%)            \ Set the low byte of ZP(1 0) to point to the VDU code
  STA ZP                 \ table at B%
@@ -286,7 +286,7 @@ ENDMACRO
  LDA #HI(B%)            \ Set the high byte of ZP(1 0) to point to the VDU code
  STA ZP+1               \ table at B%
 
- LDY #0                 \ We are now going to send the 67 VDU bytes in the table
+ LDY #0                 \ We are now going to send the N% VDU bytes in the table
                         \ at B% to OSWRCH to set up the special mode 4 screen
                         \ that forms the basis for the split-screen mode
 
