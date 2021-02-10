@@ -21,13 +21,14 @@
 #
 # ******************************************************************************
 
+from __future__ import print_function
 import sys
 
 argv = sys.argv
 argc = len(argv)
 Encrypt = True
 
-if argc > 1 and argv[1] == '-u':
+if argc > 1 and argv[1] == "-u":
     Encrypt = False
 
 print("Disc Elite Checksum")
@@ -61,7 +62,7 @@ data_block = bytearray()
 
 # Load assembled code file
 
-elite_file = open('output/ELITE4.unprot.bin', 'rb')
+elite_file = open("output/ELITE4.unprot.bin", "rb")
 data_block.extend(elite_file.read())
 elite_file.close()
 
@@ -98,13 +99,14 @@ for n in range(scramble3_from, scramble3_to):
 
 for n in range(scramble4_from, scramble4_to):
     data_block[n - load_address] = data_block[n - load_address] ^ scramble4_eor
-# Write output file for 'ELITE4.bin'
 
-output_file = open('output/ELITE4.bin', 'wb')
+# Write output file for ELITE4
+
+output_file = open("output/ELITE4.bin", "wb")
 output_file.write(data_block)
 output_file.close()
 
-print('"output/ELITE4.bin" file saved')
+print("output/ELITE4.bin file saved")
 
 # Configuration variables for D.CODE
 
@@ -117,7 +119,7 @@ data_block = bytearray()
 
 # Load assembled code file
 
-elite_file = open('output/D.CODE.unprot.bin', 'rb')
+elite_file = open("output/D.CODE.unprot.bin", "rb")
 data_block.extend(elite_file.read())
 elite_file.close()
 
@@ -126,13 +128,13 @@ elite_file.close()
 for n in range(scramble_from, scramble_to):
     data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
 
-# Write output file for 'D.CODE.bin'
+# Write output file for D.CODE
 
-output_file = open('output/D.CODE.bin', 'wb')
+output_file = open("output/D.CODE.bin", "wb")
 output_file.write(data_block)
 output_file.close()
 
-print('"output/D.CODE.bin" file saved')
+print("output/D.CODE.bin file saved")
 
 # Configuration variables for T.CODE
 
@@ -145,7 +147,7 @@ data_block = bytearray()
 
 # Load assembled code file
 
-elite_file = open('output/T.CODE.unprot.bin', 'rb')
+elite_file = open("output/T.CODE.unprot.bin", "rb")
 data_block.extend(elite_file.read())
 elite_file.close()
 
@@ -154,10 +156,10 @@ elite_file.close()
 for n in range(scramble_from, scramble_to):
     data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
 
-# Write output file for 'T.CODE.bin'
+# Write output file for T.CODE
 
-output_file = open('output/T.CODE.bin', 'wb')
+output_file = open("output/T.CODE.bin", "wb")
 output_file.write(data_block)
 output_file.close()
 
-print('"output/T.CODE.bin" file saved')
+print("output/T.CODE.bin file saved")
