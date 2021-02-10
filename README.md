@@ -205,8 +205,11 @@ ac1d57b2   2560  ac1d57b2   2560   Yes   D.MOP.bin
 14c1e8f6    256  14c1e8f6    256   Yes   ELITE2.bin
 6f90769a   2816  6f90769a   2816   Yes   ELITE3.bin
 ec04b4d2   5376  ec04b4d2   5376   Yes   ELITE4.bin
+10417c14   5376  10417c14   5376   Yes   ELITE4.unprot.bin
+0f9e270b    256  0f9e270b    256   Yes   MISSILE.bin
 42f42f63  19997  42f42f63  19997   Yes   T.CODE.bin
 8819c78b  19997  8819c78b  19997   Yes   T.CODE.unprot.bin
+52bac547   1024  52bac547   1024   Yes   WORDS.bin
 ```
 
 All the compiled binaries match the extracts, so we know we are producing the same final game as the release version.
