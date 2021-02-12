@@ -32238,7 +32238,6 @@ ENDMACRO
  EDGE       2,      12,    11,    10,         16    \ Edge 18
  EDGE       3,      12,    12,    11,         16    \ Edge 19
  EDGE       8,       9,     9,     9,         16    \ Edge 20
-
  EDGE       9,      10,     9,     9,          6    \ Edge 21
  EDGE      10,      11,     9,     9,          8    \ Edge 22
  EDGE       8,      11,     9,     9,          6    \ Edge 23
