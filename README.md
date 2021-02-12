@@ -1,8 +1,10 @@
 # Fully documented source code for Elite on the BBC Micro with a disc drive
 
-This repository contains the original source code for Elite on the BBC Micro with a disc drive, with every single line documented and (for the most part) explained.
+[BBC Micro (cassette)](https://github.com/markmoxon/elite-beebasm) | **BBC Micro (disc)** | [6502 Second Processor](https://github.com/markmoxon/6502sp-elite-beebasm) | [BBC Master 128](https://github.com/markmoxon/master-elite-beebasm)
 
-It is a companion to the [bbcelite.com website](https://www.bbcelite.com), which contains all the code from this repository, but laid out in a much more human-friendly fashion. There are two sister repositories, one for the [cassette version of Elite](https://github.com/markmoxon/elite-beebasm) and another for the [6502 Second Processor version of Elite](https://github.com/markmoxon/6502sp-elite-beebasm).
+This repository contains source code for Elite on the BBC Micro with a disc drive, with every single line documented and (for the most part) explained.
+
+It is a companion to the [bbcelite.com website](https://www.bbcelite.com), which contains all the code from this repository, but laid out in a much more human-friendly fashion. The links above will take you to repositories for the other versions of Elite that are covered by this project.
 
 * If you want to browse the source and read about how Elite works under the hood, you will probably find [the website](https://www.bbcelite.com) is a better place to start than this repository.
 
