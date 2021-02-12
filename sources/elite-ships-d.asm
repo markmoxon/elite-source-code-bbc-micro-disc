@@ -613,6 +613,8 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a splinter
 \
+\ ------------------------------------------------------------------------------
+\
 \ The ship blueprint for the splinter reuses the edges data from the escape pod,
 \ so the edges data offset is negative.
 \
