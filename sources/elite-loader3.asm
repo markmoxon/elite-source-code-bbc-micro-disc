@@ -2175,9 +2175,15 @@ ENDIF
 \
 \ ------------------------------------------------------------------------------
 \
-\ This break handler is only used until the docked code has loaded and the scram
-\ routine has decrypted the code, at which point the break handler is changed to
-\ the main game break handler (which doesn't hang the computer on an error).
+\ This break handler is used during loading and during flight, and is resident
+\ in memory throughout the game's lifecycle. The docked code loads its own
+\ break handler and overrides this one until the flight code is run.
+\
+\ The main difference between the two handlers is that this one display the
+\ error and then hangs, while the docked code displays the error and returns.
+\ This is because the docked code has to cope gracefully with errors from the
+\ disc access menu (such as "File not found"), which we obviously don't want to
+\ terminate the game.
 \
 \ ******************************************************************************
 
