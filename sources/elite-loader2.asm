@@ -87,7 +87,7 @@ ORG CODE%
  LDA #0                 \ Set &3FFF = 0
  STA &3FFF
 
- LDA #64                \ Set &7FFF = 64 
+ LDA #64                \ Set &7FFF = 64
  STA &7FFF
 
  EOR &3FFF              \ Set A = 64 EOR &3FFF
@@ -524,7 +524,7 @@ ORG &0400
  EQUB &FF, &00, &0E, &FF, &FF, &03, &57
 
 .L051A
- 
+
  EQUB &00
  EQUB &F6, &22, &00, &FF, &00, &07, &FF, &FF
  EQUB &03, &57
@@ -678,7 +678,7 @@ ORG LOADcode + P% - LOAD
  EQUB &18, &07, &0E, &14, &00, &0E, &09, &16
  EQUB &18, &18, &07, &00, &1A, &1B, &09, &00
  EQUB &18, &18, &18, &18, &18, &18
- 
+
  EQUB &00, &00, &17, &1B, &0A, &1B, &05, &06
  EQUB &1B, &0F, &0C, &0D, &11, &0A, &1B, &0D
  EQUB &10, &0A, &0F, &1B, &09, &0F, &0A, &1B
@@ -836,7 +836,7 @@ ORG LOADcode + P% - LOAD
 
  LDX #0                 \ Set S = 0, to use as a flag denoting whether this is a
  STX S                  \ BBC Micro (0) or an Acorn Electron (&FF)
-                        
+
  LDY #&FF               \ Call OSBYTE with A = 129, X = 0 and Y = &FF to detect
  LDA #129               \ the machine type. This call is undocumented and is not
  JSR OSBYTE             \ the recommended way to determine the machine type
@@ -993,7 +993,7 @@ ORG LOADcode + P% - LOAD
  EQUS "E L I T E"       \ The top half of the game's name
 
  NOP                    \ Marks the end of the VDU block
- 
+
  RTS                    \ Return from the PROT1 subroutine
 
  EQUS "      "          \ These bytes appear to be unused
@@ -1034,7 +1034,7 @@ ORG LOADcode + P% - LOAD
  EQUS "E L I T E"       \ The name of the game
 
  NOP                    \ Marks the end of the VDU block
- 
+
  RTS                    \ Return from the PROT1 subroutine
 
  EQUS "         "       \ These bytes appear to be unused
@@ -1059,7 +1059,7 @@ ORG LOADcode + P% - LOAD
                         \ prints a third Acornsoft logo
 
  JSR OSNEWL             \ Print a newline
- 
+
                         \ Fall through into LOGOS to print a fourth Acornsoft
                         \ logo and return from the subroutine using a tail call
 
@@ -1455,7 +1455,7 @@ ORG LOADcode + P% - LOAD
  STA &51
  JSR &373D
 
-.LABEL23  
+.LABEL23
 
  RTS
 

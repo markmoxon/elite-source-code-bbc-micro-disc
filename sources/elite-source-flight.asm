@@ -749,7 +749,7 @@ ORG &0100
 \
 \       Name: UP
 \       Type: Workspace
-\    Address: &0800 to &0974
+\    Address: &0300 to &03CF
 \   Category: Workspaces
 \    Summary: Ship slots, variables
 \
@@ -1974,11 +1974,11 @@ LOAD_A% = LOAD%
                         \ byte within its page
 
  EOR (SC),Y             \ EOR the current byte with its index within the page
- 
+
  EOR #&33               \ EOR the current byte with &33
 
  STA (SC),Y             \ Update the current byte
- 
+
                         \ The current byte is in page X at offset Y, and SC(1 0)
                         \ points to the first byte of page X, so we just did
                         \  this:
@@ -1991,15 +1991,13 @@ LOAD_A% = LOAD%
                         \ have done the whole page
 
  INX                    \ Increment X to point to the next page in memory
- 
- 
+
  CPX #&56               \ Loop back to scrl to decrypt the next page until we
  BNE scrl               \ reach the start of page &56
 
  JMP RSHIPS             \ Call RSHIPS to launch from the station, load a new set
                         \ of ship blueprints and jump into the main game loop
- 
- 
+
 \ ******************************************************************************
 \
 \       Name: DOENTRY
@@ -9652,7 +9650,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \       * Otherwise if this is us docking, refine our approach and we're done
 \
 \       * Otherwise this is an NPC, so turn away from station and we're done
-\ 
+\
 \ "Refine our approach" means:
 \
 \   * If this is us docking (rather than an NPC), apply pitch and roll to get
@@ -9899,7 +9897,7 @@ LOAD_C% = LOAD% +P% - CODE%
                         \ the ship
 
  EOR XX15               \ A is negative, so this sets the sign of A to the same
- EOR XX15+1             \ as -XX15 * XX15+1, or -ship_x * ship_y 
+ EOR XX15+1             \ as -XX15 * XX15+1, or -ship_x * ship_y
 
  ASL A                  \ Shift the sign bit into the C flag, so the C flag has
                         \ the following sign:
@@ -10210,7 +10208,7 @@ LOAD_C% = LOAD% +P% - CODE%
 
  LDA XX15+2             \ Set A = XX15+2
 
- JMP MAD                \ Set: 
+ JMP MAD                \ Set:
                         \
                         \   (A X) = Q * A + (S R)
                         \           = vect_z * XX15+2 + vect_y * XX15+1 +
@@ -15927,7 +15925,7 @@ LOAD_D% = LOAD% + P% - CODE%
  STY XC
 
  STY YC                 \ Move the text cursor to row 1
- 
+
  DEY                    \ Decrement Y to 0 for the high byte in pr6
 
                         \ Fall through into pr6 to print X to 5 digits, as the
@@ -24468,7 +24466,7 @@ ENDIF
 
  LDA #&FF               \ Set QQ1 to &FF to indicate we are docked, so when
  STA QQ12               \ we reach TT110 after calling FRCE below, it skips the
-                        \ launch tunnel 
+                        \ launch tunnel
 
  STA QQ11               \ Set the view number to a non-zero value, so when we
                         \ reach LOOK1 after calling FRCE below, it sets up a
@@ -24536,7 +24534,9 @@ ENDIF
 
  AND #%00000001         \ We have picked up the plans in mission 2 so we need to
  ORA #%00000010         \ load a ship blueprints file containing Thargoids, so
-                        \ set A to either 
+                        \ set A to either %10 or %11 for file D.MOC or D.MOD, as
+                        \ they are the only files that contain Thargoid ship
+                        \ blueprints
 
  TAX                    \ Store the amended A in X again
 

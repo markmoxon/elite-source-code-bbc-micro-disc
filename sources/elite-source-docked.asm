@@ -765,7 +765,7 @@ ORG &0100
 \
 \       Name: UP
 \       Type: Workspace
-\    Address: &0800 to &0974
+\    Address: &0300 to &03CF
 \   Category: Workspaces
 \    Summary: Ship slots, variables
 \
@@ -1971,7 +1971,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Name: scramble
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: Decrypt the main docked code between &1300 and &5FFF and 
+\    Summary: Decrypt the main docked code between &1300 and &5FFF and
 \             the main game loop
 \
 \ ******************************************************************************
@@ -1997,11 +1997,11 @@ BRKV = P% - 2           \ The address of the destination address in the above
                         \ byte within its page
 
  EOR (SC),Y             \ EOR the current byte with its index within the page
- 
+
  EOR #&33               \ EOR the current byte with &33
 
  STA (SC),Y             \ Update the current byte
- 
+
                         \ The current byte is in page X at offset Y, and SC(1 0)
                         \ points to the first byte of page X, so we just did
                         \  this:
@@ -2014,14 +2014,13 @@ BRKV = P% - 2           \ The address of the destination address in the above
                         \ have done the whole page
 
  INX                    \ Increment X to point to the next page in memory
- 
- 
+
  CPX #&60               \ Loop back to scrl to decrypt the next page until we
  BNE scrl               \ reach the start of page &60
 
  JMP BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
                         \ and return from the subroutine using a tail call
- 
+
 \ ******************************************************************************
 \
 \       Name: DOENTRY
@@ -8629,7 +8628,7 @@ LOAD_C% = LOAD% +P% - CODE%
  JSR DORND              \ Set A and X to random numbers
 
  BPL HA7                \ Jump to HA7 if A is positive (50% chance)
- 
+
  AND #3                 \ Reduce A to a random number in the range 0-3
 
  STA T                  \ Set X = A * 8 + A
@@ -8870,7 +8869,6 @@ LOAD_C% = LOAD% +P% - CODE%
  BEQ HA2                \ If YSAV is zero, jump to HA2 to skip the following
                         \ as there is only one ship in the hanger
 
-                        
                         \ If we get here then there are multiple ships in the
                         \ hanger, so we also need to draw the horizontal line in
                         \ the gap between the ships
@@ -11129,7 +11127,7 @@ LOAD_C% = LOAD% +P% - CODE%
                         \ If we get here then mission 1 is in progress, so we
                         \ print out the corresponding token from RUTOK
 
- JSR MT14               \ Call MT14 to switch to justified text 
+ JSR MT14               \ Call MT14 to switch to justified text
 
  LDA #1                 \ Set A = 1 so that extended token 1 (an empty string)
                         \ gets printed below instead of token 176, followed by
@@ -11182,7 +11180,7 @@ LOAD_C% = LOAD% +P% - CODE%
 
  DEX                    \ Decrement the loop counter
 
- BPL PDL1               \ Loop back to PDL1 until we have copied all 
+ BPL PDL1               \ Loop back to PDL1 until we have copied all
 
  LDA #5                 \ Set A = 5, so we print extended token 5 in the next
                         \ instruction ("{lower case}{justify}{single cap}[86-90]
@@ -11400,7 +11398,7 @@ LOAD_C% = LOAD% +P% - CODE%
 .BRL2
 
  LSR INWK               \ Halve x_lo so the Constrictor moves towards the centre
- 
+
  INC INWK+6             \ Increment z_lo so the Constrictor moves away from us
 
  BEQ BR2                \ If z_lo = 0 (i.e. it just went past 255), jump to BR2
@@ -15040,7 +15038,7 @@ LOAD_D% = LOAD% + P% - CODE%
  STY XC
 
  STY YC                 \ Move the text cursor to row 1
- 
+
  DEY                    \ Decrement Y to 0 for the high byte in pr6
 
                         \ Fall through into pr6 to print X to 5 digits, as the
@@ -28910,7 +28908,7 @@ ENDMACRO
  EJMP 13                \ Encoded as:   "{2}[31?]{13}"
  EQUB VE
 
- ETOK 175               \ Token 65:     "ITS [76-80] [81-85]
+ ETOK 175               \ Token 65:     "ITS [76-80] [81-85]"
  ERND 16                \
  ECHR ' '               \ Encoded as:   "[175][16?] [17?]"
  ERND 17
@@ -29509,7 +29507,7 @@ ENDMACRO
  EQUB VE                \
                         \ Encoded as:   "[171]"
 
- ERND 1                 \ Token 140:    "[21-25] [16-21] FOR [61-65]"
+ ERND 1                 \ Token 140:    "[21-25] [16-20] FOR [61-65]"
  ECHR ' '               \
  ERND 0                 \ Encoded as:   "[1?] [0?] F<253> [10?]"
  ECHR ' '
@@ -29519,7 +29517,7 @@ ENDMACRO
  ERND 10
  EQUB VE
 
- ETOK 140               \ Token 141:    "[21-25] [16-21] FOR [61-65] AND
+ ETOK 140               \ Token 141:    "[21-25] [16-20] FOR [61-65] AND
  ETOK 178               \                [61-65]"
  ERND 10                \
  EQUB VE                \ Encoded as:   "[140][178][10?]"
@@ -29532,7 +29530,7 @@ ENDMACRO
  ERND 12
  EQUB VE
 
- ETOK 140               \ Token 143:    "[21-25] [16-21] FOR [61-65] BUT [51-55]
+ ETOK 140               \ Token 143:    "[21-25] [16-20] FOR [61-65] BUT [51-55]
  ECHR ' '               \                BY [56-60]"
  ECHR 'B'               \
  ECHR 'U'               \ Encoded as:   "[140] BUT [142]"
@@ -31738,7 +31736,7 @@ ENDMACRO
 
 .MTIN
 
- EQUB 16                \ Token  0: a random extended token between 16 and 21
+ EQUB 16                \ Token  0: a random extended token between 16 and 20
  EQUB 21                \ Token  1: a random extended token between 21 and 25
  EQUB 26                \ Token  2: a random extended token between 26 and 30
  EQUB 31                \ Token  3: a random extended token between 31 and 35
