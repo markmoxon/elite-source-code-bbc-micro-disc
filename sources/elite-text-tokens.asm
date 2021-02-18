@@ -1381,6 +1381,7 @@ NEXT
 \       Type: Variable
 \   Category: Maths (Geometry)
 \    Summary: Arctan table
+\  Deep dive: The sine, cosine and arctan tables
 \
 \ ------------------------------------------------------------------------------
 \

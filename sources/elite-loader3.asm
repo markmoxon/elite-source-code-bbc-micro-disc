@@ -106,6 +106,8 @@ ORG CODE%
 \       Type: Variable
 \   Category: Screen mode
 \    Summary: VDU commands for setting the square mode 4 screen
+\  Deep dive: The split-screen mode
+\             Drawing monochrome pixels in mode 4
 \
 \ ------------------------------------------------------------------------------
 \
@@ -1958,6 +1960,7 @@ ORG &1100
 \   Category: Save and load
 \    Summary: The drive and directory number used when saving or loading a
 \             commander file
+\  Deep dive: Commander save files.
 \
 \ ------------------------------------------------------------------------------
 \
@@ -1979,6 +1982,8 @@ ORG &1100
 \       Type: Variable
 \   Category: Save and load
 \    Summary: The data block for the last saved commander
+\  Deep dive: Commander save files
+\             The competition code
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2127,6 +2132,8 @@ ENDIF
 \       Type: Variable
 \   Category: Save and load
 \    Summary: Second checksum byte for the saved commander data file
+\  Deep dive: Commander save files
+\             The competition code
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2150,6 +2157,8 @@ ENDIF
 \       Type: Variable
 \   Category: Save and load
 \    Summary: First checksum byte for the saved commander data file
+\  Deep dive: Commander save files
+\             The competition code
 \
 \ ------------------------------------------------------------------------------
 \

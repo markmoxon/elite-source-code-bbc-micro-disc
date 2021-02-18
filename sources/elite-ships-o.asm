@@ -299,6 +299,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Coriolis space station
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -394,6 +395,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for an escape pod
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -448,6 +450,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for an alloy plate
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -495,6 +498,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a cargo canister
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -566,6 +570,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for an asteroid
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -647,6 +652,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a splinter
+\  Deep dive: Ship blueprints
 \
 \ ------------------------------------------------------------------------------
 \
@@ -696,6 +702,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Cobra Mk III
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -812,6 +819,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Viper
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -891,6 +899,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Mamba
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -986,6 +995,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Krait
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -1067,6 +1077,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Cobra Mk I
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -1143,6 +1154,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Python (pirate)
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 

@@ -167,7 +167,6 @@ SHIP_MISSILE = &7F00    \ The address of the missile ship blueprint, as set in
 \   Category: Workspaces
 \    Summary: Lots of important variables are stored in the zero page workspace
 \             as it is quicker and more space-efficient to access memory here
-\  Deep dive: The Elite memory map
 \
 \ ******************************************************************************
 
@@ -436,9 +435,11 @@ ORG &0000
  SKIP NI% - 34          \ XX19(1 0) shares its location with INWK(34 33), which
                         \ contains the address of the ship line heap
 
-.NEWB                   \ The ship's "new byte flags" (or NEWB flags)
+.NEWB
+
+ SKIP 1                 \ The ship's "new byte flags" (or NEWB flags)
                         \
- SKIP 1                 \ Contains details about the ship's type and associated
+                        \ Contains details about the ship's type and associated
                         \ behaviour, such as whether they are a trader, a bounty
                         \ hunter, a pirate, currently hostile, in the process of
                         \ docking, inside the hold having been scooped, and so
@@ -1753,6 +1754,7 @@ NT% = SVC + 2 - TP      \ This sets the variable NT% to the size of the current
 \   Category: Workspaces
 \    Summary: Ship data blocks and ship line heaps
 \  Deep dive: Ship data blocks
+\             The local bubble of universe
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2213,6 +2215,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Print the captain's name during mission briefings
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2251,6 +2254,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Print the location hint during the mission 1 briefing
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2286,6 +2290,8 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Print an extended recursive token from the RUTOK token table
+\  Deep dive: Extended system descriptions
+\             Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2334,6 +2340,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Print an extended recursive token from the TKN1 token table
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2476,6 +2483,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Print an extended text token (1-255)
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2704,6 +2712,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Switch to ALL CAPS when printing extended tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2730,6 +2739,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Switch to Sentence Case when printing extended tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2757,6 +2767,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Tab to column 6 and start a new word when printing extended tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2784,6 +2795,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Clear the screen and set the current view type to 1
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2810,6 +2822,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Switch to lower case when printing extended tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2837,6 +2850,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Switch to standard tokens in Sentence Case
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2867,6 +2881,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Switch to extended tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2889,6 +2904,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Switch to justified text when printing extended tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2915,6 +2931,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Switch to left-aligned text when printing extended tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2942,6 +2959,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Print the selected system's adjective, e.g. Lavian for Lave
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2993,6 +3011,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Print a random 1-8 letter word in Sentence Case
+\  Deep dive: Extended text tokens
 \
 \ ******************************************************************************
 
@@ -3037,6 +3056,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Capitalise the next letter
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -3100,6 +3120,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Variable
 \   Category: Text
 \    Summary: The extended token table for jump tokens 1-32 (DETOK)
+\  Deep dive: Extended text tokens
 \
 \ ******************************************************************************
 
@@ -3144,6 +3165,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Variable
 \   Category: Text
 \    Summary: The extended two-letter token lookup table
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -3173,6 +3195,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Variable
 \   Category: Text
 \    Summary: The two-letter token lookup table
+\  Deep dive: Printing text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -3222,7 +3245,8 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Moving
 \    Summary: Move current ship: Tidy the orientation vectors
-\  Deep dive: Orientation vectors
+\  Deep dive: Program flow of the ship-moving routine
+\             Scheduling tasks with the main loop counter
 \
 \ ------------------------------------------------------------------------------
 \
@@ -3284,6 +3308,8 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Moving
 \    Summary: Move current ship: Rotate ship's orientation vectors by pitch/roll
+\  Deep dive: Orientation vectors
+\             Pitching and rolling
 \
 \ ------------------------------------------------------------------------------
 \
@@ -3314,6 +3340,8 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Moving
 \    Summary: Move current ship: Rotate ship about itself by its own pitch/roll
+\  Deep dive: Orientation vectors
+\             Pitching and rolling by a fixed angle
 \
 \ ------------------------------------------------------------------------------
 \
@@ -3703,7 +3731,8 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Moving
 \    Summary: Apply pitch and roll to an orientation vector
-\  Deep dive: Pitching and rolling
+\  Deep dive: Orientation vectors
+\             Pitching and rolling
 \
 \ ------------------------------------------------------------------------------
 \
@@ -3821,7 +3850,8 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \       Type: Subroutine
 \   Category: Moving
 \    Summary: Apply a 3.6 degree pitch or roll to an orientation vector
-\  Deep dive: Pitching and rolling by a fixed angle
+\  Deep dive: Orientation vectors
+\             Pitching and rolling by a fixed angle
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4163,6 +4193,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Drawing pixels
 \    Summary: Ready-made single-pixel character row bytes for mode 4
+\  Deep dive: Drawing colour pixels in mode 4
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4188,6 +4219,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Drawing pixels
 \    Summary: Ready-made double-pixel character row bytes for mode 4
+\  Deep dive: Drawing colour pixels in mode 4
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4213,6 +4245,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Drawing pixels
 \    Summary: Ready-made single-pixel character row bytes for mode 5
+\  Deep dive: Drawing colour pixels in mode 5
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4339,6 +4372,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Draw a line: Line has a shallow gradient, step right along x-axis
+\  Deep dive: Bresenham's line algorithm
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4481,6 +4515,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Draw a shallow line going right and up or left and down
+\  Deep dive: Bresenham's line algorithm
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4565,6 +4600,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Draw a shallow line going right and down or left and up
+\  Deep dive: Bresenham's line algorithm
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4651,6 +4687,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Draw a line: Line has a steep gradient, step up along y-axis
+\  Deep dive: Bresenham's line algorithm
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4796,6 +4833,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Draw a steep line going up and left or down and right
+\  Deep dive: Bresenham's line algorithm
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4881,6 +4919,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Draw a steep line going up and right or down and left
+\  Deep dive: Bresenham's line algorithm
 \
 \ ------------------------------------------------------------------------------
 \
@@ -5632,6 +5671,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \   Category: Drawing circles
 \    Summary: Draw a circle segment and add it to the ball line heap
 \  Deep dive: The ball line heap
+\             Drawing circles
 \
 \ ------------------------------------------------------------------------------
 \
@@ -5917,6 +5957,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Status
 \    Summary: Show the Status Mode screen (red key f8)
+\  Deep dive: Combat rank
 \
 \ ******************************************************************************
 
@@ -6222,6 +6263,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Text
 \    Summary: A constant used when printing large numbers in BPRNT
+\  Deep dive: Printing decimal numbers
 \
 \ ------------------------------------------------------------------------------
 \
@@ -6654,6 +6696,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \   Category: Text
 \    Summary: A mask for applying the lower case part of Sentence Case to
 \             extended text tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -6689,6 +6732,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Text
 \    Summary: A flag that indicates whether we are currently printing a word
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -6722,6 +6766,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Text
 \    Summary: A flag for switching between standard and extended text tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -6753,6 +6798,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Text
 \    Summary: Flags that govern how justified extended text tokens are printed
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -6794,6 +6840,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Text
 \    Summary: The size of the justified text buffer at BUF
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -6816,6 +6863,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \   Category: Text
 \    Summary: A flag to denote whether printing in lower case is enabled for
 \             extended text tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -6847,6 +6895,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Text
 \    Summary: A mask for capitalising the next letter in an extended text token
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -6911,6 +6960,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Print the character in variable DTW7
+\  Deep dive: Extended text tokens
 \
 \ ******************************************************************************
 
@@ -6933,6 +6983,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \   Category: Text
 \    Summary: Print a character at the text cursor, with support for verified
 \             text in extended tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -7274,6 +7325,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Print a character at the text cursor by poking into screen memory
+\  Deep dive: Drawing text
 \
 \ ------------------------------------------------------------------------------
 \
@@ -7660,6 +7712,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \       Type: Subroutine
 \   Category: Dashboard
 \    Summary: Update the dashboard: speed indicator
+\  Deep dive: The dashboard indicators
 \
 \ ------------------------------------------------------------------------------
 \
@@ -7708,6 +7761,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \       Type: Subroutine
 \   Category: Dashboard
 \    Summary: Update the dashboard: pitch and roll indicators
+\  Deep dive: The dashboard indicators
 \
 \ ******************************************************************************
 
@@ -7772,6 +7826,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \       Type: Subroutine
 \   Category: Dashboard
 \    Summary: Update the dashboard: four energy banks
+\  Deep dive: The dashboard indicators
 \
 \ ------------------------------------------------------------------------------
 \
@@ -7896,6 +7951,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \       Type: Subroutine
 \   Category: Dashboard
 \    Summary: Update the dashboard: shields, fuel, laser & cabin temp, altitude
+\  Deep dive: The dashboard indicators
 \
 \ ******************************************************************************
 
@@ -8215,6 +8271,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 \       Type: Subroutine
 \   Category: Dashboard
 \    Summary: Update the roll or pitch indicator on the dashboard
+\  Deep dive: The dashboard indicators
 \
 \ ------------------------------------------------------------------------------
 \
@@ -9702,6 +9759,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \       Type: Subroutine
 \   Category: Maths (Arithmetic)
 \    Summary: Calculate (A P) = P * X
+\  Deep dive: Shift-and-add multiplication
 \
 \ ------------------------------------------------------------------------------
 \
@@ -9788,6 +9846,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \       Type: Subroutine
 \   Category: Maths (Arithmetic)
 \    Summary: Calculate A = K * sin(A)
+\  Deep dive: The sine, cosine and arctan tables
 \
 \ ------------------------------------------------------------------------------
 \
@@ -9937,6 +9996,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \       Type: Subroutine
 \   Category: Maths (Arithmetic)
 \    Summary: Calculate (A P+1 P) = (A ~P) * Q
+\  Deep dive: Shift-and-add multiplication
 \
 \ ------------------------------------------------------------------------------
 \
@@ -10421,6 +10481,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \       Type: Subroutine
 \   Category: Maths (Arithmetic)
 \    Summary: Calculate (A ?) = (-X * A + (S R)) / 96
+\  Deep dive: Shift-and-subtract division
 \
 \ ------------------------------------------------------------------------------
 \
@@ -10573,6 +10634,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \       Type: Subroutine
 \   Category: Maths (Arithmetic)
 \    Summary: Calculate (P R) = 256 * A / Q
+\  Deep dive: Shift-and-subtract division
 \
 \ ------------------------------------------------------------------------------
 \
@@ -10641,6 +10703,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \       Type: Subroutine
 \   Category: Maths (Arithmetic)
 \    Summary: Calculate K(3 2 1 0) = (A P+1 P) / (z_sign z_hi z_lo)
+\  Deep dive: Shift-and-subtract division
 \
 \ ------------------------------------------------------------------------------
 \
@@ -11058,12 +11121,14 @@ LOAD_C% = LOAD% +P% - CODE%
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Print the system's extended description or a mission 1 directive
+\  Deep dive: Extended system descriptions
+\             Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
 \ This prints a specific system's extended description. This is called the "pink
 \ volcanoes string" in a comment in the original source, and the "goat soup"
-\ string by Ian Bell on his website (where he also refers to the species string
+\ recipe by Ian Bell on his website (where he also refers to the species string
 \ as the "pink felines" string).
 \
 \ For some special systems, when you are docked at them, the procedurally
@@ -11515,6 +11580,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \   Category: Text
 \    Summary: Move to row 10, switch to white text, and switch to lower case
 \             when printing extended tokens
+\  Deep dive: Extended text tokens
 \
 \ ******************************************************************************
 
@@ -11537,6 +11603,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \   Category: Text
 \    Summary: Move to row 6, switch to white text, and switch to lower case when
 \             printing extended tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -12272,7 +12339,8 @@ LOAD_D% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Universe
 \    Summary: Twist the selected system's seeds four times
-\  Deep dive: Galaxy and system seeds
+\  Deep dive: Twisting the system seeds
+\             Galaxy and system seeds
 \
 \ ------------------------------------------------------------------------------
 \
@@ -12301,6 +12369,7 @@ LOAD_D% = LOAD% + P% - CODE%
 \   Category: Universe
 \    Summary: Twist the selected system's seeds
 \  Deep dive: Twisting the system seeds
+\             Galaxy and system seeds
 \
 \ ------------------------------------------------------------------------------
 \
@@ -12517,6 +12586,8 @@ LOAD_D% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Universe
 \    Summary: Show the Data on System screen (red key f6)
+\  Deep dive: Generating system data
+\             Galaxy and system seeds
 \
 \ ------------------------------------------------------------------------------
 \
@@ -12848,6 +12919,7 @@ LOAD_D% = LOAD% + P% - CODE%
 \   Category: Universe
 \    Summary: Calculate system data from the system seeds
 \  Deep dive: Generating system data
+\             Galaxy and system seeds
 \
 \ ------------------------------------------------------------------------------
 \
@@ -13275,6 +13347,7 @@ LOAD_D% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing circles
 \    Summary: Draw a circle on a chart
+\  Deep dive: Drawing circles
 \
 \ ------------------------------------------------------------------------------
 \
@@ -14891,6 +14964,8 @@ LOAD_D% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Flight
 \    Summary: Perform a galactic hyperspace jump
+\  Deep dive: Twisting the system seeds
+\             Galaxy and system seeds
 \
 \ ------------------------------------------------------------------------------
 \
@@ -15148,6 +15223,7 @@ LOAD_D% = LOAD% + P% - CODE%
 \   Category: Market
 \    Summary: Print the name, price and availability of a market item
 \  Deep dive: Market item prices and availability
+\             Galaxy and system seeds
 \
 \ ------------------------------------------------------------------------------
 \
@@ -16619,6 +16695,7 @@ LOAD_E% = LOAD% + P% - CODE%
 \   Category: Text
 \    Summary: Print the selected system name
 \  Deep dive: Generating system names
+\             Galaxy and system seeds
 \
 \ ------------------------------------------------------------------------------
 \
@@ -16959,6 +17036,7 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Print a text token
+\  Deep dive: Printing text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -18572,6 +18650,7 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing suns
 \    Summary: Draw the sun: Start from bottom of screen and erase the old sun
+\  Deep dive: Drawing the sun
 \
 \ ------------------------------------------------------------------------------
 \
@@ -18620,6 +18699,7 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing suns
 \    Summary: Draw the sun: Continue to move up the screen, drawing the new sun
+\  Deep dive: Drawing the sun
 \
 \ ------------------------------------------------------------------------------
 \
@@ -18871,6 +18951,7 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing suns
 \    Summary: Draw the sun: Continue to the top of the screen, erasing old sun
+\  Deep dive: Drawing the sun
 \
 \ ------------------------------------------------------------------------------
 \
@@ -18929,6 +19010,7 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing circles
 \    Summary: Draw a circle for the planet
+\  Deep dive: Drawing circles
 \
 \ ------------------------------------------------------------------------------
 \
@@ -19134,6 +19216,7 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing suns
 \    Summary: Remove the sun from the screen
+\  Deep dive: Drawing the sun
 \
 \ ------------------------------------------------------------------------------
 \
@@ -19869,6 +19952,7 @@ LOAD_F% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Utility routines
 \    Summary: Reset the INWK workspace and orientation vectors
+\  Deep dive: Orientation vectors
 \
 \ ------------------------------------------------------------------------------
 \
@@ -20092,7 +20176,10 @@ LOAD_F% = LOAD% + P% - CODE%
 \       Name: Main game loop (Part 2 of 6)
 \       Type: Subroutine
 \   Category: Main loop
-\    Summary: Call main flight loop, potentially spawn trader, asteroid, cargo
+\    Summary: Potentially spawn a trader, an asteroid, or a cargo canister
+\             (though this has no effect when docked)
+\  Deep dive: Program flow of the main game loop
+\             Ship data blocks
 \
 \ ------------------------------------------------------------------------------
 \
@@ -20101,7 +20188,7 @@ LOAD_F% = LOAD% + P% - CODE%
 \
 \ This section covers the following:
 \
-\   * Potentially spawn a trader (Cobra Mk III), asteroid or cargo canister
+\   * Potentially spawn a trader, asteroid or cargo canister
 \
 \ Other entry points:
 \
@@ -20199,6 +20286,8 @@ LOAD_F% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Main loop
 \    Summary: Cool down lasers, make calls to update the dashboard
+\  Deep dive: Program flow of the main game loop
+\             The dashboard indicators
 \
 \ ------------------------------------------------------------------------------
 \
@@ -20250,6 +20339,7 @@ LOAD_F% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Main loop
 \    Summary: Process non-flight key presses (red function keys, docked keys)
+\  Deep dive: Program flow of the main game loop
 \
 \ ------------------------------------------------------------------------------
 \
@@ -21025,6 +21115,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Save and load
 \    Summary: Calculate the checksum for the last saved commander data block
+\  Deep dive: Commander save files
 \
 \ ------------------------------------------------------------------------------
 \
@@ -21195,6 +21286,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Text
 \    Summary: Fetch a line of text from the keyboard
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -21665,7 +21757,8 @@ ENDIF
 \       Type: Subroutine
 \   Category: Save and load
 \    Summary: Save the commander file
-\  Deep dive: The competition code
+\  Deep dive: Commander save files
+\             The competition code
 \
 \ ******************************************************************************
 
@@ -21829,6 +21922,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Save and load
 \    Summary: Save or load the commander file
+\  Deep dive: Commander save files
 \
 \ ------------------------------------------------------------------------------
 \
@@ -22193,6 +22287,8 @@ ENDIF
 \       Type: Subroutine
 \   Category: Maths (Geometry)
 \    Summary: Normalise the three-coordinate vector in XX15
+\  Deep dive: Tidying orthonormal vectors
+\             Orientation vectors
 \
 \ ------------------------------------------------------------------------------
 \
@@ -22422,6 +22518,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Sound
 \    Summary: Process us making a kill
+\  Deep dive: Combat rank
 \
 \ ------------------------------------------------------------------------------
 \
@@ -22666,6 +22763,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Keyboard
 \    Summary: Scan the keyboard to see if a specific key is being pressed
+\  Deep dive: The key logger
 \
 \ ------------------------------------------------------------------------------
 \
@@ -22939,6 +23037,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Keyboard
 \    Summary: Scan for pause, configuration and secondary flight keys
+\  Deep dive: The key logger
 \
 \ ------------------------------------------------------------------------------
 \
@@ -23370,6 +23469,7 @@ ENDMACRO
 \   Category: Maths (Geometry)
 \    Summary: Orthonormalise the orientation vectors for a ship
 \  Deep dive: Tidying orthonormal vectors
+\             Orientation vectors
 \
 \ ------------------------------------------------------------------------------
 \
@@ -23969,6 +24069,7 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Maths (Arithmetic)
 \    Summary: Calculate R = 256 * A / Q
+\  Deep dive: Shift-and-subtract division
 \
 \ ------------------------------------------------------------------------------
 \
@@ -24434,6 +24535,7 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing ships
 \    Summary: Draw ship: Check if ship is in field of view, close enough to draw
+\  Deep dive: Drawing ships
 \
 \ ------------------------------------------------------------------------------
 \
@@ -24540,6 +24642,7 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing ships
 \    Summary: Draw ship: Set up orientation vector, ship coordinate variables
+\  Deep dive: Drawing ships
 \
 \ ------------------------------------------------------------------------------
 \
@@ -24684,6 +24787,7 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing ships
 \    Summary: Draw ship: Set visibility for exploding ship (all faces visible)
+\  Deep dive: Drawing ships
 \
 \ ------------------------------------------------------------------------------
 \
@@ -24731,7 +24835,8 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing ships
 \    Summary: Draw ship: Calculate the visibility of each of the ship's faces
-\  Deep dive: Back-face culling
+\  Deep dive: Drawing ships
+\             Back-face culling
 \
 \ ******************************************************************************
 
@@ -25185,7 +25290,8 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing ships
 \    Summary: Draw ship: Calculate the visibility of each of the ship's vertices
-\  Deep dive: Calculating vertex coordinates
+\  Deep dive: Drawing ships
+\             Calculating vertex coordinates
 \
 \ ------------------------------------------------------------------------------
 \
@@ -25718,6 +25824,8 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing ships
 \    Summary: Draw ship: Calculate the visibility of each of the ship's vertices
+\  Deep dive: Drawing ships
+\             Calculating vertex coordinates
 \
 \ ------------------------------------------------------------------------------
 \
@@ -25804,6 +25912,7 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing ships
 \    Summary: Draw ship: Calculate the screen coordinates of visible vertices
+\  Deep dive: Drawing ships
 \
 \ ------------------------------------------------------------------------------
 \
@@ -26045,6 +26154,7 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing ships
 \    Summary: Draw ship: Draw laser beams if the ship is firing its laser at us
+\  Deep dive: Drawing ships
 \
 \ ------------------------------------------------------------------------------
 \
@@ -26217,6 +26327,7 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing ships
 \    Summary: Draw ship: Calculate the visibility of each of the ship's edges
+\  Deep dive: Drawing ships
 \
 \ ------------------------------------------------------------------------------
 \
@@ -26366,6 +26477,7 @@ LOAD_G% = LOAD% + P% - CODE%
 \   Category: Drawing lines
 \    Summary: Clip line: Work out which end-points are on-screen, if any
 \  Deep dive: Line-clipping
+\             Extended screen coordinates
 \
 \ ------------------------------------------------------------------------------
 \
@@ -26524,6 +26636,8 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Clip line: Work out if any part of the line is on-screen
+\  Deep dive: Line-clipping
+\             Extended screen coordinates
 \
 \ ------------------------------------------------------------------------------
 \
@@ -26609,6 +26723,8 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Clip line: Calculate the line's gradient
+\  Deep dive: Line-clipping
+\             Extended screen coordinates
 \
 \ ******************************************************************************
 
@@ -26734,6 +26850,8 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Clip line: Call the routine in LL188 to do the actual clipping
+\  Deep dive: Line-clipping
+\             Extended screen coordinates
 \
 \ ------------------------------------------------------------------------------
 \
@@ -26861,6 +26979,7 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing ships
 \    Summary: Draw ship: Add all visible edges to the ship line heap
+\  Deep dive: Drawing ships
 \
 \ ------------------------------------------------------------------------------
 \
@@ -26943,6 +27062,7 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing ships
 \    Summary: Draw ship: Draw all the visible edges from the ship line heap
+\  Deep dive: Drawing ships
 \
 \ ------------------------------------------------------------------------------
 \
@@ -27003,6 +27123,7 @@ LOAD_G% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Move a point along a line until it is on-screen
+\  Deep dive: Line-clipping
 \
 \ ------------------------------------------------------------------------------
 \
@@ -27536,7 +27657,7 @@ LOAD_H% = LOAD% + P% - CODE%
 \       Type: Macro
 \   Category: Text
 \    Summary: Macro definition for jump tokens in the extended token table
-\  Deep dive: Printing extended text tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -27565,7 +27686,7 @@ ENDMACRO
 \       Type: Macro
 \   Category: Text
 \    Summary: Macro definition for characters in the extended token table
-\  Deep dive: Printing extended text tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -27600,7 +27721,7 @@ ENDMACRO
 \       Type: Macro
 \   Category: Text
 \    Summary: Macro definition for recursive tokens in the extended token table
-\  Deep dive: Printing extended text tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -27630,7 +27751,7 @@ ENDMACRO
 \       Type: Macro
 \   Category: Text
 \    Summary: Macro definition for two-letter tokens in the extended token table
-\  Deep dive: Printing extended text tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -27706,7 +27827,7 @@ ENDMACRO
 \       Type: Macro
 \   Category: Text
 \    Summary: Macro definition for random tokens in the extended token table
-\  Deep dive: Printing extended text tokens
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -27782,6 +27903,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Text
 \    Summary: The first extended token table for recursive tokens 0-255 (DETOK)
+\  Deep dive: Extended text tokens
 \
 \ ******************************************************************************
 
@@ -30942,6 +31064,8 @@ ENDMACRO
 \       Type: Variable
 \   Category: Text
 \    Summary: System numbers that have special extended decriptions
+\  Deep dive: Extended system descriptions
+\             Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -30995,6 +31119,8 @@ ENDMACRO
 \       Type: Variable
 \   Category: Text
 \    Summary: The criteria for systems with special extended descriptions
+\  Deep dive: Extended system descriptions
+\             Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -31055,6 +31181,8 @@ ENDMACRO
 \       Type: Variable
 \   Category: Text
 \    Summary: The second extended token table for recursive tokens 0-26 (DETOK3)
+\  Deep dive: Extended system descriptions
+\             Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -31720,6 +31848,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Text
 \    Summary: Lookup table for random tokens in the extended token table (0-37)
+\  Deep dive: Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
@@ -32097,6 +32226,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a cargo canister
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -32168,6 +32298,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a shuttle
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -32267,6 +32398,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a transporter
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -32401,6 +32533,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Cobra Mk III
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -32517,6 +32650,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Python
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -32604,6 +32738,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Viper
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -32683,6 +32818,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Krait
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
@@ -32764,6 +32900,7 @@ ENDMACRO
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Constrictor
+\  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
 
