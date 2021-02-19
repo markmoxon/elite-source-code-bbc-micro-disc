@@ -1,6 +1,6 @@
-# Extracted binaries
+# Extracted binaries for the BBC Micro disc version of Elite
 
-This folder contains the image binaries from the original game disc on Ian Bell's personal website.
+This folder contains the image binaries from the original game disc for the BBC Micro disc version of Elite on Ian Bell's personal website.
 
 ---
 
