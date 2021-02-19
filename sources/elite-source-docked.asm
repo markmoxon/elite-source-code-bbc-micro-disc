@@ -5011,9 +5011,10 @@ LOAD_B% = LOAD% + P% - CODE%
 
 .FLKB
 
- LDA #15                \ Call OSBYTE with A = 15 and X <> 0 to flush the input
- TAX                    \ buffer and return from the subroutine using a tail
- JMP OSBYTE             \ call
+ LDA #15                \ Call OSBYTE with A = 15 and Y <> 0 to flush the input
+ TAX                    \ buffers (i.e. flush the operating system's keyboard
+ JMP OSBYTE             \ buffer) and return from the subroutine using a tail
+                        \ call
 
 \ ******************************************************************************
 \
@@ -8528,7 +8529,7 @@ PRINT "Execute at ", ~LOAD%
 PRINT "Reload at ", ~LOAD_B%
 
 PRINT "S.ELTB ", ~CODE_B%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_B%
-\SAVE "versions/cassette/output/T.ELTB.bin", CODE_B%, P%, LOAD%
+\SAVE "output/T.ELTB.bin", CODE_B%, P%, LOAD%
 
 \ ******************************************************************************
 \
@@ -18288,12 +18289,9 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Name: SPBLB
 \       Type: Subroutine
 \   Category: Dashboard
-\    Summary: Light up the space station indicator ("S") on the dashboard
+\    Summary: Draw (or erase) the space station indicator ("S") on the dashboard
 \
 \ ------------------------------------------------------------------------------
-\
-\ This draws (or erases) the space station indicator bulb ("S") on the
-\ dashboard.
 \
 \ Other entry points:
 \
@@ -19809,8 +19807,8 @@ LOAD_F% = LOAD% + P% - CODE%
 \
 \ ------------------------------------------------------------------------------
 \
-\ Reset our ship and various controls, then fall through into RES4 to recharge
-\ shields and energy, and reset the stardust and the ship workspace at INWK.
+\ Reset our ship and various controls, recharge shields and energy, and then
+\ fall through into RES2 to reset the stardust and the ship workspace at INWK.
 \
 \ In this subroutine, this means zero-filling the following locations:
 \
@@ -19828,7 +19826,8 @@ LOAD_F% = LOAD% + P% - CODE%
 \
 \     * ALP1, ALP2 - Set roll signs to 0
 \
-\ It then recharges the shields and energy banks, and falls through into RES2.
+\ It also sets QQ12 to &FF, to indicate we are docked, recharges the shields and
+\ energy banks, and then falls through into RES2.
 \
 \ ******************************************************************************
 
@@ -20734,10 +20733,10 @@ LOAD_F% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
-\       Name: BR1
+\       Name: BR1 (Part 1 of 2)
 \       Type: Subroutine
 \   Category: Start and end
-\    Summary: Restart the game
+\    Summary: Start or restart the game
 \
 \ ------------------------------------------------------------------------------
 \
@@ -20771,6 +20770,19 @@ LOAD_F% = LOAD% + P% - CODE%
 
  JSR DFAULT             \ Call DFAULT to reset the current commander data block
                         \ to the last saved commander
+
+\ ******************************************************************************
+\
+\       Name: BR1 (Part 2 of 2)
+\       Type: Subroutine
+\   Category: Start and end
+\    Summary: Show the "Load New Commander (Y/N)?" screen and start the game
+\
+\ ------------------------------------------------------------------------------
+\
+\ BRKV is set to point to BR1 by elite-loader.asm.
+\
+\ ******************************************************************************
 
  JSR msblob             \ Reset the dashboard's missile indicators so none of
                         \ them are targeted
@@ -20850,6 +20862,9 @@ LOAD_F% = LOAD% + P% - CODE%
                         \ boxed title at the top (i.e. we're going to use the
                         \ screen layout of a space view in the following)
 
+                        \ If the commander check below fails, we keep jumping
+                        \ back to here to crash the game with an infinite loop
+
  JSR CHECK              \ Call the CHECK subroutine to calculate the checksum
                         \ for the current commander block at NA%+8 and put it
                         \ in A
@@ -20872,6 +20887,12 @@ ENDIF
 
 \JSR BELL               \ This instruction is commented out in the original
                         \ source. It would make a standard system beep
+
+                        \ The checksum CHK is correct, so now we check whether
+                        \ CHK2 = CHK EOR A9, and if this check fails, bit 7 of
+                        \ the competition flags at COK gets set, to indicate
+                        \ to Acornsoft via the competition code that there has
+                        \ been some hacking going on with this competition entry
 
  EOR #&A9               \ X = checksum EOR &A9
  TAX
@@ -20902,7 +20923,7 @@ ENDIF
 
  STA COK                \ Store the updated competition flags in COK
 
- RTS                    \ Retirn from the subroutine
+ RTS                    \ Return from the subroutine
 
 \ ******************************************************************************
 \
@@ -21227,10 +21248,17 @@ ENDIF
 \
 \ ------------------------------------------------------------------------------
 \
+\ Get the commander's name for loading or saving a commander file. The name is
+\ stored in the INWK workspace and is terminated by a return character (13).
+\
+\ If ESCAPE is pressed or a blank name is entered, then the name stored is set
+\ to the name from the last saved commander block.
+\
 \ Returns:
 \
 \   INWK                The full filename, including drive and directory, in
-\                       the form ":0.E.JAMESON", for example
+\                       the form ":0.E.JAMESON", for example, terminated by a
+\                       return character (13)
 \
 \ ******************************************************************************
 
@@ -21273,10 +21301,12 @@ ENDIF
  LDA #9                 \ Reset the maximum length in RLINE+2 to the original
  STA RLINE+2            \ value of 9
 
- TYA                    \ Copy the length of the entered name into A
+ TYA                    \ The OSWORD call returns the length of the commander's
+                        \ name in Y, so transfer this to A
 
- BEQ TR1                \ If A = 0, no name was entered, so jump to TR1 to
-                        \ restore the original name from NA% to INWK+5
+ BEQ TR1                \ If A = 0, no name was entered, so jump to TR1 to copy
+                        \ the last saved commander's name from NA% to INWK
+                        \ and return from the subroutine there
 
  RTS                    \ Return from the subroutine
 
@@ -21344,7 +21374,8 @@ ENDIF
  EQUW INWK+5            \ The address to store the input, so the text entered
                         \ will be stored in INWK+5 as it is typed
 
- EQUB 9                 \ Maximum line length = 9
+ EQUB 9                 \ Maximum line length = 9, as that's the maximum size
+                        \ for a commander's name including a directory name
 
  EQUB '!'               \ Allow ASCII characters from "!" through to "{" in
  EQUB '{'               \ the input
@@ -22767,9 +22798,6 @@ ENDIF
 \
 \ ------------------------------------------------------------------------------
 \
-\ Scan the keyboard to see if the key specified in X is currently being
-\ pressed.
-\
 \ Arguments:
 \
 \   X                   The internal number of the key to check (see p.142 of
@@ -22778,12 +22806,12 @@ ENDIF
 \
 \ Returns:
 \
-\   X                   If the key in X is being pressed, X contains the
-\                       original argument X, but with bit 7 set (i.e. X + 128).
-\                       If the key in X is not being pressed, the value in X is
+\   A                   If the key in A is being pressed, A contains the
+\                       original argument A, but with bit 7 set (i.e. A + 128).
+\                       If the key in A is not being pressed, the value in A is
 \                       unchanged
 \
-\   A                   Contains the same as X
+\   X                   Contains the same as A
 \
 \ Other entry points:
 \

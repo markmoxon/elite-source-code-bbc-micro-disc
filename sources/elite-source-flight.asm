@@ -4673,9 +4673,10 @@ NEXT
 
 .FLKB
 
- LDA #15                \ Call OSBYTE with A = 15 and X <> 0 to flush the input
- TAX                    \ buffer and return from the subroutine using a tail
- JMP OSBYTE             \ call
+ LDA #15                \ Call OSBYTE with A = 15 and Y <> 0 to flush the input
+ TAX                    \ buffers (i.e. flush the operating system's keyboard
+ JMP OSBYTE             \ buffer) and return from the subroutine using a tail
+                        \ call
 
 \ ******************************************************************************
 \
@@ -8695,7 +8696,7 @@ PRINT "Execute at ", ~LOAD%
 PRINT "Reload at ", ~LOAD_B%
 
 PRINT "S.ELTB ", ~CODE_B%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_B%
-\SAVE "versions/cassette/output/D.ELTB.bin", CODE_B%, P%, LOAD%
+\SAVE "output/D.ELTB.bin", CODE_B%, P%, LOAD%
 
 \ ******************************************************************************
 \
@@ -18998,8 +18999,6 @@ LOAD_E% = LOAD% + P% - CODE%
 \
 \ ------------------------------------------------------------------------------
 \
-\ Draw a dot on the compass.
-\
 \ Arguments:
 \
 \   COMX                The screen pixel x-coordinate of the dot
@@ -19811,10 +19810,6 @@ LOAD_E% = LOAD% + P% - CODE%
 \   Category: Dashboard
 \    Summary: Light up the E.C.M. indicator bulb ("E") on the dashboard
 \
-\ ------------------------------------------------------------------------------
-\
-\ This draws (or erases) the E.C.M. indicator bulb ("E") on the dashboard.
-\
 \ ******************************************************************************
 
 .ECBLB
@@ -19836,12 +19831,9 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Name: SPBLB
 \       Type: Subroutine
 \   Category: Dashboard
-\    Summary: Light up the space station indicator ("S") on the dashboard
+\    Summary: Draw (or erase) the space station indicator ("S") on the dashboard
 \
 \ ------------------------------------------------------------------------------
-\
-\ This draws (or erases) the space station indicator bulb ("S") on the
-\ dashboard.
 \
 \ Other entry points:
 \
@@ -23047,8 +23039,8 @@ LOAD_F% = LOAD% + P% - CODE%
 \
 \ ------------------------------------------------------------------------------
 \
-\ Reset our ship and various controls, then fall through into RES4 to recharge
-\ shields and energy, and reset the stardust and the ship workspace at INWK.
+\ Reset our ship and various controls, recharge shields and energy, and then
+\ fall through into RES2 to reset the stardust and the ship workspace at INWK.
 \
 \ In this subroutine, this means zero-filling the following locations:
 \
@@ -23066,7 +23058,8 @@ LOAD_F% = LOAD% + P% - CODE%
 \
 \     * ALP1, ALP2 - Set roll signs to 0
 \
-\ It then recharges the shields and energy banks, and falls through into RES2.
+\ It also sets QQ12 to &FF, to indicate we are docked, recharges the shields and
+\ energy banks, and then falls through into RES2.
 \
 \ ******************************************************************************
 
@@ -25677,9 +25670,6 @@ ENDIF
 \
 \ ------------------------------------------------------------------------------
 \
-\ Scan the keyboard to see if the key specified in X is currently being
-\ pressed.
-\
 \ Arguments:
 \
 \   X                   The internal number of the key to check (see p.142 of
@@ -25688,12 +25678,12 @@ ENDIF
 \
 \ Returns:
 \
-\   X                   If the key in X is being pressed, X contains the
-\                       original argument X, but with bit 7 set (i.e. X + 128).
-\                       If the key in X is not being pressed, the value in X is
+\   A                   If the key in A is being pressed, A contains the
+\                       original argument A, but with bit 7 set (i.e. A + 128).
+\                       If the key in A is not being pressed, the value in A is
 \                       unchanged
 \
-\   A                   Contains the same as X
+\   X                   Contains the same as A
 \
 \ Other entry points:
 \
