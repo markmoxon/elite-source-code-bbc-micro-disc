@@ -26,22 +26,6 @@ INCLUDE "sources/elite-header.h.asm"
 _IB_DISC                = (_RELEASE = 1)
 _STH_DISC               = (_RELEASE = 2)
 
-TRTB% = &04             \ TRTB%(1 0) points to the keyboard translation table
-
-S = &70                 \ Temporary storage, used all over the place
-
-ZP = &71                \ Temporary storage, used all over the place
-
-P = &73                 \ Temporary storage, used all over the place
-
-Q = &74                 \ Temporary storage, used all over the place
-
-R = &75                 \ Temporary storage, used all over the place
-
-T = &76                 \ Temporary storage, used all over the place
-
-SC = &81                \ Temporary storage, used all over the place
-
 OSNEWL = &FFE7          \ The address for the OSNEWL routine
 OSWRCH = &FFEE          \ The address for the OSWRCH routine
 OSBYTE = &FFF4          \ The address for the OSBYTE routine
@@ -54,6 +38,71 @@ VIA = &FE00             \ Memory-mapped space for accessing internal hardware,
 
 CODE% = &5700
 LOAD% = &5700
+
+\ ******************************************************************************
+\
+\       Name: ZP
+\       Type: Workspace
+\    Address: &0004 to &0005 and &0070 to &0082
+\   Category: Workspaces
+\    Summary: Important variables used by the loader
+\
+\ ******************************************************************************
+
+ORG &0004
+
+.TRTB%
+
+ SKIP 2                 \ TRTB%(1 0) points to the keyboard translation table
+
+ORG &0070
+
+.S
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+.ZP
+
+ SKIP 2                 \ Stores addresses used for moving content around
+
+.P
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+.Q
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+.R
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+.T
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+ORG &0081
+
+.SC
+
+ SKIP 1                 \ Screen address (low byte)
+                        \
+                        \ Elite draws on-screen by poking bytes directly into
+                        \ screen memory, and SC(1 0) is typically set to the
+                        \ address of the character block containing the pixel
+                        \ we want to draw (see the deep dives on "Drawing
+                        \ monochrome pixels in mode 4" and "Drawing colour
+                        \ pixels in mode 5" for more details)
+
+.SCH
+
+ SKIP 1                 \ Screen address (high byte)
+
+\ ******************************************************************************
+\
+\ ELITE LOADER
+\
+\ ******************************************************************************
 
 ORG CODE%
 

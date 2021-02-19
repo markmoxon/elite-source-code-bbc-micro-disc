@@ -66,23 +66,6 @@ VEC = &7FFE             \ VEC is where we store the original value of the IRQ1
                         \ vector, matching the address in the elite-missile.asm
                         \ source
 
-ZP = &70                \ Temporary storage, used all over the place
-
-P = &72                 \ Temporary storage, used all over the place
-
-Q = &73                 \ Temporary storage, used all over the place
-
-YY = &74                \ Temporary storage, used when drawing Saturn
-
-T = &75                 \ Temporary storage, used all over the place
-
-SC = &76                \ Used to store the screen address while plotting pixels
-
-CHKSM = &78             \ Used in the copy protection code
-
-DL = &8B                \ The vertical sync flag, matching the address in the
-                        \ main game code
-
 LASCT = &0346           \ The laser pulse count for the current laser, matching
                         \ the address in the main game code
 
@@ -94,6 +77,75 @@ ESCP = &0386            \ The flag that determines whether we have an escape pod
 
 S% = &11E3              \ The adress of the main entry point workspace in the
                         \ main game code
+
+\ ******************************************************************************
+\
+\       Name: ZP
+\       Type: Workspace
+\    Address: &0070 to &008B
+\   Category: Workspaces
+\    Summary: Important variables used by the loader
+\
+\ ******************************************************************************
+
+ORG &0070
+
+.ZP
+
+ SKIP 2                 \ Stores addresses used for moving content around
+
+.P
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+.Q
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+.YY
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+.T
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+.SC
+
+ SKIP 1                 \ Screen address (low byte)
+                        \
+                        \ Elite draws on-screen by poking bytes directly into
+                        \ screen memory, and SC(1 0) is typically set to the
+                        \ address of the character block containing the pixel
+                        \ we want to draw (see the deep dives on "Drawing
+                        \ monochrome pixels in mode 4" and "Drawing colour
+                        \ pixels in mode 5" for more details)
+
+.SCH
+
+ SKIP 1                 \ Screen address (high byte)
+
+.CHKSM
+
+ SKIP 2                 \ Used in the copy protection code
+
+ORG &008B
+
+.DL
+
+ SKIP 1                 \ Vertical sync flag
+                        \
+                        \ DL gets set to 30 every time we reach vertical sync on
+                        \ the video system, which happens 50 times a second
+                        \ (50Hz). The WSCAN routine uses this to pause until the
+                        \ vertical sync, by setting DL to 0 and then monitoring
+                        \ its value until it changes to 30
+
+\ ******************************************************************************
+\
+\ ELITE LOADER
+\
+\ ******************************************************************************
 
 CODE% = &1900
 LOAD% = &1900

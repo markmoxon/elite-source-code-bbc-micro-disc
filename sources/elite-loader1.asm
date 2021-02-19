@@ -26,8 +26,6 @@ INCLUDE "sources/elite-header.h.asm"
 _IB_DISC                = (_RELEASE = 1)
 _STH_DISC               = (_RELEASE = 2)
 
-ZP = &01                \ Temporary storage, used all over the place
-
 BYTEV = &20A            \ The BYTEV vector that we check as part of the copy
                         \ protection
 
@@ -35,6 +33,28 @@ OSWRCH = &FFEE          \ The address for the OSWRCH routine
 OSBYTE = &FFF4          \ The address for the OSBYTE routine
 OSWORD = &FFF1          \ The address for the OSWORD routine
 OSCLI = &FFF7           \ The address for the OSCLI routine
+
+\ ******************************************************************************
+\
+\       Name: ZP
+\       Type: Workspace
+\    Address: &0001 to &0002
+\   Category: Workspaces
+\    Summary: Important variables used by the loader
+\
+\ ******************************************************************************
+
+ORG &0001
+
+.ZP
+
+ SKIP 2                 \ Stores addresses used for moving content around
+
+\ ******************************************************************************
+\
+\ ELITE LOADER
+\
+\ ******************************************************************************
 
 CODE% = &2F00
 LOAD% = &2F00

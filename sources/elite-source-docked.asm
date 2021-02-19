@@ -4306,6 +4306,8 @@ LOAD_B% = LOAD% + P% - CODE%
 
 .LL30
 
+ SKIP 0                 \ LL30 is a synomym for LOIN
+                        \
                         \ In the cassette and disc versions of Elite, LL30 and
                         \ LOIN are synonyms for the same routine, presumably
                         \ because the two developers each had their own line
