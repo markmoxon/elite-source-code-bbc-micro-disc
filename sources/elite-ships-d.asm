@@ -1005,7 +1005,7 @@ ENDMACRO
 
 \ ******************************************************************************
 \
-\       Name: SHIP_COBRA_MK1
+\       Name: SHIP_COBRA_MK_1
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Cobra Mk I

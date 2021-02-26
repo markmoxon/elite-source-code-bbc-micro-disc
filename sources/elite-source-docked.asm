@@ -8555,7 +8555,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \ ships is shown half the time (the other half shows a solo ship), and each of
 \ the four groups is equally likely.
 \
-\ The the bytes for each ship in the group contain the following information:
+\ The bytes for each ship in the group contain the following information:
 \
 \   Byte #0             Non-zero = Ship type to draw
 \                       0        = don't draw anything
