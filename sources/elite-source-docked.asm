@@ -20609,7 +20609,7 @@ LOAD_F% = LOAD% + P% - CODE%
 \ ******************************************************************************
 \
 \       Name: brkd
-\       Type: Subroutine
+\       Type: Variable
 \   Category: Utility routines
 \    Summary: The brkd counter for error handling
 \
@@ -21676,7 +21676,7 @@ ENDIF
 \ ******************************************************************************
 \
 \       Name: stack
-\       Type: Subroutine
+\       Type: Variable
 \   Category: Save and load
 \    Summary: Temporary storage for the stack pointer when switching the BRKV
 \             handler between BRBR and MEBRK

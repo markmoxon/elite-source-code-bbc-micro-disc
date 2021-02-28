@@ -24493,8 +24493,6 @@ ENDIF
  LDX #31                \ Set the screen to show all 31 text rows, which shows
  JSR DET1               \ the dashboard
 
-                        \ Fall through into DEATH2 to reset and restart the game
-
  JMP DEATH2             \ Jump to DEATH2 to reset and restart the game
 
 \ ******************************************************************************
