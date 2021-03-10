@@ -2079,9 +2079,6 @@ ORG &1100
                         \ commander lots of credits and equipment
 
  EQUB 0                 \ TP = Mission status, #0
-                        \
-                        \ Note that this byte must not have bit 7 set, or
-                        \ loading this commander will cause the game to restart
 
  EQUB 20                \ QQ0 = Current system X-coordinate (Lave), #1
  EQUB 173               \ QQ1 = Current system Y-coordinate (Lave), #2

@@ -49,10 +49,9 @@ PLT = 4                 \ Ship type for an alloy plate
 OIL = 5                 \ Ship type for a cargo canister
 AST = 7                 \ Ship type for an asteroid
 SPL = 8                 \ Ship type for a splinter
-SHU = 9                 \ Ship type for a shuttle
+SHU = 9                 \ Ship type for a Shuttle
 CYL = 11                \ Ship type for a Cobra Mk III
 ANA = 14                \ Ship type for an Anaconda
-HER = 15                \ Ship type for a rock hermit (asteroid)
 COPS = 16               \ Ship type for a Viper
 SH3 = 17                \ Ship type for a Sidewinder
 KRA = 19                \ Ship type for a Krait
@@ -73,7 +72,7 @@ JH = SHU+2              \ Junk is defined as ending before the Cobra Mk III
                         \
                         \ So junk is defined as the following: escape pod,
                         \ alloy plate, cargo canister, asteroid, splinter,
-                        \ shuttle, transporter
+                        \ Shuttle or Transporter
 
 PACK = SH3              \ The first of the eight pack-hunter ships, which tend
                         \ to spawn in groups. With the default value of PACK the
@@ -167,9 +166,9 @@ ORG &0000
 
 .TRTB%
 
- SKIP 2                 \ This is set by elite-loader.asm to point to the MOS
-                        \ keyboard translation table, which is used by the TT217
-                        \ routine to translate internal key values to ASCII
+ SKIP 2                 \ TRTB%(1 0) points to the keyboard translation table,
+                        \ which is used to translate internal key numbers to
+                        \ ASCII
 
 .T1
 
@@ -564,6 +563,7 @@ ORG &0000
                         \   32  = Equip Ship screen (red key f3)
                         \   64  = Long-range Chart (red key f4)
                         \   128 = Short-range Chart (red key f5)
+                        \   255 = Launch view
                         \
                         \ This value is typically set by calling routine TT66
 
@@ -955,10 +955,8 @@ ORG &0300
                         \   * Splinter
                         \   * Shuttle
                         \   * Transporter
-                        \   * Rock hermit
                         \
-                        \ Apart from the rock hermit, junk is the range of ship
-                        \ types from #JL to #JH - 1
+                        \ Junk is the range of ship types from #JL to #JH - 1
 
 .auto
 
@@ -3082,7 +3080,7 @@ LOAD_A% = LOAD%
  CMP #SST               \ MA14+2 to make the station hostile, skipping the
  BEQ MA14+2             \ following as we can't destroy a space station
 
- CMP #CON               \ If the ship we hit is not a Constrictor, jump tp BURN
+ CMP #CON               \ If the ship we hit is not a Constrictor, jump to BURN
  BNE BURN               \ to skip the following
 
  LDA LAS                \ Set A to the power of the laser we just used to hit
@@ -4114,15 +4112,15 @@ NEXT
  LDA TWOS,X             \ Fetch a 1-pixel byte from TWOS where pixel X is set,
  STA R                  \ and store it in R
 
- LDA Q                  \ Set A = |delta_y|
-
                         \ The following calculates:
                         \
-                        \   Q = A / P
+                        \   Q = Q / P
                         \     = |delta_y| / |delta_x|
                         \
                         \ using the same shift-and-subtract algorithm that's
                         \ documented in TIS2
+
+ LDA Q                  \ Set A = |delta_y|
 
  LDX #%11111110         \ Set Q to have bits 1-7 set, so we can rotate through 7
  STX Q                  \ loop iterations, getting a 1 each time, and then
@@ -4432,15 +4430,15 @@ NEXT
  AND #7                 \ character block at which we want to draw the start of
  TAY                    \ our line (as each character block has 8 rows)
 
- LDA P                  \ Set A = |delta_x|
-
                         \ The following calculates:
                         \
-                        \   P = A / Q
+                        \   P = P / Q
                         \     = |delta_x| / |delta_y|
                         \
                         \ using the same shift-and-subtract algorithm
                         \ documented in TIS2
+
+ LDA P                  \ Set A = |delta_x|
 
  LDX #1                 \ Set Q to have bits 1-7 clear, so we can rotate through
  STX P                  \ 7 loop iterations, getting a 1 each time, and then
@@ -4767,11 +4765,12 @@ NEXT
 
 .NLIN2
 
- STA Y1                 \ Set (X1, Y1) = (2, A)
- LDX #2
+ STA Y1                 \ Set Y1 = A
+
+ LDX #2                 \ Set X1 = 2, so (X1, Y1) = (2, A)
  STX X1
 
- LDX #254               \ Set X2 = 254
+ LDX #254               \ Set X2 = 254, so (X2, Y2) = (254, A)
  STX X2
 
  BNE HLOIN              \ Call HLOIN to draw a horizontal line from (2, A) to
@@ -7009,6 +7008,12 @@ NEXT
 \
 \                         * If X = 19, rotate roofv_z
 \
+\                         * If X = 21, rotate sidev_x
+\
+\                         * If X = 23, rotate sidev_y
+\
+\                         * If X = 25, rotate sidev_z
+\
 \   Y                   The second vector to rotate:
 \
 \                         * If Y = 9,  rotate nosev_x
@@ -8909,12 +8914,8 @@ LOAD_C% = LOAD% +P% - CODE%
 \     (6.2% chance, up to a maximum of seven) and we're done
 \
 \   * If this is the space station and it is not hostile, consider spawning
-\     (0.8% chance if there are no transporters around) a transporter or shuttle
+\     (0.8% chance if there are no Transporters around) a Transporter or Shuttle
 \     (equal odds of each type) and we're done
-\
-\   * If this is a rock hermit, consider spawning (22% chance) a highly
-\     aggressive and hostile Sidewinder, Mamba, Krait, Adder or Gecko (equal
-\     odds of each type) and we're done
 \
 \   * Recharge the ship's energy banks by 1
 \
@@ -8961,12 +8962,12 @@ LOAD_C% = LOAD% +P% - CODE%
  BNE TN5                \ station is hostile), jump to TN5 to spawn some cops
 
  LDA MANY+SHU+1         \ The station is not hostile, so check how many
- BNE TA1                \ transporters there are in the vicinity, and if we
+ BNE TA1                \ Transporters there are in the vicinity, and if we
                         \ already have one, return from the subroutine (as TA1
                         \ contains an RTS)
 
                         \ If we get here then the station is not hostile, so we
-                        \ can consider spawning a transporter or shuttle
+                        \ can consider spawning a Transporter or Shuttle
 
  JSR DORND              \ Set A and X to random numbers
 
@@ -8977,7 +8978,7 @@ LOAD_C% = LOAD% +P% - CODE%
 
  ADC #SHU-1             \ The C flag is set (as we didn't take the BCC above),
  TAX                    \ so this sets X to a value of either #SHU or #SHU + 1,
-                        \ which is the ship type for a shuttle or a transporter
+                        \ which is the ship type for a Shuttle or a Transporter
 
  BNE TN6                \ Jump to TN6 to spawn this ship type and return from
                         \ the subroutine using a tail call (this BNE is
@@ -8985,7 +8986,9 @@ LOAD_C% = LOAD% +P% - CODE%
 
 .TN5
 
-                        \ If we get here then the station is hostile and we need
+                        \ We only call the tactics routine for the space station
+                        \ when it is hostile, so if we get here then this is the
+                        \ station, and we already know it's hostile, so we need
                         \ to spawn some cops
 
  JSR DORND              \ Set A and X to random numbers
@@ -9544,8 +9547,6 @@ LOAD_C% = LOAD% +P% - CODE%
                         \ counter
 
  STA INWK+30            \ Store the result in the ship's pitch counter
-
-.TA11
 
  LDA INWK+29            \ Fetch the roll counter from byte #29 into A
 
@@ -10703,7 +10704,7 @@ LOAD_C% = LOAD% +P% - CODE%
 
  LDA TYPE               \ If the ship's type is < #CYL (i.e. a missile, Coriolis
  CMP #CYL               \ space station, escape pod, plate, cargo canister,
- BCC AN3                \ boulder, asteroid, splinter, shuttle or transporter),
+ BCC AN3                \ boulder, asteroid, splinter, Shuttle or Transporter),
                         \ then jump to AN3 to skip the following
 
  LDY #36                \ Set bit 2 of the ship's NEWB flags in byte #36 to
@@ -15723,8 +15724,8 @@ LOAD_D% = LOAD% + P% - CODE%
  JMP TTX110             \ system to the nearest system to (QQ9, QQ10), and jumps
                         \ back into this routine at TTX111 below
 
- JSR hm                 \ Set the system closest to galactic coordinates (QQ9,
-                        \ QQ10) as the selected system
+ JSR hm                 \ This is a chart view, so call hm to redraw the chart
+                        \ crosshairs
 
 .TTX111
 
@@ -16544,12 +16545,15 @@ LOAD_D% = LOAD% + P% - CODE%
  LDA QQ4                \ Set the current system's government in gov to the
  STA gov                \ selected system's government from QQ4
 
+                        \ Fall through into GVL to calculate the availability of
+                        \ market items in the new system
+
 \ ******************************************************************************
 \
 \       Name: GVL
 \       Type: Subroutine
 \   Category: Universe
-\    Summary: Calculate the availability of a market item
+\    Summary: Calculate the availability of market items
 \  Deep dive: Market item prices and availability
 \             Galaxy and system seeds
 \
@@ -18446,14 +18450,14 @@ LOAD_E% = LOAD% + P% - CODE%
  AND #%00000011         \ Extract bits 0-1 (which also help to determine the
                         \ economy), which will be between 0 and 3
 
- ADC #3                 \ Add 3 + C, to get a result between 3 and 7
+ ADC #3                 \ Add 3 + C, to get a result between 3 and 7, clearing
+                        \ the C flag in the process
 
  STA INWK+8             \ Store the result in z_sign in byte #6
 
- ROR A                  \ Halve A, rotating in the C flag, which was previously
- STA INWK+2             \ bit 0 of s0_hi + 6 + C, so when this is stored in both
- STA INWK+5             \ x_sign and y_sign, it moves the planet to the upper
-                        \ right or lower left
+ ROR A                  \ Halve A, rotating in the C flag (which is clear) and
+ STA INWK+2             \ store in both x_sign and y_sign, moving the planet to
+ STA INWK+5             \ the upper right
 
  JSR SOS1               \ Call SOS1 to set up the planet's data block and add it
                         \ to FRIN, where it will get put in the first slot as
@@ -18702,7 +18706,7 @@ LOAD_E% = LOAD% + P% - CODE%
 \   X                   The number of text rows to display on the screen (24
 \                       will hide the dashboard, 31 will make it reappear)
 \
-\ Returns
+\ Returns:
 \
 \   A                   A is set to 6
 \
@@ -18974,7 +18978,7 @@ LOAD_E% = LOAD% + P% - CODE%
                         \ higher up on the compass, which has a smaller pixel
                         \ y-coordinate). So this calculation does this:
                         \
-                        \ COMY = 204 - X - (1 - 0) = 203 - X
+                        \   COMY = 204 - X - (1 - 0) = 203 - X
 
  LDA #&F0               \ Set A to a 4-pixel mode 5 byte row in colour 2
                         \ (yellow/white), the colour for when the planet or
@@ -19646,13 +19650,12 @@ LOAD_E% = LOAD% + P% - CODE%
 
  CPX #JL                \ If JL <= X < JH, i.e. the type of ship we killed in X
  BCC NW7                \ is junk (escape pod, alloy plate, cargo canister,
- CPX #JH                \ asteroid, splinter, shuttle or transporter), then keep
+ CPX #JH                \ asteroid, splinter, Shuttle or Transporter), then keep
  BCS NW7                \ going, otherwise jump to NW7
 
 .gangbang
 
- INC JUNK               \ We're adding junk, or a rock hermit, so increase the
-                        \ junk counter
+ INC JUNK               \ We're adding junk, so increase the junk counter
 
 .NW7
 
@@ -19852,6 +19855,8 @@ LOAD_E% = LOAD% + P% - CODE%
 
  LDX #LO(SPBT)          \ Set (Y X) to point to the character definition in SPBT
  LDY #HI(SPBT)
+
+                        \ Fall through into BULB to draw the space station bulb
 
 \ ******************************************************************************
 \
@@ -22672,11 +22677,10 @@ LOAD_E% = LOAD% + P% - CODE%
 
  CPX #JL                \ If JL <= X < JH, i.e. the type of ship we killed in X
  BCC KS7                \ is junk (escape pod, alloy plate, cargo canister,
- CPX #JH                \ asteroid, splinter, shuttle or transporter), then keep
+ CPX #JH                \ asteroid, splinter, Shuttle or Transporter), then keep
  BCS KS7                \ going, otherwise jump to KS7
 
- DEC JUNK               \ We just killed junk, or a rock hermit, so decrease the
-                        \ junk counter
+ DEC JUNK               \ We just killed junk, so decrease the junk counter
 
 .KS7
 
@@ -23420,9 +23424,10 @@ LOAD_F% = LOAD% + P% - CODE%
 \
 \ This section covers the following:
 \
-\   * Spawn a trader, i.e. a Cobra Mk III, Python, Boa or Anaconda, with one
-\     missile, a 50% chance of having an E.C.M., a 50% chance of being hostile,
-\     a speed between 16 and 31, and a gentle clockwise roll
+\   * Spawn a trader, i.e. a Cobra Mk III, Python, Boa or Anaconda, with a 50%
+\     chance of it having a missile, a 50% chance of it having an E.C.M., a 50%
+\     chance of it docking and being aggressive if attacked, a speed between 16
+\     and 31, and a gentle clockwise roll
 \
 \ We call this from within the main loop.
 \
@@ -23432,7 +23437,8 @@ LOAD_F% = LOAD% + P% - CODE%
 
  JSR DORND              \ Set A and X to random numbers
 
- LSR A                  \ Clear bit 7 of our random number in A
+ LSR A                  \ Clear bit 7 of our random number in A and set the C
+                        \ flag to bit 0 of A, which os random
 
  STA INWK+32            \ Store this in the ship's AI flag, so this ship does
                         \ not have AI
@@ -23441,8 +23447,9 @@ LOAD_F% = LOAD% + P% - CODE%
                         \ clockwise roll (as bit 7 is clear), and a 1 in 127
                         \ chance of it having no damping
 
- ROL INWK+31            \ Set bit 0 of missile count (as we know the C flag is
-                        \ set), giving the ship one missile
+ ROL INWK+31            \ Set bit 0 of the ship's missile count ramdomly (as the
+                        \ C flag was set), giving the ship either no missiles or
+                        \ one missile
 
  AND #15                \ Set the ship speed to our random number, set to a
  ORA #16                \ minimum of 16 and a maximum of 31
@@ -23856,8 +23863,8 @@ ENDIF
 
 .focoug
 
- JSR NWSHP              \ Spawn the new ship, whether it's a pirate, Thargoid,
-                        \ Cougar or Constrictor
+ JSR NWSHP              \ Spawn the new ship, whether it's a pirate, Thargoid or
+                        \ Constrictor
 
 .mj1
 
@@ -23893,8 +23900,10 @@ ENDIF
 
 .more
 
- LDA CPIR               \ #PACK is set to #SH3, the ship type for a Sidewinder,
- ADC #PACK              \ so this sets our new ship type to one of the pack
+ LDA CPIR
+
+ ADC #PACK              \ #PACK is set to #SH3, the ship type for a Sidewinder,
+                        \ so this sets our new ship type to one of the pack
                         \ hunters, namely a Sidewinder, Mamba, Krait, Adder,
                         \ Gecko, Cobra Mk I, Worm or Cobra Mk III (pirate)
 
@@ -24039,6 +24048,10 @@ ENDIF
 \
 \   Y                   The amount to move the crosshairs in the y-axis
 \
+\ Other entry points:
+\
+\   T95                 Print the distance to the selected system
+\
 \ ******************************************************************************
 
 .TT102
@@ -24057,9 +24070,11 @@ ENDIF
 
  CMP #f6                \ If red key f6 was pressed, call TT111 to select the
  BNE TT92               \ system nearest to galactic coordinates (QQ9, QQ10)
- JSR TT111              \ (the location of the chart crosshairs) and jump to
- JMP TT25               \ TT25 to show the Data on System screen, returning
-                        \ from the subroutine using a tail call
+ JSR TT111              \ (the location of the chart crosshairs) and set ZZ to
+ JMP TT25               \ the system number, and then jump to TT25 to show the
+                        \ Data on System screen (along with an extended system
+                        \ description for the system in ZZ if we're docked),
+                        \ returning from the subroutine using a tail call
 
 .TT92
 
@@ -24114,8 +24129,8 @@ ENDIF
  LDA T1                 \ Restore the original value of A (the key that's been
                         \ pressed) from T1
 
- CMP #&36               \ If "O" was pressed, do the following three JSRs,
- BNE ee2                \ otherwise jump to ee2 to skip the following
+ CMP #&36               \ If "O" was pressed, do the following three jumps,
+ BNE ee2                \ otherwise skip to ee2 to continue
 
  JSR TT103              \ Draw small crosshairs at coordinates (QQ9, QQ10),
                         \ which will erase the crosshairs currently there
@@ -24899,6 +24914,8 @@ ENDIF
 \
 \   XX15                The normalised vector
 \
+\   Q                   The length of the original XX15 vector
+\
 \ Other entry points:
 \
 \   NO1                 Contains an RTS
@@ -25062,7 +25079,7 @@ ENDIF
 
  LDX JUNK               \ Set X to the total number of junk items in the
                         \ vicinity (e.g. asteroids, escape pods, cargo
-                        \ canisters, shuttles, transportes and so pn)
+                        \ canisters, Shuttles, Transporters and so pn)
 
  LDA FRIN+2,X           \ If the slot at FRIN+2+X is non-zero, then we have
                         \ something else in the vicinity besides asteroids,
@@ -26318,7 +26335,7 @@ ENDIF
 
 .DKL1
 
- LDX KYTB,Y             \ Get the internal key value of the Y-th flight key
+ LDX KYTB,Y             \ Get the internal key number of the Y-th flight key
                         \ the KYTB keyboard table
 
  CPX KL                 \ We stored the key that's being pressed in KL above,
@@ -27111,7 +27128,7 @@ LOAD_G% = LOAD% + P% - CODE%
  ORA K3+1               \ If either of the high bytes of the screen coordinates
  BNE nono               \ are non-zero, jump to nono as the ship is off-screen
 
- LDA K4                 \ Set A = y-coordinate of dot
+ LDA K4                 \ Set A = the y-coordinate of the dot
 
  CMP #Y*2-2             \ If the y-coordinate is bigger than the y-coordinate of
  BCS nono               \ the bottom of the screen, jump to nono as the ship's
@@ -32468,7 +32485,8 @@ LOAD_H% = LOAD% + P% - CODE%
 
  JSR FLFLLS             \ Call FLFLLS to reset the LSO block
 
- STA LAS2               \ Set LAS2 = 0 to stop any laser pulsing
+ STA LAS2               \ Set LAS2 = 0 to stop any laser pulsing (the call to
+                        \ FLFLLS sets A = 0)
 
  STA DLY                \ Set the delay in DLY to 0, to indicate that we are
                         \ no longer showing an in-flight message, so any new

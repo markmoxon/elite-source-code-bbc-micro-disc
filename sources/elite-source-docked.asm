@@ -49,10 +49,9 @@ PLT = 4                 \ Ship type for an alloy plate
 OIL = 5                 \ Ship type for a cargo canister
 AST = 7                 \ Ship type for an asteroid
 SPL = 8                 \ Ship type for a splinter
-SHU = 9                 \ Ship type for a shuttle
+SHU = 9                 \ Ship type for a Shuttle
 CYL = 11                \ Ship type for a Cobra Mk III
 ANA = 14                \ Ship type for an Anaconda
-HER = 15                \ Ship type for a rock hermit (asteroid)
 COPS = 16               \ Ship type for a Viper
 SH3 = 17                \ Ship type for a Sidewinder
 KRA = 19                \ Ship type for a Krait
@@ -73,7 +72,7 @@ JH = SHU+2              \ Junk is defined as ending before the Cobra Mk III
                         \
                         \ So junk is defined as the following: escape pod,
                         \ alloy plate, cargo canister, asteroid, splinter,
-                        \ shuttle, transporter
+                        \ Shuttle or Transporter
 
 PACK = SH3              \ The first of the eight pack-hunter ships, which tend
                         \ to spawn in groups. With the default value of PACK the
@@ -115,8 +114,8 @@ f7 = &16                \ Internal key number for red key f7 (Market Price)
 f8 = &76                \ Internal key number for red key f8 (Status Mode)
 f9 = &77                \ Internal key number for red key f9 (Inventory)
 
-NRU% = 25               \ The number of planetary systems with special extended
-                        \ descriptions in the RUTOK table
+NRU% = 25               \ The number of planetary systems with extended system
+                        \ description overrides in the RUTOK table
 
 VE = &57                \ The obfuscation byte used to hide the extended tokens
                         \ table from crackers viewing the binary code
@@ -183,9 +182,9 @@ ORG &0000
 
 .TRTB%
 
- SKIP 2                 \ This is set by elite-loader.asm to point to the MOS
-                        \ keyboard translation table, which is used by the TT217
-                        \ routine to translate internal key values to ASCII
+ SKIP 2                 \ TRTB%(1 0) points to the keyboard translation table,
+                        \ which is used to translate internal key numbers to
+                        \ ASCII
 
 .T1
 
@@ -580,6 +579,7 @@ ORG &0000
                         \   32  = Equip Ship screen (red key f3)
                         \   64  = Long-range Chart (red key f4)
                         \   128 = Short-range Chart (red key f5)
+                        \   255 = Launch view
                         \
                         \ This value is typically set by calling routine TT66
 
@@ -971,10 +971,8 @@ ORG &0300
                         \   * Splinter
                         \   * Shuttle
                         \   * Transporter
-                        \   * Rock hermit
                         \
-                        \ Apart from the rock hermit, junk is the range of ship
-                        \ types from #JL to #JH - 1
+                        \ Junk is the range of ship types from #JL to #JH - 1
 
 .auto
 
@@ -3152,7 +3150,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
  EQUW PAUSE2            \ Token 24: Wait for a key press
  EQUW BRIS              \ Token 25: Show incoming message screen, wait 2 seconds
  EQUW MT26              \ Token 26: Fetch line input from keyboard (filename)
- EQUW MT27              \ Token 27: Print mission 1 captain's name (217-219)
+ EQUW MT27              \ Token 27: Print mission captain's name (217-219)
  EQUW MT28              \ Token 28: Print mission 1 location hint (220-221)
  EQUW MT29              \ Token 29: Column 6, white text, lower case in words
  EQUW DASC              \ Token 30: Unused
@@ -3885,6 +3883,12 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \
 \                         * If X = 19, rotate roofv_z
 \
+\                         * If X = 21, rotate sidev_x
+\
+\                         * If X = 23, rotate sidev_y
+\
+\                         * If X = 25, rotate sidev_z
+\
 \   Y                   The second vector to rotate:
 \
 \                         * If Y = 9,  rotate nosev_x
@@ -4452,15 +4456,15 @@ LOAD_B% = LOAD% + P% - CODE%
  LDA TWOS,X             \ Fetch a 1-pixel byte from TWOS where pixel X is set,
  STA R                  \ and store it in R
 
- LDA Q                  \ Set A = |delta_y|
-
                         \ The following calculates:
                         \
-                        \   Q = A / P
+                        \   Q = Q / P
                         \     = |delta_y| / |delta_x|
                         \
                         \ using the same shift-and-subtract algorithm that's
                         \ documented in TIS2
+
+ LDA Q                  \ Set A = |delta_y|
 
  LDX #%11111110         \ Set Q to have bits 1-7 set, so we can rotate through 7
  STX Q                  \ loop iterations, getting a 1 each time, and then
@@ -4770,15 +4774,15 @@ LOAD_B% = LOAD% + P% - CODE%
  AND #7                 \ character block at which we want to draw the start of
  TAY                    \ our line (as each character block has 8 rows)
 
- LDA P                  \ Set A = |delta_x|
-
                         \ The following calculates:
                         \
-                        \   P = A / Q
+                        \   P = P / Q
                         \     = |delta_x| / |delta_y|
                         \
                         \ using the same shift-and-subtract algorithm
                         \ documented in TIS2
+
+ LDA P                  \ Set A = |delta_x|
 
  LDX #1                 \ Set Q to have bits 1-7 clear, so we can rotate through
  STX P                  \ 7 loop iterations, getting a 1 each time, and then
@@ -5105,11 +5109,12 @@ LOAD_B% = LOAD% + P% - CODE%
 
 .NLIN2
 
- STA Y1                 \ Set (X1, Y1) = (2, A)
- LDX #2
+ STA Y1                 \ Set Y1 = A
+
+ LDX #2                 \ Set X1 = 2, so (X1, Y1) = (2, A)
  STX X1
 
- LDX #254               \ Set X2 = 254
+ LDX #254               \ Set X2 = 254, so (X2, Y2) = (254, A)
  STX X2
 
  BNE HLOIN              \ Call HLOIN to draw a horizontal line from (2, A) to
@@ -7391,9 +7396,11 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  BEQ RR4                \ RR4, which doesn't print anything, it just restores
                         \ the registers and returns from the subroutine
 
- TAY                    \ If A = 0 then there is nothing to print, so jump to
- BEQ RR4                \ RR4 to restore the registers and return from the
-                        \ subroutine
+ TAY                    \ Set Y = the character to be printed
+
+ BEQ RR4                \ If the character is zero, which is typically a string
+                        \ terminator character, jump down to RR4 to restore the
+                        \ registers and return from the subroutine
 
  BMI RR4                \ If A > 127 then there is nothing to print, so jump to
                         \ RR4 to restore the registers and return from the
@@ -8784,7 +8791,7 @@ LOAD_C% = LOAD% +P% - CODE%
  AND #7                 \
  STA XX15+2             \ which is either 0 (no ships in the hanger) or one of
                         \ the first 7 ship types in the ship hanger blueprints
-                        \ table, i.e. a cargo canister, shuttle, transporter,
+                        \ table, i.e. a cargo canister, Shuttle, Transporter,
                         \ Cobra Mk III, Python, Viper or Krait
 
  JSR HAS1               \ Call HAS1 to draw this ship in the hanger, with the
@@ -8792,20 +8799,20 @@ LOAD_C% = LOAD% +P% - CODE%
                         \
                         \   * Random x-coordinate from -63 to +63
                         \
-                        \   * Randomly chosen cargo canister, shuttle,
-                        \     transporter, Cobra Mk III, Python, Viper or Krait
+                        \   * Randomly chosen cargo canister, Shuttle,
+                        \     Transporter, Cobra Mk III, Python, Viper or Krait
                         \
                         \   * Random z-coordinate from +256 to +639
 
- LDY #0                 \ Set Y = 0 to send as byte #2 of the parameter block to
-                        \ the OSWORD 248 command below, to tell the I/O
-                        \ processor that there is just one ship in the hanger
+ LDY #0                 \ Set Y = 0 to use in the following instruction, to tell
+                        \ the hanger-drawing routine that there is just one ship
+                        \ in the hanger, so it knows not to draw between the
+                        \ ships
 
 .HA9
 
- STY YSAV               \ Set YSAV = 0 to indicate that there is only one ship
-                        \ (so the HANGER routine knows not to draw between the
-                        \ ships)
+ STY YSAV               \ Store Y in YSAV to specify whether there are multiple
+                        \ ships in the hanger
 
  JSR UNWISE             \ Call UNWISE to switch the main line-drawing routine
                         \ between EOR and OR logic (in this case, switching it
@@ -11792,8 +11799,7 @@ LOAD_C% = LOAD% +P% - CODE%
                         \ printing a word
 
  ASL A                  \ Set LASCT to 0, as 128 << 1 = %10000000 << 1 = 0. This
- STA LASCT              \ stops any laser pulsing. This instruction is STA LAS2
-                        \ in the text source file ELITEC.TXT
+ STA LASCT              \ stops any laser pulsing
 
  STA DLY                \ Set the delay in DLY to 0, to indicate that we are
                         \ no longer showing an in-flight message, so any new
@@ -11816,8 +11822,6 @@ LOAD_C% = LOAD% +P% - CODE%
  CPX #&78               \ Loop back to BOL1 until we have cleared page &7700,
  BNE BOL1               \ the last character row in the space view part of the
                         \ screen (the space view)
-
-.BOX
 
  LDY #1                 \ Move the text cursor to row 1
  STY YC
@@ -12879,6 +12883,11 @@ LOAD_D% = LOAD% + P% - CODE%
 
  JSR TTX69              \ Print a paragraph break and set Sentence Case
 
+                        \ By this point, ZZ contains the current system number
+                        \ which PDESC requires. It gets put there in the TT102
+                        \ routine, which calls TT111 to populate ZZ before
+                        \ calling TT25 (this routine)
+
  JMP PDESC              \ Jump to PDESC to print the system's extended
                         \ description, returning from the subroutine using a
                         \ tail call
@@ -13594,6 +13603,9 @@ LOAD_D% = LOAD% + P% - CODE%
 \ Get a number from the keyboard, up to the maximum number in QQ25, for the
 \ buying and selling of cargo and equipment.
 \
+\ Pressing "Y" will return the maximum number (i.e. buy/sell all items), while
+\ pressing "N" will abort the sale and return a 0.
+\
 \ Pressing a key with an ASCII code less than ASCII "0" will return a 0 in A (so
 \ that includes pressing Space or Return), while pressing a key with an ASCII
 \ code greater than ASCII "9" will jump to the Inventory screen (so that
@@ -13790,6 +13802,10 @@ LOAD_D% = LOAD% + P% - CODE%
 \                           * 4 = Sell Cargo
 \
 \                           * 8 = Inventory
+\
+\ Other entry points:
+\
+\   NWDAVxx             Used to rejoin this routine from the call to NWDAV4
 \
 \ ******************************************************************************
 
@@ -14553,6 +14569,8 @@ LOAD_D% = LOAD% + P% - CODE%
 \   QQ15 to QQ15+5      The three 16-bit seeds of the nearest system to the
 \                       original coordinates
 \
+\   ZZ                  The system number of the nearest system
+\
 \ Other entry points:
 \
 \   TT111-1             Contains an RTS
@@ -14862,8 +14880,8 @@ LOAD_D% = LOAD% + P% - CODE%
                         \ then return from the subroutine (as zZ+1 contains an
                         \ RTS)
 
- JSR hm                 \ Set the system closest to galactic coordinates (QQ9,
-                        \ QQ10) as the selected system
+ JSR hm                 \ This is a chart view, so call hm to redraw the chart
+                        \ crosshairs
 
 .TTX111
 
@@ -16573,12 +16591,12 @@ LOAD_D% = LOAD% + P% - CODE%
 IF _STH_DISC
 
  NOP                    \ In the first version of disc Elite, there was a nasty
- NOP                    \ bug where buying a laser that you already owned gave
- NOP                    \ you a refund of the laser's worth without removing the
- NOP                    \ laser, so you could keep doing this to get as many
- NOP                    \ credits as you liked. This was quickly fixed by
- NOP                    \ replacing the incorrect code with NOPs, which is what
- NOP                    \ we have here
+ NOP                    \ bug where buying a laser that you already owned
+ NOP                    \ affected your credit balance, so if you were clever,
+ NOP                    \ you could keep doing this to get as many credits as
+ NOP                    \ you liked. This was quickly fixed by replacing the
+ NOP                    \ incorrect code with NOPs, which is what we have here
+ NOP
  NOP
  NOP
 
@@ -17776,7 +17794,7 @@ LOAD_E% = LOAD% + P% - CODE%
 \   X                   The number of text rows to display on the screen (24
 \                       will hide the dashboard, 31 will make it reappear)
 \
-\ Returns
+\ Returns:
 \
 \   A                   A is set to 6
 \
@@ -18310,6 +18328,8 @@ LOAD_E% = LOAD% + P% - CODE%
 
  LDX #LO(SPBT)          \ Set (Y X) to point to the character definition in SPBT
  LDY #HI(SPBT)
+
+                        \ Fall through into BULB to draw the space station bulb
 
 \ ******************************************************************************
 \
@@ -20402,6 +20422,10 @@ LOAD_F% = LOAD% + P% - CODE%
 \
 \   Y                   The amount to move the crosshairs in the y-axis
 \
+\ Other entry points:
+\
+\   T95                 Print the distance to the selected system
+\
 \ ******************************************************************************
 
 .TT102
@@ -20420,9 +20444,11 @@ LOAD_F% = LOAD% + P% - CODE%
 
  CMP #f6                \ If red key f6 was pressed, call TT111 to select the
  BNE TT92               \ system nearest to galactic coordinates (QQ9, QQ10)
- JSR TT111              \ (the location of the chart crosshairs) and jump to
- JMP TT25               \ TT25 to show the Data on System screen, returning
-                        \ from the subroutine using a tail call
+ JSR TT111              \ (the location of the chart crosshairs) and set ZZ to
+ JMP TT25               \ the system number, and then jump to TT25 to show the
+                        \ Data on System screen (along with an extended system
+                        \ description for the system in ZZ if we're docked),
+                        \ returning from the subroutine using a tail call
 
 .TT92
 
@@ -20451,7 +20477,8 @@ LOAD_F% = LOAD% + P% - CODE%
  CMP #&47               \ If "@" was not pressed, skip to nosave
  BNE nosave
 
- JSR SVE                \ "@" was pressed, so call SVE to show the disc menu
+ JSR SVE                \ "@" was pressed, so call SVE to show the disc access
+                        \ menu
 
  BCC P%+5               \ If the C flag was set by SVE, then we loaded a new
  JMP QU5                \ commander file, so jump to QU5 to restart the game
@@ -20514,8 +20541,8 @@ LOAD_F% = LOAD% + P% - CODE%
  LDA T1                 \ Restore the original value of A (the key that's been
                         \ pressed) from T1
 
- CMP #&36               \ If "O" was pressed, do the following three JSRs,
- BNE ee2                \ otherwise jump to ee2 to skip the following
+ CMP #&36               \ If "O" was pressed, do the following three jumps,
+ BNE ee2                \ otherwise skip to ee2 to continue
 
  JSR TT103              \ Draw small crosshairs at coordinates (QQ9, QQ10),
                         \ which will erase the crosshairs currently there
@@ -20790,9 +20817,9 @@ LOAD_F% = LOAD% + P% - CODE%
                         \ them are targeted
 
  LDA #7                 \ Call TITLE to show a rotating Krait (#KRA) and token
- LDX #KRA               \ 7 ("LOAD NEW {single cap}COMMANDER {all caps}(Y/N)?
- JSR TITLE              \ {sentence case}{cr}{cr}""), returning with the
-                        \ internal number of the key pressed in A
+ LDX #KRA               \ 7 ("PRESS SPACE OR FIRE,{single cap}COMMANDER.{cr}
+ JSR TITLE              \ {cr}"), returning with the internal number of the key
+                        \ pressed in A
 
  JSR ping               \ Set the target system coordinates (QQ9, QQ10) to the
                         \ current system coordinates (QQ0, QQ1) we just loaded
@@ -21113,9 +21140,11 @@ ENDIF
                         \ the value of IRB with %10000 extracts this bit
 
 \TAX                    \ This instruction is commented out in the original
-                        \ source
+                        \ source; it would have no effect, as the comparison
+                        \ flags are already set by the AND, and the value of X
+                        \ is not used anywhere
 
- BEQ TL2                \ If the joystick fire button is pressed, jump to BL2
+ BEQ TL2                \ If the joystick fire button is pressed, jump to TL2
 
  JSR RDKEY              \ Scan the keyboard for a key press
 
@@ -22075,11 +22104,6 @@ ENDIF
 
 .LOD
 
-\LDX #LO(MINI)          \ These instructions are commented out in the original
-\LDY #HI(MINI)          \ source, but they would load a commander file called
-\JSR OSCLI              \ "E.MINING" and continue below, so presumably this is
-\JMP LOL1-2             \ code for loading a test commander file
-
 \LDX #2                 \ These instructions are commented out in the original
 \JSR FX200              \ source, but they would enable the ESCAPE key and clear
                         \ memory if the BREAK key is pressed (*FX 200,2)
@@ -22132,10 +22156,6 @@ ENDIF
  EQUS "IIllegal "       \ invalid commander file with bit 7 of byte #0 set
  EQUS "ELITE II file"   \ (the spelling mistake is in the original source)
  BRK
-
-\.MINI                  \ These instructions are commented out in the original
-\EQUS "L.E.MINING B00"  \ source, and form part of the commented section above
-\EQUB 13
 
 \ ******************************************************************************
 \
@@ -22344,6 +22364,8 @@ ENDIF
 \ Returns:
 \
 \   XX15                The normalised vector
+\
+\   Q                   The length of the original XX15 vector
 \
 \ Other entry points:
 \
@@ -23151,7 +23173,8 @@ ENDIF
  CPX #&70               \ If ESCAPE is not being pressed, skip over the next
  BNE P%+5               \ instruction
 
- JMP BR1                \ Jump to BR1 to restart the game
+ JMP BR1                \ ESCAPE is being pressed, so jump to BR1 to end the
+                        \ game
 
  CPX #&64               \ If "B" is not being pressed, skip to DK7
  BNE nobit
@@ -23261,7 +23284,7 @@ ENDIF
 
  LDA (TRTB%),Y          \ The address in TRTB% points to the MOS key
                         \ translation table, which is used to translate
-                        \ internal key values to ASCII, so this fetches the
+                        \ internal key numbers to ASCII, so this fetches the
                         \ key's ASCII code into A
 
  LDY YSAV               \ Restore the original value of Y we stored above
@@ -28118,7 +28141,7 @@ ENDMACRO
  EJMP 2                 \                {sentence case}
  ECHR 'G'               \                GREETINGS {single cap}COMMANDER
  ETWO 'R', 'E'          \                {commander name}, I {lower case}AM
- ETWO 'E', 'T'          \                {sentence case} CAPTAIN {mission 1
+ ETWO 'E', 'T'          \                {sentence case} CAPTAIN {mission
  ETWO 'I', 'N'          \                captain's name} {lower case}OF{sentence
  ECHR 'G'               \                case} HER MAJESTY'S SPACE NAVY{lower
  ECHR 'S'               \                case} AND {single cap}I BEG A MOMENT OF
@@ -28471,7 +28494,7 @@ ENDMACRO
  EJMP 2                 \                {sentence case}
  ECHR ' '               \                  ATTENTION {single cap}COMMANDER
  ECHR ' '               \                {commander name}, I {lower case}AM
- ETWO 'A', 'T'          \                {sentence case} CAPTAIN {mission 1
+ ETWO 'A', 'T'          \                {sentence case} CAPTAIN {mission
  ECHR 'T'               \                captain's name} {lower case}OF{sentence
  ETWO 'E', 'N'          \                case} HER MAJESTY'S SPACE NAVY{lower
  ETWO 'T', 'I'          \                case}. {single cap}WE HAVE NEED OF YOUR
@@ -31093,7 +31116,7 @@ ENDMACRO
 \       Name: RUPLA
 \       Type: Variable
 \   Category: Text
-\    Summary: System numbers that have special extended decriptions
+\    Summary: System numbers that have extended decription overrides
 \  Deep dive: Extended system descriptions
 \             Extended text tokens
 \
@@ -31148,21 +31171,21 @@ ENDMACRO
 \       Name: RUGAL
 \       Type: Variable
 \   Category: Text
-\    Summary: The criteria for systems with special extended descriptions
+\    Summary: The criteria for systems with extended decription overrides
 \  Deep dive: Extended system descriptions
 \             Extended text tokens
 \
 \ ------------------------------------------------------------------------------
 \
-\ This table contains the criteria for printing a special extended description
+\ This table contains the criteria for printing an extended decription override
 \ for a system. The galaxy number is in bits 0-6, while bit 7 determines whether
 \ to show this token during mission 1 only (bit 7 is clear, i.e. a value of &0x
 \ in the table below), or all of the time (bit 7 is set, i.e. a value of &8x in
 \ the table below).
 \
-\ In other words, Teorge, Arredi, Anreer and Lave have special extended
-\ descriptions that are always shown, while the rest only appear when mission 1
-\ is in progress.
+\ In other words, Teorge, Arredi, Anreer and Lave have extended decription
+\ overrides descriptions that are always shown, while the rest only appear when
+\ mission 1 is in progress.
 \
 \ The three variables work as follows:
 \
@@ -31216,7 +31239,7 @@ ENDMACRO
 \
 \ ------------------------------------------------------------------------------
 \
-\ Contains the tokens for special extended descriptions of systems that match
+\ Contains the tokens for extended description overrides of systems that match
 \ the system number in RUPLA and the conditions in RUGAL.
 \
 \ The three variables work as follows:
@@ -32327,7 +32350,7 @@ ENDMACRO
 \       Name: SHIP_SHUTTLE
 \       Type: Variable
 \   Category: Drawing ships
-\    Summary: Ship blueprint for a shuttle
+\    Summary: Ship blueprint for a Shuttle
 \  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
@@ -32427,7 +32450,7 @@ ENDMACRO
 \       Name: SHIP_TRANSPORTER
 \       Type: Variable
 \   Category: Drawing ships
-\    Summary: Ship blueprint for a transporter
+\    Summary: Ship blueprint for a Transporter
 \  Deep dive: Ship blueprints
 \
 \ ******************************************************************************

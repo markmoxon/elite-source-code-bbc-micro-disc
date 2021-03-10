@@ -603,7 +603,7 @@ ENDMACRO
 \       Name: SHIP_TRANSPORTER
 \       Type: Variable
 \   Category: Drawing ships
-\    Summary: Ship blueprint for a transporter
+\    Summary: Ship blueprint for a Transporter
 \  Deep dive: Ship blueprints
 \
 \ ******************************************************************************

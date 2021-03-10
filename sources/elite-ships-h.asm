@@ -665,7 +665,7 @@ ENDMACRO
 \       Name: SHIP_SHUTTLE
 \       Type: Variable
 \   Category: Drawing ships
-\    Summary: Ship blueprint for a shuttle
+\    Summary: Ship blueprint for a Shuttle
 \  Deep dive: Ship blueprints
 \
 \ ******************************************************************************
