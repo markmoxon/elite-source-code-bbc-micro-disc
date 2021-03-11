@@ -62,9 +62,6 @@ ASP = 25                \ Ship type for an Asp Mk II
 THG = 29                \ Ship type for a Thargoid
 TGL = 30                \ Ship type for a Thargon
 CON = 31                \ Ship type for a Constrictor
-LGO = 32                \ Ship type for the Elite logo
-COU = 33                \ Ship type for a Cougar
-DOD = 34                \ Ship type for a Dodecahedron ("Dodo") space station
 
 JL = ESC                \ Junk is defined as starting from the escape pod
 
