@@ -1874,7 +1874,7 @@ ORG &1100
 \ The main interrupt handler, which implements Elite's split-screen mode (see
 \ the deep dive on "The split-screen mode" for details).
 \
-\ IRQ1V is set to point to IRQ1 by elite-loader.asm.
+\ IRQ1V is set to point to IRQ1 by the loading process.
 \
 \ ******************************************************************************
 
@@ -1984,7 +1984,7 @@ ORG &1100
  TAY
 
  JMP (VEC)              \ Jump to the address in VEC, which was set to the
-                        \ original IRQ1V vector by elite-loader.asm, so this
+                        \ original IRQ1V vector by the loading process, so this
                         \ instruction passes control to the next interrupt
                         \ handler
 
@@ -2107,8 +2107,9 @@ ENDIF
 
  EQUB 0                 \ LASER+3 = Right laser, #19
 
- EQUW 0                 \ These bytes are unused (they were originally used for
-                        \ up/down lasers, but they were dropped), #20-21
+ EQUW 0                 \ These bytes appear to be unused (they were originally
+                        \ used for up/down lasers, but they were dropped),
+                        \ #20-21
 
  EQUB 22+(15 AND Q%)    \ CRGO = Cargo capacity, #22
 
@@ -2144,7 +2145,7 @@ ENDIF
 
  EQUB Q%                \ ESCP = Escape pod, #46
 
- EQUD 0                 \ These four bytes are unused, #47-50
+ EQUD 0                 \ These four bytes appear to be unused, #47-50
 
  EQUB 3+(Q% AND 1)      \ NOMSL = Number of missiles, #51
 

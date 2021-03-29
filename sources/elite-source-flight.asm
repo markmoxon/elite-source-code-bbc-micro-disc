@@ -357,7 +357,7 @@ ORG &0000
  SKIP 1                 \ Temporary storage, typically used for y-coordinates in
                         \ line-drawing routines
 
- SKIP 2                 \ The last 2 bytes of the XX15 block
+ SKIP 2                 \ The last two bytes of the XX15 block
 
 .XX12
 
@@ -684,7 +684,7 @@ ORG &0000
 
 .XX14
 
- SKIP 1                 \ This byte is unused
+ SKIP 1                 \ This byte appears to be unused
 
 .RAT
 
@@ -700,7 +700,7 @@ ORG &0000
 
  SKIP 4                 \ Temporary storage, used in a number of places
 
-ORG &D1
+ORG &00D1
 
 .T
 
@@ -990,8 +990,9 @@ ORG &0300
                         \
                         \ CABTMP shares a location with MANY, but that's OK as
                         \ MANY+0 would contain the number of ships of type 0,
-                        \ but as there is no ship type 0 (they start at 1), MANY
-                        \ is unused
+                        \ and as there is no ship type 0 (they start at 1), the
+                        \ byte at MANY+0 is not used for storing a ship type
+                        \ and can be used for the cabin temperature instead
 
 .LAS2
 
@@ -1262,8 +1263,8 @@ ORG &0300
                         \       (0 = pulse laser) or is always on (1 = beam
                         \       laser)
 
- SKIP 2                 \ These bytes are unused (they were originally used for
-                        \ up/down lasers, but they were dropped)
+ SKIP 2                 \ These bytes appear to be unused (they were originally
+                        \ used for up/down lasers, but they were dropped)
 
 .CRGO
 
@@ -1346,7 +1347,7 @@ ORG &0300
                         \
                         \   * &FF = fitted
 
- SKIP 4                 \ These bytes are unused
+ SKIP 4                 \ These bytes appear to be unused
 
 .NOMSL
 
@@ -1600,7 +1601,7 @@ NT% = SVC + 2 - TP      \ This sets the variable NT% to the size of the current
                         \ which is 18 (#NOST) for normal space, and 3 for
                         \ witchspace
 
- SKIP 1                 \ This byte is unused
+ SKIP 1                 \ This byte appears to be unused
 
 .COMC
 
@@ -1618,7 +1619,7 @@ NT% = SVC + 2 - TP      \ This sets the variable NT% to the size of the current
                         \
                         \   * 0 = sound is on (default)
                         \
-                        \   * &10 = sound is off
+                        \   * Non-zero = sound is off
                         \
                         \ Toggled by pressing "S" when paused, see the DK4
                         \ routine for details
@@ -1721,9 +1722,21 @@ NT% = SVC + 2 - TP      \ This sets the variable NT% to the size of the current
 
 .CATF
 
- SKIP 1                 \ This byte is unused (the CATF variable in the I/O
-                        \ processor code is used to store the CATF flag, not
-                        \ this one)
+ SKIP 1                 \ The disc catalogue flag
+                        \
+                        \ Determines whether a disc catalogue is currently in
+                        \ progress, so the TT26 print routine can format the
+                        \ output correctly:
+                        \
+                        \   * 0 = disc is not currently being catalogued
+                        \
+                        \   * 1 = disc is currently being catalogued
+                        \
+                        \ Specifically, when CATF is non-zero, TT26 will omit
+                        \ column 17 from the catalogue so that it will fit
+                        \ on-screen (column 17 is blank column in the middle
+                        \ of the catalogue, between the two lists of filenames,
+                        \ so it can be dropped without affecting the layout)
 
 \ ******************************************************************************
 \
@@ -1740,8 +1753,8 @@ NT% = SVC + 2 - TP      \ This sets the variable NT% to the size of the current
 \ Contains ship data for all the ships, planets, suns and space stations in our
 \ local bubble of universe, along with their corresponding ship line heaps.
 \
-\ The blocks are pointed to by the lookup table at location UNIV. The first 432
-\ bytes of the K% workspace hold ship data on up to 12 ships, with 36 (NI%)
+\ The blocks are pointed to by the lookup table at location UNIV. The first 444
+\ bytes of the K% workspace hold ship data on up to 12 ships, with 37 (NI%)
 \ bytes per ship, and the ship line heap grows downwards from WP at the end of
 \ the K% workspace.
 \
@@ -1781,7 +1794,7 @@ ORG &0E00
                         \   * &FF indicates the sun line heap is empty
                         \
                         \   * Otherwise the LSO heap contains the line data for
-                        \     the sun, starting with this byte
+                        \     the sun
 
 .LSO
 
@@ -1818,6 +1831,7 @@ ORG &0E00
 
  SKIP NOST + 1          \ This is where we store the x_lo coordinates for all
                         \ the stardust particles
+
 .SY
 
  SKIP NOST + 1          \ This is where we store the y_hi coordinates for all
@@ -1848,7 +1862,7 @@ ORG &0E00
 
 .XX24
 
- SKIP 1                 \ This byte is unused
+ SKIP 1                 \ This byte appears to be unused
 
 .ALTIT
 
@@ -2018,6 +2032,11 @@ LOAD_A% = LOAD%
 \       Type: Subroutine
 \   Category: Start and end
 \    Summary: Reset most of the game and restart from the title screen
+\
+\ ------------------------------------------------------------------------------
+\
+\ This routine is called following death, and when the game is quit by pressing
+\ ESCAPE when paused.
 \
 \ ******************************************************************************
 
@@ -7179,7 +7198,7 @@ NEXT
 \   & 17 48 76 E8 00
 \
 \ The TENS variable contains the lowest four bytes in this number, with the
-\ least significant byte first, i.e. 00 E8 76 48. This value is used in the
+\ most significant byte first, i.e. 48 76 E8 00. This value is used in the
 \ BPRNT routine when working out which decimal digits to print when printing a
 \ number.
 \
@@ -7621,7 +7640,7 @@ NEXT
 \ Print a character at the text cursor (XC, YC), do a beep, print a newline,
 \ or delete left (backspace).
 \
-\ WRCHV is set to point here by elite-loader.asm.
+\ WRCHV is set to point here by the loading process.
 \
 \ Arguments:
 \
@@ -13455,6 +13474,8 @@ LOAD_C% = LOAD% +P% - CODE%
 \                       centre point, draining energy or heating up. This has
 \                       the effect of removing the lines from the screen
 \
+\   LASLI-1             Contains an RTS
+\
 \ ******************************************************************************
 
 .LASLI
@@ -13539,8 +13560,8 @@ LOAD_C% = LOAD% +P% - CODE%
 \       Name: Unused block
 \       Type: Variable
 \   Category: Utility routines
-\    Summary: This data appears to be unused (the same block appears in both the
-\             flight and docked code)
+\    Summary: These bytes appear to be unused (the same block appears in both
+\             the flight and docked code)
 \
 \ ******************************************************************************
 
@@ -14449,13 +14470,12 @@ LOAD_D% = LOAD% + P% - CODE%
  LDX QQ15+3             \ Fetch the s1_hi seed into X, which gives us the
                         \ galactic x-coordinate of this system
 
- LDY QQ15+4             \ Fetch the s2_lo seed and clear all the bits apart
- TYA                    \ from bits 4 and 6, storing the result in ZZ to give a
- ORA #%01010000         \ random number out of 0, &10, &40 or &50 (but which
- STA ZZ                 \ will always be the same for this system). We use this
-                        \ value to determine the size of the point for this
-                        \ system on the chart by passing it as the distance
-                        \ argument to the PIXEL routine below
+ LDY QQ15+4             \ Fetch the s2_lo seed and set bits 4 and 6, storing the
+ TYA                    \ result in ZZ to give a random number between 80 and
+ ORA #%01010000         \ (but which will always be the same for this system).
+ STA ZZ                 \ We use this value to determine the size of the point
+                        \ for this system on the chart by passing it as the
+                        \ distance argument to the PIXEL routine below
 
  LDA QQ15+1             \ Fetch the s0_hi seed into A, which gives us the
                         \ galactic y-coordinate of this system
@@ -15071,12 +15091,12 @@ LOAD_D% = LOAD% + P% - CODE%
  SEC                    \ crosshairs (QQ9) and the current system (QQ0)
  SBC QQ0
 
- CMP #38                \ If the horizontal distance in A is < 38, then the
+ CMP #38                \ If the horizontal distance in A < 38, then the
  BCC TT179              \ crosshairs are close enough to the current system to
                         \ appear in the Short-range Chart, so jump to TT179 to
                         \ check the vertical distance
 
- CMP #230               \ If the horizontal distance in A is < -26, then the
+ CMP #230               \ If the horizontal distance in A < -26, then the
  BCC TT180              \ crosshairs are too far from the current system to
                         \ appear in the Short-range Chart, so jump to TT180 to
                         \ return from the subroutine (as TT180 contains an RTS)
@@ -16318,7 +16338,7 @@ LOAD_D% = LOAD% + P% - CODE%
 
 .TT16a
 
- LDA #&67               \ Load a "k" character into A
+ LDA #'g'               \ Load a "g" character into A
 
  JMP TT26               \ Print the character, using TT216 so that it doesn't
                         \ change the character case, and return from the
@@ -16725,8 +16745,8 @@ LOAD_D% = LOAD% + P% - CODE%
  JSR GTHG               \ Call GTHG to spawn a Thargoid ship
 
  LDA #3                 \ Fetch the number of Thargoid ships from MANY+THG, and
- CMP MANY+THG           \ if it is less than 3, loop back to MJP1 to spawn
- BCS MJP1               \ another one, until we have three Thargoids
+ CMP MANY+THG           \ if it is less than or equal to 3, loop back to MJP1 to
+ BCS MJP1               \ spawn another one, until we have four Thargoids
 
  STA NOSTM              \ Set NOSTM (the maximum number of stardust particles)
                         \ to 3, so there are fewer bits of stardust in
@@ -19166,9 +19186,11 @@ LOAD_E% = LOAD% + P% - CODE%
 
 .CP1
 
- AND COL                \ Draw the dash's right pixel according to the mask in
- EOR (SC),Y             \ A, with the colour in COL, using EOR logic, just as
- STA (SC),Y             \ above
+ AND COL                \ Apply the colour mask to the pixel byte, as above
+
+ EOR (SC),Y             \ Draw the dash's right pixel according to the mask in
+ STA (SC),Y             \ A, with the colour in COL, using EOR logic, just as
+                        \ above
 
  RTS                    \ Return from the subroutine
 
@@ -21646,6 +21668,7 @@ LOAD_E% = LOAD% + P% - CODE%
  INY                    \ Increment the loop counter to point to the next point
 
  JMP WPL1               \ Loop back to WPL1 for the next point in the heap
+
 \ ******************************************************************************
 \
 \       Name: WP1
@@ -22316,7 +22339,8 @@ LOAD_E% = LOAD% + P% - CODE%
 
  LDA JSTY               \ Fetch the joystick pitch, ranging from 1 to 255 with
                         \ 128 as the centre point, and fall through into TJS1 to
-                        \ joystick pitch value (moving the stick up and down)
+                        \ set Y to the joystick pitch value (moving the stick up
+                        \ and down)
 
 .TJS1
 
@@ -22969,7 +22993,7 @@ LOAD_F% = LOAD% + P% - CODE%
 \
 \ which makes a sound with flush control 1 on channel 0, using envelope 2,
 \ and with pitch &60 (96) and duration &10 (16). The four sound envelopes (1-4)
-\ are set up in elite-loader.asm.
+\ are set up by the loading process.
 \
 \ ******************************************************************************
 
@@ -24101,7 +24125,7 @@ ENDIF
                         \
                         \ A will contain &71, &72 or &73 (for f1, f2 or f3), so
                         \ set X to the last digit (1, 2 or 3) and jump to LOOK1
-                        \ to switch to view X (back, left or right), returning
+                        \ to switch to view X (rear, left or right), returning
                         \ from the subroutine using a tail call
 
 .LABEL_3
@@ -24489,8 +24513,8 @@ ENDIF
 
  JSR U%                 \ Clear the key logger, which also sets A = 0
 
- STA DELTA              \ Set our speed in DELTA to 3, so all the cargo
-                        \ canisters we just added drift away from us
+ STA DELTA              \ Set our speed in DELTA to 0, as we aren't going
+                        \ anywhere any more
 
 .D2
 
@@ -25303,9 +25327,10 @@ ENDIF
 
 .BEEP
 
- LDA #32                \ Call NOISE with A = 32 to make a short, high beep,
- BNE NOISE              \ returning from the subroutine using a tail call (this
-                        \ BNE is effectively a JMP as A will never be zero)
+ LDA #32                \ Call the NOISE routine with A = 32 to make a short,
+ BNE NOISE              \ high beep, returning from the subroutine using a tail
+                        \ call (this BNE is effectively a JMP as A will never be
+                        \ zero)
 
 \ ******************************************************************************
 \
@@ -25931,7 +25956,7 @@ ENDIF
 \       Name: U%
 \       Type: Subroutine
 \   Category: Keyboard
-\    Summary: Clear the key logger (from KY1 through KY19)
+\    Summary: Clear the key logger
 \
 \ ------------------------------------------------------------------------------
 \
@@ -25947,7 +25972,7 @@ ENDIF
                         \ key logger at KL
 
  LDY #16                \ We want to clear the 16 key logger locations from
-                        \ KY1 to KY19, so set a counter in Y
+                        \ KY1 to KY20, so set a counter in Y
 
 .DKL3
 
@@ -26251,10 +26276,10 @@ ENDIF
  JSR RDKEY              \ Scan the keyboard for a key press and return the
                         \ internal key number in X (or 0 for no key press)
 
- CPX #&51               \ If S is not being pressed, skip to DK6
+ CPX #&51               \ If "S" is not being pressed, skip to DK6
  BNE DK6
 
- LDA #0                 \ S is being pressed, so set DNOIZ to 0 to turn the
+ LDA #0                 \ "S" is being pressed, so set DNOIZ to 0 to turn the
  STA DNOIZ              \ sound on
 
 .DK6
@@ -27161,6 +27186,7 @@ LOAD_G% = LOAD% + P% - CODE%
  PLA                    \ Pull the return address from the stack, so the RTS
  PLA                    \ below actually returns from the subroutine that called
                         \ LL9 (as we called SHPPT from LL9 with a JMP)
+
 .nono
 
  LDA #%11110111         \ Clear bit 3 of the ship's byte #31 to record that
@@ -27611,8 +27637,10 @@ LOAD_G% = LOAD% + P% - CODE%
 \
 \ This routine draws the current ship on the screen. This part checks to see if
 \ the ship is exploding, or if it should start exploding, and if it does it sets
-\ things up accordingly. It also does some basic checks to see if we can see the
-\ ship, and if not it removes it from the screen.
+\ things up accordingly.
+\
+\ It also does some basic checks to see if we can see the ship, and if not it
+\ removes it from the screen.
 \
 \ In this code, XX1 is used to point to the current ship's data block at INWK
 \ (the two labels are interchangeable).
@@ -27635,11 +27663,6 @@ LOAD_G% = LOAD% + P% - CODE%
 \
 \   EE51                Remove the current ship from the screen, called from
 \                       SHPPT before drawing the ship as a point
-\
-\   LL81+2              Draw the contents of the ship lone heap, used to draw
-\                       the ship as a dot from SHPPT
-\
-\   LL10-1              Contains an RTS
 \
 \ ******************************************************************************
 
@@ -27782,6 +27805,10 @@ LOAD_G% = LOAD% + P% - CODE%
 \
 \ This part checks whether the ship is in our field of view, and whether it is
 \ close enough to be fully drawn (if not, we jump to SHPPT to draw it as a dot).
+\
+\ Other entry points:
+\
+\   LL10-1              Contains an RTS
 \
 \ ******************************************************************************
 
@@ -29671,7 +29698,7 @@ LOAD_G% = LOAD% + P% - CODE%
 
  INY                    \ Increment Y to point to byte #3
 
- LDA (V),Y              \ Fetch byte #3 for this edge into X, which contains
+ LDA (V),Y              \ Fetch byte #3 for this edge into Q, which contains
  STA Q                  \ the number of the vertex at the end of the edge
 
  LDA XX3+1,X            \ Fetch the x_hi coordinate of the edge's start vertex
@@ -30227,6 +30254,11 @@ LOAD_G% = LOAD% + P% - CODE%
 \ This part adds all the visible edges to the ship line heap, so we can draw
 \ them in part 12.
 \
+\ Other entry points:
+\
+\   LL81+2              Draw the contents of the ship line heap, used to draw
+\                       the ship as a dot from SHPPT
+\
 \ ******************************************************************************
 
 .LL80
@@ -30266,7 +30298,7 @@ LOAD_G% = LOAD% + P% - CODE%
 
  LDY XX17               \ If Y >= XX20, which contains the number of edges in
  CPY XX20               \ the blueprint, jump to LL81 as we have processed all
- BCS LL81               \ the edges
+ BCS LL81               \ the edges and don't need to loop back for the next one
 
  LDY #0                 \ Set Y to point to byte #0 again, ready for the next
                         \ edge
@@ -33022,7 +33054,7 @@ LOAD_H% = LOAD% + P% - CODE%
                         \ stick comes out of the right side of the dot)
 
  EOR (SC),Y             \ Draw the stick on row Y of the character block using
- STA (SC),Y
+ STA (SC),Y             \ EOR logic
 
  DEX                    \ Decrement (positive) the stick height in X
 
@@ -33080,7 +33112,7 @@ LOAD_H% = LOAD% + P% - CODE%
                         \ stick comes out of the right side of the dot)
 
  EOR (SC),Y             \ Draw the stick on row Y of the character block using
- STA (SC),Y
+ STA (SC),Y             \ EOR logic
 
  INX                    \ Decrement the (negative) stick height in X
 

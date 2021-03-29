@@ -1332,7 +1332,7 @@ ENDMACRO
  CHAR 'R'
  EQUB 0
 
- SKIP 5                 \ These bytes are unused
+ SKIP 5                 \ These bytes appear to be unused
 
 \ ******************************************************************************
 \
