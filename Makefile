@@ -52,7 +52,7 @@ build:
 	$(BEEBASM) -i sources/elite-ships-o.asm -v >> output/compile.txt
 	$(BEEBASM) -i sources/elite-ships-p.asm -v >> output/compile.txt
 	$(PYTHON) sources/elite-checksum.py -u
-	$(BEEBASM) -i sources/elite-disc.asm -do elite-disc.ssd -boot ELITE2
+	$(BEEBASM) -i sources/elite-disc.asm -do elite-disc-flicker-free.ssd -boot ELITE2
 
 .PHONY:encrypt
 encrypt:
@@ -84,7 +84,7 @@ encrypt:
 	$(BEEBASM) -i sources/elite-ships-o.asm -v >> output/compile.txt
 	$(BEEBASM) -i sources/elite-ships-p.asm -v >> output/compile.txt
 	$(PYTHON) sources/elite-checksum.py
-	$(BEEBASM) -i sources/elite-disc.asm -do elite-disc.ssd -boot ELITE2
+	$(BEEBASM) -i sources/elite-disc.asm -do elite-disc-flicker-free.ssd -boot ELITE2
 
 .PHONY:verify
 verify:
