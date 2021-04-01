@@ -142,7 +142,7 @@ ENDMACRO
 
 \ ******************************************************************************
 \
-\       Name: CTRL
+\       Name: CONT
 \       Type: Macro
 \   Category: Text
 \    Summary: Macro definition for control codes in the recursive token table
@@ -152,7 +152,7 @@ ENDMACRO
 \
 \ The following macro is used when building the recursive token table:
 \
-\   CTRL n              Insert control code token {n}
+\   CONT n              Insert control code token {n}
 \
 \ See the deep dive on "Printing text tokens" for details on how characters are
 \ stored in the recursive token table.
@@ -163,7 +163,7 @@ ENDMACRO
 \
 \ ******************************************************************************
 
-MACRO CTRL n
+MACRO CONT n
 
   EQUB n EOR 35
 
@@ -227,7 +227,7 @@ ENDMACRO
 
  RTOK 111               \ Token 0:      "FUEL SCOOPS ON {beep}"
  RTOK 131               \
- CTRL 7                 \ Encoded as:   "[111][131]{7}"
+ CONT 7                 \ Encoded as:   "[111][131]{7}"
  EQUB 0
 
  CHAR ' '               \ Token 1:      " CHART"
@@ -251,7 +251,7 @@ ENDMACRO
  TWOK 'A', 'T'          \
  CHAR 'A'               \ Encoded as:   "D<145>A[131]{3}"
  RTOK 131
- CTRL 3
+ CONT 3
  EQUB 0
 
  TWOK 'I', 'N'          \ Token 4:      "INVENTORY{cr}
@@ -260,7 +260,7 @@ ENDMACRO
  CHAR 'T'               \ Encoded as:   "<140><150>NT<153>Y{12}"
  TWOK 'O', 'R'
  CHAR 'Y'
- CTRL 12
+ CONT 12
  EQUB 0
 
  CHAR 'S'               \ Token 5:      "SYSTEM"
@@ -275,7 +275,7 @@ ENDMACRO
  TWOK 'C', 'E'          \ Encoded as:   "P<158><133>"
  EQUB 0
 
- CTRL 2                 \ Token 7:      "{current system name} MARKET PRICES"
+ CONT 2                 \ Token 7:      "{current system name} MARKET PRICES"
  CHAR ' '               \
  TWOK 'M', 'A'          \ Encoded as:   "{2} <139>RKET [6]S"
  CHAR 'R'
@@ -550,7 +550,7 @@ ENDMACRO
 
  RTOK 122               \ Token 39:     "GALACTIC CHART{galaxy number}"
  RTOK 1                 \
- CTRL 1                 \ Encoded as:   "[122][1]{1}"
+ CONT 1                 \ Encoded as:   "[122][1]{1}"
  EQUB 0
 
  CHAR 'T'               \ Token 40:     "TARGET LOST"
@@ -598,7 +598,7 @@ ENDMACRO
  TWOK 'A', 'R'          \ Encoded as:   " C<138>GO{6}"
  CHAR 'G'
  CHAR 'O'
- CTRL 6
+ CONT 6
  EQUB 0
 
  CHAR 'E'               \ Token 47:     "EQUIP"
@@ -738,12 +738,12 @@ ENDMACRO
  CHAR 'S'
  EQUB 0
 
- CTRL 12                \ Token 65:     "{cr}
+ CONT 12                \ Token 65:     "{cr}
  CHAR '1'               \                10{cash} CR5{cash} CR"
  CHAR '0'               \
- CTRL 0                 \ Encoded as:   "{12}10{0}5{0}"
+ CONT 0                 \ Encoded as:   "{12}10{0}5{0}"
  CHAR '5'
- CTRL 0
+ CONT 0
  EQUB 0
 
  CHAR ' '               \ Token 66:     " CR"
@@ -925,7 +925,7 @@ ENDMACRO
  CHAR ' '               \                 PRODUCT   UNIT PRICE FOR SALE{cr}{lf}
  CHAR ' '               \               "
  RTOK 16                \
- CTRL 12                \ Encoded as:   "[14]  [16]{13} [26]   [14] [6] F<153>
+ CONT 12                \ Encoded as:   "[14]  [16]{13} [26]   [14] [6] F<153>
  CHAR ' '               \                 SA<129>{12}{10}"
  RTOK 26
  CHAR ' '
@@ -941,8 +941,8 @@ ENDMACRO
  CHAR 'S'
  CHAR 'A'
  TWOK 'L', 'E'
- CTRL 12
- CTRL 10
+ CONT 12
+ CONT 10
  EQUB 0
 
  CHAR 'F'               \ Token 96:     "FRONT"
@@ -970,7 +970,7 @@ ENDMACRO
  CHAR 'L'               \
  CHAR 'O'               \ Encoded as:   "[121]LOW{7}"
  CHAR 'W'
- CTRL 7
+ CONT 7
  EQUB 0
 
  RTOK 99                \ Token 101:    "RIGHT ON COMMANDER!"
@@ -1108,7 +1108,7 @@ ENDMACRO
 
  RTOK 37                \ Token 119:    "CASH:{cash} CR{cr}
  CHAR ':'               \               "
- CTRL 0                 \
+ CONT 0                 \
  EQUB 0                 \ Encoded as:   "[37]:{0}"
 
  TWOK 'I', 'N'          \ Token 120:    "INCOMING MISSILE"
@@ -1144,7 +1144,7 @@ ENDMACRO
  RTOK 129               \
  EQUB 0                 \ Encoded as:   "A[129]"
 
- CTRL 5                 \ Token 125:    "FUEL: {fuel level} LIGHT YEARS{cr}
+ CONT 5                 \ Token 125:    "FUEL: {fuel level} LIGHT YEARS{cr}
  TWOK 'L', 'E'          \                CASH:{cash} CR{cr}
  CHAR 'G'               \                LEGAL STATUS:"
  TWOK 'A', 'L'          \
@@ -1157,28 +1157,28 @@ ENDMACRO
 
  RTOK 92                \ Token 126:    "COMMANDER {commander name}{cr}
  CHAR ' '               \                {cr}
- CTRL 4                 \                {cr}
- CTRL 12                \                {sentence case}PRESENT SYSTEM{tab to
- CTRL 12                \                column 21}:{current system name}{cr}
- CTRL 12                \                HYPERSPACE SYSTEM{tab to column 21}:
- CTRL 6                 \                {selected system name}{cr}
+ CONT 4                 \                {cr}
+ CONT 12                \                {sentence case}PRESENT SYSTEM{tab to
+ CONT 12                \                column 21}:{current system name}{cr}
+ CONT 12                \                HYPERSPACE SYSTEM{tab to column 21}:
+ CONT 6                 \                {selected system name}{cr}
  RTOK 145               \                CONDITION{tab to column 21}:"
  CHAR ' '               \
  RTOK 5                 \ Encoded as:   "[92] {4}{12}{12}{12}{6}[145] [5]{9}{2}
- CTRL 9                 \                {12}[29][5]{9}{3}{13}C<159><141><151>
- CTRL 2                 \                <159>{9}"
- CTRL 12
+ CONT 9                 \                {12}[29][5]{9}{3}{13}C<159><141><151>
+ CONT 2                 \                <159>{9}"
+ CONT 12
  RTOK 29
  RTOK 5
- CTRL 9
- CTRL 3
- CTRL 12
+ CONT 9
+ CONT 3
+ CONT 12
  CHAR 'C'
  TWOK 'O', 'N'
  TWOK 'D', 'I'
  TWOK 'T', 'I'
  TWOK 'O', 'N'
- CTRL 9
+ CONT 9
  EQUB 0
 
  CHAR 'I'               \ Token 127:    "ITEM"
@@ -1206,14 +1206,14 @@ ENDMACRO
  CHAR ' '               \ Encoded as:   " <159> "
  EQUB 0
 
- CTRL 12                \ Token 132:    "{cr}
- CTRL 8                 \                {all caps}EQUIPMENT: {sentence case}"
+ CONT 12                \ Token 132:    "{cr}
+ CONT 8                 \                {all caps}EQUIPMENT: {sentence case}"
  RTOK 47                \
  CHAR 'M'               \ Encoded as:   "{12}{8}[47]M<146>T:{6}"
  TWOK 'E', 'N'
  CHAR 'T'
  CHAR ':'
- CTRL 6
+ CONT 6
  EQUB 0
 
  CHAR 'C'               \ Token 133:    "CLEAN"
@@ -1321,7 +1321,7 @@ ENDMACRO
  CHAR 'T'
  EQUB 0
 
- CTRL 8                 \ Token 146:    "{all caps}GAME OVER"
+ CONT 8                 \ Token 146:    "{all caps}GAME OVER"
  CHAR 'G'               \
  CHAR 'A'               \ Encoded as:   "{8}GAME O<150>R"
  CHAR 'M'

@@ -13520,10 +13520,12 @@ LOAD_D% = LOAD% + P% - CODE%
  JSR tnpr               \ Call tnpr to work out whether there is room in the
                         \ cargo hold for this item
 
- LDY #206               \ If the C flag is set, then there is no room in the
- BCS Tc                 \ cargo hold, so set Y to the recursive token 46
-                        \ (" CARGO{sentence case}") and jump up to Tc to print a
-                        \ "Cargo?" error, beep, clear the number and try again
+ LDY #206               \ Set Y to recursive token 46 (" CARGO{sentence case}")
+                        \ to pass to the Tc routine if we call it
+
+ BCS Tc                 \ If the C flag is set, then there is no room in the
+                        \ cargo hold, jump up to Tc to print a "Cargo?" error, 
+                        \ beep, clear the number and try again
 
  LDA QQ24               \ There is room in the cargo hold, so now to check
  STA Q                  \ whether we have enough cash, so fetch the item's
@@ -19621,7 +19623,7 @@ LOAD_E% = LOAD% + P% - CODE%
                         \ works in the opposite way to moving a cursor on-screen
                         \ in terms of left and right
 
- JSR TJS1               \ Call TJS1 just below to set Y to a value between -2
+ JSR TJS1               \ Call TJS1 just below to set A to a value between -2
                         \ and +2 depending on the joystick roll value (moving
                         \ the stick sideways)
 
@@ -21190,7 +21192,7 @@ ENDIF
 .CHECK
 
  LDX #NT%-2             \ Set X to the size of the commander data block, less
-                        \ 2 (as there are two checksum bytes)
+                        \ 2 (to omit the checksum bytes and the save count)
 
  CLC                    \ Clear the C flag so we can do addition without the
                         \ C flag affecting the result
@@ -21910,13 +21912,14 @@ ENDIF
 
 .SVL1
 
- LDA TP,X               \ Copy the X-th byte of TP to the X-th byte of &B00
- STA &B00,X             \ and NA%+8
+ LDA TP,X               \ Copy the X-th byte of TP to the X-th byte of &0B00
+ STA &0B00,X            \ and NA%+8
  STA NA%+8,X
 
  DEX                    \ Decrement the loop counter
 
- BPL SVL1               \ Loop back until we have copied all NT% bytes
+ BPL SVL1               \ Loop back until we have copied all the bytes in the
+                        \ commander data block
 
  JSR CHECK              \ Call CHECK to calculate the checksum for the last
                         \ saved commander and return it in A
@@ -21953,7 +21956,7 @@ ENDIF
 
  PLA                    \ Restore the checksum from the stack
 
- STA &B00+NT%           \ Store the checksum in the last byte of the save file
+ STA &0B00+NT%          \ Store the checksum in the last byte of the save file
                         \ at &0B00 (the equivalent of CHK in the last saved
                         \ block)
 
@@ -21965,9 +21968,9 @@ ENDIF
                         \ last saved block)
 
  LDY #&B                \ Set up an OSFILE block at &0C00, containing:
- STY &C0B               \
+ STY &0C0B              \
  INY                    \ Start address for save = &00000B00 in &0C0A to &0C0D
- STY &C0F               \
+ STY &0C0F              \
                         \ End address for save = &00000C00 in &0C0E to &0C11
                         \
                         \ Y is left containing &C which we use below
@@ -22124,13 +22127,13 @@ ENDIF
                         \ Length of file = &00000100 in &0C0A to &0C0D
 
  LDA #&FF               \ Call QUS1 with A = &FF, Y = &C to load the commander
- JSR QUS1               \ file at address &0B00
+ JSR QUS1               \ file to address &0B00
 
  BCS LOR                \ If the C flag is set then an invalid drive number was
                         \ entered during the call to QUS1 and the file wasn't
                         \ loaded, so jump to LOR to return from the subroutine
 
- LDA &B00               \ If the first byte of the loaded file has bit 7 set,
+ LDA &0B00              \ If the first byte of the loaded file has bit 7 set,
  BMI ELT2F              \ jump to ELT2F, as this is an invalid commander file
                         \
                         \ ELT2F contains a BRK instruction, which will force an
@@ -22853,8 +22856,8 @@ ENDIF
 
 .DKS4
 
- LDA #3                 \ Set A to 3, so it's ready to send to SHEILA once
-                        \ interrupts have been disabled
+ LDA #%00000011         \ Set A to %00000011, so it's ready to send to SHEILA
+                        \ once interrupts have been disabled
 
  SEI                    \ Disable interrupts so we can scan the keyboard
                         \ without being hijacked

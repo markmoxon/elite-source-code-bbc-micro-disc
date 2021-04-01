@@ -2272,7 +2272,7 @@ LOAD_A% = LOAD%
 \
 \ The key presses that are processed are as follows:
 \
-\   * SPACE and "?" to speed up and slow down
+\   * Space and "?" to speed up and slow down
 \   * "U", "T" and "M" to disarm, arm and fire missiles
 \   * TAB to fire an energy bomb
 \   * ESCAPE to launch an escape pod
@@ -22329,7 +22329,7 @@ LOAD_E% = LOAD% + P% - CODE%
                         \ works in the opposite way to moving a cursor on-screen
                         \ in terms of left and right
 
- JSR TJS1               \ Call TJS1 just below to set Y to a value between -2
+ JSR TJS1               \ Call TJS1 just below to set A to a value between -2
                         \ and +2 depending on the joystick roll value (moving
                         \ the stick sideways)
 
@@ -23921,7 +23921,7 @@ ENDIF
 
 .more
 
- LDA CPIR
+ LDA CPIR               \ Set A to the ship type in CPIR
 
  ADC #PACK              \ #PACK is set to #SH3, the ship type for a Sidewinder,
                         \ so this sets our new ship type to one of the pack
@@ -25616,7 +25616,7 @@ ENDIF
                         \ speed and lasers):
 
  EQUB &68 + 128         \ ?         KYTB+1      Slow down
- EQUB &62 + 128         \ SPACE     KYTB+2      Speed up
+ EQUB &62 + 128         \ Space     KYTB+2      Speed up
  EQUB &66 + 128         \ <         KYTB+3      Roll left
  EQUB &67 + 128         \ >         KYTB+4      Roll right
  EQUB &42 + 128         \ X         KYTB+5      Pitch up
@@ -25732,8 +25732,8 @@ ENDIF
 
 .DKS4
 
- LDA #3                 \ Set A to 3, so it's ready to send to SHEILA once
-                        \ interrupts have been disabled
+ LDA #%00000011         \ Set A to %00000011, so it's ready to send to SHEILA
+                        \ once interrupts have been disabled
 
  SEI                    \ Disable interrupts so we can scan the keyboard
                         \ without being hijacked
@@ -25963,6 +25963,8 @@ ENDIF
 \ Returns:
 \
 \   A                   A is set to 0
+\
+\   Y                   Y is set to 0
 \
 \ ******************************************************************************
 
@@ -33056,7 +33058,7 @@ LOAD_H% = LOAD% + P% - CODE%
  EOR (SC),Y             \ Draw the stick on row Y of the character block using
  STA (SC),Y             \ EOR logic
 
- DEX                    \ Decrement (positive) the stick height in X
+ DEX                    \ Decrement the (positive) stick height in X
 
  BNE VLL1               \ If we still have more stick to draw, jump up to VLL1
                         \ to draw the next pixel
@@ -33114,7 +33116,7 @@ LOAD_H% = LOAD% + P% - CODE%
  EOR (SC),Y             \ Draw the stick on row Y of the character block using
  STA (SC),Y             \ EOR logic
 
- INX                    \ Decrement the (negative) stick height in X
+ INX                    \ Increment the (negative) stick height in X
 
  BNE VLL2               \ If we still have more stick to draw, jump up to VLL2
                         \ to draw the next pixel
