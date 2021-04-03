@@ -1,6 +1,6 @@
 # Fully documented source code for Elite on the BBC Micro with a disc drive
 
-[BBC Micro (cassette)](https://github.com/markmoxon/elite-beebasm) | **BBC Micro (disc)** | [6502 Second Processor](https://github.com/markmoxon/6502sp-elite-beebasm) | [BBC Master 128](https://github.com/markmoxon/master-elite-beebasm)
+[BBC Micro (cassette)](https://github.com/markmoxon/elite-beebasm) | **BBC Micro (disc)** | [6502 Second Processor](https://github.com/markmoxon/6502sp-elite-beebasm) | [BBC Master](https://github.com/markmoxon/master-elite-beebasm)
 
 This repository contains source code for Elite on the BBC Micro with a disc drive, with every single line documented and (for the most part) explained.
 
@@ -80,7 +80,7 @@ If you want to browse the source in an IDE, you might find the following useful.
 
 * If you know the name of a routine, you can find it by searching for `Name: <name>`, as in `Name: SCAN` (for the 3D scanner routine) or `Name: LL9` (for the ship-drawing routine).
 
-* The entry point for the [main game code](sources/elite-source-t.asm) is routine `TT170`, which you can find by searching for `Name: TT170`. If you want to follow the program flow all the way from the title screen around the main game loop, then you can find a number of [deep dives on program flow](https://www.bbcelite.com/deep_dives/) on the accompanying website.
+* The entry point for the [main game code](sources/elite-source-docked.asm) is routine `TT170`, which you can find by searching for `Name: TT170`. If you want to follow the program flow all the way from the title screen around the main game loop, then you can find a number of [deep dives on program flow](https://www.bbcelite.com/deep_dives/) on the accompanying website.
 
 * The source code is designed to be read at an 80-column width and with a monospaced font, just like in the good old days.
 
@@ -180,7 +180,7 @@ make encrypt verify
 
 The Python script `crc32.py` does the actual verification, and shows the checksums and file sizes of both sets of files, alongside each other, and with a Match column that flags any discrepancies. If you are building an unencrypted set of files then there will be lots of differences, while the encrypted files should mostly match (see the Differences section below for more on this).
 
-The binaries in the `extracted` folder were taken straight from the [cassette sources disc image](http://www.elitehomepage.org/archive/a/a4080602.zip) (though see the [notes on `ELTB`](#eltb) below), while those in the `output` folder are produced by the build process. For example, if you don't make any changes to the code and build the project with `make encrypt verify`, then this is the output of the verification process:
+The binaries in the `extracted` folder are those extracted from the released version of the game, while those in the `output` folder are produced by the build process. For example, if you don't make any changes to the code and build the project with `make encrypt verify`, then this is the output of the verification process:
 
 ```
 [--extracted--]  [---output----]
