@@ -14456,8 +14456,8 @@ LOAD_D% = LOAD% + P% - CODE%
                         \ Y (which contains the row where we can print this
                         \ system's label)
 
- CPY #3                 \ If Y < 3, then the label would clash with the chart
- BCC TT187              \ title, so jump to TT187 to skip printing the label
+ CPY #3                 \ If Y < 3, then the system would clash with the chart
+ BCC TT187              \ title, so jump to TT187 to skip showing the system
 
  LDA #&FF               \ Store &FF in INWK+Y, to denote that this row is now
  STA INWK,Y             \ occupied so we don't try to print another system's
