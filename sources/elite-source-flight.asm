@@ -1066,7 +1066,7 @@ ORG &0300
                         \
                         \   * Non-zero = hyperspace colour effect enabled
                         \
-                        \ When HFS is set to 1, the mode 4 screen that makes
+                        \ When HFX is set to 1, the mode 4 screen that makes
                         \ up the top part of the display is temporarily switched
                         \ to mode 5 (the same screen mode as the dashboard),
                         \ which has the effect of blurring and colouring the
@@ -2613,9 +2613,9 @@ LOAD_A% = LOAD%
 \
 \ ******************************************************************************
 
- LDA BOMB               \ If we set off our energy bomb by pressing TAB (see
- BPL MA21               \ MA24 above), then BOMB is now negative, so this skips
-                        \ to MA21 if our energy bomb is not going off
+ LDA BOMB               \ If we set off our energy bomb (see MA24 above), then
+ BPL MA21               \ BOMB is now negative, so this skips to MA21 if our
+                        \ energy bomb is not going off
 
  CPY #2*SST             \ If the ship in Y is the space station, jump to BA21
  BEQ MA21               \ as energy bombs are useless against space stations
@@ -3290,9 +3290,9 @@ LOAD_A% = LOAD%
 
 .MA18
 
- LDA BOMB               \ If we set off our energy bomb by pressing TAB (see
- BPL MA77               \ MA24 above), then BOMB is now negative, so this skips
-                        \ to MA77 if our energy bomb is not going off
+ LDA BOMB               \ If we set off our energy bomb (see MA24 above), then
+ BPL MA77               \ BOMB is now negative, so this skips to MA21 if our
+                        \ energy bomb is not going off
 
  ASL BOMB               \ We set off our energy bomb, so rotate BOMB to the
                         \ left by one place. BOMB was rotated left once already
@@ -9021,7 +9021,7 @@ LOAD_C% = LOAD% +P% - CODE%
 .TN6
 
  LDA #%11110001         \ Set the AI flag to give the ship E.C.M., enable AI and
-                        \ make it very aggressive (56 out of 63)
+                        \ make it very aggressive (60 out of 63)
 
  JMP SFS1               \ Jump to SFS1 to spawn the ship, returning from the
                         \ subroutine using a tail call
@@ -9336,9 +9336,10 @@ LOAD_C% = LOAD% +P% - CODE%
  DEC INWK+31            \ We're done with the checks, so it's time to fire off a
                         \ missile, so reduce the missile count in byte #31 by 1
 
- LDA TYPE               \ If this is not a Thargoid, jump down to TA16 to launch
- CMP #THG               \ a missile
- BNE TA16
+ LDA TYPE               \ Fetch the ship type into A
+
+ CMP #THG               \ If this is not a Thargoid, jump down to TA16 to launch
+ BNE TA16               \ a missile
 
  LDX #TGL               \ This is a Thargoid, so instead of launching a missile,
  LDA INWK+32            \ the mothership launches a Thargon, so call SFS1 to
@@ -14767,9 +14768,6 @@ LOAD_D% = LOAD% + P% - CODE%
  STX K4+1
  STX K3+1
 
-\STX LSX                \ This instruction is commented out in the original
-                        \ source
-
  INX                    \ Set LSP = 1 to reset the ball line heap
  STX LSP
 
@@ -14778,9 +14776,6 @@ LOAD_D% = LOAD% + P% - CODE%
 
  JSR CIRCLE2            \ Call CIRCLE2 to draw a circle with the centre at
                         \ (K3(1 0), K4(1 0)) and radius K
-
-\LDA #&FF               \ These instructions are commented out in the original
-\STA LSX                \ source
 
  RTS                    \ Return from the subroutine
 
@@ -19752,6 +19747,12 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Dashboard
 \    Summary: Disarm missiles and update the dashboard indicators
+\
+\ ------------------------------------------------------------------------------
+\
+\ Arguments:
+\
+\   Y                   The new status of the leftmost missile indicator
 \
 \ ******************************************************************************
 
@@ -31976,12 +31977,10 @@ LOAD_H% = LOAD% + P% - CODE%
 \       Name: MV40
 \       Type: Subroutine
 \   Category: Moving
-\    Summary: Rotate the planet or sun by our ship's pitch and roll
+\    Summary: Rotate the planet or sun's location in space by the amount of
+\             pitch and roll of our ship
 \
 \ ------------------------------------------------------------------------------
-\
-\ Rotate the planet or sun's location in space by the amount of pitch and roll
-\ of our ship.
 \
 \ We implement this using the same equations as in part 5 of MVEIT, where we
 \ rotated the current ship's location by our pitch and roll. Specifically, the
@@ -32531,8 +32530,8 @@ LOAD_H% = LOAD% + P% - CODE%
 
 .BOL1
 
- JSR ZES1               \ Call ZES1 below to zero-fill the page in X, which
-                        \ clears that character row on the screen
+ JSR ZES1               \ Call ZES1  to zero-fill the page in X, which clears
+                        \ that character row on the screen
 
  INX                    \ Increment X to point to the next page, i.e. the next
                         \ character row

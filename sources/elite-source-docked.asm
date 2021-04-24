@@ -1082,7 +1082,7 @@ ORG &0300
                         \
                         \   * Non-zero = hyperspace colour effect enabled
                         \
-                        \ When HFS is set to 1, the mode 4 screen that makes
+                        \ When HFX is set to 1, the mode 4 screen that makes
                         \ up the top part of the display is temporarily switched
                         \ to mode 5 (the same screen mode as the dashboard),
                         \ which has the effect of blurring and colouring the
@@ -4267,12 +4267,6 @@ LOAD_B% = LOAD% + P% - CODE%
 \ Ready-made bytes for plotting one-pixel points in mode 5 (the bottom part of
 \ the split screen). See the dashboard routines SCAN, DIL2 and CPIX2 for
 \ details.
-\
-\ There is one extra row to support the use of CTWOS+1,X indexing in the CPIX2
-\ routine. The extra row is a repeat of the first row, and saves us from having
-\ to work out whether CTWOS+1+X needs to be wrapped around when drawing a
-\ two-pixel dash that crosses from one character block into another. See CPIX2
-\ for more details.
 \
 \ ******************************************************************************
 
@@ -11823,8 +11817,8 @@ LOAD_C% = LOAD% +P% - CODE%
 
 .BOL1
 
- JSR ZES1               \ Call ZES1 below to zero-fill the page in X, which
-                        \ clears that character row on the screen
+ JSR ZES1               \ Call ZES1  to zero-fill the page in X, which clears
+                        \ that character row on the screen
 
  INX                    \ Increment X to point to the next page, i.e. the next
                         \ character row
@@ -13397,9 +13391,6 @@ LOAD_D% = LOAD% + P% - CODE%
  LDX #0                 \ Set the high bytes of K3(1 0) and K4(1 0) to 0
  STX K4+1
  STX K3+1
-
-\STX LSX                \ This instruction is commented out in the original
-                        \ source
 
  INX                    \ Set LSP = 1 to reset the ball line heap
  STX LSP
@@ -18267,6 +18258,12 @@ LOAD_E% = LOAD% + P% - CODE%
 \   Category: Dashboard
 \    Summary: Disarm missiles and update the dashboard indicators
 \
+\ ------------------------------------------------------------------------------
+\
+\ Arguments:
+\
+\   Y                   The new status of the leftmost missile indicator
+\
 \ ******************************************************************************
 
 .ABORT
@@ -20837,8 +20834,7 @@ LOAD_F% = LOAD% + P% - CODE%
                         \ current system coordinates (QQ0, QQ1) we just loaded
 
  JSR hyp1               \ Arrive in the system closest to (QQ9, QQ10) and then
-                        \ and then fall through into the docking bay routine
-                        \ below
+                        \ fall through into the docking bay routine below
 
 \ ******************************************************************************
 \
@@ -21155,11 +21151,6 @@ ENDIF
  AND #%00010000         \ Bit 4 of IRB (PB4) is clear if joystick 1's fire
                         \ button is pressed, otherwise it is set, so AND'ing
                         \ the value of IRB with %10000 extracts this bit
-
-\TAX                    \ This instruction is commented out in the original
-                        \ source; it would have no effect, as the comparison
-                        \ flags are already set by the AND, and the value of X
-                        \ is not used anywhere
 
  BEQ TL2                \ If the joystick fire button is pressed, jump to TL2
 

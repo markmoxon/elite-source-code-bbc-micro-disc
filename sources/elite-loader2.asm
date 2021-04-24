@@ -661,7 +661,7 @@ ORG LOADcode + P% - LOAD
 \       Name: ECHAR
 \       Type: Variable
 \   Category: Loader
-\    Summary: Character definitions for the Acorn Electron to mimic the graphics
+\    Summary: Character definitions for the Electron to mimic the graphics
 \             characters of the BBC Micro's mode 7 teletext screen
 \
 \ ******************************************************************************
@@ -886,7 +886,7 @@ ORG LOADcode + P% - LOAD
  STA ZP+1
 
  LDX #0                 \ Set S = 0, to use as a flag denoting whether this is a
- STX S                  \ BBC Micro (0) or an Acorn Electron (&FF)
+ STX S                  \ BBC Micro (0) or an Electron (&FF)
 
  LDY #&FF               \ Call OSBYTE with A = 129, X = 0 and Y = &FF to detect
  LDA #129               \ the machine type. This call is undocumented and is not
@@ -895,11 +895,11 @@ ORG LOADcode + P% - LOAD
                         \ the following:
                         \
                         \   * X = Y = 0   if this is a BBC Micro with MOS 0.1
-                        \   * X = Y = 1   if this is an Acorn Electron
+                        \   * X = Y = 1   if this is an Electron
                         \   * X = Y = &FF if this is a BBC Micro with MOS 1.20
 
- CPX #1                 \ If X is not 1, then this is not an Acorn Electron,
- BNE bbc                \ so jump to bbc
+ CPX #1                 \ If X is not 1, then this is not an Electron, so jump
+ BNE bbc                \ to bbc
 
  DEC S                  \ Decrement S to &FF, to denote that this is an Acorn
                         \ Electron
@@ -1060,7 +1060,7 @@ ORG LOADcode + P% - LOAD
 
 .jsr4
 
-                        \ If we get here then this is an Acorn Electron
+                        \ If we get here then this is an Electron
 
  JSR prstr - PROT1      \ Call prstr to print the following characters,
                         \ restarting from the NOP instruction (this destination
