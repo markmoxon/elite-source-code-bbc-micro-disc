@@ -14,7 +14,6 @@ It is a companion to the [bbcelite.com website](https://www.bbcelite.com), which
 
 My hope is that this repository and the [accompanying website](https://www.bbcelite.com) will be useful for those who want to learn more about Elite and what makes it tick. It is provided on an educational and non-profit basis, with the aim of helping people appreciate one of the most iconic games of the 8-bit era.
 
-
 ## Contents
 
 * [Acknowledgements](#acknowledgements)
@@ -33,7 +32,6 @@ My hope is that this repository and the [accompanying website](https://www.bbcel
   * [Log files](#log-files)
 
 * [Building different release versions of Elite](#building-different-release-versions-of-elite)
-
 
 ## Acknowledgements
 
@@ -61,7 +59,6 @@ Under GitHub's rules, you have the right to read and fork this repository... but
 
 My hope is that the educational and non-profit intentions of this repository will enable it to stay hosted and available, but the original copyright holders do have the right to ask for it to be taken down, in which case I will comply without hesitation. I do hope, though, that along with the various other disassemblies and commentaries of this source, it will remain viable.
 
-
 ## Browsing the source in an IDE
 
 If you want to browse the source in an IDE, you might find the following useful.
@@ -74,7 +71,7 @@ If you want to browse the source in an IDE, you might find the following useful.
 
 * It's probably worth skimming through the [notes on terminology and notations](https://www.bbcelite.com/about_site/terminology_used_in_this_commentary.html) on the accompanying website, as this explains a number of terms used in the commentary, without which it might be a bit tricky to follow at times (in particular, you should understand the terminology I use for multi-byte numbers).
 
-* The accompamying website contains [a number of "deep dive" articles](https://www.bbcelite.com/deep_dives/), each of which goes into an aspect of the game in detail. Routines that are explained further in these articles are tagged with the label `Deep dive:` and the relevant article name.
+* The accompanying website contains [a number of "deep dive" articles](https://www.bbcelite.com/deep_dives/), each of which goes into an aspect of the game in detail. Routines that are explained further in these articles are tagged with the label `Deep dive:` and the relevant article name.
 
 * There are loads of routines and variables in Elite - literally hundreds. You can find them in the source files by searching for the following: `Type: Subroutine`, `Type: Variable`, `Type: Workspace` and `Type: Macro`.
 
@@ -85,7 +82,6 @@ If you want to browse the source in an IDE, you might find the following useful.
 * The source code is designed to be read at an 80-column width and with a monospaced font, just like in the good old days.
 
 I hope you enjoy exploring the inner-workings of BBC Elite as much as I have.
-
 
 ## Building Elite from the source
 
@@ -219,7 +215,6 @@ All the compiled binaries match the extracts, so we know we are producing the sa
 ### Log files
 
 During compilation, details of every step are output in a file called `compile.txt` in the `output` folder. If you have problems, it might come in handy, and it's a great reference if you need to know the addresses of labels and variables for debugging (or just snooping around).
-
 
 ## Building different release versions of Elite
 
