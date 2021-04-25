@@ -24739,9 +24739,6 @@ ENDIF
 \
 \ Arguments:
 \
-\   X                   The high byte (i.e. the page) of the starting point of
-\                       the zero-fill
-\
 \   Y                   The offset from (X SC) where we start zeroing, counting
 \                       down to 0
 \
