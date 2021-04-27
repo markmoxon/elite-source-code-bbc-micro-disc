@@ -25,6 +25,8 @@
 
 INCLUDE "sources/elite-header.h.asm"
 
+PUTFILE "binaries/$.README.bin", "README", &0000, &0000
+
 PUTFILE "output/ELITE2.bin", "ELITE2", &2F00, &2F00
 PUTFILE "output/ELITE3.bin", "ELITE3", &5700, &5700
 PUTFILE "output/ELITE4.bin", "ELITE4", &1900, &197B
