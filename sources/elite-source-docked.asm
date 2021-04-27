@@ -1276,8 +1276,8 @@ ORG &0300
                         \     * Bits 0-6 contain the laser's power
                         \
                         \     * Bit 7 determines whether or not the laser pulses
-                        \       (0 = pulse laser) or is always on (1 = beam
-                        \       laser)
+                        \       (0 = pulse or mining laser) or is always on
+                        \       (1 = beam or military laser)
 
  SKIP 2                 \ These bytes appear to be unused (they were originally
                         \ used for up/down lasers, but they were dropped)
@@ -1892,7 +1892,7 @@ ORG &0E00
                         \
                         \     where our ship is at the origin, the centre of the
                         \     planet/sun is at (x_hi, y_hi, z_hi), and the
-                        \     radius of the planet is 6
+                        \     radius of the planet/sun is 6
                         \
                         \   * 0 = we have crashed into the surface
 
@@ -4208,7 +4208,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Drawing pixels
 \    Summary: Ready-made single-pixel character row bytes for mode 4
-\  Deep dive: Drawing colour pixels in mode 4
+\  Deep dive: Drawing monochrome pixels in mode 4
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4234,7 +4234,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Drawing pixels
 \    Summary: Ready-made double-pixel character row bytes for mode 4
-\  Deep dive: Drawing colour pixels in mode 4
+\  Deep dive: Drawing monochrome pixels in mode 4
 \
 \ ------------------------------------------------------------------------------
 \
@@ -7457,7 +7457,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ definition for the character we want to draw on the
                         \ screen (i.e. we need the pixel shape of this
                         \ character). The MOS ROM contains bitmap definitions
-                        \ of the BBC's ASCII characters, starting from &C000
+                        \ of the system's ASCII characters, starting from &C000
                         \ for space (ASCII 32) and ending with the £ symbol
                         \ (ASCII 126)
                         \
@@ -19616,7 +19616,7 @@ LOAD_E% = LOAD% + P% - CODE%
                         \ (or the equivalent on joystick) and update the key
                         \ logger, setting KL to the key pressed
 
- LDA JSTK               \ If the joystick was not used, jump down to TJ1,
+ LDA JSTK               \ If the joystick is not configured, jump down to TJ1,
  BEQ TJ1                \ otherwise we move the cursor with the joystick
 
  LDA JSTX               \ Fetch the joystick roll, ranging from 1 to 255 with

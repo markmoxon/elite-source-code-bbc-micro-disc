@@ -1260,8 +1260,8 @@ ORG &0300
                         \     * Bits 0-6 contain the laser's power
                         \
                         \     * Bit 7 determines whether or not the laser pulses
-                        \       (0 = pulse laser) or is always on (1 = beam
-                        \       laser)
+                        \       (0 = pulse or mining laser) or is always on
+                        \       (1 = beam or military laser)
 
  SKIP 2                 \ These bytes appear to be unused (they were originally
                         \ used for up/down lasers, but they were dropped)
@@ -1876,7 +1876,7 @@ ORG &0E00
                         \
                         \     where our ship is at the origin, the centre of the
                         \     planet/sun is at (x_hi, y_hi, z_hi), and the
-                        \     radius of the planet is 6
+                        \     radius of the planet/sun is 6
                         \
                         \   * 0 = we have crashed into the surface
 
@@ -3469,7 +3469,8 @@ LOAD_A% = LOAD%
 \       Name: Main flight loop (Part 15 of 16)
 \       Type: Subroutine
 \   Category: Main loop
-\    Summary: Perform altitude checks with planet and sun, process fuel scooping
+\    Summary: Perform altitude checks with the planet and sun and process fuel
+\             scooping if appropriate
 \  Deep dive: Program flow of the main game loop
 \             Scheduling tasks with the main loop counter
 \
@@ -3560,8 +3561,9 @@ LOAD_A% = LOAD%
 .MA28
 
  JMP DEATH              \ If we get here then we just crashed into the planet
-                        \ or got too close to the sun, so call DEATH to start
-                        \ the funeral preparations
+                        \ or got too close to the sun, so jump to DEATH to start
+                        \ the funeral preparations and return from the main
+                        \ flight loop using a tail call
 
 .MA29
 
@@ -3868,7 +3870,7 @@ NEXT
 \       Type: Variable
 \   Category: Drawing pixels
 \    Summary: Ready-made single-pixel character row bytes for mode 4
-\  Deep dive: Drawing colour pixels in mode 4
+\  Deep dive: Drawing monochrome pixels in mode 4
 \
 \ ------------------------------------------------------------------------------
 \
@@ -3894,7 +3896,7 @@ NEXT
 \       Type: Variable
 \   Category: Drawing pixels
 \    Summary: Ready-made double-pixel character row bytes for mode 4
-\  Deep dive: Drawing colour pixels in mode 4
+\  Deep dive: Drawing monochrome pixels in mode 4
 \
 \ ------------------------------------------------------------------------------
 \
@@ -5614,13 +5616,6 @@ NEXT
 \ ******************************************************************************
 
 .STARS
-
-\LDA #&FF               \ These instructions are commented out in the original
-\STA COL                \ source, but they would set the stardust colour to
-                        \ white. That said, COL is only used when updating the
-                        \ dashboard, so this would have no effect - perhaps it's
-                        \ left over from experiments with a colour top part of
-                        \ the screen? Who knows...
 
  LDX VIEW               \ Load the current view into X:
                         \
@@ -7738,7 +7733,7 @@ NEXT
                         \ definition for the character we want to draw on the
                         \ screen (i.e. we need the pixel shape of this
                         \ character). The MOS ROM contains bitmap definitions
-                        \ of the BBC's ASCII characters, starting from &C000
+                        \ of the system's ASCII characters, starting from &C000
                         \ for space (ASCII 32) and ending with the £ symbol
                         \ (ASCII 126)
                         \
@@ -18490,7 +18485,7 @@ LOAD_E% = LOAD% + P% - CODE%
  STA INWK+29
  STA INWK+30
 
- LDA #129               \ Set A = 129, the "ship" type for the sun
+ LDA #129               \ Set A = 129, the ship type for the sun
 
  JSR NWSHP              \ Call NWSHP to set up the sun's data block and add it
                         \ to FRIN, where it will get put in the second slot as
@@ -22320,7 +22315,7 @@ LOAD_E% = LOAD% + P% - CODE%
                         \ (or the equivalent on joystick) and update the key
                         \ logger, setting KL to the key pressed
 
- LDA JSTK               \ If the joystick was not used, jump down to TJ1,
+ LDA JSTK               \ If the joystick is not configured, jump down to TJ1,
  BEQ TJ1                \ otherwise we move the cursor with the joystick
 
  LDA JSTX               \ Fetch the joystick roll, ranging from 1 to 255 with
@@ -22501,11 +22496,6 @@ LOAD_E% = LOAD% + P% - CODE%
 \   Category: Universe
 \    Summary: Remove the space station and replace it with the sun
 \
-\ ------------------------------------------------------------------------------
-\
-\ Remove the space station from our local bubble of universe, and replace it
-\ with the sun.
-\
 \ ******************************************************************************
 
 .KS4
@@ -22527,7 +22517,7 @@ LOAD_E% = LOAD% + P% - CODE%
  LDA #6                 \ Set the sun's y_sign to 6
  STA INWK+5
 
- LDA #129               \ Set A = 129, the "ship" type for the sun
+ LDA #129               \ Set A = 129, the ship type for the sun
 
  JMP NWSHP              \ Call NWSHP to set up the sun's data block and add it
                         \ to FRIN, where it will get put in the second slot as
@@ -23758,7 +23748,8 @@ ENDIF
 \       Name: Main game loop (Part 4 of 6)
 \       Type: Subroutine
 \   Category: Main loop
-\    Summary: Potentially spawn lone bounty hunter, Thargoid, or up to 4 pirates
+\    Summary: Potentially spawn a lone bounty hunter, a Thargoid, or up to four
+\             pirates
 \  Deep dive: Program flow of the main game loop
 \             Ship data blocks
 \
@@ -25132,17 +25123,6 @@ ENDIF
                         \ planet in any of the three axes (we could also call
                         \ routine m to do the same thing, as A = 0)
 
-                        \ The following two instructions appear in the BASIC
-                        \ source file (ELITEC), but in the text source file
-                        \ (ELITEC.TXT) they are replaced by:
-                        \
-                        \   LSR A
-                        \   BEQ WA1
-                        \
-                        \ which does the same thing, but saves one byte of
-                        \ memory (as LSR A is a one-byte opcode, while CMP #2
-                        \ takes up two bytes)
-
  LSR A                  \ If A < 2 then jump to WA1 to abort the in-system jump
  BEQ WA1                \ with a low beep, as we are facing the planet and are
                         \ too close to jump in that direction
@@ -25164,17 +25144,6 @@ ENDIF
 
  JSR m                  \ Call m to set A to the largest distance to the sun
                         \ in any of the three axes
-
-                        \ The following two instructions appear in the BASIC
-                        \ source file (ELITEC), but in the text source file
-                        \ (ELITEC.TXT) they are replaced by:
-                        \
-                        \   LSR A
-                        \   BEQ WA1
-                        \
-                        \ which does the same thing, but saves one byte of
-                        \ memory (as LSR A is a one-byte opcode, while CMP #2
-                        \ takes up two bytes)
 
  LSR A                  \ If A < 2 then jump to WA1 to abort the in-system jump
  BEQ WA1                \ with a low beep, as we are facing the sun and are too
@@ -32978,21 +32947,14 @@ LOAD_H% = LOAD% + P% - CODE%
  PHP                    \ Store the flags (specifically the C flag) from the
                         \ above subtraction
 
-\BCS SC48               \ These instructions are commented out in the original
-\EOR #&FF               \ source. They would negate A if the C flag were set,
-\ADC #1                 \ which would reverse the direction of all the sticks,
-                        \ so you could turn your joystick around. Perhaps one of
-                        \ the authors' test sticks was easier to use upside
-                        \ down? Who knows...
-
 .SC48
 
  PHA                    \ Store the stick height in A on the stack
 
- JSR CPIX4              \ Draw a double-height mode 5 dot at (X1, Y1). This also
-                        \ leaves the following variables set up for the dot's
-                        \ top-right pixel, the last pixel to be drawn (as the
-                        \ dot gets drawn from the bottom up):
+ JSR CPIX4              \ Draw a double-height dot at (X1, Y1). This also leaves
+                        \ the following variables set up for the dot's top-right
+                        \ pixel, the last pixel to be drawn (as the dot gets
+                        \ drawn from the bottom up):
                         \
                         \   SC(1 0) = screen address of the pixel's character
                         \             block
