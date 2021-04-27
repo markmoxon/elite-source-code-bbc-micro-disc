@@ -1084,7 +1084,7 @@ ORG &0300
                         \
                         \   * Non-zero = hyperspace colour effect enabled
                         \
-                        \ When HFS is set to 1, the mode 4 screen that makes
+                        \ When HFX is set to 1, the mode 4 screen that makes
                         \ up the top part of the display is temporarily switched
                         \ to mode 5 (the same screen mode as the dashboard),
                         \ which has the effect of blurring and colouring the
@@ -1278,8 +1278,8 @@ ORG &0300
                         \     * Bits 0-6 contain the laser's power
                         \
                         \     * Bit 7 determines whether or not the laser pulses
-                        \       (0 = pulse laser) or is always on (1 = beam
-                        \       laser)
+                        \       (0 = pulse or mining laser) or is always on
+                        \       (1 = beam or military laser)
 
  SKIP 2                 \ These bytes appear to be unused (they were originally
                         \ used for up/down lasers, but they were dropped)
@@ -1894,7 +1894,7 @@ ORG &0E00
                         \
                         \     where our ship is at the origin, the centre of the
                         \     planet/sun is at (x_hi, y_hi, z_hi), and the
-                        \     radius of the planet is 6
+                        \     radius of the planet/sun is 6
                         \
                         \   * 0 = we have crashed into the surface
 
@@ -4210,7 +4210,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Drawing pixels
 \    Summary: Ready-made single-pixel character row bytes for mode 4
-\  Deep dive: Drawing colour pixels in mode 4
+\  Deep dive: Drawing monochrome pixels in mode 4
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4236,7 +4236,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Drawing pixels
 \    Summary: Ready-made double-pixel character row bytes for mode 4
-\  Deep dive: Drawing colour pixels in mode 4
+\  Deep dive: Drawing monochrome pixels in mode 4
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4269,12 +4269,6 @@ LOAD_B% = LOAD% + P% - CODE%
 \ Ready-made bytes for plotting one-pixel points in mode 5 (the bottom part of
 \ the split screen). See the dashboard routines SCAN, DIL2 and CPIX2 for
 \ details.
-\
-\ There is one extra row to support the use of CTWOS+1,X indexing in the CPIX2
-\ routine. The extra row is a repeat of the first row, and saves us from having
-\ to work out whether CTWOS+1+X needs to be wrapped around when drawing a
-\ two-pixel dash that crosses from one character block into another. See CPIX2
-\ for more details.
 \
 \ ******************************************************************************
 
@@ -7465,7 +7459,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ definition for the character we want to draw on the
                         \ screen (i.e. we need the pixel shape of this
                         \ character). The MOS ROM contains bitmap definitions
-                        \ of the BBC's ASCII characters, starting from &C000
+                        \ of the system's ASCII characters, starting from &C000
                         \ for space (ASCII 32) and ending with the £ symbol
                         \ (ASCII 126)
                         \
@@ -11691,6 +11685,12 @@ LOAD_C% = LOAD% +P% - CODE%
 \   Category: Keyboard
 \    Summary: Wait until a key is pressed, ignoring any existing key press
 \
+\ ------------------------------------------------------------------------------
+\
+\ Returns:
+\
+\   X                   The internal key number of the key that was pressed
+\
 \ ******************************************************************************
 
 .PAUSE2
@@ -11819,8 +11819,8 @@ LOAD_C% = LOAD% +P% - CODE%
 
 .BOL1
 
- JSR ZES1               \ Call ZES1 below to zero-fill the page in X, which
-                        \ clears that character row on the screen
+ JSR ZES1               \ Call ZES1  to zero-fill the page in X, which clears
+                        \ that character row on the screen
 
  INX                    \ Increment X to point to the next page, i.e. the next
                         \ character row
@@ -13357,7 +13357,7 @@ LOAD_D% = LOAD% + P% - CODE%
 
                         \ Fall through into TT128 to draw a circle with the
                         \ centre at the same coordinates as the crosshairs,
-                        \ (QQ19, QQ19+1),  and radius K that reflects the
+                        \ (QQ19, QQ19+1), and radius K that reflects the
                         \ current fuel levels
 
 \ ******************************************************************************
@@ -13393,9 +13393,6 @@ LOAD_D% = LOAD% + P% - CODE%
  LDX #0                 \ Set the high bytes of K3(1 0) and K4(1 0) to 0
  STX K4+1
  STX K3+1
-
-\STX LSX                \ This instruction is commented out in the original
-                        \ source
 
  INX                    \ Set LSP = 1 to reset the ball line heap
  STX LSP
@@ -13522,10 +13519,12 @@ LOAD_D% = LOAD% + P% - CODE%
  JSR tnpr               \ Call tnpr to work out whether there is room in the
                         \ cargo hold for this item
 
- LDY #206               \ If the C flag is set, then there is no room in the
- BCS Tc                 \ cargo hold, so set Y to the recursive token 46
-                        \ (" CARGO{sentence case}") and jump up to Tc to print a
-                        \ "Cargo?" error, beep, clear the number and try again
+ LDY #206               \ Set Y to recursive token 46 (" CARGO{sentence case}")
+                        \ to pass to the Tc routine if we call it
+
+ BCS Tc                 \ If the C flag is set, then there is no room in the
+                        \ cargo hold, jump up to Tc to print a "Cargo?" error, 
+                        \ beep, clear the number and try again
 
  LDA QQ24               \ There is room in the cargo hold, so now to check
  STA Q                  \ whether we have enough cash, so fetch the item's
@@ -14450,8 +14449,8 @@ LOAD_D% = LOAD% + P% - CODE%
                         \ Y (which contains the row where we can print this
                         \ system's label)
 
- CPY #3                 \ If Y < 3, then the label would clash with the chart
- BCC TT187              \ title, so jump to TT187 to skip printing the label
+ CPY #3                 \ If Y < 3, then the system would clash with the chart
+ BCC TT187              \ title, so jump to TT187 to skip showing the system
 
  LDA #&FF               \ Store &FF in INWK+Y, to denote that this row is now
  STA INWK,Y             \ occupied so we don't try to print another system's
@@ -14808,7 +14807,7 @@ LOAD_D% = LOAD% + P% - CODE%
 
                         \ We now store the distance to the selected system * 4
                         \ in the two-byte location QQ8, by taking (0 Q) and
-                        \ shifting it left twice, storing it in (QQ8+1 QQ8)
+                        \ shifting it left twice, storing it in QQ8(1 0)
 
  LDA Q                  \ First we shift the low byte left by setting
  ASL A                  \ A = Q * 2, with bit 7 of A going into the C flag
@@ -18261,6 +18260,12 @@ LOAD_E% = LOAD% + P% - CODE%
 \   Category: Dashboard
 \    Summary: Disarm missiles and update the dashboard indicators
 \
+\ ------------------------------------------------------------------------------
+\
+\ Arguments:
+\
+\   Y                   The new status of the leftmost missile indicator
+\
 \ ******************************************************************************
 
 .ABORT
@@ -19613,7 +19618,7 @@ LOAD_E% = LOAD% + P% - CODE%
                         \ (or the equivalent on joystick) and update the key
                         \ logger, setting KL to the key pressed
 
- LDA JSTK               \ If the joystick was not used, jump down to TJ1,
+ LDA JSTK               \ If the joystick is not configured, jump down to TJ1,
  BEQ TJ1                \ otherwise we move the cursor with the joystick
 
  LDA JSTX               \ Fetch the joystick roll, ranging from 1 to 255 with
@@ -19623,7 +19628,7 @@ LOAD_E% = LOAD% + P% - CODE%
                         \ works in the opposite way to moving a cursor on-screen
                         \ in terms of left and right
 
- JSR TJS1               \ Call TJS1 just below to set Y to a value between -2
+ JSR TJS1               \ Call TJS1 just below to set A to a value between -2
                         \ and +2 depending on the joystick roll value (moving
                         \ the stick sideways)
 
@@ -20831,8 +20836,7 @@ LOAD_F% = LOAD% + P% - CODE%
                         \ current system coordinates (QQ0, QQ1) we just loaded
 
  JSR hyp1               \ Arrive in the system closest to (QQ9, QQ10) and then
-                        \ and then fall through into the docking bay routine
-                        \ below
+                        \ fall through into the docking bay routine below
 
 \ ******************************************************************************
 \
@@ -20980,6 +20984,11 @@ ENDIF
 \
 \   X                   The type of the ship to show (see variable XX21 for a
 \                       list of ship types)
+\
+\ Returns:
+\
+\   X                   If a key is being pressed, X contains the internal key
+\                       number, otherwise it contains 0
 \
 \ ******************************************************************************
 
@@ -21145,11 +21154,6 @@ ENDIF
                         \ button is pressed, otherwise it is set, so AND'ing
                         \ the value of IRB with %10000 extracts this bit
 
-\TAX                    \ This instruction is commented out in the original
-                        \ source; it would have no effect, as the comparison
-                        \ flags are already set by the AND, and the value of X
-                        \ is not used anywhere
-
  BEQ TL2                \ If the joystick fire button is pressed, jump to TL2
 
  JSR RDKEY              \ Scan the keyboard for a key press
@@ -21192,7 +21196,7 @@ ENDIF
 .CHECK
 
  LDX #NT%-2             \ Set X to the size of the commander data block, less
-                        \ 2 (as there are two checksum bytes)
+                        \ 2 (to omit the checksum bytes and the save count)
 
  CLC                    \ Clear the C flag so we can do addition without the
                         \ C flag affecting the result
@@ -21912,13 +21916,14 @@ ENDIF
 
 .SVL1
 
- LDA TP,X               \ Copy the X-th byte of TP to the X-th byte of &B00
- STA &B00,X             \ and NA%+8
+ LDA TP,X               \ Copy the X-th byte of TP to the X-th byte of &0B00
+ STA &0B00,X            \ and NA%+8
  STA NA%+8,X
 
  DEX                    \ Decrement the loop counter
 
- BPL SVL1               \ Loop back until we have copied all NT% bytes
+ BPL SVL1               \ Loop back until we have copied all the bytes in the
+                        \ commander data block
 
  JSR CHECK              \ Call CHECK to calculate the checksum for the last
                         \ saved commander and return it in A
@@ -21955,7 +21960,7 @@ ENDIF
 
  PLA                    \ Restore the checksum from the stack
 
- STA &B00+NT%           \ Store the checksum in the last byte of the save file
+ STA &0B00+NT%          \ Store the checksum in the last byte of the save file
                         \ at &0B00 (the equivalent of CHK in the last saved
                         \ block)
 
@@ -21967,9 +21972,9 @@ ENDIF
                         \ last saved block)
 
  LDY #&B                \ Set up an OSFILE block at &0C00, containing:
- STY &C0B               \
+ STY &0C0B              \
  INY                    \ Start address for save = &00000B00 in &0C0A to &0C0D
- STY &C0F               \
+ STY &0C0F              \
                         \ End address for save = &00000C00 in &0C0E to &0C11
                         \
                         \ Y is left containing &C which we use below
@@ -22126,13 +22131,13 @@ ENDIF
                         \ Length of file = &00000100 in &0C0A to &0C0D
 
  LDA #&FF               \ Call QUS1 with A = &FF, Y = &C to load the commander
- JSR QUS1               \ file at address &0B00
+ JSR QUS1               \ file to address &0B00
 
  BCS LOR                \ If the C flag is set then an invalid drive number was
                         \ entered during the call to QUS1 and the file wasn't
                         \ loaded, so jump to LOR to return from the subroutine
 
- LDA &B00               \ If the first byte of the loaded file has bit 7 set,
+ LDA &0B00              \ If the first byte of the loaded file has bit 7 set,
  BMI ELT2F              \ jump to ELT2F, as this is an invalid commander file
                         \
                         \ ELT2F contains a BRK instruction, which will force an
@@ -22855,8 +22860,8 @@ ENDIF
 
 .DKS4
 
- LDA #3                 \ Set A to 3, so it's ready to send to SHEILA once
-                        \ interrupts have been disabled
+ LDA #%00000011         \ Set A to %00000011, so it's ready to send to SHEILA
+                        \ once interrupts have been disabled
 
  SEI                    \ Disable interrupts so we can scan the keyboard
                         \ without being hijacked

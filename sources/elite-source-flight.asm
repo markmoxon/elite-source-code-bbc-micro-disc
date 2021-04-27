@@ -1068,7 +1068,7 @@ ORG &0300
                         \
                         \   * Non-zero = hyperspace colour effect enabled
                         \
-                        \ When HFS is set to 1, the mode 4 screen that makes
+                        \ When HFX is set to 1, the mode 4 screen that makes
                         \ up the top part of the display is temporarily switched
                         \ to mode 5 (the same screen mode as the dashboard),
                         \ which has the effect of blurring and colouring the
@@ -1262,8 +1262,8 @@ ORG &0300
                         \     * Bits 0-6 contain the laser's power
                         \
                         \     * Bit 7 determines whether or not the laser pulses
-                        \       (0 = pulse laser) or is always on (1 = beam
-                        \       laser)
+                        \       (0 = pulse or mining laser) or is always on
+                        \       (1 = beam or military laser)
 
  SKIP 2                 \ These bytes appear to be unused (they were originally
                         \ used for up/down lasers, but they were dropped)
@@ -1878,7 +1878,7 @@ ORG &0E00
                         \
                         \     where our ship is at the origin, the centre of the
                         \     planet/sun is at (x_hi, y_hi, z_hi), and the
-                        \     radius of the planet is 6
+                        \     radius of the planet/sun is 6
                         \
                         \   * 0 = we have crashed into the surface
 
@@ -2274,7 +2274,7 @@ LOAD_A% = LOAD%
 \
 \ The key presses that are processed are as follows:
 \
-\   * SPACE and "?" to speed up and slow down
+\   * Space and "?" to speed up and slow down
 \   * "U", "T" and "M" to disarm, arm and fire missiles
 \   * TAB to fire an energy bomb
 \   * ESCAPE to launch an escape pod
@@ -2615,9 +2615,9 @@ LOAD_A% = LOAD%
 \
 \ ******************************************************************************
 
- LDA BOMB               \ If we set off our energy bomb by pressing TAB (see
- BPL MA21               \ MA24 above), then BOMB is now negative, so this skips
-                        \ to MA21 if our energy bomb is not going off
+ LDA BOMB               \ If we set off our energy bomb (see MA24 above), then
+ BPL MA21               \ BOMB is now negative, so this skips to MA21 if our
+                        \ energy bomb is not going off
 
  CPY #2*SST             \ If the ship in Y is the space station, jump to BA21
  BEQ MA21               \ as energy bombs are useless against space stations
@@ -3292,9 +3292,9 @@ LOAD_A% = LOAD%
 
 .MA18
 
- LDA BOMB               \ If we set off our energy bomb by pressing TAB (see
- BPL MA77               \ MA24 above), then BOMB is now negative, so this skips
-                        \ to MA77 if our energy bomb is not going off
+ LDA BOMB               \ If we set off our energy bomb (see MA24 above), then
+ BPL MA77               \ BOMB is now negative, so this skips to MA21 if our
+                        \ energy bomb is not going off
 
  ASL BOMB               \ We set off our energy bomb, so rotate BOMB to the
                         \ left by one place. BOMB was rotated left once already
@@ -3471,7 +3471,8 @@ LOAD_A% = LOAD%
 \       Name: Main flight loop (Part 15 of 16)
 \       Type: Subroutine
 \   Category: Main loop
-\    Summary: Perform altitude checks with planet and sun, process fuel scooping
+\    Summary: Perform altitude checks with the planet and sun and process fuel
+\             scooping if appropriate
 \  Deep dive: Program flow of the main game loop
 \             Scheduling tasks with the main loop counter
 \
@@ -3562,8 +3563,9 @@ LOAD_A% = LOAD%
 .MA28
 
  JMP DEATH              \ If we get here then we just crashed into the planet
-                        \ or got too close to the sun, so call DEATH to start
-                        \ the funeral preparations
+                        \ or got too close to the sun, so jump to DEATH to start
+                        \ the funeral preparations and return from the main
+                        \ flight loop using a tail call
 
 .MA29
 
@@ -3870,7 +3872,7 @@ NEXT
 \       Type: Variable
 \   Category: Drawing pixels
 \    Summary: Ready-made single-pixel character row bytes for mode 4
-\  Deep dive: Drawing colour pixels in mode 4
+\  Deep dive: Drawing monochrome pixels in mode 4
 \
 \ ------------------------------------------------------------------------------
 \
@@ -3896,7 +3898,7 @@ NEXT
 \       Type: Variable
 \   Category: Drawing pixels
 \    Summary: Ready-made double-pixel character row bytes for mode 4
-\  Deep dive: Drawing colour pixels in mode 4
+\  Deep dive: Drawing monochrome pixels in mode 4
 \
 \ ------------------------------------------------------------------------------
 \
@@ -5616,13 +5618,6 @@ NEXT
 \ ******************************************************************************
 
 .STARS
-
-\LDA #&FF               \ These instructions are commented out in the original
-\STA COL                \ source, but they would set the stardust colour to
-                        \ white. That said, COL is only used when updating the
-                        \ dashboard, so this would have no effect - perhaps it's
-                        \ left over from experiments with a colour top part of
-                        \ the screen? Who knows...
 
  LDX VIEW               \ Load the current view into X:
                         \
@@ -7740,7 +7735,7 @@ NEXT
                         \ definition for the character we want to draw on the
                         \ screen (i.e. we need the pixel shape of this
                         \ character). The MOS ROM contains bitmap definitions
-                        \ of the BBC's ASCII characters, starting from &C000
+                        \ of the system's ASCII characters, starting from &C000
                         \ for space (ASCII 32) and ending with the £ symbol
                         \ (ASCII 126)
                         \
@@ -9023,7 +9018,7 @@ LOAD_C% = LOAD% +P% - CODE%
 .TN6
 
  LDA #%11110001         \ Set the AI flag to give the ship E.C.M., enable AI and
-                        \ make it very aggressive (56 out of 63)
+                        \ make it very aggressive (60 out of 63)
 
  JMP SFS1               \ Jump to SFS1 to spawn the ship, returning from the
                         \ subroutine using a tail call
@@ -9338,9 +9333,10 @@ LOAD_C% = LOAD% +P% - CODE%
  DEC INWK+31            \ We're done with the checks, so it's time to fire off a
                         \ missile, so reduce the missile count in byte #31 by 1
 
- LDA TYPE               \ If this is not a Thargoid, jump down to TA16 to launch
- CMP #THG               \ a missile
- BNE TA16
+ LDA TYPE               \ Fetch the ship type into A
+
+ CMP #THG               \ If this is not a Thargoid, jump down to TA16 to launch
+ BNE TA16               \ a missile
 
  LDX #TGL               \ This is a Thargoid, so instead of launching a missile,
  LDA INWK+32            \ the mothership launches a Thargon, so call SFS1 to
@@ -14732,7 +14728,7 @@ LOAD_D% = LOAD% + P% - CODE%
 
                         \ Fall through into TT128 to draw a circle with the
                         \ centre at the same coordinates as the crosshairs,
-                        \ (QQ19, QQ19+1),  and radius K that reflects the
+                        \ (QQ19, QQ19+1), and radius K that reflects the
                         \ current fuel levels
 
 \ ******************************************************************************
@@ -14769,9 +14765,6 @@ LOAD_D% = LOAD% + P% - CODE%
  STX K4+1
  STX K3+1
 
-\STX LSX                \ This instruction is commented out in the original
-                        \ source
-
  INX                    \ Set LSP = 1 to reset the ball line heap
  STX LSP
 
@@ -14780,9 +14773,6 @@ LOAD_D% = LOAD% + P% - CODE%
 
  JSR CIRCLE2            \ Call CIRCLE2 to draw a circle with the centre at
                         \ (K3(1 0), K4(1 0)) and radius K
-
-\LDA #&FF               \ These instructions are commented out in the original
-\STA LSX                \ source
 
  RTS                    \ Return from the subroutine
 
@@ -15317,8 +15307,8 @@ LOAD_D% = LOAD% + P% - CODE%
                         \ Y (which contains the row where we can print this
                         \ system's label)
 
- CPY #3                 \ If Y < 3, then the label would clash with the chart
- BCC TT187              \ title, so jump to TT187 to skip printing the label
+ CPY #3                 \ If Y < 3, then the system would clash with the chart
+ BCC TT187              \ title, so jump to TT187 to skip showing the system
 
  LDA #&FF               \ Store &FF in INWK+Y, to denote that this row is now
  STA INWK,Y             \ occupied so we don't try to print another system's
@@ -15669,7 +15659,7 @@ LOAD_D% = LOAD% + P% - CODE%
 
                         \ We now store the distance to the selected system * 4
                         \ in the two-byte location QQ8, by taking (0 Q) and
-                        \ shifting it left twice, storing it in (QQ8+1 QQ8)
+                        \ shifting it left twice, storing it in QQ8(1 0)
 
  LDA Q                  \ First we shift the low byte left by setting
  ASL A                  \ A = Q * 2, with bit 7 of A going into the C flag
@@ -18497,7 +18487,7 @@ LOAD_E% = LOAD% + P% - CODE%
  STA INWK+29
  STA INWK+30
 
- LDA #129               \ Set A = 129, the "ship" type for the sun
+ LDA #129               \ Set A = 129, the ship type for the sun
 
  JSR NWSHP              \ Call NWSHP to set up the sun's data block and add it
                         \ to FRIN, where it will get put in the second slot as
@@ -19754,6 +19744,12 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Dashboard
 \    Summary: Disarm missiles and update the dashboard indicators
+\
+\ ------------------------------------------------------------------------------
+\
+\ Arguments:
+\
+\   Y                   The new status of the leftmost missile indicator
 \
 \ ******************************************************************************
 
@@ -22321,7 +22317,7 @@ LOAD_E% = LOAD% + P% - CODE%
                         \ (or the equivalent on joystick) and update the key
                         \ logger, setting KL to the key pressed
 
- LDA JSTK               \ If the joystick was not used, jump down to TJ1,
+ LDA JSTK               \ If the joystick is not configured, jump down to TJ1,
  BEQ TJ1                \ otherwise we move the cursor with the joystick
 
  LDA JSTX               \ Fetch the joystick roll, ranging from 1 to 255 with
@@ -22331,7 +22327,7 @@ LOAD_E% = LOAD% + P% - CODE%
                         \ works in the opposite way to moving a cursor on-screen
                         \ in terms of left and right
 
- JSR TJS1               \ Call TJS1 just below to set Y to a value between -2
+ JSR TJS1               \ Call TJS1 just below to set A to a value between -2
                         \ and +2 depending on the joystick roll value (moving
                         \ the stick sideways)
 
@@ -22502,11 +22498,6 @@ LOAD_E% = LOAD% + P% - CODE%
 \   Category: Universe
 \    Summary: Remove the space station and replace it with the sun
 \
-\ ------------------------------------------------------------------------------
-\
-\ Remove the space station from our local bubble of universe, and replace it
-\ with the sun.
-\
 \ ******************************************************************************
 
 .KS4
@@ -22528,7 +22519,7 @@ LOAD_E% = LOAD% + P% - CODE%
  LDA #6                 \ Set the sun's y_sign to 6
  STA INWK+5
 
- LDA #129               \ Set A = 129, the "ship" type for the sun
+ LDA #129               \ Set A = 129, the ship type for the sun
 
  JMP NWSHP              \ Call NWSHP to set up the sun's data block and add it
                         \ to FRIN, where it will get put in the second slot as
@@ -23759,7 +23750,8 @@ ENDIF
 \       Name: Main game loop (Part 4 of 6)
 \       Type: Subroutine
 \   Category: Main loop
-\    Summary: Potentially spawn lone bounty hunter, Thargoid, or up to 4 pirates
+\    Summary: Potentially spawn a lone bounty hunter, a Thargoid, or up to four
+\             pirates
 \  Deep dive: Program flow of the main game loop
 \             Ship data blocks
 \
@@ -23923,7 +23915,7 @@ ENDIF
 
 .more
 
- LDA CPIR
+ LDA CPIR               \ Set A to the ship type in CPIR
 
  ADC #PACK              \ #PACK is set to #SH3, the ship type for a Sidewinder,
                         \ so this sets our new ship type to one of the pack
@@ -24740,9 +24732,6 @@ ENDIF
 \
 \ Arguments:
 \
-\   X                   The high byte (i.e. the page) of the starting point of
-\                       the zero-fill
-\
 \   Y                   The offset from (X SC) where we start zeroing, counting
 \                       down to 0
 \
@@ -25136,17 +25125,6 @@ ENDIF
                         \ planet in any of the three axes (we could also call
                         \ routine m to do the same thing, as A = 0)
 
-                        \ The following two instructions appear in the BASIC
-                        \ source file (ELITEC), but in the text source file
-                        \ (ELITEC.TXT) they are replaced by:
-                        \
-                        \   LSR A
-                        \   BEQ WA1
-                        \
-                        \ which does the same thing, but saves one byte of
-                        \ memory (as LSR A is a one-byte opcode, while CMP #2
-                        \ takes up two bytes)
-
  LSR A                  \ If A < 2 then jump to WA1 to abort the in-system jump
  BEQ WA1                \ with a low beep, as we are facing the planet and are
                         \ too close to jump in that direction
@@ -25168,17 +25146,6 @@ ENDIF
 
  JSR m                  \ Call m to set A to the largest distance to the sun
                         \ in any of the three axes
-
-                        \ The following two instructions appear in the BASIC
-                        \ source file (ELITEC), but in the text source file
-                        \ (ELITEC.TXT) they are replaced by:
-                        \
-                        \   LSR A
-                        \   BEQ WA1
-                        \
-                        \ which does the same thing, but saves one byte of
-                        \ memory (as LSR A is a one-byte opcode, while CMP #2
-                        \ takes up two bytes)
 
  LSR A                  \ If A < 2 then jump to WA1 to abort the in-system jump
  BEQ WA1                \ with a low beep, as we are facing the sun and are too
@@ -25618,7 +25585,7 @@ ENDIF
                         \ speed and lasers):
 
  EQUB &68 + 128         \ ?         KYTB+1      Slow down
- EQUB &62 + 128         \ SPACE     KYTB+2      Speed up
+ EQUB &62 + 128         \ Space     KYTB+2      Speed up
  EQUB &66 + 128         \ <         KYTB+3      Roll left
  EQUB &67 + 128         \ >         KYTB+4      Roll right
  EQUB &42 + 128         \ X         KYTB+5      Pitch up
@@ -25734,8 +25701,8 @@ ENDIF
 
 .DKS4
 
- LDA #3                 \ Set A to 3, so it's ready to send to SHEILA once
-                        \ interrupts have been disabled
+ LDA #%00000011         \ Set A to %00000011, so it's ready to send to SHEILA
+                        \ once interrupts have been disabled
 
  SEI                    \ Disable interrupts so we can scan the keyboard
                         \ without being hijacked
@@ -25965,6 +25932,8 @@ ENDIF
 \ Returns:
 \
 \   A                   A is set to 0
+\
+\   Y                   Y is set to 0
 \
 \ ******************************************************************************
 
@@ -32024,12 +31993,10 @@ LOAD_H% = LOAD% + P% - CODE%
 \       Name: MV40
 \       Type: Subroutine
 \   Category: Moving
-\    Summary: Rotate the planet or sun by our ship's pitch and roll
+\    Summary: Rotate the planet or sun's location in space by the amount of
+\             pitch and roll of our ship
 \
 \ ------------------------------------------------------------------------------
-\
-\ Rotate the planet or sun's location in space by the amount of pitch and roll
-\ of our ship.
 \
 \ We implement this using the same equations as in part 5 of MVEIT, where we
 \ rotated the current ship's location by our pitch and roll. Specifically, the
@@ -32579,8 +32546,8 @@ LOAD_H% = LOAD% + P% - CODE%
 
 .BOL1
 
- JSR ZES1               \ Call ZES1 below to zero-fill the page in X, which
-                        \ clears that character row on the screen
+ JSR ZES1               \ Call ZES1  to zero-fill the page in X, which clears
+                        \ that character row on the screen
 
  INX                    \ Increment X to point to the next page, i.e. the next
                         \ character row
@@ -33030,21 +32997,14 @@ LOAD_H% = LOAD% + P% - CODE%
  PHP                    \ Store the flags (specifically the C flag) from the
                         \ above subtraction
 
-\BCS SC48               \ These instructions are commented out in the original
-\EOR #&FF               \ source. They would negate A if the C flag were set,
-\ADC #1                 \ which would reverse the direction of all the sticks,
-                        \ so you could turn your joystick around. Perhaps one of
-                        \ the authors' test sticks was easier to use upside
-                        \ down? Who knows...
-
 .SC48
 
  PHA                    \ Store the stick height in A on the stack
 
- JSR CPIX4              \ Draw a double-height mode 5 dot at (X1, Y1). This also
-                        \ leaves the following variables set up for the dot's
-                        \ top-right pixel, the last pixel to be drawn (as the
-                        \ dot gets drawn from the bottom up):
+ JSR CPIX4              \ Draw a double-height dot at (X1, Y1). This also leaves
+                        \ the following variables set up for the dot's top-right
+                        \ pixel, the last pixel to be drawn (as the dot gets
+                        \ drawn from the bottom up):
                         \
                         \   SC(1 0) = screen address of the pixel's character
                         \             block
@@ -33106,7 +33066,7 @@ LOAD_H% = LOAD% + P% - CODE%
  EOR (SC),Y             \ Draw the stick on row Y of the character block using
  STA (SC),Y             \ EOR logic
 
- DEX                    \ Decrement (positive) the stick height in X
+ DEX                    \ Decrement the (positive) stick height in X
 
  BNE VLL1               \ If we still have more stick to draw, jump up to VLL1
                         \ to draw the next pixel
@@ -33164,7 +33124,7 @@ LOAD_H% = LOAD% + P% - CODE%
  EOR (SC),Y             \ Draw the stick on row Y of the character block using
  STA (SC),Y             \ EOR logic
 
- INX                    \ Decrement the (negative) stick height in X
+ INX                    \ Increment the (negative) stick height in X
 
  BNE VLL2               \ If we still have more stick to draw, jump up to VLL2
                         \ to draw the next pixel
