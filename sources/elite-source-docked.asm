@@ -440,8 +440,9 @@ ORG &0000
                         \ hunter, a pirate, currently hostile, in the process of
                         \ docking, inside the hold having been scooped, and so
                         \ on. The default values for each ship type are taken
-                        \ from the table at E%, where the NEWB flags are
-                        \ described in more detail
+                        \ from the table at E%, and you can find out more detail
+                        \ in the deep dive on "Advanced tactics with the NEWB
+                        \ flags"
 
 .LSP
 
@@ -21965,7 +21966,7 @@ ENDIF
  EOR #&A9               \ Store the checksum EOR &A9 in CHK2, the penultimate
  STA CHK2               \ byte of the last saved commander block
 
- STA &AFF+NT%           \ Store the checksum EOR &A9 in the penultimate byte of
+ STA &0AFF+NT%          \ Store the checksum EOR &A9 in the penultimate byte of
                         \ the save file at &0B00 (the equivalent of CHK2 in the
                         \ last saved block)
 
@@ -22014,7 +22015,7 @@ ENDIF
 \
 \   Y                   Points to the page number containing the OSFILE block,
 \                       which must be &C because that's where the pointer to the
-\                       filename in INWK is stored below (by the STX &C00
+\                       filename in INWK is stored below (by the STX &0C00
 \                       instruction)
 \
 \ ******************************************************************************
@@ -22149,7 +22150,7 @@ ENDIF
 
 .LOL1
 
- LDA &B00,X             \ Copy the X-th byte of &0B00 to the X-th byte of NA%+8
+ LDA &0B00,X            \ Copy the X-th byte of &0B00 to the X-th byte of NA%+8
  STA NA%+8,X
 
  DEX                    \ Decrement the loop counter
@@ -32086,6 +32087,8 @@ LOAD_SHIPS% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprints default NEWB flags for the ship hanger
+\  Deep dive: Ship blueprints
+\             Advanced tactics with the NEWB flags
 \
 \ ******************************************************************************
 

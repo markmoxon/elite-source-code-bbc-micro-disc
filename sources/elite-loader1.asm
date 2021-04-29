@@ -26,7 +26,7 @@ INCLUDE "sources/elite-header.h.asm"
 _IB_DISC                = (_RELEASE = 1)
 _STH_DISC               = (_RELEASE = 2)
 
-BYTEV = &20A            \ The BYTEV vector that we check as part of the copy
+BYTEV = &020A           \ The BYTEV vector that we check as part of the copy
                         \ protection
 
 OSWRCH = &FFEE          \ The address for the OSWRCH routine
@@ -187,8 +187,8 @@ ORG CODE%
 .os100
 
  LDA &D941,Y            \ Copy the Y-th byte from the default vector table at
- STA &200               \ &D941 into location &0200 (this is surely supposed to
-                        \ be the Y-th byte in &0200, i.e. STA &200,Y, but it
+ STA &0200              \ &D941 into location &0200 (this is surely supposed to
+                        \ be the Y-th byte in &0200, i.e. STA &0200,Y, but it
                         \ isn't, which feels like a bug)
 
  INY                    \ Increment the loop counter
@@ -208,7 +208,7 @@ ORG CODE%
 .ABCDEFG
 
  LDA (ZP),Y             \ Copy the Y-th byte from the default vector table into
- STA &200,Y             \ the vector table in &0200
+ STA &0200,Y            \ the vector table in &0200
 
  INY                    \ Increment the loop counter
 

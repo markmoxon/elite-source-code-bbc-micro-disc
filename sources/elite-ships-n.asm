@@ -86,6 +86,8 @@ ORG CODE%
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprints default NEWB flags for the D.MON file
+\  Deep dive: Ship blueprints
+\             Advanced tactics with the NEWB flags
 \
 \ ******************************************************************************
 
@@ -1189,5 +1191,5 @@ ENDMACRO
 \ ******************************************************************************
 
 PRINT "S.D.MON ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
-SAVE "output/D.MON.bin", CODE%, CODE% + &A00
+SAVE "output/D.MON.bin", CODE%, CODE% + &0A00
 

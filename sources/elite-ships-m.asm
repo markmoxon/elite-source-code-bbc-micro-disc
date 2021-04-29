@@ -86,6 +86,8 @@ ORG CODE%
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprints default NEWB flags for the D.MOM file
+\  Deep dive: Ship blueprints
+\             Advanced tactics with the NEWB flags
 \
 \ ******************************************************************************
 
@@ -1166,5 +1168,5 @@ ENDMACRO
 \ ******************************************************************************
 
 PRINT "S.D.MOM ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
-SAVE "output/D.MOM.bin", CODE%, CODE% + &A00
+SAVE "output/D.MOM.bin", CODE%, CODE% + &0A00
 

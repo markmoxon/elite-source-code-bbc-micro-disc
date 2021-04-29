@@ -86,6 +86,8 @@ ORG CODE%
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprints default NEWB flags for the D.MOO file
+\  Deep dive: Ship blueprints
+\             Advanced tactics with the NEWB flags
 \
 \ ******************************************************************************
 
@@ -1243,5 +1245,5 @@ ENDMACRO
 \ ******************************************************************************
 
 PRINT "S.D.MOO ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
-SAVE "output/D.MOO.bin", CODE%, CODE% + &A00
+SAVE "output/D.MOO.bin", CODE%, CODE% + &0A00
 

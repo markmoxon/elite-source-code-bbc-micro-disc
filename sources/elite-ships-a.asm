@@ -86,6 +86,8 @@ ORG CODE%
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprints default NEWB flags for the D.MOA file
+\  Deep dive: Ship blueprints
+\             Advanced tactics with the NEWB flags
 \
 \ ******************************************************************************
 
@@ -1198,4 +1200,4 @@ ENDMACRO
 \ ******************************************************************************
 
 PRINT "S.D.MOA ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
-SAVE "output/D.MOA.bin", CODE%, CODE% + &A00
+SAVE "output/D.MOA.bin", CODE%, CODE% + &0A00

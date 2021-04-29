@@ -86,6 +86,8 @@ ORG CODE%
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprints default NEWB flags for the D.MOB file
+\  Deep dive: Ship blueprints
+\             Advanced tactics with the NEWB flags
 \
 \ ******************************************************************************
 
@@ -1200,5 +1202,5 @@ ENDMACRO
 \ ******************************************************************************
 
 PRINT "S.D.MOB ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
-SAVE "output/D.MOB.bin", CODE%, CODE% + &A00
+SAVE "output/D.MOB.bin", CODE%, CODE% + &0A00
 
