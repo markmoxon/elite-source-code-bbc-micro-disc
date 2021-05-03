@@ -18,9 +18,11 @@
 \
 \ ------------------------------------------------------------------------------
 \
-\ This source file produces the following SSD disc image:
+\ This source file produces one of the following SSD disc images, depending on
+\ which release is being built:
 \
-\   * elite-disc.ssd
+\   * elite-disc-sth.ssd
+\   * elite-disc-ib-disc.ssd
 \
 \ This can be loaded into an emulator or a real BBC Micro.
 \

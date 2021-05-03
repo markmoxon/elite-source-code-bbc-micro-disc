@@ -17,9 +17,11 @@ PYTHON?=python
 ifeq ($(release-disc), ib-disc)
   rel-disc=1
   folder-disc='/ib-disc'
+  suffix-disc='-ib-disc'
 else
   rel-disc=2
   folder-disc='/sth'
+  suffix-disc='-sth'
 endif
 
 .PHONY:build
@@ -52,7 +54,7 @@ build:
 	$(BEEBASM) -i sources/elite-ships-o.asm -v >> output/compile.txt
 	$(BEEBASM) -i sources/elite-ships-p.asm -v >> output/compile.txt
 	$(PYTHON) sources/elite-checksum.py -u
-	$(BEEBASM) -i sources/elite-disc.asm -do elite-disc.ssd -boot ELITE2
+	$(BEEBASM) -i sources/elite-disc.asm -do elite-disc$(suffix-disc).ssd -boot ELITE2
 
 .PHONY:encrypt
 encrypt:
@@ -84,7 +86,7 @@ encrypt:
 	$(BEEBASM) -i sources/elite-ships-o.asm -v >> output/compile.txt
 	$(BEEBASM) -i sources/elite-ships-p.asm -v >> output/compile.txt
 	$(PYTHON) sources/elite-checksum.py
-	$(BEEBASM) -i sources/elite-disc.asm -do elite-disc.ssd -boot ELITE2
+	$(BEEBASM) -i sources/elite-disc.asm -do elite-disc$(suffix-disc).ssd -boot ELITE2
 
 .PHONY:verify
 verify:
