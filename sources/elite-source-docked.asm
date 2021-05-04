@@ -20427,6 +20427,9 @@ LOAD_F% = LOAD% + P% - CODE%
 \ the cursor keys or joystick have been used (i.e. the values that are returned
 \ by routine TT17).
 \
+\ This routine also checks for the "F" key press (search for a system), which
+\ applies to enhanced versions only.
+\
 \ Arguments:
 \
 \   A                   The internal key number of the key pressed (see p.142 of
