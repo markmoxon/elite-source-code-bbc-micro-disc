@@ -33,6 +33,12 @@ My hope is that this repository and the [accompanying website](https://www.bbcel
 
 * [Building different releases of Elite](#building-different-releases-of-elite)
 
+  * [Building the Ian Bell disc release](#building-the-ian-bell-disc-release)
+
+  * [Building the Stairway to Hell release](#building-the-stairway-to-hell-release)
+
+  * [Differences between the releases](#differences-between-the-releases)
+
 ## Acknowledgements
 
 Elite was written by Ian Bell and David Braben and is copyright &copy; Acornsoft 1984.
@@ -224,7 +230,11 @@ This repository contains the source code for two different releases of the disc 
 
 * The release from the game disc on Ian Bell's website
 
-By default the build process builds the Stairway to Hell release, but you can build the Ian Bell disc release by appending `release-disc=ib-disc` to the `make` command, like this on Windows:
+By default the build process builds the Stairway to Hell release, but you can build the other release as follows.
+
+### Building the Ian Bell disc release
+
+You can build the Ian Bell disc release by appending `release-disc=ib-disc` to the `make` command, like this on Windows:
 
 ```
 make.bat encrypt verify release-disc=ib-disc
@@ -238,7 +248,11 @@ make encrypt verify release-disc=ib-disc
 
 This will produce a file called `elite-disc-ib-disc.ssd` that contains the Ian Bell disc release.
 
-You can also add `release-disc=sth` to produce the `elite-disc-sth.ssd` file containing the Stairway to Hell release, though that's the default value so it isn't necessary.
+### Building the Stairway to Hell release
+
+You can add `release-disc=sth` to produce the `elite-disc-sth.ssd` file containing the Stairway to Hell release, though that's the default value so it isn't necessary.
+
+### Differences between the releases
 
 You can see the differences between the releases by searching the source code for `_STH_DISC` (for features in the Stairway to Hell release) or `_IB_DISC` (for features in the Ian Bell game disc release). There are only a few differences:
 
