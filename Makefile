@@ -16,12 +16,12 @@ PYTHON?=python
 
 ifeq ($(release-disc), ib-disc)
   rel-disc=1
-  folder-disc='/ib-disc'
-  suffix-disc='-ib-disc'
+  folder-disc=/ib-disc
+  suffix-disc=-ib-disc
 else
   rel-disc=2
-  folder-disc='/sth'
-  suffix-disc='-sth'
+  folder-disc=/sth
+  suffix-disc=-sth
 endif
 
 .PHONY:build
