@@ -4,17 +4,13 @@
 
 This repository contains source code for Elite on the BBC Micro with a disc drive, with every single line documented and (for the most part) explained.
 
-It is a companion to the [bbcelite.com website](https://www.bbcelite.com), which contains all the code from this repository, but laid out in a much more human-friendly fashion. The links above will take you to repositories for the other versions of Elite that are covered by this project.
+It is a companion to the [bbcelite.com website](https://www.bbcelite.com).
 
-* If you want to browse the source and read about how Elite works under the hood, you will probably find [the website](https://www.bbcelite.com) is a better place to start than this repository.
-
-* If you would rather explore the source code in your favourite IDE, then the [annotated source](sources/elite-source.asm) is what you're looking for. It contains the exact same content as the website, so you won't be missing out (the website is generated from the source files, so they are guaranteed to be identical). You might also like to read the section on [Browsing the source in an IDE](#browsing-the-source-in-an-ide) for some tips.
-
-* If you want to build Elite from the source on a modern computer, to produce a working game disc that can be loaded into a BBC Micro or an emulator, then you want the section on [Building Elite from the source](#building-elite-from-the-source).
-
-My hope is that this repository and the [accompanying website](https://www.bbcelite.com) will be useful for those who want to learn more about Elite and what makes it tick. It is provided on an educational and non-profit basis, with the aim of helping people appreciate one of the most iconic games of the 8-bit era.
+See the [introduction](#introduction) for more information.
 
 ## Contents
+
+* [Introduction](#introduction)
 
 * [Acknowledgements](#acknowledgements)
 
@@ -34,10 +30,24 @@ My hope is that this repository and the [accompanying website](https://www.bbcel
 * [Building different releases of Elite](#building-different-releases-of-elite)
 
   * [Building the Ian Bell disc release](#building-the-ian-bell-disc-release)
-
   * [Building the Stairway to Hell release](#building-the-stairway-to-hell-release)
-
   * [Differences between the releases](#differences-between-the-releases)
+
+## Introduction
+
+This repository contains source code for Elite on the BBC Micro with a disc drive, with every single line documented and (for the most part) explained.
+
+You can build the fully functioning game from this source. Two releases are currently supported ([see below](#building-different-releases-of-elite)): the version from Ian Bell's site, and the version from the Stairway to Hell archive.
+
+It is a companion to the [bbcelite.com website](https://www.bbcelite.com), which contains all the code from this repository, but laid out in a much more human-friendly fashion. The links above will take you to repositories for the other versions of Elite that are covered by this project.
+
+* If you want to browse the source and read about how Elite works under the hood, you will probably find [the website](https://www.bbcelite.com) is a better place to start than this repository.
+
+* If you would rather explore the source code in your favourite IDE, then the [annotated source](sources/elite-source.asm) is what you're looking for. It contains the exact same content as the website, so you won't be missing out (the website is generated from the source files, so they are guaranteed to be identical). You might also like to read the section on [Browsing the source in an IDE](#browsing-the-source-in-an-ide) for some tips.
+
+* If you want to build Elite from the source on a modern computer, to produce a working game disc that can be loaded into a BBC Micro or an emulator, then you want the section on [Building Elite from the source](#building-elite-from-the-source).
+
+My hope is that this repository and the [accompanying website](https://www.bbcelite.com) will be useful for those who want to learn more about Elite and what makes it tick. It is provided on an educational and non-profit basis, with the aim of helping people appreciate one of the most iconic games of the 8-bit era.
 
 ## Acknowledgements
 
