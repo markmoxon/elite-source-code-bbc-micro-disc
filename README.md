@@ -244,23 +244,23 @@ By default the build process builds the Stairway to Hell release, but you can bu
 
 ### Building the Ian Bell disc release
 
-You can build the Ian Bell disc release by appending `release-disc=ib-disc` to the `make` command, like this on Windows:
+You can build the Ian Bell disc release by appending `release=ib-disc` to the `make` command, like this on Windows:
 
 ```
-make.bat encrypt verify release-disc=ib-disc
+make.bat encrypt verify release=ib-disc
 ```
 
 or this on a Mac or Linux:
 
 ```
-make encrypt verify release-disc=ib-disc
+make encrypt verify release=ib-disc
 ```
 
 This will produce a file called `elite-disc-ib-disc.ssd` that contains the Ian Bell disc release.
 
 ### Building the Stairway to Hell release
 
-You can add `release-disc=sth` to produce the `elite-disc-sth.ssd` file containing the Stairway to Hell release, though that's the default value so it isn't necessary.
+You can add `release=sth` to produce the `elite-disc-sth.ssd` file containing the Stairway to Hell release, though that's the default value so it isn't necessary.
 
 ### Differences between the releases
 

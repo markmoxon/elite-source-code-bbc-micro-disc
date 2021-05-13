@@ -1,7 +1,7 @@
 BEEBASM?=beebasm
 PYTHON?=python
 
-# You can set the release that gets built by adding 'release-disc=<rel>' to
+# You can set the release that gets built by adding 'release=<rel>' to
 # the make command, where <rel> is one of:
 #
 #   ib-disc
@@ -9,12 +9,12 @@ PYTHON?=python
 #
 # So, for example:
 #
-#   make encrypt verify release-disc=ib-disc
+#   make encrypt verify release=ib-disc
 #
 # will build the version from the game disc on Ian Bell's site. If you omit
-# the release-disc parameter, it will build the Stairway to Hell version.
+# the release parameter, it will build the Stairway to Hell version.
 
-ifeq ($(release-disc), ib-disc)
+ifeq ($(release), ib-disc)
   rel-disc=1
   folder-disc=/ib-disc
   suffix-disc=-ib-disc
