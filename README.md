@@ -1,6 +1,6 @@
 # Fully documented source code for Elite on the BBC Micro with a disc drive
 
-[BBC Micro (cassette)](https://github.com/markmoxon/cassette-elite-beebasm) | **BBC Micro (disc)** | [6502 Second Processor](https://github.com/markmoxon/6502sp-elite-beebasm) | [BBC Master](https://github.com/markmoxon/master-elite-beebasm) | [Acorn Electron](https://github.com/markmoxon/electron-elite-beebasm)
+[BBC Micro (cassette)](https://github.com/markmoxon/cassette-elite-beebasm) | **BBC Micro (disc)** | [6502 Second Processor](https://github.com/markmoxon/6502sp-elite-beebasm) | [BBC Master](https://github.com/markmoxon/master-elite-beebasm) | [Acorn Electron](https://github.com/markmoxon/electron-elite-beebasm) | [Elite-A](https://github.com/markmoxon/elite-a-beebasm)
 
 This repository contains source code for Elite on the BBC Micro with a disc drive, with every single line documented and (for the most part) explained.
 
