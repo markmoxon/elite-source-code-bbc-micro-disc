@@ -13,11 +13,16 @@
 \ The terminology and notations used in this commentary are explained at
 \ https://www.bbcelite.com/about_site/terminology_used_in_this_commentary.html
 \
+\ The deep dive articles referred to in this commentary can be found at
+\ https://www.bbcelite.com/deep_dives
+\
 \ ------------------------------------------------------------------------------
 \
-\ This source file produces the following SSD disc image:
+\ This source file produces one of the following SSD disc images, depending on
+\ which release is being built:
 \
-\   * elite-disc.ssd
+\   * elite-disc-sth.ssd
+\   * elite-disc-ib-disc.ssd
 \
 \ This can be loaded into an emulator or a real BBC Micro.
 \

@@ -13,6 +13,9 @@
 \ The terminology and notations used in this commentary are explained at
 \ https://www.bbcelite.com/about_site/terminology_used_in_this_commentary.html
 \
+\ The deep dive articles referred to in this commentary can be found at
+\ https://www.bbcelite.com/deep_dives
+\
 \ ------------------------------------------------------------------------------
 \
 \ This source file produces the following binary file:
@@ -86,6 +89,8 @@ ORG CODE%
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprints default NEWB flags for the D.MOC file
+\  Deep dive: Ship blueprints
+\             Advanced tactics with the NEWB flags
 \
 \ ******************************************************************************
 
@@ -1245,5 +1250,5 @@ ENDMACRO
 \ ******************************************************************************
 
 PRINT "S.D.MOC ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
-SAVE "output/D.MOC.bin", CODE%, CODE% + &A00
+SAVE "output/D.MOC.bin", CODE%, CODE% + &0A00
 

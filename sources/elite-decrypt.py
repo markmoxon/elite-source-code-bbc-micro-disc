@@ -17,11 +17,11 @@
 # Run this script by changing directory to the repository's root folder and
 # running the script with "python sources/elite-decrypt.py"
 #
-# You can decrypt specific versions by adding the following arguments, as in
+# You can decrypt specific releases by adding the following arguments, as in
 # "python sources/elite-decrypt.py -rel1" for example:
 #
-#   -rel1   Decrypt the version from Ian Bell's site
-#   -rel2   Decrypt the Stairway to Hell version
+#   -rel1   Decrypt the release from Ian Bell's site
+#   -rel2   Decrypt the Stairway to Hell release
 #
 # If unspecified, the default is rel2
 #

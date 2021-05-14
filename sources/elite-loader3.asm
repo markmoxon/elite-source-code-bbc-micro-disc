@@ -13,6 +13,9 @@
 \ The terminology and notations used in this commentary are explained at
 \ https://www.bbcelite.com/about_site/terminology_used_in_this_commentary.html
 \
+\ The deep dive articles referred to in this commentary can be found at
+\ https://www.bbcelite.com/deep_dives
+\
 \ ------------------------------------------------------------------------------
 \
 \ This source file produces the following binary file:
@@ -30,17 +33,17 @@ Q% = FALSE              \ Set Q% to TRUE to max out the default commander, FALSE
                         \ for the standard default commander (this is set to
                         \ TRUE if checksums are disabled, just for convenience)
 
-NETV = &224             \ The NETV vector that we intercept as part of the copy
-                        \ protection
-
-BRKV = &202             \ The break vector that we intercept to enable us to
+BRKV = &0202            \ The break vector that we intercept to enable us to
                         \ handle and display system errors
 
-IRQ1V = &204            \ The IRQ1V vector that we intercept to implement the
+IRQ1V = &0204           \ The IRQ1V vector that we intercept to implement the
                         \ split-sceen mode
 
-WRCHV = &20E            \ The WRCHV vector that we intercept with our custom
+WRCHV = &020E           \ The WRCHV vector that we intercept with our custom
                         \ text printing routine
+
+NETV = &0224            \ The NETV vector that we intercept as part of the copy
+                        \ protection
 
 OSWRCH = &FFEE          \ The address for the OSWRCH routine
 OSBYTE = &FFF4          \ The address for the OSBYTE routine
@@ -361,10 +364,10 @@ ENDMACRO
  LDX #3                 \ sample 3 channels from the joystick/Bitstik
  JSR OSBYTE
 
- LDA #&60               \ Store an RTS instruction in location &232
- STA &232
+ LDA #&60               \ Store an RTS instruction in location &0232
+ STA &0232
 
- LDA #&2                \ Point the NETV vector to &232, which we just filled
+ LDA #&2                \ Point the NETV vector to &0232, which we just filled
  STA NETV+1             \ with an RTS
  LDA #&32
  STA NETV
@@ -825,45 +828,7 @@ ORG CATDcode + P% - CATD
 \       Type: Subroutine
 \   Category: Drawing planets
 \    Summary: Draw Saturn on the loading screen
-\
-\ ------------------------------------------------------------------------------
-\
-\ Part 1 (PLL1) x 1280 - planet
-\
-\   * Draw pixels at (x, y) where:
-\
-\     r1 = random number from 0 to 255
-\     r2 = random number from 0 to 255
-\     (r1^2 + r1^2) < 128^2
-\
-\     y = r2, squished into 64 to 191 by negation
-\
-\     x = SQRT(128^2 - (r1^2 + r1^2)) / 2
-\
-\ Part 2 (PLL2) x 477 - stars
-\
-\   * Draw pixels at (x, y) where:
-\
-\     y = random number from 0 to 255
-\     y = random number from 0 to 255
-\     (x^2 + y^2) div 256 > 17
-\
-\ Part 3 (PLL3) x 1280 - rings
-\
-\   * Draw pixels at (x, y) where:
-\
-\     r5 = random number from 0 to 255
-\     r6 = random number from 0 to 255
-\     r7 = r5, squashed into -32 to 31
-\
-\     32 <= (r5^2 + r6^2 + r7^2) / 256 <= 79
-\     Draw 50% fewer pixels when (r6^2 + r7^2) / 256 <= 16
-\
-\     x = r5 + r7
-\     y = r5
-\
-\ Draws pixels within the diagonal band of horizontal width 64, from top-left to
-\ bottom-right of the screen.
+\  Deep dive: Drawing Saturn on the loading screen
 \
 \ ******************************************************************************
 

@@ -1,20 +1,16 @@
 # Fully documented source code for Elite on the BBC Micro with a disc drive
 
-[BBC Micro (cassette)](https://github.com/markmoxon/elite-beebasm) | **BBC Micro (disc)** | [6502 Second Processor](https://github.com/markmoxon/6502sp-elite-beebasm) | [BBC Master](https://github.com/markmoxon/master-elite-beebasm) | [Acorn Electron](https://github.com/markmoxon/electron-elite-beebasm)
+[BBC Micro (cassette)](https://github.com/markmoxon/cassette-elite-beebasm) | **BBC Micro (disc)** | [6502 Second Processor](https://github.com/markmoxon/6502sp-elite-beebasm) | [BBC Master](https://github.com/markmoxon/master-elite-beebasm) | [Acorn Electron](https://github.com/markmoxon/electron-elite-beebasm) | [Elite-A](https://github.com/markmoxon/elite-a-beebasm)
 
 This repository contains source code for Elite on the BBC Micro with a disc drive, with every single line documented and (for the most part) explained.
 
-It is a companion to the [bbcelite.com website](https://www.bbcelite.com), which contains all the code from this repository, but laid out in a much more human-friendly fashion. The links above will take you to repositories for the other versions of Elite that are covered by this project.
+It is a companion to the [bbcelite.com website](https://www.bbcelite.com).
 
-* If you want to browse the source and read about how Elite works under the hood, you will probably find [the website](https://www.bbcelite.com) is a better place to start than this repository.
-
-* If you would rather explore the source code in your favourite IDE, then the [annotated source](sources/elite-source.asm) is what you're looking for. It contains the exact same content as the website, so you won't be missing out (the website is generated from the source files, so they are guaranteed to be identical). You might also like to read the section on [Browsing the source in an IDE](#browsing-the-source-in-an-ide) for some tips.
-
-* If you want to build Elite from the source on a modern computer, to produce a working game disc that can be loaded into a BBC Micro or an emulator, then you want the section on [Building Elite from the source](#building-elite-from-the-source).
-
-My hope is that this repository and the [accompanying website](https://www.bbcelite.com) will be useful for those who want to learn more about Elite and what makes it tick. It is provided on an educational and non-profit basis, with the aim of helping people appreciate one of the most iconic games of the 8-bit era.
+See the [introduction](#introduction) for more information.
 
 ## Contents
+
+* [Introduction](#introduction)
 
 * [Acknowledgements](#acknowledgements)
 
@@ -31,7 +27,27 @@ My hope is that this repository and the [accompanying website](https://www.bbcel
   * [Verifying the output](#verifying-the-output)
   * [Log files](#log-files)
 
-* [Building different release versions of Elite](#building-different-release-versions-of-elite)
+* [Building different releases of Elite](#building-different-releases-of-elite)
+
+  * [Building the Ian Bell disc release](#building-the-ian-bell-disc-release)
+  * [Building the Stairway to Hell release](#building-the-stairway-to-hell-release)
+  * [Differences between the releases](#differences-between-the-releases)
+
+## Introduction
+
+This repository contains source code for Elite on the BBC Micro with a disc drive, with every single line documented and (for the most part) explained.
+
+You can build the fully functioning game from this source. [Two releases](#building-different-releases-of-elite) are currently supported: the version from Ian Bell's site, and the version from the Stairway to Hell archive.
+
+It is a companion to the [bbcelite.com website](https://www.bbcelite.com), which contains all the code from this repository, but laid out in a much more human-friendly fashion. The links above will take you to repositories for the other versions of Elite that are covered by this project.
+
+* If you want to browse the source and read about how Elite works under the hood, you will probably find [the website](https://www.bbcelite.com) is a better place to start than this repository.
+
+* If you would rather explore the source code in your favourite IDE, then the [annotated source](sources/elite-source.asm) is what you're looking for. It contains the exact same content as the website, so you won't be missing out (the website is generated from the source files, so they are guaranteed to be identical). You might also like to read the section on [Browsing the source in an IDE](#browsing-the-source-in-an-ide) for some tips.
+
+* If you want to build Elite from the source on a modern computer, to produce a working game disc that can be loaded into a BBC Micro or an emulator, then you want the section on [Building Elite from the source](#building-elite-from-the-source).
+
+My hope is that this repository and the [accompanying website](https://www.bbcelite.com) will be useful for those who want to learn more about Elite and what makes it tick. It is provided on an educational and non-profit basis, with the aim of helping people appreciate one of the most iconic games of the 8-bit era.
 
 ## Acknowledgements
 
@@ -128,7 +144,7 @@ make.bat build
 make.bat encrypt
 ```
 
-will produce a file called `elite-disc.ssd`, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
+will produce a file called `elite-disc-sth.ssd` containing the Stairway to Hell release, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
 
 ### Mac and Linux
 
@@ -144,7 +160,7 @@ make build
 make encrypt
 ```
 
-will produce a file called `elite-disc.ssd`, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
+will produce a file called `elite-disc-sth.ssd` containing the Stairway to Hell release, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
 
 ### Verifying the output
 
@@ -216,39 +232,49 @@ All the compiled binaries match the extracts, so we know we are producing the sa
 
 During compilation, details of every step are output in a file called `compile.txt` in the `output` folder. If you have problems, it might come in handy, and it's a great reference if you need to know the addresses of labels and variables for debugging (or just snooping around).
 
-## Building different release versions of Elite
+## Building different releases of Elite
 
-This repository contains the source code for two different versions of Disc Elite:
+This repository contains the source code for two different releases of the disc version of Elite:
 
-* The version from the Stairway to Hell archive
+* The release from the Stairway to Hell archive
 
-* The version from the game disc on Ian Bell's website
+* The release from the game disc on Ian Bell's website
 
-By default the build process builds the Stairway to Hell version, but you can build the Ian Bell disc version by appending `release-disc=ib-disc` to the `make` command, like this on Windows:
+By default the build process builds the Stairway to Hell release, but you can build the other release as follows.
+
+### Building the Ian Bell disc release
+
+You can build the Ian Bell disc release by appending `release=ib-disc` to the `make` command, like this on Windows:
 
 ```
-make.bat encrypt verify release-disc=ib-disc
+make.bat encrypt verify release=ib-disc
 ```
 
 or this on a Mac or Linux:
 
 ```
-make encrypt verify release-disc=ib-disc
+make encrypt verify release=ib-disc
 ```
 
-You can also add `release-disc=sth`, though that's the default value so it isn't necessary.
+This will produce a file called `elite-disc-ib-disc.ssd` that contains the Ian Bell disc release.
 
-You can see the differences between the versions by searching the source code for `_STH_DISC` (for features in the Stairway to Hell version) or `_IB_DISC` (for features in the Ian Bell game disc). There are only a few differences:
+### Building the Stairway to Hell release
 
-* The Ian Bell version contains the refund bug, which has been fixed in the Stairway to Hell version
+You can add `release=sth` to produce the `elite-disc-sth.ssd` file containing the Stairway to Hell release, though that's the default value so it isn't necessary.
 
-* The Ian Bell version never spawns asteroids, which has been fixed in the Stairway to Hell version
+### Differences between the releases
 
-* The Ian Bell version sets bit 2 of the competition flag in the commander file, while the Stairway to Hell version sets bit 5
+You can see the differences between the releases by searching the source code for `_STH_DISC` (for features in the Stairway to Hell release) or `_IB_DISC` (for features in the Ian Bell game disc release). There are only a few differences:
 
-In other words, the Ian Bell version is the very first release of the disc version of Elite, while the Stairway to Hell version has both bugs fixed and a bumped-up version number.
+* The Ian Bell release contains the refund bug, which has been fixed in the Stairway to Hell release
 
-Note that I have only included differences that appear in the main game code, rather than those that appear in the loaders, as these files can differ extensively between versions without affecting the game itself. The version on Ian Bell's site contains a whole load of copy protection differences when compared to the same code in the Stairway to Hell version, and it also contains two more binary files (`ELITE5` and `ELITE6`), plus a `!BOOT` file that contains even more copy protection code. I haven't disassembled the loader files from this version as that's a whole different rabbit hole, so if you build the Ian Bell version with `make encrypt verify`, the compiled loader binaries will not match those extracted from the original disc. The main binaries will match, however, which is the interesting part from a digital archaeology perspective, as that's where the bug fixes live.
+* The Ian Bell release never spawns asteroids, which has been fixed in the Stairway to Hell release
+
+* The Ian Bell release sets bit 2 of the competition flag in the commander file, while the Stairway to Hell release sets bit 5
+
+In other words, the Ian Bell release is the very first release of the disc version of Elite, while the Stairway to Hell release has both bugs fixed and a bumped-up release number.
+
+Note that I have only included differences that appear in the main game code, rather than those that appear in the loaders, as these files can differ extensively between releases without affecting the game itself. The release on Ian Bell's site contains a whole load of copy protection differences when compared to the same code in the Stairway to Hell release, and it also contains two more binary files (`ELITE5` and `ELITE6`), plus a `!BOOT` file that contains even more copy protection code. I haven't disassembled the loader files from this release as that's a whole different rabbit hole, so if you build the Ian Bell release with `make encrypt verify`, the compiled loader binaries will not match those extracted from the original disc. The main binaries will match, however, which is the interesting part from a digital archaeology perspective, as that's where the bug fixes live.
 
 ---
 

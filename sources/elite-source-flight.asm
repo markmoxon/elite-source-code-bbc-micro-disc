@@ -13,6 +13,9 @@
 \ The terminology and notations used in this commentary are explained at
 \ https://www.bbcelite.com/about_site/terminology_used_in_this_commentary.html
 \
+\ The deep dive articles referred to in this commentary can be found at
+\ https://www.bbcelite.com/deep_dives
+\
 \ ------------------------------------------------------------------------------
 \
 \ This source file produces the following binary file:
@@ -426,8 +429,9 @@ ORG &0000
                         \ hunter, a pirate, currently hostile, in the process of
                         \ docking, inside the hold having been scooped, and so
                         \ on. The default values for each ship type are taken
-                        \ from the table at E%, where the NEWB flags are
-                        \ described in more detail
+                        \ from the table at E%, and you can find out more detail
+                        \ in the deep dive on "Advanced tactics with the NEWB
+                        \ flags"
 
 .LSP
 
@@ -22376,8 +22380,8 @@ LOAD_E% = LOAD% + P% - CODE%
 
  LDA KL                 \ Set A to the value of KL (the key pressed)
 
- LDX #0                 \ Set the results, X = Y = 0
- LDY #0
+ LDX #0                 \ Set the initial values for the results, X = Y = 0,
+ LDY #0                 \ which we now increase or decrease appropriately
 
  CMP #&19               \ If left arrow was pressed, set X = X - 1
  BNE P%+3
@@ -23760,6 +23764,12 @@ ENDIF
 \ This section covers the following:
 \
 \   * Potentially spawn (47% chance) either a lone bounty hunter (a Cobra Mk
+\     III, Asp Mk II, Python or Fer-de-lance), a Thargoid, or a group of up to 4
+\     pirates (a mix of Sidewinders, Mambas, Kraits, Adders, Geckos, Cobras Mk I
+\     and III, and Worms)
+\
+\   * Also potentially spawn a Constrictor if this is the mission 1 endgame, or
+\     Thargoids if mission 2 is in progress
 \
 \ ******************************************************************************
 
@@ -25666,7 +25676,7 @@ ENDIF
 .CTRL
 
  LDX #1                 \ Set X to the internal key number for CTRL and fall
-                        \ through to DSK4 to scan the keyboard
+                        \ through to DKS4 to scan the keyboard
 
 \ ******************************************************************************
 \

@@ -1,7 +1,7 @@
 BEEBASM?=beebasm
 PYTHON?=python
 
-# You can set the release that gets built by adding 'release-disc=<rel>' to
+# You can set the release that gets built by adding 'release=<rel>' to
 # the make command, where <rel> is one of:
 #
 #   ib-disc
@@ -9,17 +9,19 @@ PYTHON?=python
 #
 # So, for example:
 #
-#   make encrypt verify release-disc=ib-disc
+#   make encrypt verify release=ib-disc
 #
 # will build the version from the game disc on Ian Bell's site. If you omit
-# the release-disc parameter, it will build the Stairway to Hell version.
+# the release parameter, it will build the Stairway to Hell version.
 
-ifeq ($(release-disc), ib-disc)
+ifeq ($(release), ib-disc)
   rel-disc=1
-  folder-disc='/ib-disc'
+  folder-disc=/ib-disc
+  suffix-disc=-ib-disc
 else
   rel-disc=2
-  folder-disc='/sth'
+  folder-disc=/sth
+  suffix-disc=-sth
 endif
 
 .PHONY:build
@@ -52,7 +54,7 @@ build:
 	$(BEEBASM) -i sources/elite-ships-o.asm -v >> output/compile.txt
 	$(BEEBASM) -i sources/elite-ships-p.asm -v >> output/compile.txt
 	$(PYTHON) sources/elite-checksum.py -u
-	$(BEEBASM) -i sources/elite-disc.asm -do elite-disc-flicker-free.ssd -boot ELITE2
+	$(BEEBASM) -i sources/elite-disc.asm -do elite-disc-flicker-free$(suffix-disc).ssd -boot ELITE2
 
 .PHONY:encrypt
 encrypt:
@@ -84,7 +86,7 @@ encrypt:
 	$(BEEBASM) -i sources/elite-ships-o.asm -v >> output/compile.txt
 	$(BEEBASM) -i sources/elite-ships-p.asm -v >> output/compile.txt
 	$(PYTHON) sources/elite-checksum.py
-	$(BEEBASM) -i sources/elite-disc.asm -do elite-disc-flicker-free.ssd -boot ELITE2
+	$(BEEBASM) -i sources/elite-disc.asm -do elite-disc-flicker-free$(suffix-disc).ssd -boot ELITE2
 
 .PHONY:verify
 verify:

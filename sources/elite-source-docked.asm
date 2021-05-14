@@ -13,6 +13,9 @@
 \ The terminology and notations used in this commentary are explained at
 \ https://www.bbcelite.com/about_site/terminology_used_in_this_commentary.html
 \
+\ The deep dive articles referred to in this commentary can be found at
+\ https://www.bbcelite.com/deep_dives
+\
 \ ------------------------------------------------------------------------------
 \
 \ This source file produces the following binary file:
@@ -442,8 +445,9 @@ ORG &0000
                         \ hunter, a pirate, currently hostile, in the process of
                         \ docking, inside the hold having been scooped, and so
                         \ on. The default values for each ship type are taken
-                        \ from the table at E%, where the NEWB flags are
-                        \ described in more detail
+                        \ from the table at E%, and you can find out more detail
+                        \ in the deep dive on "Advanced tactics with the NEWB
+                        \ flags"
 
 .LSP
 
@@ -19677,8 +19681,8 @@ LOAD_E% = LOAD% + P% - CODE%
 
  LDA KL                 \ Set A to the value of KL (the key pressed)
 
- LDX #0                 \ Set the results, X = Y = 0
- LDY #0
+ LDX #0                 \ Set the initial values for the results, X = Y = 0,
+ LDY #0                 \ which we now increase or decrease appropriately
 
  CMP #&19               \ If left arrow was pressed, set X = X - 1
  BNE P%+3
@@ -20424,6 +20428,9 @@ LOAD_F% = LOAD% + P% - CODE%
 \ system). We can also pass cursor position deltas in X and Y to indicate that
 \ the cursor keys or joystick have been used (i.e. the values that are returned
 \ by routine TT17).
+\
+\ This routine also checks for the "F" key press (search for a system), which
+\ applies to enhanced versions only.
 \
 \ Arguments:
 \
@@ -21667,8 +21674,9 @@ ENDIF
 
 .DELT
 
- JSR CATS               \ Call CATS to ask for a drive number, catalogue that
-                        \ disc and update the catalogue command at CTLI
+ JSR CATS               \ Call CATS to ask for a drive number (or a directory
+                        \ name on the Master Compact) and catalogue that disc
+                        \ or directory
 
  BCS SVE                \ If the C flag is set then an invalid drive number was
                         \ entered as part of the catalogue process, so jump to
@@ -21967,7 +21975,7 @@ ENDIF
  EOR #&A9               \ Store the checksum EOR &A9 in CHK2, the penultimate
  STA CHK2               \ byte of the last saved commander block
 
- STA &AFF+NT%           \ Store the checksum EOR &A9 in the penultimate byte of
+ STA &0AFF+NT%          \ Store the checksum EOR &A9 in the penultimate byte of
                         \ the save file at &0B00 (the equivalent of CHK2 in the
                         \ last saved block)
 
@@ -22016,7 +22024,7 @@ ENDIF
 \
 \   Y                   Points to the page number containing the OSFILE block,
 \                       which must be &C because that's where the pointer to the
-\                       filename in INWK is stored below (by the STX &C00
+\                       filename in INWK is stored below (by the STX &0C00
 \                       instruction)
 \
 \ ******************************************************************************
@@ -22151,7 +22159,7 @@ ENDIF
 
 .LOL1
 
- LDA &B00,X             \ Copy the X-th byte of &0B00 to the X-th byte of NA%+8
+ LDA &0B00,X            \ Copy the X-th byte of &0B00 to the X-th byte of NA%+8
  STA NA%+8,X
 
  DEX                    \ Decrement the loop counter
@@ -22825,7 +22833,7 @@ ENDIF
 .CTRL
 
  LDX #1                 \ Set X to the internal key number for CTRL and fall
-                        \ through to DSK4 to scan the keyboard
+                        \ through to DKS4 to scan the keyboard
 
 \ ******************************************************************************
 \
@@ -32136,6 +32144,8 @@ LOAD_SHIPS% = LOAD% + P% - CODE%
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprints default NEWB flags for the ship hanger
+\  Deep dive: Ship blueprints
+\             Advanced tactics with the NEWB flags
 \
 \ ******************************************************************************
 
