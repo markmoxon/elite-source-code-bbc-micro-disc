@@ -1178,7 +1178,7 @@ ORG &0300
 
 .TP
 
- SKIP 1                 \ The current mission status:
+ SKIP 1                 \ The current mission status
                         \
                         \   * Bits 0-1 = Mission 1 status
                         \
@@ -32368,6 +32368,10 @@ LOAD_H% = LOAD% + P% - CODE%
 \                         * 2 = left
 \
 \                         * 3 = right
+\
+\ Other entry points:
+\
+\   LO2                 Contains an RTS
 \
 \ ******************************************************************************
 

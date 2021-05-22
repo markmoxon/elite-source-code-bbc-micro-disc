@@ -1194,7 +1194,7 @@ ORG &0300
 
 .TP
 
- SKIP 1                 \ The current mission status:
+ SKIP 1                 \ The current mission status
                         \
                         \   * Bits 0-1 = Mission 1 status
                         \
@@ -1946,9 +1946,9 @@ LOAD_A% = LOAD%
 
 .S%
 
- JMP DOENTRY            \ Decrypt the main flight code and dock at the station
+ JMP DOENTRY            \ Decrypt the main docked code and dock at the station
 
- JMP DOBEGIN            \ Decrypt the main flight code and start a new game
+ JMP DOBEGIN            \ Decrypt the main docked code and start a new game
 
  JMP CHPR               \ WRCHV is set to point here by elite-loader3.asm
 
@@ -20682,6 +20682,7 @@ LOAD_F% = LOAD% + P% - CODE%
 .brkd
 
  EQUB 0
+
 \ ******************************************************************************
 \
 \       Name: BRBR
