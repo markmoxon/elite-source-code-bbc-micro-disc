@@ -11135,6 +11135,11 @@ LOAD_C% = LOAD% +P% - CODE%
 \   A                   The step size of the straight lines making up the rings
 \                       (4 for launch, 8 for hyperspace)
 \
+\ Other entry points:
+\
+\   HFS1                Don't clear the screen, and draw 8 concentric rings
+\                       with the step size in STP
+\
 \ ******************************************************************************
 
 .HFS2
@@ -12086,6 +12091,7 @@ LOAD_C% = LOAD% +P% - CODE%
                         \
                         \   (A ?) = A * Q
                         \         = K * sin(A) * 256
+                        \
                         \ which is equivalent to:
                         \
                         \   A = K * sin(A)
@@ -12809,6 +12815,11 @@ LOAD_C% = LOAD% +P% - CODE%
 
  LDA SZ,Y               \ Fetch the Y-th dust particle's z_hi coordinate into A
 
+                        \ Fall through into DV41 to do:
+                        \
+                        \   (P R) = 256 * DELTA / A
+                        \         = 256 * DELTA / Y-th stardust particle's z_hi
+
 \ ******************************************************************************
 \
 \       Name: DV41
@@ -12842,6 +12853,11 @@ LOAD_C% = LOAD% +P% - CODE%
  STA Q                  \ Store A in Q
 
  LDA DELTA              \ Fetch the speed from DELTA into A
+
+                        \ Fall through into DVID4 to do:
+                        \
+                        \   (P R) = 256 * A / Q
+                        \         = 256 * DELTA / A
 
 \ ******************************************************************************
 \

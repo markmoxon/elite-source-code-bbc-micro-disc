@@ -27,7 +27,7 @@ See the [introduction](#introduction) for more information.
   * [Verifying the output](#verifying-the-output)
   * [Log files](#log-files)
 
-* [Building different releases of Elite](#building-different-releases-of-elite)
+* [Building different releases of the disc version of Elite](#building-different-releases-of-the-disc-version-of-elite)
 
   * [Building the Ian Bell disc release](#building-the-ian-bell-disc-release)
   * [Building the Stairway to Hell release](#building-the-stairway-to-hell-release)
@@ -232,7 +232,7 @@ All the compiled binaries match the extracts, so we know we are producing the sa
 
 During compilation, details of every step are output in a file called `compile.txt` in the `output` folder. If you have problems, it might come in handy, and it's a great reference if you need to know the addresses of labels and variables for debugging (or just snooping around).
 
-## Building different releases of Elite
+## Building different releases of the disc version of Elite
 
 This repository contains the source code for two different releases of the disc version of Elite:
 
