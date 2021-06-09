@@ -12134,10 +12134,6 @@ LOAD_C% = LOAD% +P% - CODE%
 
  LDA Y1                 \ Fetch the y-coordinate into A
 
-\.CPIX                  \ This label is commented out in the original source. It
-                        \ would provide a new entry point with A specifying the
-                        \ y-coordinate instead of Y1, but it isn't used anywhere
-
  TAY                    \ Store the y-coordinate in Y
 
  LSR A                  \ Set A = A / 8, so A now contains the character row we
@@ -13530,11 +13526,6 @@ LOAD_D% = LOAD% + P% - CODE%
  LDX #12                \ Perhaps they were left behind when code was moved from
  STX T1                 \ here into gnum, and weren't deleted?
 
-\.TT223                 \ This label is commented out in the original source,
-                        \ and is a duplicate of a label in gnum, so this could
-                        \ also be a remnant if the code in gnum was originally
-                        \ here, but got moved into the gnum subroutine
-
  JSR gnum               \ Call gnum to get a number from the keyboard, which
                         \ will be the quantity of this item we want to purchase,
                         \ returning the number entered in A and R
@@ -14096,7 +14087,7 @@ LOAD_D% = LOAD% + P% - CODE%
 
  DEY                    \ Negate the change in Y and push it onto the stack
  TYA                    \ (let's call this the y-delta)
- EOR #255
+ EOR #&FF
  PHA
 
  JSR WSCAN              \ Call WSCAN to wait for the vertical sync, so the whole
@@ -17931,7 +17922,7 @@ LOAD_E% = LOAD% + P% - CODE%
 \ copied into the first two K3 bytes, and the sign of the sign byte is copied
 \ into the highest K3 byte.
 \
-\ The comments below are written for the x-coordinate.
+\ The comments below are written for the x-coordinate into K3(2 1 0).
 \
 \ Arguments:
 \
@@ -19245,7 +19236,7 @@ LOAD_E% = LOAD% + P% - CODE%
  JSR BLINE              \ Call BLINE to draw this segment, which also increases
                         \ CNT by STP, the step size
 
- CMP #65                \ If CNT >=65 then skip the next instruction
+ CMP #65                \ If CNT >= 65 then skip the next instruction
  BCS P%+5
 
  JMP PLL3               \ Jump back for the next segment
@@ -21058,10 +21049,6 @@ ENDIF
 
 .tiwe
 
-\LSR A                  \ This instruction is commented out in the original
-                        \ source. It would halve the value of z_hi to 48, so the
-                        \ ship would start off closer to the viewer
-
  STA INWK+7             \ Set z_hi, the high byte of the ship's z-coordinate,
                         \ to 96, which is the distance at which the rotating
                         \ ship starts out before coming towards us
@@ -21142,9 +21129,6 @@ ENDIF
 
  PLA                    \ Restore the recursive token number we stored on the
                         \ stack at the start of this subroutine
-
-\JSR ex                 \ This instruction is commented out in the original
-                        \ source (it would print the recursive token in A)
 
  JSR DETOK              \ Print the extended token in A
 
@@ -22153,10 +22137,6 @@ ENDIF
 \ ******************************************************************************
 
 .LOD
-
-\LDX #2                 \ These instructions are commented out in the original
-\JSR FX200              \ source, but they would enable the ESCAPE key and clear
-                        \ memory if the BREAK key is pressed (*FX 200,2)
 
  JSR ZEBC               \ Call ZEBC to zero-fill pages &B and &C
 
@@ -27805,7 +27785,7 @@ ENDMACRO
 \
 \   ECHR 'x'            Insert ASCII character "x"
 \
-\ To include an apostrophe, use a backtick character, as in i.e. CHAR '`'.
+\ To include an apostrophe, use a backtick character, as in ECHR '`'.
 \
 \ See the deep dive on "Printing extended text tokens" for details on how
 \ characters are stored in the extended token table.
@@ -31883,8 +31863,8 @@ ENDMACRO
 
  ETOK 147               \ Token 25:     "THE INHABITANTS OF [86-90] ARE SO
  ETOK 193               \                AMAZINGLY PRIMITIVE THAT THEY STILL
- ECHR 'S'               \                THINK {single cap}STILL THINK A*****R
- ECHR ' '               \                IS A PRETTY NEAT GAME"
+ ECHR 'S'               \                THINK {single cap}A*****R IS A PRETTY
+ ECHR ' '               \                NEAT GAME"
  ECHR 'O'               \
  ECHR 'F'               \ Encoded as:   "[147][193]S OF [18?] A<242> <235> A
  ECHR ' '               \                <239>Z<240>GLY PRIMI<251><250> <226>

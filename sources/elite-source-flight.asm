@@ -14954,7 +14954,7 @@ LOAD_D% = LOAD% + P% - CODE%
 
  DEY                    \ Negate the change in Y and push it onto the stack
  TYA                    \ (let's call this the y-delta)
- EOR #255
+ EOR #&FF
  PHA
 
  JSR WSCAN              \ Call WSCAN to wait for the vertical sync, so the whole
@@ -18541,10 +18541,7 @@ LOAD_E% = LOAD% + P% - CODE%
 .NWSTARS
 
  LDA QQ11               \ If this is not a space view, jump to WPSHPS to skip
-\ORA MJ                 \ the initialisation of the SX, SY and SZ tables. The OR
- BNE WPSHPS             \ instruction is commented out in the original source,
-                        \ but it would have the effect of also skipping the
-                        \ initialisation if we had mis-jumped into witchspace
+ BNE WPSHPS             \ the initialisation of the SX, SY and SZ tables
 
 \ ******************************************************************************
 \
@@ -19138,10 +19135,6 @@ LOAD_E% = LOAD% + P% - CODE%
 
  LDA Y1                 \ Fetch the y-coordinate into A
 
-\.CPIX                  \ This label is commented out in the original source. It
-                        \ would provide a new entry point with A specifying the
-                        \ y-coordinate instead of Y1, but it isn't used anywhere
-
  TAY                    \ Store the y-coordinate in Y
 
  LSR A                  \ Set A = A / 8, so A now contains the character row we
@@ -19263,9 +19256,6 @@ LOAD_E% = LOAD% + P% - CODE%
 
 .OO2
 
-\LDX #0                 \ This instruction is commented out in the original
-                        \ source, and isn't required as X is set to 0 above
-
  STX FSH                \ Set the forward shield to 0
 
  BCC OO3                \ Jump to OO3 to start taking damage directly from the
@@ -19287,9 +19277,6 @@ LOAD_E% = LOAD% + P% - CODE%
  RTS                    \ Return from the subroutine
 
 .OO5
-
-\LDX #0                 \ This instruction is commented out in the original
-                        \ source, and isn't required as X is set to 0 above
 
  STX ASH                \ Set the aft shield to 0
 
@@ -19335,7 +19322,7 @@ LOAD_E% = LOAD% + P% - CODE%
 \ copied into the first two K3 bytes, and the sign of the sign byte is copied
 \ into the highest K3 byte.
 \
-\ The comments below are written for the x-coordinate.
+\ The comments below are written for the x-coordinate into K3(2 1 0).
 \
 \ Arguments:
 \
@@ -21613,7 +21600,7 @@ LOAD_E% = LOAD% + P% - CODE%
  JSR BLINE              \ Call BLINE to draw this segment, which also increases
                         \ CNT by STP, the step size
 
- CMP #65                \ If CNT >=65 then skip the next instruction
+ CMP #65                \ If CNT >= 65 then skip the next instruction
  BCS P%+5
 
  JMP PLL3               \ Jump back for the next segment
@@ -21634,10 +21621,6 @@ LOAD_E% = LOAD% + P% - CODE%
 \
 \ We do this by redrawing it using the lines stored in the ball line heap when
 \ the planet was originally drawn by the BLINE routine.
-\
-\ Other entry points:
-\
-\   WPLS-1              Contains an RTS
 \
 \ ******************************************************************************
 
@@ -21733,6 +21716,10 @@ LOAD_E% = LOAD% + P% - CODE%
 \ Arguments:
 \
 \   SUNX(1 0)           The x-coordinate of the vertical centre axis of the sun
+\
+\ Other entry points:
+\
+\   WPLS-1              Contains an RTS
 \
 \ ******************************************************************************
 
@@ -25610,6 +25597,10 @@ ENDIF
 \
 \ Note that KYTB actually points to the byte before the start of the table, so
 \ the offset of the first key value is 1 (i.e. KYTB+1), not 0.
+\
+\ Other entry points:
+\
+\   KYTB                Contains an RTS
 \
 \ ******************************************************************************
 
