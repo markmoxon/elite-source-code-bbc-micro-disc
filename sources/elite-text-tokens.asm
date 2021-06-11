@@ -39,6 +39,12 @@ INCLUDE "sources/elite-header.h.asm"
 _IB_DISC                = (_RELEASE = 1)
 _STH_DISC               = (_RELEASE = 2)
 
+\ ******************************************************************************
+\
+\ Configuration variables
+\
+\ ******************************************************************************
+
 CODE_WORDS% = &0400
 LOAD_WORDS% = &254B
 
