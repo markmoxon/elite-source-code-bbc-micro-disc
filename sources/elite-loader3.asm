@@ -373,7 +373,7 @@ ENDMACRO
  LDA #&60               \ Store an RTS instruction in location &0232
  STA &0232
 
- LDA #&2                \ Point the NETV vector to &0232, which we just filled
+ LDA #&02               \ Point the NETV vector to &0232, which we just filled
  STA NETV+1             \ with an RTS
  LDA #&32
  STA NETV
