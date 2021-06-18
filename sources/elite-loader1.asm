@@ -114,7 +114,8 @@ ORG CODE%
 
  INX                    \ Increment the pointer
 
- BNE p1a                \ Loop back until we have decrypted to the end of the page
+ BNE p1a                \ Loop back until we have decrypted to the end of the
+                        \ page
 
 .p1b
 
