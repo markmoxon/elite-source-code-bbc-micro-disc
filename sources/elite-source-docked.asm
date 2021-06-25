@@ -5917,10 +5917,6 @@ LOAD_B% = LOAD% + P% - CODE%
 
 .FLIP
 
-\LDA MJ                 \ These instructions are commented out in the original
-\BNE FLIP-1             \ source. They would have the effect of not swapping the
-                        \ stardust if we had mis-jumped into witchspace
-
  LDY NOSTM              \ Set Y to the current number of stardust particles, so
                         \ we can use it as a counter through all the stardust
 
@@ -7199,25 +7195,6 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
  INC DTW5               \ Increment the buffer size in DTW5
 
-\LDA #' '               \ This instruction is commented out in the original
-                        \ source, as it has no effect because A already contains
-                        \ ASCII " ". This is because the last character that is
-                        \ tested in the above loop is at position SC, which we
-                        \ know contains a space, so we know A contains a space
-                        \ character when the loop finishes
-
-                        \ We've now shifted the line to the right by 1 from
-                        \ position SC onwards, so SC and SC+1 both contain
-                        \ spaces, and Y is now SC-1 as we did a DEY just before
-                        \ the end of the loop - in other words, we have inserted
-                        \ a space at position SC, and Y points to the character
-                        \ before the newly inserted space
-
-                        \ We now want to move the pointer Y left to find the
-                        \ next space in the line buffer, before looping back to
-                        \ check whether we are done, and if not, insert another
-                        \ space
-
 .DAL3
 
  CMP BUF,Y              \ If the character at position Y is not a space, jump to
@@ -7245,9 +7222,8 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  JSR CHPR
 
  LDA DTW5               \ Subtract #LL from the end-of-buffer pointer in DTW5
-\CLC                    \
- SBC #LL                \ The CLC instruction is commented out in the original
- STA DTW5               \ source. It isn't needed as CHPR clears the C flag
+ SBC #LL                \
+ STA DTW5               \ The subtraction works as CHPR clears the C flag
 
  TAX                    \ Copy the new value of DTW5 into X
 
@@ -7781,11 +7757,9 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
 
  LDA DELTA              \ Fetch our ship's speed into A, in the range 0-40
 
-\LSR A                  \ Draw the speed indicator using a range of 0-31, and
- JSR DIL-1              \ increment SC to point to the next indicator (the roll
-                        \ indicator). The LSR is commented out as it isn't
-                        \ required with a call to DIL-1, so perhaps this was
-                        \ originally a call to DIL that got optimised
+ JSR DIL-1              \ Draw the speed indicator using a range of 0-31, and
+                        \ increment SC to point to the next indicator (the roll
+                        \ indicator)
 
 \ ******************************************************************************
 \
@@ -8293,7 +8267,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ to the next indicator, i.e. the one below the one we
                         \ just drew
 
-.DL9                    \ This label is not used but is in the original source
+.DL9
 
  RTS                    \ Return from the subroutine
 
@@ -12932,30 +12906,6 @@ LOAD_D% = LOAD% + P% - CODE%
 
  LDX ZZ                 \ Fetch the system number from ZZ into X
 
-\LDY #LO(PTEXT)         \ These instructions are commented out in the original
-\STY INWK               \ source. The variable PTEXT doesn't exist, so it isn't
-\LDY #HI(PTEXT)-1       \ entirely obvious what this code does, though it looks
-\STY INWK+1             \ like it loops through a table of text tokens in PTEXT
-\LDY #&FF               \ until we get to the entry for the current system,
-\.PDT1                  \ which it prints out as text tokens (so perhaps PTEXT
-\INY                    \ used to be a token table for the system's extended
-\BNE P%+4               \ descriptions before PDESC took over)
-\INC INWK+1
-\LDA (INWK),Y
-\BNE PDT1
-\DEX
-\BNE PDT1
-\.PDT2
-\INY
-\BNE P%+4
-\INC INWK+1
-\STY INWK+2
-\LDA (INWK),Y
-\BEQ TT24-1
-\JSR TT27
-\LDY INWK+2
-\JMP PDT2
-
  RTS                    \ Return from the subroutine
 
 \ ******************************************************************************
@@ -13892,9 +13842,6 @@ LOAD_D% = LOAD% + P% - CODE%
  LDA QQ11               \ If the current view type in QQ11 is not 4 (Sell Cargo
  CMP #4                 \ screen), jump to TT212 to skip the option to sell
  BNE TT212              \ items
-
-\JSRTT162               \ This instruction is commented out in the original
-                        \ source
 
  LDA #205               \ Print recursive token 45 ("SELL")
  JSR TT27
@@ -15077,11 +15024,6 @@ LOAD_D% = LOAD% + P% - CODE%
 
  BPL G1                 \ Loop back for the next seed byte, until we have
                         \ rotated them all
-
-\JSR DORND              \ This instruction is commented out in the original
-                        \ source, and would set A and X to random numbers, so
-                        \ perhaps the original plan was to arrive in each new
-                        \ galaxy in a random place?
 
 .zZ
 
@@ -16972,7 +16914,7 @@ LOAD_E% = LOAD% + P% - CODE%
  LDA #195               \ Print recursive token 35 ("LIGHT YEARS") followed by
  JSR plf                \ a newline
 
-.PCASH                  \ This label is not used but is in the original source
+.PCASH
 
  LDA #119               \ Print recursive token 119 ("CASH:" then control code
  BNE TT27               \ 0, which prints cash levels, then " CR" and newline)
@@ -18166,11 +18108,10 @@ LOAD_E% = LOAD% + P% - CODE%
                         \ because INWK is in zero page, so INWK+34 = 0
 
  LDA INWK+33            \ Calculate INWK+33 - INF, again using 16-bit
-\SEC                    \ arithmetic, and put the result in (A Y), so the high
- SBC INF                \ byte is in A and the low byte in Y. The SEC
- TAY                    \ instruction is commented out in the original source;
- LDA INWK+34            \ as the previous subtraction will never underflow, it
- SBC INF+1              \ is superfluous
+ SBC INF                \ arithmetic, and put the result in (A Y), so the high
+ TAY                    \ byte is in A and the low byte in Y. The subtraction
+ LDA INWK+34            \ works because the previous subtraction will never
+ SBC INF+1              \ underflow, so we know the C flag is set
 
  BCC NW3+1              \ If we have an underflow from the subtraction, then
                         \ INF > INWK+33 and we definitely don't have enough
@@ -19671,10 +19612,6 @@ LOAD_E% = LOAD% + P% - CODE%
  CPY #16                \ If Y >= 16 set the C flag, so A = A - 1
  SBC #0
 
-\CPY #&20               \ These instructions are commented out in the original
-\SBC #0                 \ source, but they would make the joystick move the
-                        \ cursor faster by increasing the range of Y by -1 to +1
-
  CPY #64                \ If Y >= 64 set the C flag, so A = A - 1
  SBC #0
 
@@ -19683,10 +19620,6 @@ LOAD_E% = LOAD% + P% - CODE%
 
  CPY #224               \ If Y >= 224 set the C flag, so A = A + 1
  ADC #0
-
-\CPY #&F0               \ These instructions are commented out in the original
-\ADC #0                 \ source, but they would make the joystick move the
-                        \ cursor faster by increasing the range of Y by -1 to +1
 
  TAY                    \ Copy the value of A into Y
 
@@ -20197,7 +20130,10 @@ LOAD_F% = LOAD% + P% - CODE%
 \
 \ ------------------------------------------------------------------------------
 \
-\ Set A and X to random numbers. The C and V flags are also set randomly.
+\ Set A and X to random numbers (though note that X is set to the random number
+\ that was returned in A the last time DORND was called).
+\
+\ The C and V flags are also set randomly.
 \
 \ Other entry points:
 \
@@ -20681,7 +20617,7 @@ LOAD_F% = LOAD% + P% - CODE%
 \
 \ This counter starts at zero, and is decremented whenever the BRKV handler at
 \ BRBR prints an error message. It is incremented every time an error message
-\ is printer out as part of the TITLE routine.
+\ is printed out as part of the TITLE routine.
 \
 \ ******************************************************************************
 
@@ -20948,9 +20884,6 @@ ELSE
                         \ will keep returning the same incorrect value
 
 ENDIF
-
-\JSR BELL               \ This instruction is commented out in the original
-                        \ source. It would make a standard system beep
 
                         \ The checksum CHK is correct, so now we check whether
                         \ CHK2 = CHK EOR A9, and if this check fails, bit 7 of
@@ -22222,8 +22155,17 @@ ENDIF
  LDA #200               \ X, and return from the subroutine using a tail call
  JMP OSBYTE
 
- JSR GTNME              \ This code appears to be unused
- RTS
+\ ******************************************************************************
+\
+\       Name: Unused routine
+\       Type: Subroutine
+\   Category: Utility routines
+\    Summary: This code appears to be unused
+\
+\ ******************************************************************************
+
+ JSR GTNME              \ This code appears to be unused, but it would fetch the
+ RTS                    \ the name of a commander file to save or load
 
 \ ******************************************************************************
 \
@@ -23053,12 +22995,7 @@ ENDIF
  LDA VIA+&40            \ Read 6522 System VIA input register IRB (SHEILA &40)
 
  TAX                    \ This instruction doesn't seem to have any effect, as
-                        \ X is overwritten in a few instructions. When the
-                        \ joystick is checked in a similar way in the TITLE
-                        \ subroutine for the "Press Fire Or Space,Commander."
-                        \ stage of the start-up screen, there's another
-                        \ unnecessary TAX instruction present, but there it's
-                        \ commented out
+                        \ X is overwritten in a few instructions
 
  AND #%00010000         \ Bit 4 of IRB (PB4) is clear if joystick 1's fire
                         \ button is pressed, otherwise it is set, so AND'ing
@@ -24316,7 +24253,7 @@ LOAD_G% = LOAD% + P% - CODE%
 \
 \ ------------------------------------------------------------------------------
 \
-\ Calculate following dot products:
+\ Calculate the following dot products:
 \
 \   XX12(1 0) = XX15(5 0) . XX16(5 0)
 \   XX12(3 2) = XX15(5 0) . XX16(11 6)
@@ -24544,9 +24481,6 @@ LOAD_G% = LOAD% + P% - CODE%
  LDY #2                 \ vertices used as origins for explosion clouds), and
  STA (XX19),Y           \ store it in byte #2 of the ship line heap
 
-\LDA XX1+32             \ These instructions are commented out in the original
-\AND #&7F               \ source
-
                         \ The following loop sets bytes 3-6 of the of the ship
                         \ line heap to random numbers
 
@@ -24603,10 +24537,6 @@ LOAD_G% = LOAD% + P% - CODE%
  JMP LL155              \ Jump to LL155 to draw the ship, which removes it from
                         \ the screen, returning from the subroutine using a
                         \ tail call
-
-\LL24                   \ This label is commented out in the original source,
-                        \ and was presumably used to label the RTS which is
-                        \ actually called by LL10-1 above, not LL24
 
  RTS                    \ Return from the subroutine
 
@@ -27203,8 +27133,6 @@ LOAD_G% = LOAD% + P% - CODE%
  CPY XX20               \ If the heap counter is less than the size of the heap,
  BCC LL27               \ loop back to LL27 to draw the next line from the heap
 
-\LL82                   \ This label is commented out in the original source
-
  RTS                    \ Return from the subroutine
 
 \ ******************************************************************************
@@ -27364,9 +27292,6 @@ LOAD_G% = LOAD% + P% - CODE%
 
 .LL135
 
-\BNE LL139              \ This instruction is commented out in the original
-                        \ source
-
  LDA XX15+2             \ Set (S R) = (y1_hi y1_lo) - 192
  SEC                    \
  SBC #Y*2               \ starting with the low bytes
@@ -27442,8 +27367,6 @@ LOAD_G% = LOAD% + P% - CODE%
 
  LDA XX15               \ Set R = x1_lo
  STA R
-
-\.LL120                 \ This label is commented out in the original source
 
  JSR LL129              \ Call LL129 to do the following:
                         \
@@ -27652,10 +27575,9 @@ LOAD_G% = LOAD% + P% - CODE%
 
  TXA                    \ Otherwise negate (Y X) using two's complement by first
  EOR #%11111111         \ setting the low byte to ~X + 1
-\CLC                    \
- ADC #1                 \ The CLC instruction is commented out in the original
- TAX                    \ source. It would have no effect as we know the C flag
-                        \ is clear from when we passed through the BCS above
+ ADC #1                 \
+ TAX                    \ The addition works as we know the C flag is clear from
+                        \ when we passed through the BCS above
 
  TYA                    \ Then set the high byte to ~Y + C
  EOR #%11111111
@@ -31993,6 +31915,15 @@ ENDMACRO
  EQUB 115               \ Token 35: a random extended token between 115 and 119
  EQUB 120               \ Token 36: a random extended token between 120 and 124
  EQUB 125               \ Token 37: a random extended token between 125 and 129
+
+\ ******************************************************************************
+\
+\       Name: Unused block 2
+\       Type: Variable
+\   Category: Utility routines
+\    Summary: These bytes appear to be unused
+\
+\ ******************************************************************************
 
 IF _STH_DISC
 

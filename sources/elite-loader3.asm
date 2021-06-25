@@ -1165,7 +1165,10 @@ ORG CATDcode + P% - CATD
 \
 \ ------------------------------------------------------------------------------
 \
-\ Set A and X to random numbers. The C and V flags are also set randomly.
+\ Set A and X to random numbers (though note that X is set to the random number
+\ that was returned in A the last time DORND was called).
+\
+\ The C and V flags are also set randomly.
 \
 \ This is a simplified version of the DORND routine in the main game code. It
 \ swaps the two calculations around and omits the ROL A instruction, but is
