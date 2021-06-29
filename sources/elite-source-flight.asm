@@ -1292,7 +1292,7 @@ ORG &0300
                         \   * 37 = large cargo bay of 35 tonnes
                         \
                         \ The value is two greater than the actual capacity to
-                        \ male the maths in tnpr slightly more efficient
+                        \ make the maths in tnpr slightly more efficient
 
 .QQ20
 
@@ -2853,7 +2853,7 @@ LOAD_A% = LOAD%
  STA QQ20,Y             \ of type Y in the cargo hold, as we just successfully
                         \ scooped one canister of type Y
 
- TYA                    \ Print recursive token 48 + A as an in-flight token,
+ TYA                    \ Print recursive token 48 + Y as an in-flight token,
  ADC #208               \ which will be in the range 48 ("FOOD") to 64 ("ALIEN
  JSR MESS               \ ITEMS"), so this prints the scooped item's name
 
@@ -16164,7 +16164,7 @@ LOAD_D% = LOAD% + P% - CODE%
                         \ "g"), padded to a width of two characters
 
  JSR var                \ Call var to set QQ19+3 = economy * |economic_factor|
-                        \ (and set the availability of Alien Items to 0)
+                        \ (and set the availability of alien items to 0)
 
  LDA QQ19+1             \ Fetch the byte #1 that we stored above and jump to
  BMI TT155              \ TT155 if it is negative (i.e. if the economic_factor
@@ -16431,7 +16431,7 @@ LOAD_D% = LOAD% + P% - CODE%
 \ ------------------------------------------------------------------------------
 \
 \ Set QQ19+3 = economy * |economic_factor|, given byte #1 of the market prices
-\ table for an item. Also sets the availability of Alien Items to 0.
+\ table for an item. Also sets the availability of alien items to 0.
 \
 \ This routine forms part of the calculations for market item prices (TT151)
 \ and availability (GVL).
@@ -16457,7 +16457,7 @@ LOAD_D% = LOAD% + P% - CODE%
 
  CLC                    \ Clear the C flag so we can do additions below
 
- LDA #0                 \ Set AVL+16 (availability of Alien Items) to 0,
+ LDA #0                 \ Set AVL+16 (availability of alien items) to 0,
  STA AVL+16             \ setting A to 0 in the process
 
 .TT153
@@ -16603,7 +16603,7 @@ LOAD_D% = LOAD% + P% - CODE%
                         \ QQ19+1
 
  JSR var                \ Call var to set QQ19+3 = economy * |economic_factor|
-                        \ (and set the availability of Alien Items to 0)
+                        \ (and set the availability of alien items to 0)
 
  LDA QQ23+3,X           \ Fetch byte #3 from the market prices table (mask) and
  AND QQ26               \ AND with the random number for this system visit
@@ -19294,7 +19294,8 @@ LOAD_E% = LOAD% + P% - CODE%
 \ copied into the first two K3 bytes, and the sign of the sign byte is copied
 \ into the highest K3 byte.
 \
-\ The comments below are written for the x-coordinate into K3(2 1 0).
+\ The comments below are written for copying the planet's x-coordinate into
+\ K3(2 1 0).
 \
 \ Arguments:
 \
@@ -26483,7 +26484,7 @@ ENDIF
  BMI DK5                \ If A < 0 (50% chance), return from the subroutine
                         \ (as DK5 contains an RTS)
 
- CPX #22                \ If X >= 22 (89% chance), return from the subroutine
+ CPX #22                \ If X >= 22 (91% chance), return from the subroutine
  BCS DK5                \ (as DK5 contains an RTS)
 
  LDA QQ20,X             \ If we do not have any of item QQ20+X, return from the
@@ -26659,7 +26660,7 @@ ENDMACRO
 
  ITEM 45,  -1, 'g', 250, %00001111   \ 15 = Gem-Stones
 
- ITEM 53,  15, 't', 192, %00000111   \ 16 = Alien Items
+ ITEM 53,  15, 't', 192, %00000111   \ 16 = Alien items
 
 \ ******************************************************************************
 \

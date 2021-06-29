@@ -1308,7 +1308,7 @@ ORG &0300
                         \   * 37 = large cargo bay of 35 tonnes
                         \
                         \ The value is two greater than the actual capacity to
-                        \ male the maths in tnpr slightly more efficient
+                        \ make the maths in tnpr slightly more efficient
 
 .QQ20
 
@@ -15272,7 +15272,7 @@ LOAD_D% = LOAD% + P% - CODE%
                         \ "g"), padded to a width of two characters
 
  JSR var                \ Call var to set QQ19+3 = economy * |economic_factor|
-                        \ (and set the availability of Alien Items to 0)
+                        \ (and set the availability of alien items to 0)
 
  LDA QQ19+1             \ Fetch the byte #1 that we stored above and jump to
  BMI TT155              \ TT155 if it is negative (i.e. if the economic_factor
@@ -15539,7 +15539,7 @@ LOAD_D% = LOAD% + P% - CODE%
 \ ------------------------------------------------------------------------------
 \
 \ Set QQ19+3 = economy * |economic_factor|, given byte #1 of the market prices
-\ table for an item. Also sets the availability of Alien Items to 0.
+\ table for an item. Also sets the availability of alien items to 0.
 \
 \ This routine forms part of the calculations for market item prices (TT151)
 \ and availability (GVL).
@@ -15565,7 +15565,7 @@ LOAD_D% = LOAD% + P% - CODE%
 
  CLC                    \ Clear the C flag so we can do additions below
 
- LDA #0                 \ Set AVL+16 (availability of Alien Items) to 0,
+ LDA #0                 \ Set AVL+16 (availability of alien items) to 0,
  STA AVL+16             \ setting A to 0 in the process
 
 .TT153
@@ -16355,7 +16355,7 @@ LOAD_D% = LOAD% + P% - CODE%
                         \ the transaction, so jump to c to return from the
                         \ subroutine (as c contains an RTS)
 
- LDA #197               \ Otherwise we don't have enough cash to but this piece
+ LDA #197               \ Otherwise we don't have enough cash to buy this piece
  JSR prq                \ of equipment, so print recursive token 37 ("CASH")
                         \ followed by a question mark
 
@@ -17863,7 +17863,8 @@ LOAD_E% = LOAD% + P% - CODE%
 \ copied into the first two K3 bytes, and the sign of the sign byte is copied
 \ into the highest K3 byte.
 \
-\ The comments below are written for the x-coordinate into K3(2 1 0).
+\ The comments below are written for copying the planet's x-coordinate into
+\ K3(2 1 0).
 \
 \ Arguments:
 \
@@ -22115,8 +22116,9 @@ ENDIF
 .ELT2F
 
  BRK                    \ The error that is printed if we try to load an
- EQUS "IIllegal "       \ invalid commander file with bit 7 of byte #0 set
- EQUS "ELITE II file"   \ (the spelling mistake is in the original source)
+ EQUB &49               \ invalid commander file with bit 7 of byte #0 set
+ EQUS "Illegal "        \ (&49 is the error number)
+ EQUS "ELITE II file"
  BRK
 
 \ ******************************************************************************
@@ -23480,7 +23482,7 @@ ENDMACRO
 
  ITEM 45,  -1, 'g', 250, %00001111   \ 15 = Gem-Stones
 
- ITEM 53,  15, 't', 192, %00000111   \ 16 = Alien Items
+ ITEM 53,  15, 't', 192, %00000111   \ 16 = Alien items
 
 \ ******************************************************************************
 \
@@ -32930,7 +32932,7 @@ ENDMACRO
 .SHIP_CONSTRICTOR
 
  EQUB 3 + (15 << 4)     \ Max. canisters on demise = 3
-                        \ Market item when scooped = 15 + 1 = 16 (Alien items)
+                        \ Market item when scooped = 15 + 1 = 16 (alien items)
  EQUW 99 * 99           \ Targetable area          = 99 * 99
  EQUB &7A               \ Edges data offset (low)  = &007A
  EQUB &DA               \ Faces data offset (low)  = &00DA
