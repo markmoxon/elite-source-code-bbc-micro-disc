@@ -35,8 +35,6 @@ _STH_DISC               = (_RELEASE = 2)
 \
 \ ******************************************************************************
 
-LS% = &0CFF             \ The start of the descending ship line heap
-
 NOST = 18               \ The number of stardust particles in normal space (this
                         \ goes down to 3 in witchspace)
 
@@ -87,17 +85,6 @@ Armlas = INT(128.5+1.5*POW) \ Military laser power
 
 NI% = 37                \ The number of bytes in each ship's data block (as
                         \ stored in INWK and K%)
-
-OSBYTE = &FFF4          \ The address for the OSBYTE routine
-OSWORD = &FFF1          \ The address for the OSWORD routine
-OSFILE = &FFDD          \ The address for the OSFILE routine
-OSWRCH = &FFEE          \ The address for the OSWRCH routine
-OSCLI = &FFF7           \ The address for the OSCLI routine
-
-VIA = &FE00             \ Memory-mapped space for accessing internal hardware,
-                        \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
-                        \ known as SHEILA)
-
 VSCAN = 57              \ Defines the split position in the split-screen mode
 
 X = 128                 \ The centre x-coordinate of the 256 x 192 space view
@@ -136,6 +123,8 @@ QQ16_FLIGHT = &0880     \ The address of the two-letter text token table in the
                         \ flight code (this gets populated by the docked code at
                         \ the start of the game)
 
+LS% = &0CFF             \ The start of the descending ship line heap
+
 CATD = &0D7A            \ The address of the CATD routine that is put in place
                         \ by the third loader, as set in elite-loader3.asm
 
@@ -157,6 +146,16 @@ CHK = &11D4             \ The address of the first checksum byte for the saved
 
 SHIP_MISSILE = &7F00    \ The address of the missile ship blueprint, as set in
                         \ elite-loader3.asm
+
+VIA = &FE00             \ Memory-mapped space for accessing internal hardware,
+                        \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
+                        \ known as SHEILA)
+
+OSBYTE = &FFF4          \ The address for the OSBYTE routine
+OSWORD = &FFF1          \ The address for the OSWORD routine
+OSFILE = &FFDD          \ The address for the OSFILE routine
+OSWRCH = &FFEE          \ The address for the OSWRCH routine
+OSCLI = &FFF7           \ The address for the OSCLI routine
 
 \ ******************************************************************************
 \
@@ -1527,8 +1526,19 @@ NT% = SVC + 2 - TP      \ This sets the variable NT% to the size of the current
 
 .QQ28
 
- SKIP 1                 \ Temporary storage, used to store the economy byte of
-                        \ the current system in routine var
+ SKIP 1                 \ The current system's economy (0-7)
+                        \
+                        \   * 0 = Rich Industrial
+                        \   * 1 = Average Industrial
+                        \   * 2 = Poor Industrial
+                        \   * 3 = Mainly Industrial
+                        \   * 4 = Mainly Agricultural
+                        \   * 5 = Rich Agricultural
+                        \   * 6 = Average Agricultural
+                        \   * 7 = Poor Agricultural
+                        \
+                        \ See the deep dive on "Generating system data" for more
+                        \ information on economies
 
 .QQ29
 
@@ -1570,6 +1580,15 @@ NT% = SVC + 2 - TP      \ This sets the variable NT% to the size of the current
 .QQ3
 
  SKIP 1                 \ The selected system's economy (0-7)
+                        \
+                        \   * 0 = Rich Industrial
+                        \   * 1 = Average Industrial
+                        \   * 2 = Poor Industrial
+                        \   * 3 = Mainly Industrial
+                        \   * 4 = Mainly Agricultural
+                        \   * 5 = Rich Agricultural
+                        \   * 6 = Average Agricultural
+                        \   * 7 = Poor Agricultural
                         \
                         \ See the deep dive on "Generating system data" for more
                         \ information on economies
@@ -2527,9 +2546,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \
 \ Other entry points:
 \
-\   DTS                 Print the single letter pointed to by A, where A is an
-\                       address within the extended two-letter token tables of
-\                       TKN2 and QQ16
+\   DTS                 Print a single letter in the correct case
 \
 \ ******************************************************************************
 
@@ -13400,8 +13417,7 @@ LOAD_D% = LOAD% + P% - CODE%
 .TT219
 
  LDA #2                 \ Clear the top part of the screen, draw a white border,
- JSR TT66               \ Clear the top part of the screen, draw a white border,
-                        \ and set the current view type in QQ11 to 2
+ JSR TT66               \ and set the current view type in QQ11 to 2
 
  JSR TT163              \ Print the column headers for the prices table
 
@@ -13628,7 +13644,7 @@ LOAD_D% = LOAD% + P% - CODE%
 
  STA Q                  \ Store the key pressed in Q
 
- SEC                    \ Subtract ASCII '0' from the key pressed, to leave the
+ SEC                    \ Subtract ASCII "0" from the key pressed, to leave the
  SBC #'0'               \ numeric value of the key in A (if it was a number key)
 
  BCC OUT                \ If A < 0, jump to OUT to return from the subroutine
@@ -15890,6 +15906,12 @@ LOAD_D% = LOAD% + P% - CODE%
 \   err                 Beep, pause and go to the docking bay (i.e. show the
 \                       Status Mode screen)
 \
+\   pres                Given an item number A with the item name in recursive
+\                       token Y, show an error to say that the item is already
+\                       present, refund the cost of the item, and then beep and
+\                       exit to the docking bay (i.e. show the Status Mode
+\                       screen)
+\                        
 \ ******************************************************************************
 
 .bay
@@ -15927,24 +15949,25 @@ LOAD_D% = LOAD% + P% - CODE%
  BCC P%+4               \ 3 and 14
  LDA #14
 
- STA Q                  \ Set QQ25 = A (so QQ25 is in the range 3-12 and
+ STA Q                  \ Set QQ25 = A (so QQ25 is in the range 3-14 and
  STA QQ25               \ represents number of the most advanced item available
  INC Q                  \ in this system, which we can pass to gnum below when
                         \ asking which item we want to buy)
                         \
-                        \ Set Q = A + 1 (so Q is in the range 4-13 and contains
+                        \ Set Q = A + 1 (so Q is in the range 4-15 and contains
                         \ QQ25 + 1, i.e. the highest item number on sale + 1)
 
  LDA #70                \ Set A = 70 - QQ14, where QQ14 contains the current
- SEC                    \ level in light years * 10, so this leaves the amount
+ SEC                    \ fuel in light years * 10, so this leaves the amount
  SBC QQ14               \ of fuel we need to fill 'er up (in light years * 10)
 
  ASL A                  \ The price of fuel is always 2 Cr per light year, so we
  STA PRXS               \ double A and store it in PRXS, as the first price in
                         \ the price list (which is reserved for fuel), and
                         \ because the table contains prices as price * 10, it's
-                        \ in the right format (so a full tank, or 7.0 light
-                        \ years, would be 14.0 Cr, or a PRXS value of 140)
+                        \ in the right format (so tank containing 7.0 light
+                        \ years of fuel would be 14.0 Cr, or a PRXS value of
+                        \ 140)
 
  LDX #1                 \ We are now going to work our way through the equipment
                         \ price list at PRXS, printing out the equipment that is
@@ -16028,8 +16051,8 @@ LOAD_D% = LOAD% + P% - CODE%
  BNE et0                \ If A is not 0 (i.e. the item we've just bought is not
                         \ fuel), skip to et0
 
- LDX #70                \ And set the current fuel level * 10 in QQ14 to 70, or
- STX QQ14               \ 7.0 light years (a full tank)
+ LDX #70                \ Set the current fuel level * 10 in QQ14 to 70, or 7.0
+ STX QQ14               \ light years (a full tank)
 
 .et0
 
@@ -16133,8 +16156,9 @@ LOAD_D% = LOAD% + P% - CODE%
 .pres
 
                         \ If we get here we need to show an error to say that
-                        \ item number A is already present, where the item's
-                        \ name is recursive token Y
+                        \ the item whose name is in recursive token Y is already
+                        \ present, and then process a refund for the cost of
+                        \ item number A
 
  STY K                  \ Store the item's name in K
 
@@ -16375,7 +16399,7 @@ LOAD_D% = LOAD% + P% - CODE%
 \
 \ Arguments:
 \
-\   A                   The item number of the piece of equipment (0-11) as
+\   A                   The item number of the piece of equipment (0-13) as
 \                       shown in the table at PRXS
 \
 \ Returns:
@@ -16400,7 +16424,7 @@ LOAD_D% = LOAD% + P% - CODE%
 
  LDX PRXS,Y             \ Fetch the low byte of the price into X
 
- LDA PRXS+1,Y           \ Fetch the low byte of the price into A and transfer
+ LDA PRXS+1,Y           \ Fetch the high byte of the price into A and transfer
  TAY                    \ it to X, so the price is now in (Y X)
 
 .c
@@ -16445,7 +16469,8 @@ LOAD_D% = LOAD% + P% - CODE%
                         \ Ship screen)
 
  LDY #16                \ Move the text cursor to row 16, and at the same time
- STY YC                 \ set Y to a counter going from 16-20 in the loop below
+ STY YC                 \ set Y to a counter going from 16 to 19 in the loop
+                        \ below
 
 .qv1
 
@@ -16455,11 +16480,11 @@ LOAD_D% = LOAD% + P% - CODE%
  TYA                    \ Transfer the counter value from Y to A
 
  CLC                    \ Print ASCII character "0" - 16 + A, so as A goes from
- ADC #'0'-16            \ 16 to 20, this prints "0" through "3" followed by a
+ ADC #'0'-16            \ 16 to 19, this prints "0" through "3" followed by a
  JSR spc                \ space
 
  LDA YC                 \ Print recursive text token 80 + YC, so as YC goes from
- CLC                    \ 16 to 20, this prints "FRONT", "REAR", "LEFT" and
+ CLC                    \ 16 to 19, this prints "FRONT", "REAR", "LEFT" and
  ADC #80                \ "RIGHT"
  JSR TT27
 
@@ -16482,7 +16507,7 @@ LOAD_D% = LOAD% + P% - CODE%
  JSR TT217              \ Scan the keyboard until a key is pressed, and return
                         \ the key's ASCII code in A (and X)
 
- SEC                    \ Subtract ASCII '0' from the key pressed, to leave the
+ SEC                    \ Subtract ASCII "0" from the key pressed, to leave the
  SBC #'0'               \ numeric value of the key in A (if it was a number key)
 
  CMP #4                 \ If the number entered in A < 4, then it is a valid
@@ -16880,8 +16905,7 @@ LOAD_E% = LOAD% + P% - CODE%
 
  JMP pr2                \ Jump to pr2, which prints the number in X to a width
                         \ of 3 figures, left-padding with spaces to a width of
-                        \ 3, and once done, return from the subroutine (as pr2
-                        \ ends with an RTS)
+                        \ 3, and return from the subroutine using a tail call
 
 \ ******************************************************************************
 \
@@ -16951,11 +16975,11 @@ LOAD_E% = LOAD% + P% - CODE%
 
  BPL pc1                \ Loop back for the next byte to copy
 
- LDA #9                 \ We want to print the cash using up to 9 digits
+ LDA #9                 \ We want to print the cash amount using up to 9 digits
  STA U                  \ (including the decimal point), so store this in U
                         \ for BRPNT to take as an argument
 
- SEC                    \ We want to print the fuel level with a decimal point,
+ SEC                    \ We want to print the cash amount with a decimal point,
                         \ so set the C flag for BRPNT to take as an argument
 
  JSR BPRNT              \ Print the amount of cash to 9 digits with a decimal
@@ -20373,7 +20397,7 @@ LOAD_F% = LOAD% + P% - CODE%
 \       Name: TT102
 \       Type: Subroutine
 \   Category: Keyboard
-\    Summary: Process function key, save, hyperspace and chart key presses
+\    Summary: Process function key, save key, hyperspace and chart key presses
 \
 \ ------------------------------------------------------------------------------
 \
@@ -20643,7 +20667,7 @@ LOAD_F% = LOAD% + P% - CODE%
 \ BRKV is set to this routine in the decryption routine at DEEOR just before the
 \ game is run for the first time, and at the end of the SVE routine after the
 \ disc access menu has been processed. In other words, this is the standard
-\ BRKV handler for the game, and it's swapped out to MRBRK for disc access
+\ BRKV handler for the game, and it's swapped out to MEBRK for disc access
 \ operations only.
 \
 \ When it is the BRKV handler, the routine can be triggered using a BRK
@@ -21643,7 +21667,7 @@ ENDIF
 
                         \ We now copy the entered filename from INWK to DELI, so
                         \ that it overwrites the filename part of the string,
-                        \ i.e. the "E.1234567" part of "DELETE:0.E.1234567"
+                        \ i.e. the "E.1234567" part of "DE.:0.E.1234567"
 
  LDX #9                 \ Set up a counter in X to count from 9 to 1, so that we
                         \ copy the string starting at INWK+4+1 (i.e. INWK+5) to
@@ -21701,7 +21725,7 @@ ENDIF
 \ BRKV is set to this routine at the start of the SVE routine, just before the
 \ disc access menu is shown, and it reverts to BRBR at the end of the SVE
 \ routine after the disc access menu has been processed. In other words, BRBR is
-\ the standard BRKV handler for the game, and it's swapped out to MRBRK for disc
+\ the standard BRKV handler for the game, and it's swapped out to MEBRK for disc
 \ access operations only.
 \
 \ When it is the BRKV handler, the routine can be triggered using a BRK
@@ -21714,7 +21738,7 @@ ENDIF
 .MEBRK
 
  LDX stack              \ Set the stack pointer to the value that we stored in
- TXS                    \ location stack, so that's back to the value it had
+ TXS                    \ the stack variable, so that's back to the value it had
                         \ before we set BRKV to point to MEBRK in the SVE
                         \ routine
 
@@ -21795,7 +21819,7 @@ ENDIF
  JSR ZEBC               \ Call ZEBC to zero-fill pages &B and &C
 
  TSX                    \ Transfer the stack pointer to X and store it in stack,
- STX stack              \ so we can restore it in the MRBRK routine
+ STX stack              \ so we can restore it in the MEBRK routine
 
  LDA #LO(MEBRK)         \ Set BRKV to point to the MEBRK routine, which is the
  STA BRKV               \ BRKV handler for disc access operations, and replaces
@@ -23037,7 +23061,8 @@ ENDIF
  LDA JSTK               \ If JSTK is zero, then we are configured to use the
  BEQ DK9                \ keyboard rather than the joystick, so jump to DK9 to
                         \ make sure the Bitstik is disabled as well (DK9 then
-                        \ jumps to DK4 below)
+                        \ jumps to DK4 to scan for pause, configuration and
+                        \ secondary flight keys)
 
  LDX #1                 \ Call DKS2 to fetch the value of ADC channel 1 (the
  JSR DKS2               \ joystick X value) into (A X), and OR A with 1. This

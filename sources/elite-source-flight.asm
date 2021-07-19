@@ -35,8 +35,6 @@ _STH_DISC               = (_RELEASE = 2)
 \
 \ ******************************************************************************
 
-LS% = &0CFF             \ The start of the descending ship line heap
-
 NOST = 18               \ The number of stardust particles in normal space (this
                         \ goes down to 3 in witchspace)
 
@@ -125,6 +123,8 @@ ACT = &07E0             \ The address of the arctan lookup table, as set in
 QQ16 = &0880            \ The address of the two-letter text token table in the
                         \ flight code (this gets populated by the docked code at
                         \ the start of the game)
+
+LS% = &0CFF             \ The start of the descending ship line heap
 
 CATD = &0D7A            \ The address of the CATD routine that is put in place
                         \ by the third loader, as set in elite-loader3.asm
@@ -1511,8 +1511,19 @@ NT% = SVC + 2 - TP      \ This sets the variable NT% to the size of the current
 
 .QQ28
 
- SKIP 1                 \ Temporary storage, used to store the economy byte of
-                        \ the current system in routine var
+ SKIP 1                 \ The current system's economy (0-7)
+                        \
+                        \   * 0 = Rich Industrial
+                        \   * 1 = Average Industrial
+                        \   * 2 = Poor Industrial
+                        \   * 3 = Mainly Industrial
+                        \   * 4 = Mainly Agricultural
+                        \   * 5 = Rich Agricultural
+                        \   * 6 = Average Agricultural
+                        \   * 7 = Poor Agricultural
+                        \
+                        \ See the deep dive on "Generating system data" for more
+                        \ information on economies
 
 .QQ29
 
@@ -1554,6 +1565,15 @@ NT% = SVC + 2 - TP      \ This sets the variable NT% to the size of the current
 .QQ3
 
  SKIP 1                 \ The selected system's economy (0-7)
+                        \
+                        \   * 0 = Rich Industrial
+                        \   * 1 = Average Industrial
+                        \   * 2 = Poor Industrial
+                        \   * 3 = Mainly Industrial
+                        \   * 4 = Mainly Agricultural
+                        \   * 5 = Rich Agricultural
+                        \   * 6 = Average Agricultural
+                        \   * 7 = Poor Agricultural
                         \
                         \ See the deep dive on "Generating system data" for more
                         \ information on economies
@@ -3133,7 +3153,7 @@ LOAD_A% = LOAD%
  LDA INWK+35            \ Fetch the hit ship's energy from byte #35 and subtract
  SEC                    \ our current laser power, and if the result is greater
  SBC LAS                \ than zero, the other ship has survived the hit, so
- BCS MA14               \ jump down to MA14
+ BCS MA14               \ jump down to MA14 to make it angry
 
  ASL INWK+31            \ Set bit 7 of the ship byte #31 to indicate that it has
  SEC                    \ now been killed
@@ -9326,10 +9346,11 @@ LOAD_C% = LOAD% +P% - CODE%
  AND #31                \ Restrict A to a random number in the range 0-31
 
  CMP T                  \ If A >= T, which is quite likely, though less likely
- BCS TA3                \ with higher numbers of missiles, jump to TA3
+ BCS TA3                \ with higher numbers of missiles, jump to TA3 to skip
+                        \ firing a missile
 
  LDA ECMA               \ If an E.C.M. is currently active (either our's or an
- BNE TA3                \ opponent's), jump to TA3
+ BNE TA3                \ opponent's), jump to TA3 to skip firing a missile
 
  DEC INWK+31            \ We're done with the checks, so it's time to fire off a
                         \ missile, so reduce the missile count in byte #31 by 1
@@ -17298,8 +17319,7 @@ LOAD_E% = LOAD% + P% - CODE%
 
  JMP pr2                \ Jump to pr2, which prints the number in X to a width
                         \ of 3 figures, left-padding with spaces to a width of
-                        \ 3, and once done, return from the subroutine (as pr2
-                        \ ends with an RTS)
+                        \ 3, and return from the subroutine using a tail call
 
 \ ******************************************************************************
 \
@@ -17369,11 +17389,11 @@ LOAD_E% = LOAD% + P% - CODE%
 
  BPL pc1                \ Loop back for the next byte to copy
 
- LDA #9                 \ We want to print the cash using up to 9 digits
+ LDA #9                 \ We want to print the cash amount using up to 9 digits
  STA U                  \ (including the decimal point), so store this in U
                         \ for BRPNT to take as an argument
 
- SEC                    \ We want to print the fuel level with a decimal point,
+ SEC                    \ We want to print the cash amount with a decimal point,
                         \ so set the C flag for BRPNT to take as an argument
 
  JSR BPRNT              \ Print the amount of cash to 9 digits with a decimal
@@ -23710,8 +23730,8 @@ ENDIF
 
  CMP T                  \ If the random value in A >= our badness level, which
  BCS P%+7               \ will be the case unless we have been really, really
-                        \ bad, then skip the following two instructions (so if
-                        \ we are really bad, there's a higher chance of
+                        \ bad, then skip the following two instructions (so
+                        \ if we are really bad, there's a higher chance of
                         \ spawning a cop, otherwise we got away with it, for
                         \ now)
 
@@ -23719,8 +23739,9 @@ ENDIF
  JSR NWSHP
 
  LDA MANY+COPS          \ If we now have at least one cop in the local bubble,
- BNE MLOOPS             \ jump down to MLOOPS, otherwise fall through into the
-                        \ next part to look at spawning something else
+ BNE MLOOPS             \ jump down to MLOOPS to stop spawning, otherwise fall
+                        \ through into the next part to look at spawning
+                        \ something else
 
 \ ******************************************************************************
 \
@@ -23746,9 +23767,10 @@ ENDIF
 \
 \ ******************************************************************************
 
- DEC EV                 \ Decrement EV, the extra vessels spawning delay, and
- BPL MLOOPS             \ jump to MLOOPS if it is still positive, so we only
-                        \ do the following when the EV counter runs down
+ DEC EV                 \ Decrement EV, the extra vessels spawning delay, and if
+ BPL MLOOPS             \ it is still positive, jump to MLOOPS to stop spawning,
+                        \ so we only do the following when the EV counter runs
+                        \ down
 
  INC EV                 \ EV is negative, so bump it up again, setting it back
                         \ to 0
@@ -23917,7 +23939,7 @@ ENDIF
                         \ spawning that type of pirate instead
 
  BPL more               \ Loop back to more to have another go at spawning this
-                        \ pirate, until we have tried spawning a Sidewinder
+                        \ pirate, until we have tried spawning a Sidewinder when
                         \ CPIR is 0, in which case give up and move on to the
                         \ next pirate to spawn
 
@@ -24026,7 +24048,8 @@ ENDIF
 \       Name: TT102
 \       Type: Subroutine
 \   Category: Keyboard
-\    Summary: Process function key, save, hyperspace and chart key presses
+\    Summary: Process function key, save key, hyperspace and chart key presses
+\             and update the hyperspace counter
 \
 \ ------------------------------------------------------------------------------
 \
@@ -24610,7 +24633,7 @@ ENDIF
  ADC #'A'
 
  STA SHIPI+6            \ Store the letter of the ship blueprints file we want
-                        \ in the sixth byte of the command string at SHIPI, so
+                        \ in the seventh byte of the command string at SHIPI, so
                         \ it overwrites the "0" in "D.MO0" with the file letter
                         \ to load, from D.MOA to D.MOP
 
@@ -25983,7 +26006,8 @@ ENDIF
  LDA JSTK               \ If JSTK is non-zero, then we are configured to use
  BNE DKJ1               \ the joystick rather than keyboard, so jump to DKJ1
                         \ to read the joystick flight controls, before jumping
-                        \ to DK4 below
+                        \ to DK4 to scan for pause, configuration and secondary
+                        \ flight keys
 
  STA BSTK               \ Set BSTK = 0 to disable the Bitstik
 
