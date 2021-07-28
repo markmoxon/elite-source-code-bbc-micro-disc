@@ -650,7 +650,7 @@ ORG &0B00
  LDA #HI(S%+11)
  STA BRKV+1
 
- LDA #LO(S%+6)          \ Point BRKV to the third entry in the main docked
+ LDA #LO(S%+6)          \ Point WRCHV to the third entry in the main docked
  STA WRCHV              \ code's S% workspace, which contains JMP CHPR
  LDA #HI(S%+6)
  STA WRCHV+1
@@ -706,7 +706,7 @@ ENDIF
 
 .LTLI
 
- EQUS "L.T.CODE"
+ EQUS "L.T.CODE"        \ This is short for "*LOAD T.CODE"
  EQUB 13
 
  EQUB &44, &6F, &65     \ These bytes appear to be unused
@@ -1596,8 +1596,8 @@ ORG CATDcode + P% - CATD
 
  EOR #&A5               \ Decrypt it by EOR'ing with &A5
 
- STA (ZP),Y             \ Store the decrypted result in the Y-th byte of the
-                        \ ZP(1 0) memory block
+ STA (ZP),Y             \ Store the result in the Y-th byte of the ZP(1 0)
+                        \ memory block
 
  DEY                    \ Decrement the byte counter
 
@@ -1745,7 +1745,7 @@ ORG CATDcode + P% - CATD
  STA &9F                \ TITLE routine in the main docked code as part of the
                         \ copy protection (the game hangs if it doesn't match)
 
- RTS
+ RTS                    \ Return from the subroutine
 
 \ ******************************************************************************
 \
@@ -1765,7 +1765,7 @@ ORG CATDcode + P% - CATD
 
 .TVT1code
 
-EQUB &FF
+ EQUB &FF
 
 ORG &1100
 

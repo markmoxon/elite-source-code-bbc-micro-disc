@@ -181,9 +181,9 @@ ORG &0000
 
 .TRTB%
 
- SKIP 2                 \ TRTB%(1 0) points to the keyboard translation table,
-                        \ which is used to translate internal key numbers to
-                        \ ASCII
+ SKIP 2                 \ Contains the address of the keyboard translation
+                        \ table, which is used to translate internal key
+                        \ numbers to ASCII
 
 .T1
 
@@ -2203,8 +2203,8 @@ BRKV = P% - 2           \ The address of the destination address in the above
 
  LDA QQ1                \ Set A = the current system's galactic y-coordinate
 
- CMP #72
- BNE EN4                \ If A <> 72 then jump to EN4
+ CMP #72                \ If A <> 72 then jump to EN4
+ BNE EN4
 
  JMP DEBRIEF2           \ If we get here, mission 1 is complete and no longer in
                         \ progress, mission 2 has started and we have picked up
@@ -6238,8 +6238,9 @@ LOAD_B% = LOAD% + P% - CODE%
 
  LDA #103               \ Set A to token 103 ("PULSE LASER")
 
- LDX CNT                \ Set Y = the laser power for view X
- LDY LASER,X
+ LDX CNT                \ Retrieve the view number from CNT that we stored above
+
+ LDY LASER,X            \ Set Y = the laser power for view X
 
  CPY #128+POW           \ If the laser power for view X is not #POW+128 (beam
  BNE P%+4               \ laser), skip the next LDA instruction
@@ -8685,10 +8686,6 @@ LOAD_C% = LOAD% +P% - CODE%
 \ around on the ground so they can face in any dirction, and larger ships are
 \ drawn higher up off the ground than smaller ships.
 \
-\ The ships are drawn by the HAS1 routine, which uses the normal ship-drawing
-\ routine in LL9, and then the hanger background is drawn by sending an OSWORD
-\ 248 command to the I/O processor.
-\
 \ ******************************************************************************
 
 .HALL
@@ -9502,7 +9499,7 @@ LOAD_C% = LOAD% +P% - CODE%
  LDX #0                 \ Set X = 0
 
  STX XX4                \ Set XX4 = 0, which we will use as a counter for
-                        \ drawing 8 concentric rings
+                        \ drawing eight concentric rings
 
  STX K3+1               \ Set the high bytes of K3(1 0) and K4(1 0) to 0
  STX K4+1
@@ -12103,7 +12100,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \       Name: CPIX2
 \       Type: Subroutine
 \   Category: Drawing pixels
-\    Summary: Draw a single-height dot on the dashboard
+\    Summary: Draw a single-height dash on the dashboard
 \  Deep dive: Drawing colour pixels in mode 5
 \
 \ ------------------------------------------------------------------------------
@@ -13510,7 +13507,7 @@ LOAD_D% = LOAD% + P% - CODE%
                         \ to pass to the Tc routine if we call it
 
  BCS Tc                 \ If the C flag is set, then there is no room in the
-                        \ cargo hold, jump up to Tc to print a "Cargo?" error, 
+                        \ cargo hold, jump up to Tc to print a "Cargo?" error,
                         \ beep, clear the number and try again
 
  LDA QQ24               \ There is room in the cargo hold, so now to check
@@ -15883,13 +15880,13 @@ LOAD_D% = LOAD% + P% - CODE%
 \       Name: RDLI
 \       Type: Variable
 \   Category: Loader
-\    Summary: The OS command string for loading the flight code file D.CODE
+\    Summary: The OS command string for running the flight code in file D.CODE
 \
 \ ******************************************************************************
 
 .RDLI
 
- EQUS "R.D.CODE"
+ EQUS "R.D.CODE"        \ This is short for "*RUN D.CODE"
  EQUB 13
 
 \ ******************************************************************************
@@ -15911,7 +15908,7 @@ LOAD_D% = LOAD% + P% - CODE%
 \                       present, refund the cost of the item, and then beep and
 \                       exit to the docking bay (i.e. show the Status Mode
 \                       screen)
-\                        
+\
 \ ******************************************************************************
 
 .bay
@@ -16488,7 +16485,8 @@ LOAD_D% = LOAD% + P% - CODE%
  ADC #80                \ "RIGHT"
  JSR TT27
 
- INC YC                 \ Move the text cursor down a row
+ INC YC                 \ Move the text cursor down a row, and increment the
+                        \ counter in YC at the same time
 
  LDY YC                 \ Update Y with the incremented counter in YC
 
@@ -16758,7 +16756,7 @@ LOAD_E% = LOAD% + P% - CODE%
  AND #%00011111         \ extract bits 0-4 by AND'ing with %11111
 
  BEQ P%+7               \ If all those bits are zero, then skip the following
-                        \ 2 instructions to go to step 3
+                        \ two instructions to go to step 3
 
  ORA #%10000000         \ We now have a number in the range 1-31, which we can
                         \ easily convert into a two-letter token, but first we
@@ -16883,7 +16881,7 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Name: tal
 \       Type: Subroutine
 \   Category: Text
-\    Summary: Print the current galaxy numbe
+\    Summary: Print the current galaxy number
 \
 \ ------------------------------------------------------------------------------
 \
@@ -17097,14 +17095,14 @@ LOAD_E% = LOAD% + P% - CODE%
  DEX                    \ If token = 5, this is control code 5 (fuel, newline,
  BEQ fwl                \ cash, newline), so jump to fwl
 
- DEX                    \ If token > 6, skip the following 3 instructions
+ DEX                    \ If token > 6, skip the following three instructions
  BNE P%+7
 
  LDA #%10000000         \ This token is control code 6 (switch to Sentence
  STA QQ17               \ Case), so set bit 7 of QQ17 to switch to Sentence Case
  RTS                    \ and return from the subroutine as we are done
 
- DEX                    \ If token > 8, skip the following 2 instructions
+ DEX                    \ If token > 8, skip the following two instructions
  DEX
  BNE P%+5
 
@@ -17122,7 +17120,7 @@ LOAD_E% = LOAD% + P% - CODE%
                         \ range (i.e. where the recursive token number is
                         \ correct and doesn't need correcting)
 
- CMP #14                \ If token < 14, skip the following 2 instructions
+ CMP #14                \ If token < 14, skip the following two instructions
  BCC P%+6
 
  CMP #32                \ If token < 32, then this means token is in 14-31, so
@@ -17525,7 +17523,7 @@ LOAD_E% = LOAD% + P% - CODE%
 
  TAX                    \ Copy the token number into X
 
- LDA #LO(QQ18)          \ Set V, V+1 to point to the recursive token table at
+ LDA #LO(QQ18)          \ Set V(1 0) to point to the recursive token table at
  STA V                  \ location QQ18
  LDA #HI(QQ18)
  STA V+1
@@ -18308,7 +18306,7 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Name: SPBLB
 \       Type: Subroutine
 \   Category: Dashboard
-\    Summary: Draw (or erase) the space station indicator ("S") on the dashboard
+\    Summary: Light up the space station indicator ("S") on the dashboard
 \
 \ ------------------------------------------------------------------------------
 \
@@ -18872,7 +18870,7 @@ LOAD_E% = LOAD% + P% - CODE%
                         \
                         \   XX____X1____X2____XX+1      ->      +  +__+  +
                         \
-                        \ They all end up with a line between X1 and Y1, which
+                        \ They all end up with a line between X1 and X2, which
                         \ is what we want. There's probably a mathematical proof
                         \ of why this works somewhere, but the above is probably
                         \ easier to follow.
@@ -20085,7 +20083,7 @@ LOAD_F% = LOAD% + P% - CODE%
  LDA #0                 \ Set the delay in DLY to 0, so any new in-flight
  STA DLY                \ messages will be shown instantly
 
- JMP me3                \ Jump back into the main spawning loop at TT100
+ JMP me3                \ Jump back into the main spawning loop at me3
 
 \ ******************************************************************************
 \
@@ -20664,11 +20662,10 @@ LOAD_F% = LOAD% + P% - CODE%
 \ pointed to by (&FD &FE), which is where the MOS will put any system errors. It
 \ then waits for a key press and restarts the game.
 \
-\ BRKV is set to this routine in the decryption routine at DEEOR just before the
-\ game is run for the first time, and at the end of the SVE routine after the
-\ disc access menu has been processed. In other words, this is the standard
-\ BRKV handler for the game, and it's swapped out to MEBRK for disc access
-\ operations only.
+\ BRKV is set to this routine in the loader, when the docked code is loaded, and
+\ at the end of the SVE routine after the disc access menu has been processed.
+\ In other words, this is the standard BRKV handler for the game, and it's
+\ swapped out to MEBRK for disc access operations only.
 \
 \ When it is the BRKV handler, the routine can be triggered using a BRK
 \ instruction. The main differences between this routine and the MEBRK handler
@@ -21010,8 +21007,9 @@ ENDIF
                         \ to 96, which is the distance at which the rotating
                         \ ship starts out before coming towards us
 
- LDX #127
- STX INWK+29            \ Set roll counter = 127, so don't dampen the roll
+ LDX #127               \ Set roll counter = 127, so don't dampen the roll
+ STX INWK+29
+
  STX INWK+30            \ Set pitch counter = 127, so don't dampen the pitch
 
  INX                    \ Set QQ17 to 128 (so bit 7 is set) to switch to
@@ -21553,7 +21551,7 @@ ENDIF
 
 .DELI
 
- EQUS "DE.:0.E.1234567"
+ EQUS "DE.:0.E.1234567" \ Short for "*DELETE :0.E.1234567"
  EQUB 13
 
 \ ******************************************************************************
@@ -23475,38 +23473,22 @@ ENDMACRO
 
 .QQ23
 
- ITEM 19,  -2, 't',   6, %00000001   \ 0  = Food
-
- ITEM 20,  -1, 't',  10, %00000011   \ 1  = Textiles
-
- ITEM 65,  -3, 't',   2, %00000111   \ 2  = Radioactives
-
- ITEM 40,  -5, 't', 226, %00011111   \ 3  = Slaves
-
- ITEM 83,  -5, 't', 251, %00001111   \ 4  = Liquor/Wines
-
- ITEM 196,  8, 't',  54, %00000011   \ 5  = Luxuries
-
- ITEM 235, 29, 't',   8, %01111000   \ 6  = Narcotics
-
- ITEM 154, 14, 't',  56, %00000011   \ 7  = Computers
-
- ITEM 117,  6, 't',  40, %00000111   \ 8  = Machinery
-
- ITEM 78,   1, 't',  17, %00011111   \ 9  = Alloys
-
+ ITEM 19,  -2, 't',   6, %00000001   \  0 = Food
+ ITEM 20,  -1, 't',  10, %00000011   \  1 = Textiles
+ ITEM 65,  -3, 't',   2, %00000111   \  2 = Radioactives
+ ITEM 40,  -5, 't', 226, %00011111   \  3 = Slaves
+ ITEM 83,  -5, 't', 251, %00001111   \  4 = Liquor/Wines
+ ITEM 196,  8, 't',  54, %00000011   \  5 = Luxuries
+ ITEM 235, 29, 't',   8, %01111000   \  6 = Narcotics
+ ITEM 154, 14, 't',  56, %00000011   \  7 = Computers
+ ITEM 117,  6, 't',  40, %00000111   \  8 = Machinery
+ ITEM 78,   1, 't',  17, %00011111   \  9 = Alloys
  ITEM 124, 13, 't',  29, %00000111   \ 10 = Firearms
-
  ITEM 176, -9, 't', 220, %00111111   \ 11 = Furs
-
  ITEM 32,  -1, 't',  53, %00000011   \ 12 = Minerals
-
  ITEM 97,  -1, 'k',  66, %00000111   \ 13 = Gold
-
  ITEM 171, -2, 'k',  55, %00011111   \ 14 = Platinum
-
  ITEM 45,  -1, 'g', 250, %00001111   \ 15 = Gem-Stones
-
  ITEM 53,  15, 't', 192, %00000111   \ 16 = Alien items
 
 \ ******************************************************************************
@@ -33034,7 +33016,7 @@ ENDMACRO
  FACE        0,        0,     -160,         31    \ Face 8
  FACE        0,      -27,        0,         31    \ Face 9
 
- SKIP 171
+ SKIP 171               \ These bytes appear to be unused
 
 \ ******************************************************************************
 \
