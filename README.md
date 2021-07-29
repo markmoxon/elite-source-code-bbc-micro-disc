@@ -1,8 +1,10 @@
-# Fully documented source code for Elite on the BBC Micro with a disc drive
+# Fully documented source code for the disc version of Elite on the BBC Micro
 
 [BBC Micro (cassette)](https://github.com/markmoxon/cassette-elite-beebasm) | **BBC Micro (disc)** | [6502 Second Processor](https://github.com/markmoxon/6502sp-elite-beebasm) | [BBC Master](https://github.com/markmoxon/master-elite-beebasm) | [Acorn Electron](https://github.com/markmoxon/electron-elite-beebasm) | [Elite-A](https://github.com/markmoxon/elite-a-beebasm)
 
-This repository contains source code for Elite on the BBC Micro with a disc drive, with every single line documented and (for the most part) explained.
+![Screenshot of the first mission in the disc version of Elite on the BBC Micro](https://www.bbcelite.com/images/github/mission1a.png)
+
+This repository contains source code for the disc version of Elite on the BBC Micro, with every single line documented and (for the most part) explained.
 
 It is a companion to the [bbcelite.com website](https://www.bbcelite.com).
 
@@ -35,7 +37,7 @@ See the [introduction](#introduction) for more information.
 
 ## Introduction
 
-This repository contains source code for Elite on the BBC Micro with a disc drive, with every single line documented and (for the most part) explained.
+This repository contains source code for the disc version of Elite on the BBC Micro, with every single line documented and (for the most part) explained.
 
 You can build the fully functioning game from this source. [Two releases](#building-different-releases-of-elite) are currently supported: the version from Ian Bell's site, and the version from the Stairway to Hell archive.
 
