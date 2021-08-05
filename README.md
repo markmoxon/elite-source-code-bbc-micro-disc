@@ -240,7 +240,7 @@ This repository contains the source code for two different releases of the disc 
 
 * The release from the Stairway to Hell archive
 
-* The release from the game disc on Ian Bell's website
+* The game disc on Ian Bell's website
 
 By default the build process builds the Stairway to Hell release, but you can build the other release as follows.
 
@@ -275,6 +275,8 @@ You can see the differences between the releases by searching the source code fo
 * The Ian Bell release sets bit 2 of the competition flag in the commander file, while the Stairway to Hell release sets bit 5
 
 In other words, the Ian Bell release is the very first release of the disc version of Elite, while the Stairway to Hell release has both bugs fixed and a bumped-up release number.
+
+See the [accompanying website](https://www.bbcelite.com/disc/releases.html) for a comprehensive list of differences between the releases.
 
 Note that I have only included differences that appear in the main game code, rather than those that appear in the loaders, as these files can differ extensively between releases without affecting the game itself. The release on Ian Bell's site contains a whole load of copy protection differences when compared to the same code in the Stairway to Hell release, and it also contains two more binary files (`ELITE5` and `ELITE6`), plus a `!BOOT` file that contains even more copy protection code. I haven't disassembled the loader files from this release as that's a whole different rabbit hole, so if you build the Ian Bell release with `make encrypt verify`, the compiled loader binaries will not match those extracted from the original disc. The main binaries will match, however, which is the interesting part from a digital archaeology perspective, as that's where the bug fixes live.
 
