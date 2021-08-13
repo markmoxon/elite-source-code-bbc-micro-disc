@@ -1338,7 +1338,17 @@ ORG &0300
                         \
                         \   * 0 = not fitted
                         \
-                        \   * 1 = fitted
+                        \   * Non-zero = fitted
+                        \
+                        \ The actual value determines the refresh rate of our
+                        \ energy banks, as they refresh by ENGY+1 each time (so
+                        \ our ship's energy level goes up by 2 each time if we
+                        \ have an energy unit fitted, otherwise it goes up by 1)
+                        \
+                        \ The enhanced versions of Elite set ENGY to 2 as the
+                        \ reward for completing mission 2, where we receive a
+                        \ naval energy unit that recharges 50% faster than a
+                        \ standard energy unit, i.e. by 3 each time
 
 .DKCMP
 
@@ -18729,12 +18739,13 @@ LOAD_E% = LOAD% + P% - CODE%
 \
 \ ------------------------------------------------------------------------------
 \
-\ Set the screen to show the number of text rows given in X. This is used when
-\ we are killed, as reducing the number of rows from the usual 31 to 24 has the
-\ effect of hiding the dashboard, leaving a monochrome image of ship debris and
-\ explosion clouds. Increasing the rows back up to 31 makes the dashboard
-\ reappear, as the dashboard's screen memory doesn't get touched by this
-\ process.
+\ This routine sets the screen to show the number of text rows given in X.
+\
+\ It is used when we are killed, as reducing the number of rows from the usual
+\ 31 to 24 has the effect of hiding the dashboard, leaving a monochrome image
+\ of ship debris and explosion clouds. Increasing the rows back up to 31 makes
+\ the dashboard reappear, as the dashboard's screen memory doesn't get touched
+\ by this process.
 \
 \ Arguments:
 \
@@ -19866,9 +19877,6 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Dashboard
 \    Summary: Light up the space station indicator ("S") on the dashboard
-\
-\ ------------------------------------------------------------------------------
-\
 \
 \ ******************************************************************************
 
@@ -32489,7 +32497,7 @@ LOAD_H% = LOAD% + P% - CODE%
 
  CPX #&78               \ Loop back to BOL1 until we have cleared page &7700,
  BNE BOL1               \ the last character row in the space view part of the
-                        \ screen (the space view)
+                        \ screen (the top part)
 
  LDX QQ22+1             \ Fetch into X the number that's shown on-screen during
                         \ the hyperspace countdown
@@ -32626,8 +32634,10 @@ LOAD_H% = LOAD% + P% - CODE%
 \
 \ ------------------------------------------------------------------------------
 \
-\ Clear some space at the bottom of the screen and move the text cursor to
-\ column 1, row 21. Specifically, this zeroes the following screen locations:
+\ This routine clears some space at the bottom of the screen and moves the text
+\ cursor to column 1, row 21. 
+\
+\ Specifically, it zeroes the following screen locations:
 \
 \   &7507 to &75F0
 \   &7607 to &76F0
