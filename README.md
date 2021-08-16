@@ -31,8 +31,8 @@ See the [introduction](#introduction) for more information.
 
 * [Building different releases of the disc version of Elite](#building-different-releases-of-the-disc-version-of-elite)
 
-  * [Building the Ian Bell disc release](#building-the-ian-bell-disc-release)
   * [Building the Stairway to Hell release](#building-the-stairway-to-hell-release)
+  * [Building the Ian Bell disc release](#building-the-ian-bell-disc-release)
   * [Differences between the releases](#differences-between-the-releases)
 
 ## Introduction
@@ -242,7 +242,11 @@ This repository contains the source code for two different releases of the disc 
 
 * The game disc on Ian Bell's website
 
-By default the build process builds the Stairway to Hell release, but you can build the other release as follows.
+By default the build process builds the Stairway to Hell release, but you can build a specified release using the `release=` build parameter.
+
+### Building the Stairway to Hell release
+
+You can add `release=sth` to produce the `elite-disc-sth.ssd` file containing the Stairway to Hell release, though that's the default value so it isn't necessary.
 
 ### Building the Ian Bell disc release
 
@@ -259,10 +263,6 @@ make encrypt verify release=ib-disc
 ```
 
 This will produce a file called `elite-disc-ib-disc.ssd` that contains the Ian Bell disc release.
-
-### Building the Stairway to Hell release
-
-You can add `release=sth` to produce the `elite-disc-sth.ssd` file containing the Stairway to Hell release, though that's the default value so it isn't necessary.
 
 ### Differences between the releases
 
