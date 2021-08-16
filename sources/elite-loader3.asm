@@ -29,30 +29,15 @@ INCLUDE "sources/elite-header.h.asm"
 _IB_DISC                = (_RELEASE = 1)
 _STH_DISC               = (_RELEASE = 2)
 
-Q% = FALSE              \ Set Q% to TRUE to max out the default commander, FALSE
+\ ******************************************************************************
+\
+\ Configuration variables
+\
+\ ******************************************************************************
+
+Q% = _REMOVE_CHECKSUMS  \ Set Q% to TRUE to max out the default commander, FALSE
                         \ for the standard default commander (this is set to
                         \ TRUE if checksums are disabled, just for convenience)
-
-BRKV = &0202            \ The break vector that we intercept to enable us to
-                        \ handle and display system errors
-
-IRQ1V = &0204           \ The IRQ1V vector that we intercept to implement the
-                        \ split-sceen mode
-
-WRCHV = &020E           \ The WRCHV vector that we intercept with our custom
-                        \ text printing routine
-
-NETV = &0224            \ The NETV vector that we intercept as part of the copy
-                        \ protection
-
-OSWRCH = &FFEE          \ The address for the OSWRCH routine
-OSBYTE = &FFF4          \ The address for the OSBYTE routine
-OSWORD = &FFF1          \ The address for the OSWORD routine
-OSCLI = &FFF7           \ The address for the OSCLI vector
-
-VIA = &FE00             \ Memory-mapped space for accessing internal hardware,
-                        \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
-                        \ known as SHEILA)
 
 N% = 67                 \ N% is set to the number of bytes in the VDU table, so
                         \ we can loop through them below
@@ -69,6 +54,18 @@ VEC = &7FFE             \ VEC is where we store the original value of the IRQ1
                         \ vector, matching the address in the elite-missile.asm
                         \ source
 
+BRKV = &0202            \ The break vector that we intercept to enable us to
+                        \ handle and display system errors
+
+IRQ1V = &0204           \ The IRQ1V vector that we intercept to implement the
+                        \ split-sceen mode
+
+WRCHV = &020E           \ The WRCHV vector that we intercept with our custom
+                        \ text printing routine
+
+NETV = &0224            \ The NETV vector that we intercept as part of the copy
+                        \ protection
+
 LASCT = &0346           \ The laser pulse count for the current laser, matching
                         \ the address in the main game code
 
@@ -80,6 +77,15 @@ ESCP = &0386            \ The flag that determines whether we have an escape pod
 
 S% = &11E3              \ The adress of the main entry point workspace in the
                         \ main game code
+
+VIA = &FE00             \ Memory-mapped space for accessing internal hardware,
+                        \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
+                        \ known as SHEILA)
+
+OSWRCH = &FFEE          \ The address for the OSWRCH routine
+OSBYTE = &FFF4          \ The address for the OSBYTE routine
+OSWORD = &FFF1          \ The address for the OSWORD routine
+OSCLI = &FFF7           \ The address for the OSCLI vector
 
 \ ******************************************************************************
 \
@@ -367,7 +373,7 @@ ENDMACRO
  LDA #&60               \ Store an RTS instruction in location &0232
  STA &0232
 
- LDA #&2                \ Point the NETV vector to &0232, which we just filled
+ LDA #&02               \ Point the NETV vector to &0232, which we just filled
  STA NETV+1             \ with an RTS
  LDA #&32
  STA NETV
@@ -644,7 +650,7 @@ ORG &0B00
  LDA #HI(S%+11)
  STA BRKV+1
 
- LDA #LO(S%+6)          \ Point BRKV to the third entry in the main docked
+ LDA #LO(S%+6)          \ Point WRCHV to the third entry in the main docked
  STA WRCHV              \ code's S% workspace, which contains JMP CHPR
  LDA #HI(S%+6)
  STA WRCHV+1
@@ -700,7 +706,7 @@ ENDIF
 
 .LTLI
 
- EQUS "L.T.CODE"
+ EQUS "L.T.CODE"        \ This is short for "*LOAD T.CODE"
  EQUB 13
 
  EQUB &44, &6F, &65     \ These bytes appear to be unused
@@ -725,8 +731,8 @@ ORG LOADcode + P% - LOAD
 \       Name: CATDcode
 \       Type: Subroutine
 \   Category: Save and load
-\    Summary: CATD routine, bundled up in the loader so it can be moved to &0D7A
-\             to be run
+\    Summary: The CATD routine, bundled up in the loader so it can be moved to
+\             &0D7A to be run
 \
 \ ******************************************************************************
 
@@ -1159,7 +1165,10 @@ ORG CATDcode + P% - CATD
 \
 \ ------------------------------------------------------------------------------
 \
-\ Set A and X to random numbers. The C and V flags are also set randomly.
+\ Set A and X to random numbers (though note that X is set to the random number
+\ that was returned in A the last time DORND was called).
+\
+\ The C and V flags are also set randomly.
 \
 \ This is a simplified version of the DORND routine in the main game code. It
 \ swaps the two calculations around and omits the ROL A instruction, but is
@@ -1587,8 +1596,8 @@ ORG CATDcode + P% - CATD
 
  EOR #&A5               \ Decrypt it by EOR'ing with &A5
 
- STA (ZP),Y             \ Store the decrypted result in the Y-th byte of the
-                        \ ZP(1 0) memory block
+ STA (ZP),Y             \ Store the result in the Y-th byte of the ZP(1 0)
+                        \ memory block
 
  DEY                    \ Decrement the byte counter
 
@@ -1736,7 +1745,7 @@ ORG CATDcode + P% - CATD
  STA &9F                \ TITLE routine in the main docked code as part of the
                         \ copy protection (the game hangs if it doesn't match)
 
- RTS
+ RTS                    \ Return from the subroutine
 
 \ ******************************************************************************
 \
@@ -1755,6 +1764,8 @@ ORG CATDcode + P% - CATD
 \ ******************************************************************************
 
 .TVT1code
+
+ EQUB &FF
 
 ORG &1100
 
@@ -1977,7 +1988,7 @@ ORG &1100
 \   Category: Save and load
 \    Summary: The drive and directory number used when saving or loading a
 \             commander file
-\  Deep dive: Commander save files.
+\  Deep dive: Commander save files
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2026,7 +2037,7 @@ ORG &1100
  EQUS "JAMESON"         \ The current commander name, which defaults to JAMESON
  EQUB 13                \
                         \ The commander name can be up to 7 characters (the DFS
-                        \ limit for file names), and is terminated by a carriage
+                        \ limit for filenames), and is terminated by a carriage
                         \ return
 
                         \ NA%+8 is the start of the commander data block
@@ -2078,25 +2089,25 @@ ENDIF
 
  EQUB 22+(15 AND Q%)    \ CRGO = Cargo capacity, #22
 
- EQUB 0                 \ QQ20+0  = Amount of Food in cargo hold, #23
- EQUB 0                 \ QQ20+1  = Amount of Textiles in cargo hold, #24
- EQUB 0                 \ QQ20+2  = Amount of Radioactives in cargo hold, #25
- EQUB 0                 \ QQ20+3  = Amount of Slaves in cargo hold, #26
- EQUB 0                 \ QQ20+4  = Amount of Liquor/Wines in cargo hold, #27
- EQUB 0                 \ QQ20+5  = Amount of Luxuries in cargo hold, #28
- EQUB 0                 \ QQ20+6  = Amount of Narcotics in cargo hold, #29
- EQUB 0                 \ QQ20+7  = Amount of Computers in cargo hold, #30
- EQUB 0                 \ QQ20+8  = Amount of Machinery in cargo hold, #31
- EQUB 0                 \ QQ20+9  = Amount of Alloys in cargo hold, #32
- EQUB 0                 \ QQ20+10 = Amount of Firearms in cargo hold, #33
- EQUB 0                 \ QQ20+11 = Amount of Furs in cargo hold, #34
- EQUB 0                 \ QQ20+12 = Amount of Minerals in cargo hold, #35
- EQUB 0                 \ QQ20+13 = Amount of Gold in cargo hold, #36
- EQUB 0                 \ QQ20+14 = Amount of Platinum in cargo hold, #37
- EQUB 0                 \ QQ20+15 = Amount of Gem-Stones in cargo hold, #38
- EQUB 0                 \ QQ20+16 = Amount of Alien Items in cargo hold, #39
+ EQUB 0                 \ QQ20+0  = Amount of food in cargo hold, #23
+ EQUB 0                 \ QQ20+1  = Amount of textiles in cargo hold, #24
+ EQUB 0                 \ QQ20+2  = Amount of radioactives in cargo hold, #25
+ EQUB 0                 \ QQ20+3  = Amount of slaves in cargo hold, #26
+ EQUB 0                 \ QQ20+4  = Amount of liquor/Wines in cargo hold, #27
+ EQUB 0                 \ QQ20+5  = Amount of luxuries in cargo hold, #28
+ EQUB 0                 \ QQ20+6  = Amount of narcotics in cargo hold, #29
+ EQUB 0                 \ QQ20+7  = Amount of computers in cargo hold, #30
+ EQUB 0                 \ QQ20+8  = Amount of machinery in cargo hold, #31
+ EQUB 0                 \ QQ20+9  = Amount of alloys in cargo hold, #32
+ EQUB 0                 \ QQ20+10 = Amount of firearms in cargo hold, #33
+ EQUB 0                 \ QQ20+11 = Amount of furs in cargo hold, #34
+ EQUB 0                 \ QQ20+12 = Amount of minerals in cargo hold, #35
+ EQUB 0                 \ QQ20+13 = Amount of gold in cargo hold, #36
+ EQUB 0                 \ QQ20+14 = Amount of platinum in cargo hold, #37
+ EQUB 0                 \ QQ20+15 = Amount of gem-stones in cargo hold, #38
+ EQUB 0                 \ QQ20+16 = Amount of alien items in cargo hold, #39
 
- EQUB Q%                \ ECM = E.C.M., #40
+ EQUB Q%                \ ECM = E.C.M. system, #40
 
  EQUB Q%                \ BST = Fuel scoops ("barrel status"), #41
 
@@ -2116,23 +2127,23 @@ ENDIF
 
  EQUB 0                 \ FIST = Legal status ("fugitive/innocent status"), #52
 
- EQUB 16                \ AVL+0  = Market availability of Food, #53
- EQUB 15                \ AVL+1  = Market availability of Textiles, #54
- EQUB 17                \ AVL+2  = Market availability of Radioactives, #55
- EQUB 0                 \ AVL+3  = Market availability of Slaves, #56
- EQUB 3                 \ AVL+4  = Market availability of Liquor/Wines, #57
- EQUB 28                \ AVL+5  = Market availability of Luxuries, #58
- EQUB 14                \ AVL+6  = Market availability of Narcotics, #59
- EQUB 0                 \ AVL+7  = Market availability of Computers, #60
- EQUB 0                 \ AVL+8  = Market availability of Machinery, #61
- EQUB 10                \ AVL+9  = Market availability of Alloys, #62
- EQUB 0                 \ AVL+10 = Market availability of Firearms, #63
- EQUB 17                \ AVL+11 = Market availability of Furs, #64
- EQUB 58                \ AVL+12 = Market availability of Minerals, #65
- EQUB 7                 \ AVL+13 = Market availability of Gold, #66
- EQUB 9                 \ AVL+14 = Market availability of Platinum, #67
- EQUB 8                 \ AVL+15 = Market availability of Gem-Stones, #68
- EQUB 0                 \ AVL+16 = Market availability of Alien Items, #69
+ EQUB 16                \ AVL+0  = Market availability of food, #53
+ EQUB 15                \ AVL+1  = Market availability of textiles, #54
+ EQUB 17                \ AVL+2  = Market availability of radioactives, #55
+ EQUB 0                 \ AVL+3  = Market availability of slaves, #56
+ EQUB 3                 \ AVL+4  = Market availability of liquor/Wines, #57
+ EQUB 28                \ AVL+5  = Market availability of luxuries, #58
+ EQUB 14                \ AVL+6  = Market availability of narcotics, #59
+ EQUB 0                 \ AVL+7  = Market availability of computers, #60
+ EQUB 0                 \ AVL+8  = Market availability of machinery, #61
+ EQUB 10                \ AVL+9  = Market availability of alloys, #62
+ EQUB 0                 \ AVL+10 = Market availability of firearms, #63
+ EQUB 17                \ AVL+11 = Market availability of furs, #64
+ EQUB 58                \ AVL+12 = Market availability of minerals, #65
+ EQUB 7                 \ AVL+13 = Market availability of gold, #66
+ EQUB 9                 \ AVL+14 = Market availability of platinum, #67
+ EQUB 8                 \ AVL+15 = Market availability of gem-stones, #68
+ EQUB 0                 \ AVL+16 = Market availability of alien items, #69
 
  EQUB 0                 \ QQ26 = Random byte that changes for each visit to a
                         \ system, for randomising market prices, #70

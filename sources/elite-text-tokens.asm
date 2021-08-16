@@ -39,6 +39,12 @@ INCLUDE "sources/elite-header.h.asm"
 _IB_DISC                = (_RELEASE = 1)
 _STH_DISC               = (_RELEASE = 2)
 
+\ ******************************************************************************
+\
+\ Configuration variables
+\
+\ ******************************************************************************
+
 CODE_WORDS% = &0400
 LOAD_WORDS% = &254B
 
@@ -58,7 +64,7 @@ ORG CODE_WORDS%
 \
 \   CHAR 'x'            Insert ASCII character "x"
 \
-\ To include an apostrophe, use a backtick character, as in i.e. CHAR '`'.
+\ To include an apostrophe, use a backtick character, as in CHAR '`'.
 \
 \ See the deep dive on "Printing text tokens" for details on how characters are
 \ stored in the recursive token table.

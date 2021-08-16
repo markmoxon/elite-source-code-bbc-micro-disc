@@ -29,6 +29,12 @@ INCLUDE "sources/elite-header.h.asm"
 _IB_DISC                = (_RELEASE = 1)
 _STH_DISC               = (_RELEASE = 2)
 
+\ ******************************************************************************
+\
+\ Configuration variables
+\
+\ ******************************************************************************
+
 BYTEV = &020A           \ The BYTEV vector that we check as part of the copy
                         \ protection
 
@@ -108,7 +114,8 @@ ORG CODE%
 
  INX                    \ Increment the pointer
 
- BNE p1a                \ Loop back until we have decrypted to the end of the page
+ BNE p1a                \ Loop back until we have decrypted to the end of the
+                        \ page
 
 .p1b
 

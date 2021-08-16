@@ -89,7 +89,7 @@ ORG CODE%
 \       Type: Variable
 \   Category: Drawing ships
 \    Summary: Ship blueprints default NEWB flags for the D.MOH file
-\  Deep dive: Ship blueprints
+\  Deep dive: Ship blueprints in the disc version
 \             Advanced tactics with the NEWB flags
 \
 \ ******************************************************************************
@@ -419,7 +419,7 @@ ENDMACRO
 .SHIP_ESCAPE_POD
 
  EQUB 0 + (2 << 4)      \ Max. canisters on demise = 0
-                        \ Market item when scooped = 2 + 1 = 3 (Slaves)
+                        \ Market item when scooped = 2 + 1 = 3 (slaves)
  EQUW 16 * 16           \ Targetable area          = 16 * 16
  EQUB &2C               \ Edges data offset (low)  = &002C
  EQUB &44               \ Faces data offset (low)  = &0044
