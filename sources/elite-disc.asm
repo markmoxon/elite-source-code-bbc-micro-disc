@@ -30,26 +30,28 @@
 
 INCLUDE "sources/elite-header.h.asm"
 
-PUTFILE "output/ELITE2.bin", "ELITE2", &2F00, &2F00
-PUTFILE "output/ELITE3.bin", "ELITE3", &5700, &5700
-PUTFILE "output/ELITE4.bin", "ELITE4", &1900, &197B
+PUTFILE "output/ELITE2.bin", "ELITE2", &FF2F00, &FF2F00
+PUTFILE "output/ELITE3.bin", "ELITE3", &FF5700, &FF5700
+PUTFILE "output/ELITE4.bin", "ELITE4", &FF1900, &FF197B
 
-PUTFILE "output/D.CODE.bin", "D.CODE", &11E3, &11E3
-PUTFILE "output/T.CODE.bin", "T.CODE", &11E3, &11E3
+PUTFILE "output/D.CODE.bin", "D.CODE", &0011E3, &0011E3
+PUTFILE "output/T.CODE.bin", "T.CODE", &0011E3, &0011E3
 
-PUTFILE "output/D.MOA.bin", "D.MOA", &5600, &5600
-PUTFILE "output/D.MOB.bin", "D.MOB", &5600, &5600
-PUTFILE "output/D.MOC.bin", "D.MOC", &5600, &5600
-PUTFILE "output/D.MOD.bin", "D.MOD", &5600, &5600
-PUTFILE "output/D.MOE.bin", "D.MOE", &5600, &5600
-PUTFILE "output/D.MOF.bin", "D.MOF", &5600, &5600
-PUTFILE "output/D.MOG.bin", "D.MOG", &5600, &5600
-PUTFILE "output/D.MOH.bin", "D.MOH", &5600, &5600
-PUTFILE "output/D.MOI.bin", "D.MOI", &5600, &5600
-PUTFILE "output/D.MOJ.bin", "D.MOJ", &5600, &5600
-PUTFILE "output/D.MOK.bin", "D.MOK", &5600, &5600
-PUTFILE "output/D.MOL.bin", "D.MOL", &5600, &5600
-PUTFILE "output/D.MOM.bin", "D.MOM", &5600, &5600
-PUTFILE "output/D.MON.bin", "D.MON", &5600, &5600
-PUTFILE "output/D.MOO.bin", "D.MOO", &5600, &5600
-PUTFILE "output/D.MOP.bin", "D.MOP", &5600, &5600
+PUTFILE "output/D.MOA.bin", "D.MOA", &005600, &005600
+PUTFILE "output/D.MOB.bin", "D.MOB", &005600, &005600
+PUTFILE "output/D.MOC.bin", "D.MOC", &005600, &005600
+PUTFILE "output/D.MOD.bin", "D.MOD", &005600, &005600
+PUTFILE "output/D.MOE.bin", "D.MOE", &005600, &005600
+PUTFILE "output/D.MOF.bin", "D.MOF", &005600, &005600
+PUTFILE "output/D.MOG.bin", "D.MOG", &005600, &005600
+PUTFILE "output/D.MOH.bin", "D.MOH", &005600, &005600
+PUTFILE "output/D.MOI.bin", "D.MOI", &005600, &005600
+PUTFILE "output/D.MOJ.bin", "D.MOJ", &005600, &005600
+PUTFILE "output/D.MOK.bin", "D.MOK", &005600, &005600
+PUTFILE "output/D.MOL.bin", "D.MOL", &005600, &005600
+PUTFILE "output/D.MOM.bin", "D.MOM", &005600, &005600
+PUTFILE "output/D.MON.bin", "D.MON", &005600, &005600
+PUTFILE "output/D.MOO.bin", "D.MOO", &005600, &005600
+PUTFILE "output/D.MOP.bin", "D.MOP", &005600, &005600
+
+PUTFILE "output/README.txt", "README", &FFFFFF, &FFFFFF
