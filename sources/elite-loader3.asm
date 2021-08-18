@@ -29,6 +29,8 @@ INCLUDE "sources/elite-header.h.asm"
 _IB_DISC                = (_RELEASE = 1)
 _STH_DISC               = (_RELEASE = 2)
 
+GUARD &6000             \ Guard against assembling over screen memory
+
 \ ******************************************************************************
 \
 \ Configuration variables
@@ -658,7 +660,7 @@ ORG &0B00
  SEC                    \ Set the C flag so the checksum we calculate in A
                         \ starts with an initial value of 18 (17 plus carry)
 
- LDY #&00               \ Set Y = 0 to act as a byte pointer
+ LDY #0                 \ Set Y = 0 to act as a byte pointer
 
  STY ZP                 \ Set the low byte of ZP(1 0) to 0, so ZP(1 0) always
                         \ points to the start of a page
@@ -1759,13 +1761,11 @@ ORG CATDcode + P% - CATD
 \
 \ This section is encrypted by EOR'ing with &A5. The encryption is done by the
 \ elite-checksum.py script, and decryption is done in part 1 above, at the same
-\ time as it is moved to &1000.
+\ time as it is moved to &1100.
 \
 \ ******************************************************************************
 
 .TVT1code
-
- EQUB &FF
 
 ORG &1100
 

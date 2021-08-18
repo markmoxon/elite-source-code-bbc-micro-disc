@@ -86,6 +86,12 @@ if Encrypt:
     data_block[checksum_offset] = CH ^ 0xA9
     data_block[checksum_offset + 1] = CH
 
+# Extract unscrambled &1100-&11E3 for use in &55FF checksum below
+
+start_1100 = scramble1_from - load_address
+end_1100 = start_1100 + 0xE3
+block_1100 = data_block[start_1100:end_1100]
+
 # EOR bytes in the various blocks
 
 for n in range(scramble1_from, scramble1_to):
@@ -155,6 +161,33 @@ elite_file.close()
 
 for n in range(scramble_from, scramble_to):
     data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
+
+# LOAD routine, which calculates checksum at &55FF in docked code
+# This checksum is not correct - need to fix this at some point
+
+load_address = 0x1100
+checksum_address = 0x55FF
+block_to_checksum = block_1100 + data_block
+
+d_checksum = 0x11
+carry = 1
+for x in range(0x11, 0x54):
+    for y in [0] + list(range(255, 0, -1)):
+        i = x * 256 + y
+        d_checksum += block_to_checksum[i - 0x1100] + carry
+        if d_checksum > 255:
+            carry = 1
+        else:
+            carry = 0
+        d_checksum = d_checksum % 256
+    carry = 0
+    d_checksum = d_checksum % 256
+d_checksum = d_checksum % 256
+
+# if Encrypt:
+#     data_block[checksum_address - load_address] = d_checksum % 256
+
+print("&55FF docked code checksum = ", d_checksum)
 
 # Write output file for T.CODE
 
