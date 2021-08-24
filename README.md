@@ -20,6 +20,8 @@ See the [introduction](#introduction) for more information.
 
 * [Browsing the source in an IDE](#browsing-the-source-in-an-ide)
 
+* [Folder structure](#folder-structure)
+
 * [Flicker-free Elite](#flicker-free-elite)
 
 * [Building Elite from the source](#building-elite-from-the-source)
@@ -41,13 +43,13 @@ See the [introduction](#introduction) for more information.
 
 This repository contains source code for the disc version of Elite on the BBC Micro, with every single line documented and (for the most part) explained.
 
-You can build the fully functioning game from this source. [Two releases](#building-different-releases-of-the-disc-version-of-elite) are currently supported: the version from Ian Bell's site, and the version from the Stairway to Hell archive.
+You can build the fully functioning game from this source. [Two releases](#building-different-releases-of-the-disc-version-of-elite) are currently supported: the version from Ian Bell's personal website, and the version from the Stairway to Hell archive.
 
 It is a companion to the [bbcelite.com website](https://www.bbcelite.com), which contains all the code from this repository, but laid out in a much more human-friendly fashion. The links at the top of this page will take you to repositories for the other versions of Elite that are covered by this project.
 
 * If you want to browse the source and read about how Elite works under the hood, you will probably find [the website](https://www.bbcelite.com) is a better place to start than this repository.
 
-* If you would rather explore the source code in your favourite IDE, then the [annotated source](sources/elite-source.asm) is what you're looking for. It contains the exact same content as the website, so you won't be missing out (the website is generated from the source files, so they are guaranteed to be identical). You might also like to read the section on [Browsing the source in an IDE](#browsing-the-source-in-an-ide) for some tips.
+* If you would rather explore the source code in your favourite IDE, then the [annotated source](1-source-files/main-sources/elite-source.asm) is what you're looking for. It contains the exact same content as the website, so you won't be missing out (the website is generated from the source files, so they are guaranteed to be identical). You might also like to read the section on [Browsing the source in an IDE](#browsing-the-source-in-an-ide) for some tips.
 
 * If you want to build Elite from the source on a modern computer, to produce a working game disc that can be loaded into a BBC Micro or an emulator, then you want the section on [Building Elite from the source](#building-elite-from-the-source).
 
@@ -63,7 +65,7 @@ The commentary is copyright &copy; Mark Moxon. Any misunderstandings or mistakes
 
 Huge thanks are due to the original authors for not only creating such an important piece of my childhood, but also for releasing the source code for us to play with; to Paul Brink for his annotated disassembly; and to Kieran Connell for his [BeebAsm version](https://github.com/kieranhj/elite-beebasm), which I forked as the original basis for this project. You can find more information about this project in the [accompanying website's project page](https://www.bbcelite.com/about_site/about_this_project.html).
 
-The following archive from Ian Bell's site forms the basis for this project:
+The following archive from Ian Bell's personal website forms the basis for this project:
 
 * [BBC Elite, disc version](http://www.elitehomepage.org/archive/a/a4100000.zip)
 
@@ -83,11 +85,11 @@ My hope is that the educational and non-profit intentions of this repository wil
 
 If you want to browse the source in an IDE, you might find the following useful.
 
-* The most interesting files are in the [sources](sources) folder:
+* The most interesting files are in the [main-sources](1-source-files/main-sources) folder:
 
-  * The main game's source code is in the [elite-source-flight.asm](sources/elite-source-flight.asm) and [elite-source-docked.asm](sources/elite-source-docked.asm) files (for when we're in-flight or docked) - this is the motherlode and probably contains all the stuff you're interested in.
+  * The main game's source code is in the [elite-source-flight.asm](1-source-files/main-sources/elite-source-flight.asm) and [elite-source-docked.asm](1-source-files/main-sources/elite-source-docked.asm) files (for when we're in-flight or docked) - this is the motherlode and probably contains all the stuff you're interested in.
 
-  * The game's loader is in the [elite-loader1.asm](sources/elite-loader1.asm), [elite-loader2.asm](sources/elite-loader2.asm) and [elite-loader3.asm](sources/elite-loader3.asm) files - these are mainly concerned with setup and copy protection.
+  * The game's loader is in the [elite-loader1.asm](1-source-files/main-sources/elite-loader1.asm), [elite-loader2.asm](1-source-files/main-sources/elite-loader2.asm) and [elite-loader3.asm](1-source-files/main-sources/elite-loader3.asm) files - these are mainly concerned with setup and copy protection.
 
 * It's probably worth skimming through the [notes on terminology and notations](https://www.bbcelite.com/about_site/terminology_used_in_this_commentary.html) on the accompanying website, as this explains a number of terms used in the commentary, without which it might be a bit tricky to follow at times (in particular, you should understand the terminology I use for multi-byte numbers).
 
@@ -97,11 +99,25 @@ If you want to browse the source in an IDE, you might find the following useful.
 
 * If you know the name of a routine, you can find it by searching for `Name: <name>`, as in `Name: SCAN` (for the 3D scanner routine) or `Name: LL9` (for the ship-drawing routine).
 
-* The entry point for the [main game code](sources/elite-source-docked.asm) is routine `TT170`, which you can find by searching for `Name: TT170`. If you want to follow the program flow all the way from the title screen around the main game loop, then you can find a number of [deep dives on program flow](https://www.bbcelite.com/deep_dives/) on the accompanying website.
+* The entry point for the [main game code](1-source-files/main-sources/elite-source-docked.asm) is routine `TT170`, which you can find by searching for `Name: TT170`. If you want to follow the program flow all the way from the title screen around the main game loop, then you can find a number of [deep dives on program flow](https://www.bbcelite.com/deep_dives/) on the accompanying website.
 
 * The source code is designed to be read at an 80-column width and with a monospaced font, just like in the good old days.
 
 I hope you enjoy exploring the inner-workings of BBC Elite as much as I have.
+
+## Folder structure
+
+There are five main folders in this repository, which reflect the order of the build process.
+
+* [1-source-files](1-source-files) contains all the different source files, such as the main assembler source files, image binaries, fonts, boot files and so on
+
+* [2-build-files](2-build-files) contains build-related scripts, such as the checksum, encryption and crc32 verification scripts
+
+* [3-assembled-output](3-assembled-output) contains the output from the assembly process, when the source files are assembled and the results processed by the build files
+
+* [4-reference-binaries](4-reference-binaries) contains the correct binaries for each release, so we can verify that our assembled output matches the reference
+
+* [5-compiled-game-discs](5-compiled-game-discs) contains the final output of the build process: an SSD disc image that contains the compiled game and which can be run on real hardware or in an emulator
 
 ## Flicker-free Elite
 
@@ -154,7 +170,7 @@ make.bat build
 make.bat encrypt
 ```
 
-will produce a file called `elite-disc-sth.ssd` containing the Stairway to Hell release, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
+will produce a file called `elite-disc-sth.ssd` in the `5-compiled-game-discs` folder that contains the Stairway to Hell release, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
 
 ### Mac and Linux
 
@@ -170,11 +186,11 @@ make build
 make encrypt
 ```
 
-will produce a file called `elite-disc-sth.ssd` containing the Stairway to Hell release, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
+will produce a file called `elite-disc-sth.ssd` in the `5-compiled-game-discs` folder that contains the Stairway to Hell release, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
 
 ### Verifying the output
 
-The build process also supports a verification target that prints out checksums of all the generated files, along with the checksums of the files extracted from the original sources.
+The build process also supports a verification target that prints out checksums of all the generated files, along with the checksums of the files from the original sources.
 
 You can run this verification step on its own, or you can run it once a build has finished. To run it on its own, use the following command on Windows:
 
@@ -200,12 +216,12 @@ or this on Mac/Linux:
 make encrypt verify
 ```
 
-The Python script `crc32.py` does the actual verification, and shows the checksums and file sizes of both sets of files, alongside each other, and with a Match column that flags any discrepancies. If you are building an unencrypted set of files then there will be lots of differences, while the encrypted files should mostly match (see the Differences section below for more on this).
+The Python script `crc32.py` in the `2-build-files` folder does the actual verification, and shows the checksums and file sizes of both sets of files, alongside each other, and with a Match column that flags any discrepancies. If you are building an unencrypted set of files then there will be lots of differences, while the encrypted files should mostly match (see the Differences section below for more on this).
 
-The binaries in the `extracted` folder are those extracted from the released version of the game, while those in the `output` folder are produced by the build process. For example, if you don't make any changes to the code and build the project with `make encrypt verify`, then this is the output of the verification process:
+The binaries in the `4-reference-binaries` folder are those extracted from the released version of the game, while those in the `3-assembled-output` folder are produced by the build process. For example, if you don't make any changes to the code and build the project with `make encrypt verify`, then this is the output of the verification process:
 
 ```
-[--extracted--]  [---output----]
+[--originals--]  [---output----]
 Checksum   Size  Checksum   Size  Match  Filename
 -----------------------------------------------------------
 a9ee9d74  17437  a9ee9d74  17437   Yes   D.CODE.bin
@@ -236,11 +252,11 @@ ec04b4d2   5376  ec04b4d2   5376   Yes   ELITE4.bin
 52bac547   1024  52bac547   1024   Yes   WORDS.bin
 ```
 
-All the compiled binaries match the extracts, so we know we are producing the same final game as the release version.
+All the compiled binaries match the originals, so we know we are producing the same final game as the release version.
 
 ### Log files
 
-During compilation, details of every step are output in a file called `compile.txt` in the `output` folder. If you have problems, it might come in handy, and it's a great reference if you need to know the addresses of labels and variables for debugging (or just snooping around).
+During compilation, details of every step are output in a file called `compile.txt` in the `3-assembled-output` folder. If you have problems, it might come in handy, and it's a great reference if you need to know the addresses of labels and variables for debugging (or just snooping around).
 
 ## Building different releases of the disc version of Elite
 
@@ -270,7 +286,7 @@ or this on a Mac or Linux:
 make encrypt verify release=ib-disc
 ```
 
-This will produce a file called `elite-disc-ib-disc.ssd` that contains the Ian Bell disc release.
+This will produce a file called `elite-disc-ib-disc.ssd` in the `5-compiled-game-discs` folder that contains the Ian Bell disc release.
 
 ### Differences between the releases
 
@@ -286,7 +302,7 @@ In other words, the Ian Bell release is the very first release of the disc versi
 
 See the [accompanying website](https://www.bbcelite.com/disc/releases.html) for a comprehensive list of differences between the releases.
 
-Note that I have only included differences that appear in the main game code, rather than those that appear in the loaders, as these files can differ extensively between releases without affecting the game itself. The release on Ian Bell's site contains a whole load of copy protection differences when compared to the same code in the Stairway to Hell release, and it also contains two more binary files (`ELITE5` and `ELITE6`), plus a `!BOOT` file that contains even more copy protection code. I haven't disassembled the loader files from this release as that's a whole different rabbit hole, so if you build the Ian Bell release with `make encrypt verify`, the compiled loader binaries will not match those extracted from the original disc. The main binaries will match, however, which is the interesting part from a digital archaeology perspective, as that's where the bug fixes live.
+Note that I have only included differences that appear in the main game code, rather than those that appear in the loaders, as these files can differ extensively between releases without affecting the game itself. The release on Ian Bell's personal website contains a whole load of copy protection differences when compared to the same code in the Stairway to Hell release, and it also contains two more binary files (`ELITE5` and `ELITE6`), plus a `!BOOT` file that contains even more copy protection code. I haven't disassembled the loader files from this release as that's a whole different rabbit hole, so if you build the Ian Bell release with `make encrypt verify`, the compiled loader binaries will not match those extracted from the original disc. The main binaries will match, however, which is the interesting part from a digital archaeology perspective, as that's where the bug fixes live.
 
 ---
 
