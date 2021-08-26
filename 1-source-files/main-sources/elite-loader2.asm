@@ -37,10 +37,6 @@ GUARD &7C00             \ Guard against assembling over screen memory
 \
 \ ******************************************************************************
 
-VIA = &FE00             \ Memory-mapped space for accessing internal hardware,
-                        \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
-                        \ known as SHEILA)
-
 OSNEWL = &FFE7          \ The address for the OSNEWL routine
 OSWRCH = &FFEE          \ The address for the OSWRCH routine
 OSBYTE = &FFF4          \ The address for the OSBYTE routine

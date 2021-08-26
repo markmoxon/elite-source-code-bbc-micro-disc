@@ -74,11 +74,6 @@ JH = SHU+2              \ Junk is defined as ending before the Cobra Mk III
                         \ alloy plate, cargo canister, asteroid, splinter,
                         \ Shuttle or Transporter
 
-PACK = SH3              \ The first of the eight pack-hunter ships, which tend
-                        \ to spawn in groups. With the default value of PACK the
-                        \ pack-hunters are the Sidewinder, Mamba, Krait, Adder,
-                        \ Gecko, Cobra Mk I, Worm and Cobra Mk III (pirate)
-
 POW = 15                \ Pulse laser power
 
 Mlas = 50               \ Mining laser power
@@ -87,7 +82,6 @@ Armlas = INT(128.5+1.5*POW) \ Military laser power
 
 NI% = 37                \ The number of bytes in each ship's data block (as
                         \ stored in INWK and K%)
-VSCAN = 57              \ Defines the split position in the split-screen mode
 
 X = 128                 \ The centre x-coordinate of the 256 x 192 space view
 Y = 96                  \ The centre y-coordinate of the 256 x 192 space view
@@ -116,9 +110,6 @@ QQ18 = &0400            \ The address of the text token table, as set in
                         \ elite-loader3.asm
 
 SNE = &07C0             \ The address of the sine lookup table, as set in
-                        \ elite-loader3.asm
-
-ACT = &07E0             \ The address of the arctan lookup table, as set in
                         \ elite-loader3.asm
 
 QQ16_FLIGHT = &0880     \ The address of the two-letter text token table in the
@@ -4221,7 +4212,9 @@ BRKV = P% - 2           \ The address of the destination address in the above
 .UNIV
 
 FOR I%, 0, NOSH
-  EQUW K% + I% * NI%    \ Address of block no. I%, of size NI%, in workspace K%
+
+ EQUW K% + I% * NI%     \ Address of block no. I%, of size NI%, in workspace K%
+
 NEXT
 
 \ ******************************************************************************

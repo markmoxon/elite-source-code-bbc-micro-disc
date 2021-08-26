@@ -39,17 +39,23 @@ _STH_DISC               = (_RELEASE = 2)
  EQUB 10, 13
  EQUS "Version: BBC Micro disc"
  EQUB 10, 13
+
 IF _IB_DISC
+
  EQUS "Release: Ian Bell's game disc"
  EQUB 10, 13
  EQUS "         Acornsoft SNG38 v1.0"
  EQUB 10, 13
+
 ELIF _STH_DISC
+
  EQUS "Release: Stairway to Hell archive"
  EQUB 10, 13
  EQUS "         Acornsoft SNG38 v1.1"
  EQUB 10, 13
+
 ENDIF
+
  EQUB 10, 13
  EQUS "See www.bbcelite.com for details"
  EQUB 10, 13
