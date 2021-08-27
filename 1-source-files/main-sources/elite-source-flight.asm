@@ -88,10 +88,6 @@ Armlas = INT(128.5+1.5*POW) \ Military laser power
 NI% = 37                \ The number of bytes in each ship's data block (as
                         \ stored in INWK and K%)
 
-VIA = &FE00             \ Memory-mapped space for accessing internal hardware,
-                        \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
-                        \ known as SHEILA)
-
 X = 128                 \ The centre x-coordinate of the 256 x 192 space view
 Y = 96                  \ The centre y-coordinate of the 256 x 192 space view
 
@@ -136,6 +132,10 @@ XX21 = &5600            \ The address of the ship blueprints lookup table, where
 
 E% = &563E              \ The address of the default NEWB ship bytes within the
                         \ loaded ship blueprints file
+
+VIA = &FE00             \ Memory-mapped space for accessing internal hardware,
+                        \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
+                        \ known as SHEILA)
 
 OSBYTE = &FFF4          \ The address for the OSBYTE routine
 OSWORD = &FFF1          \ The address for the OSWORD routine
@@ -23376,7 +23376,7 @@ LOAD_F% = LOAD% + P% - CODE%
 
  JSR DORND              \ Set A and X to random numbers
 
- CMP #245               \ Set the C flag if X >= 245 (4% chance)
+ CMP #245               \ Set the C flag if A >= 245 (4% chance)
 
  ROL A                  \ Set bit 0 of A to the C flag (i.e. there's a 4%
                         \ chance of this ship having E.C.M.)
