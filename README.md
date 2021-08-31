@@ -221,6 +221,7 @@ The Python script `crc32.py` in the `2-build-files` folder does the actual verif
 The binaries in the `4-reference-binaries` folder are those extracted from the released version of the game, while those in the `3-assembled-output` folder are produced by the build process. For example, if you don't make any changes to the code and build the project with `make encrypt verify`, then this is the output of the verification process:
 
 ```
+Results for release: sth
 [--originals--]  [---output----]
 Checksum   Size  Checksum   Size  Match  Filename
 -----------------------------------------------------------
@@ -272,6 +273,8 @@ By default the build process builds the Stairway to Hell release, but you can bu
 
 You can add `release=sth` to produce the `elite-disc-sth.ssd` file containing the Stairway to Hell release, though that's the default value so it isn't necessary.
 
+The verification checksums for this version are shown above.
+
 ### Building the Ian Bell disc release
 
 You can build the Ian Bell disc release by appending `release=ib-disc` to the `make` command, like this on Windows:
@@ -287,6 +290,46 @@ make encrypt verify release=ib-disc
 ```
 
 This will produce a file called `elite-disc-ib-disc.ssd` in the `5-compiled-game-discs` folder that contains the Ian Bell disc release.
+
+The verification checksums for this version are as follows:
+
+```
+Results for release: ib-disc
+[--originals--]  [---output----]
+Checksum   Size  Checksum   Size  Match  Filename
+-----------------------------------------------------------
+7b8eceb7   1418  -             -    -    !BOOT.bin
+25be225d  17437  25be225d  17437   Yes   D.CODE.bin
+56876c8a  17437  56876c8a  17437   Yes   D.CODE.unprot.bin
+9f4a04fd   2560  9f4a04fd   2560   Yes   D.MOA.bin
+d9eb34f9   2560  d9eb34f9   2560   Yes   D.MOB.bin
+93fe2e13   2560  93fe2e13   2560   Yes   D.MOC.bin
+64e8ebb4   2560  64e8ebb4   2560   Yes   D.MOD.bin
+80afbff9   2560  80afbff9   2560   Yes   D.MOE.bin
+b86fe100   2560  b86fe100   2560   Yes   D.MOF.bin
+72f99614   2560  72f99614   2560   Yes   D.MOG.bin
+29b6ce81   2560  29b6ce81   2560   Yes   D.MOH.bin
+0eeab415   2560  0eeab415   2560   Yes   D.MOI.bin
+7911181d   2560  7911181d   2560   Yes   D.MOJ.bin
+851d789f   2560  851d789f   2560   Yes   D.MOK.bin
+3025e5d8   2560  3025e5d8   2560   Yes   D.MOL.bin
+d6c01098   2560  d6c01098   2560   Yes   D.MOM.bin
+6930e1c7   2560  6930e1c7   2560   Yes   D.MON.bin
+43caddc7   2560  43caddc7   2560   Yes   D.MOO.bin
+ac1d57b2   2560  ac1d57b2   2560   Yes   D.MOP.bin
+86e4a1ef    256  14c1e8f6    256   No    ELITE2.bin
+fd788d2a   2304  6f90769a   2816   No    ELITE3.bin
+7abce0df   5376  74278df9   5376   No    ELITE4.bin
+10417c14   5376  8862453f   5376   No    ELITE4.unprot.bin
+e51c9eae    256  -             -    -    ELITE5.bin
+e99072dc    256  -             -    -    ELITE6.bin
+0f9e270b    256  0f9e270b    256   Yes   MISSILE.bin
+6b22a971  19997  6b22a971  19997   Yes   T.CODE.bin
+a1cf4199  19997  a1cf4199  19997   Yes   T.CODE.unprot.bin
+52bac547   1024  52bac547   1024   Yes   WORDS.bin
+```
+
+The failed matches are because I haven't yet converted the loader into BeebAsm source files (see the next section for details).
 
 ### Differences between the releases
 
