@@ -1944,7 +1944,7 @@ PRINT "WP workspace from  ", ~WP," to ", ~P%
 CODE% = &11E3
 LOAD% = &11E3
 
- ORG CODE%
+ORG CODE%
 
 LOAD_A% = LOAD%
 
