@@ -8,6 +8,8 @@ This folder contains support scripts for building the BBC Micro disc version of 
 
 * [elite-decrypt.py](elite-decrypt.py) decrypts an encrypted game binary by doing the opposite to the elite-checksum.py script (this is not used in the build process, but is useful when trying to decrypt any new releases that might be found)
 
+It also contains the `make.exe` executable for Windows, plus the required DLL files.
+
 ---
 
 Right on, Commanders!

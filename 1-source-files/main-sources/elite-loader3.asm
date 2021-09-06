@@ -48,10 +48,6 @@ VSCAN = 57              \ Defines the split position in the split-screen mode
 
 POW = 15                \ Pulse laser power
 
-Mlas = 50               \ Mining laser power
-
-Armlas = INT(128.5+1.5*POW) \ Military laser power
-
 VEC = &7FFE             \ VEC is where we store the original value of the IRQ1
                         \ vector, matching the address in the elite-missile.asm
                         \ source
@@ -1164,6 +1160,7 @@ ORG CATDcode + P% - CATD
 \   Category: Utility routines
 \    Summary: Generate random numbers
 \  Deep dive: Generating random numbers
+\             Fixing ship positions
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2319,15 +2316,15 @@ ORG TVT1code + P% - TVT1
 
 IF _MATCH_EXTRACTED_BINARIES
 
-IF _STH_DISC
- INCBIN "4-reference-binaries/sth/workspaces/loader3.bin"
-ELIF _IB_DISC
- SKIP 158
-ENDIF
+ IF _STH_DISC
+  INCBIN "4-reference-binaries/sth/workspaces/loader3.bin"
+ ELIF _IB_DISC
+  SKIP 158
+ ENDIF
 
 ELSE
 
- SKIP 158               \ These bytes appear to be unused
+  SKIP 158              \ These bytes appear to be unused
 
 ENDIF
 

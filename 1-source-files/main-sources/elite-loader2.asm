@@ -37,10 +37,6 @@ GUARD &7C00             \ Guard against assembling over screen memory
 \
 \ ******************************************************************************
 
-VIA = &FE00             \ Memory-mapped space for accessing internal hardware,
-                        \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
-                        \ known as SHEILA)
-
 OSNEWL = &FFE7          \ The address for the OSNEWL routine
 OSWRCH = &FFEE          \ The address for the OSWRCH routine
 OSBYTE = &FFF4          \ The address for the OSBYTE routine
@@ -121,10 +117,10 @@ ORG CODE%
 
 \ ******************************************************************************
 \
-\       Name: Elite loader (Part 1 of 4)
+\       Name: Elite loader (Part 1 of 2)
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: Various copy protection checks, plus make sure there is no Tube
+\    Summary: Various copy protection checks, and make sure there is no Tube
 \
 \ ******************************************************************************
 
@@ -229,34 +225,18 @@ ENDIF
 
 \ ******************************************************************************
 \
-\       Name: Elite loader (Part 2 of 4)
-\       Type: Subroutine
-\   Category: Loader
-\    Summary: Jump straight to part 3, as the copy protection code has been
-\             removed
-\
-\ ******************************************************************************
-
-.ENTRY2
-
- JMP ENTRY3             \ Jump to the next part, as the copy protection code has
-                        \ been removed
-
- NOP                    \ These bytes appear to be unused
- NOP
- NOP
- NOP
-
-\ ******************************************************************************
-\
-\       Name: Elite loader (Part 4 of 4)
+\       Name: Elite loader (Part 2 of 2)
 \       Type: Subroutine
 \   Category: Loader
 \    Summary: Load and run the ELITE4 loader
 \
 \ ******************************************************************************
 
-.ENTRY4
+.ENTRY2
+
+ LDA #15                \ Call OSBYTE with A = 129 and Y = 0 to flush the input
+ LDY #0                 \ buffer
+ JSR OSBYTE
 
  LDX #LO(MESS1)         \ Set (Y X) to point to MESS1 ("LOAD Elite4")
  LDY #HI(MESS1)
@@ -291,33 +271,7 @@ ENDIF
  EQUS "LOAD Elite4"
  EQUB 13
 
- SKIP 4                 \ These bytes appear to be unused
-
-\ ******************************************************************************
-\
-\       Name: Elite loader (Part 3 of 4)
-\       Type: Subroutine
-\   Category: Loader
-\    Summary: Pause for a surprisingly long time (7.67 seconds) so people can
-\             enjoy the Acornsoft loading screen
-\
-\ ******************************************************************************
-
-.ENTRY3
-
- LDA #129               \ Call OSBYTE with A = 129, X = &FF and Y = 2 to scan
- LDY #2                 \ the keyboard for &2FF centiseconds (7.67 seconds)
- LDX #&FF
- JSR OSBYTE
-
- LDA #15                \ Call OSBYTE with A = 129 and Y = 0 to flush the input
- LDY #0                 \ buffer
- JSR OSBYTE
-
- JMP ENTRY4             \ Jump to ENTRY4 to load and run the next part of the
-                        \ loader
-
- SKIP 63                \ These bytes appear to be unused
+ SKIP 86                \ These bytes appear to be unused
  EQUB &32
  SKIP 13
 

@@ -30,7 +30,7 @@
 
 INCLUDE "1-source-files/main-sources/elite-header.h.asm"
 
-PUTFILE "3-assembled-output/ELITE2.bin", "ELITE2", &FF2F00, &FF2F00
+PUTFILE "3-assembled-output/ELITE2.bin", "ELITE2", &FF2F00, &FF2F23
 PUTFILE "3-assembled-output/ELITE3.bin", "ELITE3", &FF5700, &FF5700
 PUTFILE "3-assembled-output/ELITE4.bin", "ELITE4", &FF1900, &FF197B
 

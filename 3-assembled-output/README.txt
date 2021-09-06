@@ -3,8 +3,8 @@
 Acornsoft Elite (flicker-free version)
 
 Version: BBC Micro disc
-Release: Ian Bell's game disc
-         Acornsoft SNG38 v1.0
+Release: Stairway to Hell archive
+         Acornsoft SNG38 v1.1
 
 Contains the flicker-free ship drawing
 routines from the BBC Master version,
