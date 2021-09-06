@@ -243,8 +243,8 @@ d6c01098   2560  d6c01098   2560   Yes   D.MOM.bin
 6930e1c7   2560  6930e1c7   2560   Yes   D.MON.bin
 43caddc7   2560  43caddc7   2560   Yes   D.MOO.bin
 ac1d57b2   2560  ac1d57b2   2560   Yes   D.MOP.bin
-14c1e8f6    256  14c1e8f6    256   Yes   ELITE2.bin
-6f90769a   2816  6f90769a   2816   Yes   ELITE3.bin
+c73d535a    256  c73d535a    256   Yes   ELITE2.bin
+17eefeec   2816  17eefeec   2816   Yes   ELITE3.bin
 ec04b4d2   5376  ec04b4d2   5376   Yes   ELITE4.bin
 10417c14   5376  10417c14   5376   Yes   ELITE4.unprot.bin
 0f9e270b    256  0f9e270b    256   Yes   MISSILE.bin
@@ -317,8 +317,8 @@ d6c01098   2560  d6c01098   2560   Yes   D.MOM.bin
 6930e1c7   2560  6930e1c7   2560   Yes   D.MON.bin
 43caddc7   2560  43caddc7   2560   Yes   D.MOO.bin
 ac1d57b2   2560  ac1d57b2   2560   Yes   D.MOP.bin
-86e4a1ef    256  14c1e8f6    256   No    ELITE2.bin
-fd788d2a   2304  6f90769a   2816   No    ELITE3.bin
+86e4a1ef    256  c73d535a    256   No    ELITE2.bin
+fd788d2a   2304  17eefeec   2816   No    ELITE3.bin
 7abce0df   5376  74278df9   5376   No    ELITE4.bin
 10417c14   5376  8862453f   5376   No    ELITE4.unprot.bin
 e51c9eae    256  -             -    -    ELITE5.bin

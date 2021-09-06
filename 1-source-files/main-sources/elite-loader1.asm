@@ -84,19 +84,15 @@ ORG CODE%
 
 .BEGIN
 
- JMP ENTRY              \ Jump over the copy protection to disable it
+                        \ Note that the following copy protection code is
+                        \ skipped in the unprotected version built here, as the
+                        \ binaries are not encrypted and therefore do not need
+                        \ to be decyrpted
+                        \
+                        \ Instead, the execution address for the ELITE2 binary
+                        \ points to ENTRY rather than BEGIN
 
-                        \ The version on Ian Bell's site has an encrypted ELITE2
-                        \ loader, so in that version, the loader starts with the
-                        \ following LDX instruction rather than a JMP. However,
-                        \ that version also contains a load of disc protection
-                        \ which the BeebAsm version doesn't include, so for now
-                        \ the differences in the ib-disc release build are
-                        \ restricted to the main game code rather than the
-                        \ loader, but here's a breakdown of the decryption code
-                        \ for those interested in the protection
-
-\LDX p1c+1              \ Set X to the comparison value from the CMP instruction
+ LDX p1c+1              \ Set X to the comparison value from the CMP instruction
                         \ below, which has the value p1d - BEGIN, which we use
                         \ as the offset of the first byte to decrypt (so we
                         \ decrypt from p1d onwards)
