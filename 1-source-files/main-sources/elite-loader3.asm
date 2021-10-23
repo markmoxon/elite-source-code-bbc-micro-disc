@@ -2314,7 +2314,7 @@ ORG TVT1code + P% - TVT1
 
  INCBIN "1-source-files/images/P.(C)ASFT.bin"
 
-IF _MATCH_EXTRACTED_BINARIES
+IF _MATCH_ORIGINAL_BINARIES
 
  IF _STH_DISC
   INCBIN "4-reference-binaries/sth/workspaces/loader3.bin"

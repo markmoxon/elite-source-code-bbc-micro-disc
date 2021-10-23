@@ -29,7 +29,7 @@ build:
 	echo _VERSION=2 > 1-source-files/main-sources/elite-header.h.asm
 	echo _RELEASE=$(rel-disc) >> 1-source-files/main-sources/elite-header.h.asm
 	echo _REMOVE_CHECKSUMS=TRUE >> 1-source-files/main-sources/elite-header.h.asm
-	echo _MATCH_EXTRACTED_BINARIES=FALSE >> 1-source-files/main-sources/elite-header.h.asm
+	echo _MATCH_ORIGINAL_BINARIES=FALSE >> 1-source-files/main-sources/elite-header.h.asm
 	$(BEEBASM) -i 1-source-files/main-sources/elite-text-tokens.asm -v > 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-missile.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-loader1.asm -v >> 3-assembled-output/compile.txt
@@ -62,7 +62,7 @@ encrypt:
 	echo _VERSION=2 > 1-source-files/main-sources/elite-header.h.asm
 	echo _RELEASE=$(rel-disc) >> 1-source-files/main-sources/elite-header.h.asm
 	echo _REMOVE_CHECKSUMS=FALSE >> 1-source-files/main-sources/elite-header.h.asm
-	echo _MATCH_EXTRACTED_BINARIES=TRUE >> 1-source-files/main-sources/elite-header.h.asm
+	echo _MATCH_ORIGINAL_BINARIES=TRUE >> 1-source-files/main-sources/elite-header.h.asm
 	$(BEEBASM) -i 1-source-files/main-sources/elite-text-tokens.asm -v > 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-missile.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-loader1.asm -v >> 3-assembled-output/compile.txt
