@@ -44,14 +44,14 @@ IF _IB_DISC
 
  EQUS "Variant: Ian Bell's game disc"
  EQUB 10, 13
- EQUS "Release: Acornsoft SNG38"
+ EQUS "Product: Acornsoft SNG38"
  EQUB 10, 13
 
 ELIF _STH_DISC
 
  EQUS "Variant: Stairway to Hell archive"
  EQUB 10, 13
- EQUS "Release: Acornsoft SNG38"
+ EQUS "Product: Acornsoft SNG38"
  EQUB 10, 13
  EQUS "         Acornsoft SNG47"
  EQUB 10, 13
