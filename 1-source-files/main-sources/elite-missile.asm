@@ -29,8 +29,8 @@
 
 INCLUDE "1-source-files/main-sources/elite-header.h.asm"
 
-_IB_DISC                = (_RELEASE = 1)
-_STH_DISC               = (_RELEASE = 2)
+_IB_DISC                = (_VARIANT = 1)
+_STH_DISC               = (_VARIANT = 2)
 
 GUARD &6000             \ Guard against assembling over screen memory
 

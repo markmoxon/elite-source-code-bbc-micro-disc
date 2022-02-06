@@ -3,8 +3,8 @@
 Acornsoft Elite
 
 Version: BBC Micro disc
-Release: Stairway to Hell archive
-         Acornsoft SNG38 v1.1
+Variant: Stairway to Hell archive
+Release: Acornsoft SNG38         Acornsoft SNG47
 
 See www.bbcelite.com for details
 ---------------------------------------

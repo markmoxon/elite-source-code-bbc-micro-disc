@@ -33,17 +33,17 @@ See the [introduction](#introduction) for more information.
   * [Verifying the output](#verifying-the-output)
   * [Log files](#log-files)
 
-* [Building different releases of the disc version of Elite](#building-different-releases-of-the-disc-version-of-elite)
+* [Building different variants of the disc version of Elite](#building-different-variants-of-the-disc-version-of-elite)
 
-  * [Building the Stairway to Hell release](#building-the-stairway-to-hell-release)
-  * [Building the Ian Bell disc release](#building-the-ian-bell-disc-release)
-  * [Differences between the releases](#differences-between-the-releases)
+  * [Building the Stairway to Hell variant](#building-the-stairway-to-hell-variant)
+  * [Building the Ian Bell disc variant](#building-the-ian-bell-disc-variant)
+  * [Differences between the variants](#differences-between-the-variants)
 
 ## Introduction
 
 This repository contains source code for the disc version of Elite on the BBC Micro, with every single line documented and (for the most part) explained.
 
-You can build the fully functioning game from this source. [Two releases](#building-different-releases-of-the-disc-version-of-elite) are currently supported: the version from Ian Bell's personal website, and the version from the Stairway to Hell archive.
+You can build the fully functioning game from this source. [Two variants](#building-different-variants-of-the-disc-version-of-elite) are currently supported: the version from Ian Bell's personal website, and the version from the Stairway to Hell archive.
 
 It is a companion to the [bbcelite.com website](https://www.bbcelite.com), which contains all the code from this repository, but laid out in a much more human-friendly fashion. The links at the top of this page will take you to repositories for the other versions of Elite that are covered by this project.
 
@@ -115,7 +115,7 @@ There are five main folders in this repository, which reflect the order of the b
 
 * [3-assembled-output](3-assembled-output) contains the output from the assembly process, when the source files are assembled and the results processed by the build files.
 
-* [4-reference-binaries](4-reference-binaries) contains the correct binaries for each release, so we can verify that our assembled output matches the reference.
+* [4-reference-binaries](4-reference-binaries) contains the correct binaries for each variant, so we can verify that our assembled output matches the reference.
 
 * [5-compiled-game-discs](5-compiled-game-discs) contains the final output of the build process: an SSD disc image that contains the compiled game and which can be run on real hardware or in an emulator.
 
@@ -146,11 +146,11 @@ Let's look at how to build Elite from the source.
 There are two main build targets available. They are:
 
 * `build` - An unencrypted version
-* `encrypt` - An encrypted version that exactly matches the released version of the game
+* `encrypt` - An encrypted version that includes the same obfuscation as the released version of the game
 
 The unencrypted version should be more useful for anyone who wants to make modifications to the game code. It includes a default commander with lots of cash and equipment, which makes it easier to test the game. As this target produces unencrypted files, the binaries produced will be quite different to the binaries on the original source disc, which are encrypted.
 
-The encrypted version produces the released version of Elite, along with the standard default commander.
+The encrypted version contains an obfuscated version of the game binary, along with the standard default commander.
 
 Builds are supported for both Windows and Mac/Linux systems. In all cases the build process is defined in the `Makefile` provided.
 
@@ -170,7 +170,7 @@ make.bat build
 make.bat encrypt
 ```
 
-will produce a file called `elite-disc-sth.ssd` in the `5-compiled-game-discs` folder that contains the Stairway to Hell release, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
+will produce a file called `elite-disc-sth.ssd` in the `5-compiled-game-discs` folder that contains the Stairway to Hell variant, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
 
 ### Mac and Linux
 
@@ -186,7 +186,7 @@ make build
 make encrypt
 ```
 
-will produce a file called `elite-disc-sth.ssd` in the `5-compiled-game-discs` folder that contains the Stairway to Hell release, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
+will produce a file called `elite-disc-sth.ssd` in the `5-compiled-game-discs` folder that contains the Stairway to Hell variant, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
 
 ### Verifying the output
 
@@ -221,7 +221,7 @@ The Python script `crc32.py` in the `2-build-files` folder does the actual verif
 The binaries in the `4-reference-binaries` folder are those extracted from the released version of the game, while those in the `3-assembled-output` folder are produced by the build process. For example, if you don't make any changes to the code and build the project with `make encrypt verify`, then this is the output of the verification process:
 
 ```
-Results for release: sth
+Results for variant: sth
 [--originals--]  [---output----]
 Checksum   Size  Checksum   Size  Match  Filename
 -----------------------------------------------------------
@@ -253,48 +253,48 @@ ec04b4d2   5376  ec04b4d2   5376   Yes   ELITE4.bin
 52bac547   1024  52bac547   1024   Yes   WORDS.bin
 ```
 
-All the compiled binaries match the originals, so we know we are producing the same final game as the release version.
+All the compiled binaries match the originals, so we know we are producing the same final game as the Stairway to Hell variant.
 
 ### Log files
 
 During compilation, details of every step are output in a file called `compile.txt` in the `3-assembled-output` folder. If you have problems, it might come in handy, and it's a great reference if you need to know the addresses of labels and variables for debugging (or just snooping around).
 
-## Building different releases of the disc version of Elite
+## Building different variants of the disc version of Elite
 
-This repository contains the source code for two different releases of the disc version of Elite:
+This repository contains the source code for two different variants of the disc version of Elite:
 
-* The release from the Stairway to Hell archive
+* The variant from the Stairway to Hell archive
 
-* The game disc on Ian Bell's website
+* The variant from the game disc on Ian Bell's website
 
-By default the build process builds the Stairway to Hell release, but you can build a specified release using the `release=` build parameter.
+By default the build process builds the Stairway to Hell variant, but you can build a specified variant using the `variant=` build parameter.
 
-### Building the Stairway to Hell release
+### Building the Stairway to Hell variant
 
-You can add `release=sth` to produce the `elite-disc-sth.ssd` file containing the Stairway to Hell release, though that's the default value so it isn't necessary.
+You can add `variant=sth` to produce the `elite-disc-sth.ssd` file containing the Stairway to Hell variant, though that's the default value so it isn't necessary.
 
 The verification checksums for this version are shown above.
 
-### Building the Ian Bell disc release
+### Building the Ian Bell disc variant
 
-You can build the Ian Bell disc release by appending `release=ib-disc` to the `make` command, like this on Windows:
+You can build the Ian Bell disc variant by appending `variant=ib-disc` to the `make` command, like this on Windows:
 
 ```
-make.bat encrypt verify release=ib-disc
+make.bat encrypt verify variant=ib-disc
 ```
 
 or this on a Mac or Linux:
 
 ```
-make encrypt verify release=ib-disc
+make encrypt verify variant=ib-disc
 ```
 
-This will produce a file called `elite-disc-ib-disc.ssd` in the `5-compiled-game-discs` folder that contains the Ian Bell disc release.
+This will produce a file called `elite-disc-ib-disc.ssd` in the `5-compiled-game-discs` folder that contains the Ian Bell disc variant.
 
 The verification checksums for this version are as follows:
 
 ```
-Results for release: ib-disc
+Results for variant: ib-disc
 [--originals--]  [---output----]
 Checksum   Size  Checksum   Size  Match  Filename
 -----------------------------------------------------------
@@ -331,21 +331,21 @@ a1cf4199  19997  a1cf4199  19997   Yes   T.CODE.unprot.bin
 
 The failed matches are because I haven't yet converted the loader into BeebAsm source files (see the next section for details).
 
-### Differences between the releases
+### Differences between the variants
 
-You can see the differences between the releases by searching the source code for `_STH_DISC` (for features in the Stairway to Hell release) or `_IB_DISC` (for features in the Ian Bell game disc release). There are only a few differences:
+You can see the differences between the variants by searching the source code for `_STH_DISC` (for features in the Stairway to Hell variant) or `_IB_DISC` (for features in the Ian Bell game disc variant). There are only a few differences:
 
-* The Ian Bell release contains the refund bug, which has been fixed in the Stairway to Hell release
+* The Ian Bell variant contains the refund bug, which has been fixed in the Stairway to Hell variant
 
-* The Ian Bell release never spawns asteroids, which has been fixed in the Stairway to Hell release
+* The Ian Bell variant never spawns asteroids, which has been fixed in the Stairway to Hell variant
 
-* The Ian Bell release sets bit 2 of the competition flag in the commander file, while the Stairway to Hell release sets bit 5
+* The Ian Bell variant sets bit 2 of the competition flag in the commander file, while the Stairway to Hell variant sets bit 5
 
-In other words, the Ian Bell release is the very first release of the disc version of Elite, while the Stairway to Hell release has both bugs fixed and a bumped-up release number.
+In other words, the Ian Bell variant appears to be the very first release of the disc version of Elite, while the Stairway to Hell variant has both bugs fixed and a bumped-up number in the competition flag.
 
-See the [accompanying website](https://www.bbcelite.com/disc/releases.html) for a comprehensive list of differences between the releases.
+See the [accompanying website](https://www.bbcelite.com/disc/releases.html) for a comprehensive list of differences between the variants.
 
-Note that I have only included differences that appear in the main game code, rather than those that appear in the loaders, as these files can differ extensively between releases without affecting the game itself. The release on Ian Bell's personal website contains a whole load of copy protection differences when compared to the same code in the Stairway to Hell release, and it also contains two more binary files (`ELITE5` and `ELITE6`), plus a `!BOOT` file that contains even more copy protection code. I haven't disassembled the loader files from this release as that's a whole different rabbit hole, so if you build the Ian Bell release with `make encrypt verify`, the compiled loader binaries will not match those extracted from the original disc. The main binaries will match, however, which is the interesting part from a digital archaeology perspective, as that's where the bug fixes live.
+Note that I have only included differences that appear in the main game code, rather than those that appear in the loaders, as these files can differ extensively between variants without affecting the game itself. The variant on Ian Bell's personal website contains a whole load of copy protection differences when compared to the same code in the Stairway to Hell variant, and it also contains two more binary files (`ELITE5` and `ELITE6`), plus a `!BOOT` file that contains even more copy protection code. I haven't disassembled the loader files from this variant as that's a whole different rabbit hole, so if you build the Ian Bell variant with `make encrypt verify`, the compiled loader binaries will not match those extracted from the original disc. The main binaries will match, however, which is the interesting part from a digital archaeology perspective, as that's where the bug fixes live.
 
 ---
 
