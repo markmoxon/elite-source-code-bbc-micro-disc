@@ -26,8 +26,8 @@
 
 INCLUDE "1-source-files/main-sources/elite-header.h.asm"
 
-_IB_DISC                = (_RELEASE = 1)
-_STH_DISC               = (_RELEASE = 2)
+_IB_DISC                = (_VARIANT = 1)
+_STH_DISC               = (_VARIANT = 2)
 
 GUARD &6000             \ Guard against assembling over screen memory
 
@@ -56,7 +56,7 @@ BRKV = &0202            \ The break vector that we intercept to enable us to
                         \ handle and display system errors
 
 IRQ1V = &0204           \ The IRQ1V vector that we intercept to implement the
-                        \ split-sceen mode
+                        \ split-screen mode
 
 WRCHV = &020E           \ The WRCHV vector that we intercept with our custom
                         \ text printing routine
@@ -632,6 +632,15 @@ ORG &0B00
 \    Summary: Load the main docked code, set up various vectors, run a checksum
 \             and start the game
 \
+\ ------------------------------------------------------------------------------
+\
+\ This routine also contains a hidden message from the authors for potential
+\ crackers to enjoy:
+\
+\   Does your mother know you do this?
+\
+\ I bet this made quite a few people smile back in the day...
+\
 \ ******************************************************************************
 
 .LOAD
@@ -707,18 +716,7 @@ ENDIF
  EQUS "L.T.CODE"        \ This is short for "*LOAD T.CODE"
  EQUB 13
 
- EQUB &44, &6F, &65     \ These bytes appear to be unused
- EQUB &73, &20, &79
- EQUB &6F, &75, &72
- EQUB &20, &6D, &6F
- EQUB &74, &68, &65
- EQUB &72, &20, &6B
- EQUB &6E, &6F, &77
- EQUB &20, &79, &6F
- EQUB &75, &20, &64
- EQUB &6F, &20, &74
- EQUB &68, &69, &73
- EQUB &3F
+ EQUS "Does your mother know you do this?"
 
 COPYBLOCK LOAD, P%, LOADcode
 
@@ -2314,7 +2312,7 @@ ORG TVT1code + P% - TVT1
 
  INCBIN "1-source-files/images/P.(C)ASFT.bin"
 
-IF _MATCH_EXTRACTED_BINARIES
+IF _MATCH_ORIGINAL_BINARIES
 
  IF _STH_DISC
   INCBIN "4-reference-binaries/sth/workspaces/loader3.bin"

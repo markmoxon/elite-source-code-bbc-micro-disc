@@ -26,8 +26,8 @@
 
 INCLUDE "1-source-files/main-sources/elite-header.h.asm"
 
-_IB_DISC                = (_RELEASE = 1)
-_STH_DISC               = (_RELEASE = 2)
+_IB_DISC                = (_VARIANT = 1)
+_STH_DISC               = (_VARIANT = 2)
 
 GUARD &6000             \ Guard against assembling over screen memory
 
@@ -4575,12 +4575,27 @@ LOAD_B% = LOAD% + P% - CODE%
 \
 \   * X1 < X2 and Y1-1 > Y2
 \
-\   * Draw from (X1, Y1) at bottom left to (X2, Y2) at top right
+\   * Draw from (X1, Y1) at bottom left to (X2, Y2) at top right, omitting the
+\     first pixel
 \
 \ ******************************************************************************
 
  LDA SWAP               \ If SWAP > 0 then we swapped the coordinates above, so
  BNE LI6                \ jump down to LI6 to skip plotting the first pixel
+                        \
+                        \ This appears to be a bug that omits the last pixel
+                        \ of this type of shallow line, rather than the first
+                        \ pixel, which makes the treatment of this kind of line
+                        \ different to the other kinds of slope (they all have a
+                        \ BEQ instruction at this point, rather than a BNE)
+                        \
+                        \ The result is a rather messy line join when a shallow
+                        \ line that goes right and up or left and down joins a
+                        \ line with any of the other three types of slope
+                        \
+                        \ This bug was fixed in the advanced versions of ELite,
+                        \ where the BNE is replaced by a BEQ to bring it in line
+                        \ with the other three slopes
 
  DEX                    \ Decrement the counter in X because we're about to plot
                         \ the first pixel
@@ -4660,7 +4675,8 @@ LOAD_B% = LOAD% + P% - CODE%
 \
 \   * X1 < X2 and Y1-1 <= Y2
 \
-\   * Draw from (X1, Y1) at top left to (X2, Y2) at bottom right
+\   * Draw from (X1, Y1) at top left to (X2, Y2) at bottom right, omitting the
+\     first pixel
 \
 \ ******************************************************************************
 
@@ -4893,7 +4909,8 @@ LOAD_B% = LOAD% + P% - CODE%
 \
 \   * X1 < X2 and Y1 >= Y2
 \
-\   * Draw from (X1, Y1) at top left to (X2, Y2) at bottom right
+\   * Draw from (X1, Y1) at top left to (X2, Y2) at bottom right, omitting the
+\     first pixel
 \
 \ ******************************************************************************
 
@@ -4930,7 +4947,7 @@ LOAD_B% = LOAD% + P% - CODE%
 
 .LI16
 
- LDA S                  \ Set S = S + Q to update the slope error
+ LDA S                  \ Set S = S + P to update the slope error
  ADC P
  STA S
 
@@ -4979,7 +4996,8 @@ LOAD_B% = LOAD% + P% - CODE%
 \
 \   * X1 >= X2 and Y1 >= Y2
 \
-\   * Draw from (X1, Y1) at bottom left to (X2, Y2) at top right
+\   * Draw from (X1, Y1) at bottom left to (X2, Y2) at top right, omitting the
+\     first pixel
 \
 \ Other entry points:
 \
@@ -4990,7 +5008,7 @@ LOAD_B% = LOAD% + P% - CODE%
 .LFT
 
  LDA SWAP               \ If SWAP = 0 then we didn't swap the coordinates above,
- BEQ LI18               \ jump down to LI18 to skip plotting the first pixel
+ BEQ LI18               \ so jump down to LI18 to skip plotting the first pixel
 
  DEX                    \ Decrement the counter in X because we're about to plot
                         \ the first pixel
@@ -5225,7 +5243,7 @@ LOAD_B% = LOAD% + P% - CODE%
 \
 \ ------------------------------------------------------------------------------
 \
-\ We do not draw a pixel at the end point (X2, X1).
+\ We do not draw a pixel at the right end of the line.
 \
 \ To understand how this routine works, you might find it helpful to read the
 \ deep dive on "Drawing monochrome pixels in mode 4".
@@ -15060,6 +15078,16 @@ LOAD_D% = LOAD% + P% - CODE%
  JSR TT111              \ Call TT111 to set the current system to the nearest
                         \ system to (QQ9, QQ10), and put the seeds of the
                         \ nearest system into QQ15 to QQ15+5
+                        \
+                        \ This call fixes a bug in the cassette version, where
+                        \ the galactic hyperdrive will take us to coordinates
+                        \ (96, 96) in the new galaxy, even if there isn't
+                        \ actually a system there, so if we jump when we are
+                        \ low on fuel, it is possible to get stuck in the
+                        \ middle of nowhere when changing galaxy
+                        \
+                        \ This call sets the current system correctly, so we
+                        \ always arrive at the nearest system to (96, 96)
 
  LDX #0                 \ Set the distance to the selected system in QQ8(1 0)
  STX QQ8                \ to 0
@@ -20119,6 +20147,11 @@ LOAD_F% = LOAD% + P% - CODE%
 \
 \ This routine also sets A, X, T1 and the C flag to random values.
 \
+\ Note that because this routine uses the value of X returned by DORND, and X
+\ contains the value of A returned by the previous call to DORND, this routine
+\ does not necessarily set the new ship to a totally random location. See the
+\ deep dive on "Fixing ship positions" for details.
+\
 \ ******************************************************************************
 
 .Ze
@@ -20300,6 +20333,12 @@ LOAD_F% = LOAD% + P% - CODE%
  STA INWK               \ Set x_lo = random
 
  STX INWK+3             \ Set y_lo = random
+                        \
+                        \ Note that because we use the value of X returned by
+                        \ DORND, and X contains the value of A returned by the
+                        \ previous call to DORND, this does not set the new ship
+                        \ to a totally random location. See the deep dive on
+                        \ "Fixing ship positions" for details
 
  AND #%10000000         \ Set x_sign = bit 7 of x_lo
  STA INWK+2
@@ -22930,9 +22969,9 @@ ENDIF
 
 .DKS2
 
- LDA #128               \ Call OSBYTE 128 to fetch the 16-bit value from ADC
- JSR OSBYTE             \ channel X, returning (Y X), i.e. the high byte in Y
-                        \ and the low byte in X
+ LDA #128               \ Call OSBYTE with A = 128 to fetch the 16-bit value
+ JSR OSBYTE             \ from ADC channel X, returning (Y X), i.e. the high
+                        \ byte in Y and the low byte in X
 
  TYA                    \ Copy Y to A, so the result is now in (A X)
 
@@ -31184,31 +31223,31 @@ ENDMACRO
 
 .RUPLA
 
- EQUB 211                \ System 211, Galaxy 0                Teorge = Token  1
- EQUB 150                \ System 150, Galaxy 0, Mission 1       Xeer = Token  2
- EQUB 36                 \ System  36, Galaxy 0, Mission 1   Reesdice = Token  3
- EQUB 28                 \ System  28, Galaxy 0, Mission 1      Arexe = Token  4
- EQUB 253                \ System 253, Galaxy 1, Mission 1     Errius = Token  5
- EQUB 79                 \ System  79, Galaxy 1, Mission 1     Inbibe = Token  6
- EQUB 53                 \ System  53, Galaxy 1, Mission 1      Ausar = Token  7
- EQUB 118                \ System 118, Galaxy 1, Mission 1     Usleri = Token  8
- EQUB 100                \ System 100, Galaxy 2                Arredi = Token  9
- EQUB 32                 \ System  32, Galaxy 1, Mission 1     Bebege = Token 10
- EQUB 68                 \ System  68, Galaxy 1, Mission 1     Cearso = Token 11
- EQUB 164                \ System 164, Galaxy 1, Mission 1     Dicela = Token 12
- EQUB 220                \ System 220, Galaxy 1, Mission 1     Eringe = Token 13
- EQUB 106                \ System 106, Galaxy 1, Mission 1     Gexein = Token 14
- EQUB 16                 \ System  16, Galaxy 1, Mission 1     Isarin = Token 15
- EQUB 162                \ System 162, Galaxy 1, Mission 1   Letibema = Token 16
- EQUB 3                  \ System   3, Galaxy 1, Mission 1     Maisso = Token 17
- EQUB 107                \ System 107, Galaxy 1, Mission 1       Onen = Token 18
- EQUB 26                 \ System  26, Galaxy 1, Mission 1     Ramaza = Token 19
- EQUB 192                \ System 192, Galaxy 1, Mission 1     Sosole = Token 20
- EQUB 184                \ System 184, Galaxy 1, Mission 1     Tivere = Token 21
- EQUB 5                  \ System   5, Galaxy 1, Mission 1     Veriar = Token 22
- EQUB 101                \ System 101, Galaxy 2, Mission 1     Xeveon = Token 23
- EQUB 193                \ System 193, Galaxy 1, Mission 1     Orarra = Token 24
- EQUB 41                 \ System  41, Galaxy 2                Anreer = Token 25
+ EQUB 211               \ System 211, Galaxy 0                 Teorge = Token  1
+ EQUB 150               \ System 150, Galaxy 0, Mission 1        Xeer = Token  2
+ EQUB 36                \ System  36, Galaxy 0, Mission 1    Reesdice = Token  3
+ EQUB 28                \ System  28, Galaxy 0, Mission 1       Arexe = Token  4
+ EQUB 253               \ System 253, Galaxy 1, Mission 1      Errius = Token  5
+ EQUB 79                \ System  79, Galaxy 1, Mission 1      Inbibe = Token  6
+ EQUB 53                \ System  53, Galaxy 1, Mission 1       Ausar = Token  7
+ EQUB 118               \ System 118, Galaxy 1, Mission 1      Usleri = Token  8
+ EQUB 100               \ System 100, Galaxy 2                 Arredi = Token  9
+ EQUB 32                \ System  32, Galaxy 1, Mission 1      Bebege = Token 10
+ EQUB 68                \ System  68, Galaxy 1, Mission 1      Cearso = Token 11
+ EQUB 164               \ System 164, Galaxy 1, Mission 1      Dicela = Token 12
+ EQUB 220               \ System 220, Galaxy 1, Mission 1      Eringe = Token 13
+ EQUB 106               \ System 106, Galaxy 1, Mission 1      Gexein = Token 14
+ EQUB 16                \ System  16, Galaxy 1, Mission 1      Isarin = Token 15
+ EQUB 162               \ System 162, Galaxy 1, Mission 1    Letibema = Token 16
+ EQUB 3                 \ System   3, Galaxy 1, Mission 1      Maisso = Token 17
+ EQUB 107               \ System 107, Galaxy 1, Mission 1        Onen = Token 18
+ EQUB 26                \ System  26, Galaxy 1, Mission 1      Ramaza = Token 19
+ EQUB 192               \ System 192, Galaxy 1, Mission 1      Sosole = Token 20
+ EQUB 184               \ System 184, Galaxy 1, Mission 1      Tivere = Token 21
+ EQUB 5                 \ System   5, Galaxy 1, Mission 1      Veriar = Token 22
+ EQUB 101               \ System 101, Galaxy 2, Mission 1      Xeveon = Token 23
+ EQUB 193               \ System 193, Galaxy 1, Mission 1      Orarra = Token 24
+ EQUB 41                \ System  41, Galaxy 2                 Anreer = Token 25
 
 \ ******************************************************************************
 \
@@ -31246,31 +31285,31 @@ ENDMACRO
 
 .RUGAL
 
- EQUB &80                \ System 211, Galaxy 0                Teorge = Token  1
- EQUB &00                \ System 150, Galaxy 0, Mission 1       Xeer = Token  2
- EQUB &00                \ System  36, Galaxy 0, Mission 1   Reesdice = Token  3
- EQUB &00                \ System  28, Galaxy 0, Mission 1      Arexe = Token  4
- EQUB &01                \ System 253, Galaxy 1, Mission 1     Errius = Token  5
- EQUB &01                \ System  79, Galaxy 1, Mission 1     Inbibe = Token  6
- EQUB &01                \ System  53, Galaxy 1, Mission 1      Ausar = Token  7
- EQUB &01                \ System 118, Galaxy 1, Mission 1     Usleri = Token  8
- EQUB &82                \ System 100, Galaxy 2                Arredi = Token  9
- EQUB &01                \ System  32, Galaxy 1, Mission 1     Bebege = Token 10
- EQUB &01                \ System  68, Galaxy 1, Mission 1     Cearso = Token 11
- EQUB &01                \ System 164, Galaxy 1, Mission 1     Dicela = Token 12
- EQUB &01                \ System 220, Galaxy 1, Mission 1     Eringe = Token 13
- EQUB &01                \ System 106, Galaxy 1, Mission 1     Gexein = Token 14
- EQUB &01                \ System  16, Galaxy 1, Mission 1     Isarin = Token 15
- EQUB &01                \ System 162, Galaxy 1, Mission 1   Letibema = Token 16
- EQUB &01                \ System   3, Galaxy 1, Mission 1     Maisso = Token 17
- EQUB &01                \ System 107, Galaxy 1, Mission 1       Onen = Token 18
- EQUB &01                \ System  26, Galaxy 1, Mission 1     Ramaza = Token 19
- EQUB &01                \ System 192, Galaxy 1, Mission 1     Sosole = Token 20
- EQUB &01                \ System 184, Galaxy 1, Mission 1     Tivere = Token 21
- EQUB &01                \ System   5, Galaxy 1, Mission 1     Veriar = Token 22
- EQUB &02                \ System 101, Galaxy 2, Mission 1     Xeveon = Token 23
- EQUB &01                \ System 193, Galaxy 1, Mission 1     Orarra = Token 24
- EQUB &82                \ System  41, Galaxy 2                Anreer = Token 25
+ EQUB &80               \ System 211, Galaxy 0                 Teorge = Token  1
+ EQUB &00               \ System 150, Galaxy 0, Mission 1        Xeer = Token  2
+ EQUB &00               \ System  36, Galaxy 0, Mission 1    Reesdice = Token  3
+ EQUB &00               \ System  28, Galaxy 0, Mission 1       Arexe = Token  4
+ EQUB &01               \ System 253, Galaxy 1, Mission 1      Errius = Token  5
+ EQUB &01               \ System  79, Galaxy 1, Mission 1      Inbibe = Token  6
+ EQUB &01               \ System  53, Galaxy 1, Mission 1       Ausar = Token  7
+ EQUB &01               \ System 118, Galaxy 1, Mission 1      Usleri = Token  8
+ EQUB &82               \ System 100, Galaxy 2                 Arredi = Token  9
+ EQUB &01               \ System  32, Galaxy 1, Mission 1      Bebege = Token 10
+ EQUB &01               \ System  68, Galaxy 1, Mission 1      Cearso = Token 11
+ EQUB &01               \ System 164, Galaxy 1, Mission 1      Dicela = Token 12
+ EQUB &01               \ System 220, Galaxy 1, Mission 1      Eringe = Token 13
+ EQUB &01               \ System 106, Galaxy 1, Mission 1      Gexein = Token 14
+ EQUB &01               \ System  16, Galaxy 1, Mission 1      Isarin = Token 15
+ EQUB &01               \ System 162, Galaxy 1, Mission 1    Letibema = Token 16
+ EQUB &01               \ System   3, Galaxy 1, Mission 1      Maisso = Token 17
+ EQUB &01               \ System 107, Galaxy 1, Mission 1        Onen = Token 18
+ EQUB &01               \ System  26, Galaxy 1, Mission 1      Ramaza = Token 19
+ EQUB &01               \ System 192, Galaxy 1, Mission 1      Sosole = Token 20
+ EQUB &01               \ System 184, Galaxy 1, Mission 1      Tivere = Token 21
+ EQUB &01               \ System   5, Galaxy 1, Mission 1      Veriar = Token 22
+ EQUB &02               \ System 101, Galaxy 2, Mission 1      Xeveon = Token 23
+ EQUB &01               \ System 193, Galaxy 1, Mission 1      Orarra = Token 24
+ EQUB &82               \ System  41, Galaxy 2                 Anreer = Token 25
 
 \ ******************************************************************************
 \

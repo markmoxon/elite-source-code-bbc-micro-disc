@@ -26,8 +26,8 @@
 
 INCLUDE "1-source-files/main-sources/elite-header.h.asm"
 
-_IB_DISC                = (_RELEASE = 1)
-_STH_DISC               = (_RELEASE = 2)
+_IB_DISC                = (_VARIANT = 1)
+_STH_DISC               = (_VARIANT = 2)
 
 GUARD &7C00             \ Guard against assembling over screen memory
 
@@ -234,7 +234,7 @@ ENDIF
 
 .ENTRY2
 
- LDA #15                \ Call OSBYTE with A = 129 and Y = 0 to flush the input
+ LDA #15                \ Call OSBYTE with A = 15 and Y = 0 to flush the input
  LDY #0                 \ buffer
  JSR OSBYTE
 

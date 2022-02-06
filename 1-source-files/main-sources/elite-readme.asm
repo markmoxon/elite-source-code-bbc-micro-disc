@@ -26,8 +26,8 @@
 
 INCLUDE "1-source-files/main-sources/elite-header.h.asm"
 
-_IB_DISC                = (_RELEASE = 1)
-_STH_DISC               = (_RELEASE = 2)
+_IB_DISC                = (_VARIANT = 1)
+_STH_DISC               = (_VARIANT = 2)
 
 .readme
 
@@ -42,16 +42,18 @@ _STH_DISC               = (_RELEASE = 2)
 
 IF _IB_DISC
 
- EQUS "Release: Ian Bell's game disc"
+ EQUS "Variant: Ian Bell's game disc"
  EQUB 10, 13
- EQUS "         Acornsoft SNG38 v1.0"
+ EQUS "Product: Acornsoft SNG38"
  EQUB 10, 13
 
 ELIF _STH_DISC
 
- EQUS "Release: Stairway to Hell archive"
+ EQUS "Variant: Stairway to Hell archive"
  EQUB 10, 13
- EQUS "         Acornsoft SNG38 v1.1"
+ EQUS "Product: Acornsoft SNG38"
+ EQUB 10, 13
+ EQUS "         Acornsoft SNG47"
  EQUB 10, 13
 
 ENDIF

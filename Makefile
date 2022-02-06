@@ -1,7 +1,7 @@
 BEEBASM?=beebasm
 PYTHON?=python
 
-# You can set the release that gets built by adding 'release=<rel>' to
+# You can set the variant that gets built by adding 'variant=<rel>' to
 # the make command, where <rel> is one of:
 #
 #   ib-disc
@@ -9,17 +9,17 @@ PYTHON?=python
 #
 # So, for example:
 #
-#   make encrypt verify release=ib-disc
+#   make encrypt verify variant=ib-disc
 #
-# will build the version from the game disc on Ian Bell's site. If you omit
-# the release parameter, it will build the Stairway to Hell version.
+# will build the variant from the game disc on Ian Bell's site. If you omit
+# the variant parameter, it will build the Stairway to Hell variant.
 
-ifeq ($(release), ib-disc)
-  rel-disc=1
+ifeq ($(variant), ib-disc)
+  variant-disc=1
   folder-disc=/ib-disc
   suffix-disc=-ib-disc
 else
-  rel-disc=2
+  variant-disc=2
   folder-disc=/sth
   suffix-disc=-sth
 endif
@@ -27,9 +27,9 @@ endif
 .PHONY:build
 build:
 	echo _VERSION=2 > 1-source-files/main-sources/elite-header.h.asm
-	echo _RELEASE=$(rel-disc) >> 1-source-files/main-sources/elite-header.h.asm
+	echo _VARIANT=$(variant-disc) >> 1-source-files/main-sources/elite-header.h.asm
 	echo _REMOVE_CHECKSUMS=TRUE >> 1-source-files/main-sources/elite-header.h.asm
-	echo _MATCH_EXTRACTED_BINARIES=FALSE >> 1-source-files/main-sources/elite-header.h.asm
+	echo _MATCH_ORIGINAL_BINARIES=FALSE >> 1-source-files/main-sources/elite-header.h.asm
 	$(BEEBASM) -i 1-source-files/main-sources/elite-text-tokens.asm -v > 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-missile.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-loader1.asm -v >> 3-assembled-output/compile.txt
@@ -60,9 +60,9 @@ build:
 .PHONY:encrypt
 encrypt:
 	echo _VERSION=2 > 1-source-files/main-sources/elite-header.h.asm
-	echo _RELEASE=$(rel-disc) >> 1-source-files/main-sources/elite-header.h.asm
+	echo _VARIANT=$(variant-disc) >> 1-source-files/main-sources/elite-header.h.asm
 	echo _REMOVE_CHECKSUMS=FALSE >> 1-source-files/main-sources/elite-header.h.asm
-	echo _MATCH_EXTRACTED_BINARIES=TRUE >> 1-source-files/main-sources/elite-header.h.asm
+	echo _MATCH_ORIGINAL_BINARIES=TRUE >> 1-source-files/main-sources/elite-header.h.asm
 	$(BEEBASM) -i 1-source-files/main-sources/elite-text-tokens.asm -v > 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-missile.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-loader1.asm -v >> 3-assembled-output/compile.txt
