@@ -747,7 +747,7 @@ ORG &0D7A
 \
 \ This routine is copied to &0D7A in part 1 above. It is called by both the main
 \ docked code and the main flight code, just before the docked code, flight code
-\ or shup blueprint files are loaded.
+\ or ship blueprint files are loaded.
 \
 \ ******************************************************************************
 
