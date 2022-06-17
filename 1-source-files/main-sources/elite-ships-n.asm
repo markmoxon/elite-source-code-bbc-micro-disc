@@ -4,8 +4,8 @@
 \
 \ Elite was written by Ian Bell and David Braben and is copyright Acornsoft 1984
 \
-\ The code on this site has been disassembled from the version released on Ian
-\ Bell's personal website at http://www.elitehomepage.org/
+\ The code on this site has been reconstructed from a disassembly of the version
+\ released on Ian Bell's personal website at http://www.elitehomepage.org/
 \
 \ The commentary is copyright Mark Moxon, and any misunderstandings or mistakes
 \ in the documentation are entirely my fault
