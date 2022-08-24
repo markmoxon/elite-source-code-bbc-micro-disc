@@ -696,7 +696,7 @@ ORG &0B00
 
  CMP &55FF              \ Compare the checksum with the value in &55FF, which is
                         \ in the docked file we just loaded, in the byte before
-                        \ the ship hanger blueprints at XX21
+                        \ the ship hangar blueprints at XX21
 
 IF _REMOVE_CHECKSUMS
 

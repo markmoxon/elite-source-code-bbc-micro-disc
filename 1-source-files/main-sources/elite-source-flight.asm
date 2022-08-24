@@ -2968,7 +2968,7 @@ LOAD_A% = LOAD%
 
  JSR HFS2               \ Call HFS2 to draw the launch tunnel rings
 
- JMP DOENTRY            \ Go to the docking bay (i.e. show the ship hanger)
+ JMP DOENTRY            \ Go to the docking bay (i.e. show the ship hangar)
 
 .MA62
 
@@ -8754,7 +8754,7 @@ NEXT
  STA QQ14               \ fuel, so set the current fuel level in QQ14 to 70, or
                         \ 7.0 light years
 
- JMP GOIN               \ Go to the docking bay (i.e. show the ship hanger
+ JMP GOIN               \ Go to the docking bay (i.e. show the ship hangar
                         \ screen) and return from the subroutine with a tail
                         \ call
 
