@@ -59,7 +59,7 @@ My hope is that this repository and the [accompanying website](https://www.bbcel
 
 Elite was written by Ian Bell and David Braben and is copyright &copy; Acornsoft 1984.
 
-The code on this site has been disassembled from the version released on [Ian Bell's personal website](http://www.elitehomepage.org/).
+The code on this site has been reconstructed from a disassembly of the version released on [Ian Bell's personal website](http://www.elitehomepage.org/).
 
 The commentary is copyright &copy; Mark Moxon. Any misunderstandings or mistakes in the documentation are entirely my fault.
 
@@ -103,7 +103,7 @@ If you want to browse the source in an IDE, you might find the following useful.
 
 * The source code is designed to be read at an 80-column width and with a monospaced font, just like in the good old days.
 
-I hope you enjoy exploring the inner-workings of BBC Elite as much as I have.
+I hope you enjoy exploring the inner workings of BBC Elite as much as I have.
 
 ## Folder structure
 
