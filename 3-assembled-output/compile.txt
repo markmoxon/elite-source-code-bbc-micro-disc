@@ -2644,7 +2644,7 @@ Code size is &400
 Execute at &254B 
 Reload at &254B 
 S.WORDS &400  &800  &254B  &254B 
-Saving file 'versions/disc/3-assembled-output/WORDS.bin'
+Saving file '3-assembled-output/WORDS.bin'
 .SHIP_MISSILE
      7F00   00
      7F01   40 06
@@ -3009,7 +3009,7 @@ Code size is &100
 Execute at &244B 
 Reload at &244B 
 S.MISSILE &7F00  &8000  &244B  &244B 
-Saving file 'versions/disc/3-assembled-output/MISSILE.bin'
+Saving file '3-assembled-output/MISSILE.bin'
 .ZP
      0001
 .BEGIN
@@ -3168,7 +3168,7 @@ Saving file 'versions/disc/3-assembled-output/MISSILE.bin'
      2FFE   00
      2FFF   00
 S.ELITE2 &2F00  &3000  &2F00  &2F00 
-Saving file 'versions/disc/3-assembled-output/ELITE2.bin'
+Saving file '3-assembled-output/ELITE2.bin'
 .TRTB%
      0004
 .S
@@ -4511,7 +4511,7 @@ Saving file 'versions/disc/3-assembled-output/ELITE2.bin'
      61FC   A5 44      LDA &44
      61FE   85 4C      STA &4C
 S.ELITE3 &5700  &6200  &5700  &5700 
-Saving file 'versions/disc/3-assembled-output/ELITE3.bin'
+Saving file '3-assembled-output/ELITE3.bin'
 .ZP
      0070
 .P
@@ -5382,7 +5382,7 @@ End macro FNE
 .ASOFT
 .CpASOFT
 S.ELITE4 &1900  &2E00  &1900  &1900 
-Saving file 'versions/disc/3-assembled-output/ELITE4.unprot.bin'
+Saving file '3-assembled-output/ELITE4.unprot.bin'
 .ZP
      0000
 .RAND
@@ -15555,7 +15555,7 @@ Execute at &11E3
 Reload at &50A0 
 S.ELTH &50A0  &5600  &11E3  &50A0 
 S.D.CODE &11E3  &5600  &11E3  &11E3 
-Saving file 'versions/disc/3-assembled-output/D.CODE.unprot.bin'
+Saving file '3-assembled-output/D.CODE.unprot.bin'
 .ZP
      0000
 .RAND
@@ -37084,7 +37084,7 @@ Execute at &11E3
 Reload at &5600 
 S.SHIPS &175B  &6000  &11E3  &5600 
 S.T.CODE &11E3  &6000  &11E3  &11E3 
-Saving file 'versions/disc/3-assembled-output/T.CODE.unprot.bin'
+Saving file '3-assembled-output/T.CODE.unprot.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -40543,7 +40543,7 @@ Macro FACE:
      5FDE   00
 End macro FACE
 S.D.MOA &5600  &5FDF  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOA.bin'
+Saving file '3-assembled-output/D.MOA.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -44020,7 +44020,7 @@ Macro FACE:
      5FEC   00
 End macro FACE
 S.D.MOB &5600  &5FED  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOB.bin'
+Saving file '3-assembled-output/D.MOB.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -47504,7 +47504,7 @@ Macro FACE:
      5FF4   00
 End macro FACE
 S.D.MOC &5600  &5FF5  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOC.bin'
+Saving file '3-assembled-output/D.MOC.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -50960,7 +50960,7 @@ Macro FACE:
      5FE2   00
 End macro FACE
 S.D.MOD &5600  &5FE3  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOD.bin'
+Saving file '3-assembled-output/D.MOD.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -54458,7 +54458,7 @@ Macro FACE:
      5FFE   3E
 End macro FACE
 S.D.MOE &5600  &5FFF  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOE.bin'
+Saving file '3-assembled-output/D.MOE.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -57970,7 +57970,7 @@ Macro FACE:
      5FFC   D6
 End macro FACE
 S.D.MOF &5600  &5FFD  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOF.bin'
+Saving file '3-assembled-output/D.MOF.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -61475,7 +61475,7 @@ Macro FACE:
      5FFE   00
 End macro FACE
 S.D.MOG &5600  &5FFF  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOG.bin'
+Saving file '3-assembled-output/D.MOG.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -64935,7 +64935,7 @@ Macro FACE:
      5FDA   09
 End macro FACE
 S.D.MOH &5600  &5FDB  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOH.bin'
+Saving file '3-assembled-output/D.MOH.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -68428,7 +68428,7 @@ Macro FACE:
      5FF4   70
 End macro FACE
 S.D.MOI &5600  &5FF5  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOI.bin'
+Saving file '3-assembled-output/D.MOI.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -71787,7 +71787,7 @@ Macro FACE:
      5F9C   09
 End macro FACE
 S.D.MOJ &5600  &5F9D  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOJ.bin'
+Saving file '3-assembled-output/D.MOJ.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -75260,7 +75260,7 @@ Macro FACE:
      5FE4   32
 End macro FACE
 S.D.MOK &5600  &5FE5  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOK.bin'
+Saving file '3-assembled-output/D.MOK.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -78670,7 +78670,7 @@ Macro FACE:
      5FB8   00
 End macro FACE
 S.D.MOL &5600  &5FB9  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOL.bin'
+Saving file '3-assembled-output/D.MOL.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -82174,7 +82174,7 @@ Macro FACE:
      5FF8   09
 End macro FACE
 S.D.MOM &5600  &5FF9  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOM.bin'
+Saving file '3-assembled-output/D.MOM.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -85546,7 +85546,7 @@ Macro FACE:
      5FA0   5A
 End macro FACE
 S.D.MON &5600  &5FA1  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MON.bin'
+Saving file '3-assembled-output/D.MON.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -89033,7 +89033,7 @@ Macro FACE:
      5FF4   70
 End macro FACE
 S.D.MOO &5600  &5FF5  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOO.bin'
+Saving file '3-assembled-output/D.MOO.bin'
 .XX21
      5600   00 7F
      5602   5D 56
@@ -92442,7 +92442,7 @@ Macro FACE:
      5FBE   5A
 End macro FACE
 S.D.MOP &5600  &5FBF  &5600  &5600 
-Saving file 'versions/disc/3-assembled-output/D.MOP.bin'
+Saving file '3-assembled-output/D.MOP.bin'
 .readme
      0000   0A
      0001   0D
@@ -92474,4 +92474,4 @@ Saving file 'versions/disc/3-assembled-output/D.MOP.bin'
      00D2   2D 2D 2D ...
      00F9   0A
      00FA   0D
-Saving file 'versions/disc/3-assembled-output/README.txt'
+Saving file '3-assembled-output/README.txt'
