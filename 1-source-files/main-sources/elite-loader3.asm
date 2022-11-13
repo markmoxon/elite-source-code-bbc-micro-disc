@@ -808,7 +808,7 @@ ORG CATDcode + P% - CATD
 
  DEX                    \ Decrement the loop counter
 
- BPL p1a                \ Loop back until we have runnthe checksum 65 times
+ BPL p1a                \ Loop back until we have run the checksum 65 times
 
  STA RAND+2             \ Store the checksum result in the random number seeds
                         \ used to generate the Saturn
@@ -943,12 +943,12 @@ ORG CATDcode + P% - CATD
                         \ So this is the same as plotting at (x, y) where:
                         \
                         \   r1 = random number from 0 to 255
-                        \   r1 = random number from 0 to 255
-                        \   (r1^2 + r1^2) < 128^2
+                        \   r2 = random number from 0 to 255
+                        \   (r1^2 + r2^2) < 128^2
                         \
                         \   y = r2, squished into 64 to 191 by negation
                         \
-                        \   x = SQRT(128^2 - (r1^2 + r1^2)) / 2
+                        \   x = SQRT(128^2 - (r1^2 + r2^2)) / 2
                         \
                         \ which is what we want
 
