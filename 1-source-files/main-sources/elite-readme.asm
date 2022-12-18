@@ -37,29 +37,29 @@ _STH_DISC               = (_VARIANT = 2)
  EQUS "Acornsoft Elite"
  EQUB 10, 13
  EQUB 10, 13
- EQUS "Version: BBC Micro disc"
+ EQUS "Version: BBC Master 128 version of the"
+ EQUB 10, 13
+ EQUS "         original BBC Micro disc"
+ EQUB 10, 13
+ EQUS "         release"
  EQUB 10, 13
 
-IF _IB_DISC
-
- EQUS "Variant: Ian Bell's game disc"
  EQUB 10, 13
- EQUS "Product: Acornsoft SNG38"
+ EQUS "Based on the Acornsoft SNG38 release"
  EQUB 10, 13
-
-ELIF _STH_DISC
-
- EQUS "Variant: Stairway to Hell archive"
+ EQUS "of Elite by Ian Bell and David Braben"
  EQUB 10, 13
- EQUS "Product: Acornsoft SNG38"
+ EQUS "Copyright (c) Acornsoft 1984"
  EQUB 10, 13
- EQUS "         Acornsoft SNG47"
+ EQUB 10, 13
+ EQUS "BBC Master 128 conversion by Mark Moxon"
+ EQUB 10, 13
  EQUB 10, 13
 
-ENDIF
-
- EQUB 10, 13
  EQUS "See www.bbcelite.com for details"
+ EQUB 10, 13
+ EQUB 10, 13
+ EQUS "Build: ", TIME$("%F %T")
  EQUB 10, 13
  EQUS "---------------------------------------"
  EQUB 10, 13
