@@ -7532,14 +7532,34 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \
                         \ We'll refer to this below
 
- LDX #&BF               \ Set X to point to the first font page in ROM minus 1,
-                        \ which is &C0 - 1, or &BF
+                        \ --- Mod: Original Acornsoft code removed: ----------->
+
+\LDX #&BF               \ Set X to point to the first font page in ROM minus 1,
+\                       \ which is &C0 - 1, or &BF
+
+                        \ --- And replaced by: -------------------------------->
+
+ JSR SwitchToMosRom     \ Switch the MOS ROM into memory so we can access the
+                        \ character definitions at &8900 onwards
+
+ LDX #&88               \ Set X to point to the first font page in ROM minus 1,
+                        \ which is &89 - 1, or &88
+
+                        \ --- End of replacement ------------------------------>
 
  ASL A                  \ If bit 6 of the character is clear (A is 32-63)
  ASL A                  \ then skip the following instruction
  BCC P%+4
 
- LDX #&C1               \ A is 64-126, so set X to point to page &C1
+                        \ --- Mod: Original Acornsoft code removed: ----------->
+
+\LDX #&C1               \ A is 64-126, so set X to point to page &C1
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDX #&8A               \ A is 64-126, so set X to point to page &8A
+
+                        \ --- End of replacement ------------------------------>
 
  ASL A                  \ If bit 5 of the character is clear (A is 64-95)
  BCC P%+3               \ then skip the following instruction
@@ -7742,6 +7762,14 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  BPL RRL1               \ Loop back for the next byte to print to the screen
 
 .RR4
+
+                        \ --- Mod: Code added for BBC Master disc Elite: ------>
+
+ LDA VIA+&30            \ Clear bit 7 of the ROM Select latch at SHEILA &30 to
+ AND #%01111111         \ switch the MOS ROM out of &8000-&BFFF
+ STA VIA+&30
+
+                        \ --- End of added code ------------------------------->
 
  LDY YSAV2              \ We're done printing, so restore the values of the
  LDX XSAV2              \ A, X and Y registers that we saved above and clear
@@ -33116,7 +33144,39 @@ ENDMACRO
  FACE        0,        0,     -160,         31    \ Face 8
  FACE        0,      -27,        0,         31    \ Face 9
 
- SKIP 171               \ These bytes appear to be unused
+\ ******************************************************************************
+\
+\       Name: SwitchToMosRom
+\       Type: Subroutine
+\   Category: Text
+\    Summary: Switch the MOS ROM into memory so we can access the character
+\             definitions at &8900 onwards
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Original Acornsoft code removed: ----------->
+
+\SKIP 171               \ These bytes appear to be unused
+
+                        \ --- And replaced by: -------------------------------->
+
+.SwitchToMosRom
+
+ PHA                    \ Store the value of A on the stack so we can retrieve
+                        \ it below
+
+ LDA VIA+&30            \ Set bit 7 of the ROM Select latch at SHEILA &30 to
+ ORA #%10000000         \ switch the MOS ROM into &8000-&BFFF
+ STA VIA+&30
+
+ PLA                    \ Retrieve A from the stack so it is unchanged by the
+                        \ routine
+
+ RTS                    \ Return from the subroutine
+
+ SKIP 149               \ These bytes appear to be unused
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
