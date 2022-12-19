@@ -7994,7 +7994,8 @@ NEXT
                         \ --- Mod: Code added for BBC Master disc Elite: ------>
 
  LDA VIA+&30            \ Clear bit 7 of the ROM Select latch at SHEILA &30 to
- AND #%01111111         \ switch the MOS ROM out of &8000-&BFFF
+ AND #%01111111         \ switch the MOS ROM out of &8000-&BFFF, updating the
+ STA &F4                \ RAM copy in &F4 at the same time
  STA VIA+&30
 
                         \ --- End of added code ------------------------------->
@@ -12253,11 +12254,10 @@ LOAD_C% = LOAD% +P% - CODE%
 \
 \ ******************************************************************************
 
-{
- LDX Q
-
                         \ --- Mod: Original Acornsoft code removed: ----------->
 
+\{
+\LDX Q
 \BEQ MU1
 \DEX
 \STX T
@@ -12274,10 +12274,9 @@ LOAD_C% = LOAD% +P% - CODE%
 \DEX
 \BNE MUL6
 \RTS
+\}
 
                         \ --- End of removed code ----------------------------->
-
-}
 
 \ ******************************************************************************
 \
@@ -12295,7 +12294,7 @@ LOAD_C% = LOAD% +P% - CODE%
 
  LDA VIA+&30            \ Set bit 7 of the ROM Select latch at SHEILA &30 to
  ORA #%10000000         \ switch the MOS ROM into &8000-&BFFF, updating the RAM
- STA &00F4              \ copy in &F4 at the same time
+ STA &F4                \ copy in &F4 at the same time
  STA VIA+&30
 
  RTS                    \ Return from the subroutine

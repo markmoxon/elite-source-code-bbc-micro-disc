@@ -7447,13 +7447,27 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ RR4 to restore the registers and return from the
                         \ subroutine
 
- CMP #7                 \ If this is a beep character (A = 7), jump to R5,
- BEQ R5                 \ which will emit the beep, restore the registers and
-                        \ return from the subroutine
+                        \ --- Mod: Original Acornsoft code removed: ----------->
+
+\CMP #7                 \ If this is a beep character (A = 7), jump to R5,
+\BEQ R5                 \ which will emit the beep, restore the registers and
+\                       \ return from the subroutine
+\
+\CMP #32                \ If this is an ASCII character (A >= 32), jump to RR1
+\BCS RR1                \ below, which will print the character, restore the
+\                       \ registers and return from the subroutine
+
+                        \ --- And replaced by: -------------------------------->
 
  CMP #32                \ If this is an ASCII character (A >= 32), jump to RR1
  BCS RR1                \ below, which will print the character, restore the
                         \ registers and return from the subroutine
+
+ CMP #7                 \ If this is a beep character (A = 7), jump to R5,
+ BEQ R5                 \ which will emit the beep, restore the registers and
+                        \ return from the subroutine
+
+                        \ --- End of replacement ------------------------------>
 
  CMP #10                \ If this is control code 10 (line feed) then jump to
  BEQ RRX1               \ RRX1, which will move down a line, restore the
@@ -7770,7 +7784,8 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ --- Mod: Code added for BBC Master disc Elite: ------>
 
  LDA VIA+&30            \ Clear bit 7 of the ROM Select latch at SHEILA &30 to
- AND #%01111111         \ switch the MOS ROM out of &8000-&BFFF
+ AND #%01111111         \ switch the MOS ROM out of &8000-&BFFF, updating the
+ STA &F4                \ RAM copy in &F4 at the same time
  STA VIA+&30
 
                         \ --- End of added code ------------------------------->
@@ -33168,12 +33183,12 @@ ENDMACRO
 
  LDA VIA+&30            \ Set bit 7 of the ROM Select latch at SHEILA &30 to
  ORA #%10000000         \ switch the MOS ROM into &8000-&BFFF, updating the RAM
- STA &00F4              \ copy in &F4 at the same time
+ STA &F4                \ copy in &F4 at the same time
  STA VIA+&30
 
  RTS                    \ Return from the subroutine
 
- SKIP 149               \ These bytes appear to be unused
+ SKIP 147               \ These bytes appear to be unused
 
                         \ --- End of added code ------------------------------->
 
