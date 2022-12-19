@@ -7838,9 +7838,6 @@ NEXT
 
                         \ --- And replaced by: -------------------------------->
 
- JSR SwitchToMosRom     \ Switch the MOS ROM into memory so we can access the
-                        \ character definitions at &8900 onwards
-
  LDX #&88               \ Set X to point to the first font page in ROM minus 1,
                         \ which is &89 - 1, or &88
 
@@ -7959,6 +7956,13 @@ NEXT
  STA SC+1               \ Store the page number of the destination screen
                         \ location in SC+1, so SC now points to the full screen
                         \ location where this character should go
+
+                        \ --- Mod: Code added for BBC Master disc Elite: ------>
+
+ JSR SwitchToMosRom     \ Switch the MOS ROM into memory so we can access the
+                        \ character definitions at &8900 onwards
+
+                        \ --- End of added code ------------------------------->
 
  LDY #7                 \ We want to print the 8 bytes of character data to the
                         \ screen (one byte per row), so set up a counter in Y
@@ -12289,15 +12293,10 @@ LOAD_C% = LOAD% +P% - CODE%
 
 .SwitchToMosRom
 
- PHA                    \ Store the value of A on the stack so we can retrieve
-                        \ it below
-
  LDA VIA+&30            \ Set bit 7 of the ROM Select latch at SHEILA &30 to
- ORA #%10000000         \ switch the MOS ROM into &8000-&BFFF
+ ORA #%10000000         \ switch the MOS ROM into &8000-&BFFF, updating the RAM
+ STA &00F4              \ copy in &F4 at the same time
  STA VIA+&30
-
- PLA                    \ Retrieve A from the stack so it is unchanged by the
-                        \ routine
 
  RTS                    \ Return from the subroutine
 

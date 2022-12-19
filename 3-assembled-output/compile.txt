@@ -7630,32 +7630,32 @@ S.ELTA &11E3  &1695  &11E3  &11E3
      1F1A   E6 2D      INC &2D
      1F1C   D0 37      BNE &1F55
 .RR1
-     1F1E   20 6C 28   JSR &286C
-     1F21   A2 88      LDX #&88
-     1F23   0A         ASL A
-     1F24   0A         ASL A
-     1F25   90 02      BCC &1F29
-     1F27   A2 8A      LDX #&8A
-     1F29   0A         ASL A
-     1F2A   90 01      BCC &1F2D
-     1F2C   E8         INX
-     1F2D   85 1C      STA &1C
-     1F2F   86 1D      STX &1D
-     1F31   A5 2C      LDA &2C
-     1F33   0A         ASL A
-     1F34   0A         ASL A
-     1F35   0A         ASL A
-     1F36   85 07      STA &07
-     1F38   E6 2C      INC &2C
-     1F3A   A5 2D      LDA &2D
-     1F3C   C9 18      CMP #&18
-     1F3E   90 06      BCC &1F46
-     1F40   20 C8 54   JSR &54C8
-     1F43   4C 55 1F   JMP &1F55
+     1F1E   A2 88      LDX #&88
+     1F20   0A         ASL A
+     1F21   0A         ASL A
+     1F22   90 02      BCC &1F26
+     1F24   A2 8A      LDX #&8A
+     1F26   0A         ASL A
+     1F27   90 01      BCC &1F2A
+     1F29   E8         INX
+     1F2A   85 1C      STA &1C
+     1F2C   86 1D      STX &1D
+     1F2E   A5 2C      LDA &2C
+     1F30   0A         ASL A
+     1F31   0A         ASL A
+     1F32   0A         ASL A
+     1F33   85 07      STA &07
+     1F35   E6 2C      INC &2C
+     1F37   A5 2D      LDA &2D
+     1F39   C9 18      CMP #&18
+     1F3B   90 06      BCC &1F43
+     1F3D   20 C8 54   JSR &54C8
+     1F40   4C 55 1F   JMP &1F55
 .RR3
-     1F46   09 60      ORA #&60
+     1F43   09 60      ORA #&60
 .RREN
-     1F48   85 08      STA &08
+     1F45   85 08      STA &08
+     1F47   20 6C 28   JSR &286C
      1F4A   A0 07      LDY #&07
 .RRL1
      1F4C   B1 1C      LDA (&1C),Y
@@ -8965,11 +8965,10 @@ S.ELTB &1695  &210D  &11E3  &1695
      2869   60         RTS
      286A   A6 81      LDX &81
 .SwitchToMosRom
-     286C   48         PHA
-     286D   AD 30 FE   LDA &FE30
-     2870   09 80      ORA #&80
-     2872   8D 30 FE   STA &FE30
-     2875   68         PLA
+     286C   AD 30 FE   LDA &FE30
+     286F   09 80      ORA #&80
+     2871   85 F4      STA &F4
+     2873   8D 30 FE   STA &FE30
      2876   60         RTS
      2877   86 81      STX &81
 .MLTU2
@@ -11232,7 +11231,7 @@ S.ELTD &2AEC  &330A  &11E3  &2AEC
      3829   86 1C      STX &1C
      382B   84 1D      STY &1D
      382D   A9 7D      LDA #&7D
-     382F   4C 48 1F   JMP &1F48
+     382F   4C 45 1F   JMP &1F45
 .ECBT
      3832   E0
      3833   E0
@@ -17679,51 +17678,51 @@ S.ELTA &11E3  &175B  &11E3  &11E3
      1D7C   E6 2D      INC &2D
      1D7E   D0 58      BNE &1DD8
 .RR1
-     1D80   20 60 5F   JSR &5F60
-     1D83   A2 88      LDX #&88
-     1D85   0A         ASL A
-     1D86   0A         ASL A
-     1D87   90 02      BCC &1D8B
-     1D89   A2 8A      LDX #&8A
-     1D8B   0A         ASL A
-     1D8C   90 01      BCC &1D8F
-     1D8E   E8         INX
-     1D8F   85 1C      STA &1C
-     1D91   86 1D      STX &1D
-     1D93   A5 2C      LDA &2C
-     1D95   AE CF 03   LDX &03CF
-     1D98   F0 08      BEQ &1DA2
-     1D9A   C0 20      CPY #&20
-     1D9C   D0 04      BNE &1DA2
-     1D9E   C9 11      CMP #&11
-     1DA0   F0 36      BEQ &1DD8
+     1D80   A2 88      LDX #&88
+     1D82   0A         ASL A
+     1D83   0A         ASL A
+     1D84   90 02      BCC &1D88
+     1D86   A2 8A      LDX #&8A
+     1D88   0A         ASL A
+     1D89   90 01      BCC &1D8C
+     1D8B   E8         INX
+     1D8C   85 1C      STA &1C
+     1D8E   86 1D      STX &1D
+     1D90   A5 2C      LDA &2C
+     1D92   AE CF 03   LDX &03CF
+     1D95   F0 08      BEQ &1D9F
+     1D97   C0 20      CPY #&20
+     1D99   D0 04      BNE &1D9F
+     1D9B   C9 11      CMP #&11
+     1D9D   F0 39      BEQ &1DD8
 .RR5
-     1DA2   0A         ASL A
-     1DA3   0A         ASL A
-     1DA4   0A         ASL A
-     1DA5   85 07      STA &07
-     1DA7   A5 2D      LDA &2D
-     1DA9   C0 7F      CPY #&7F
-     1DAB   D0 0C      BNE &1DB9
-     1DAD   C6 2C      DEC &2C
-     1DAF   69 5E      ADC #&5E
-     1DB1   AA         TAX
-     1DB2   A0 F8      LDY #&F8
-     1DB4   20 0E 3A   JSR &3A0E
-     1DB7   F0 1F      BEQ &1DD8
+     1D9F   0A         ASL A
+     1DA0   0A         ASL A
+     1DA1   0A         ASL A
+     1DA2   85 07      STA &07
+     1DA4   A5 2D      LDA &2D
+     1DA6   C0 7F      CPY #&7F
+     1DA8   D0 0C      BNE &1DB6
+     1DAA   C6 2C      DEC &2C
+     1DAC   69 5E      ADC #&5E
+     1DAE   AA         TAX
+     1DAF   A0 F8      LDY #&F8
+     1DB1   20 0E 3A   JSR &3A0E
+     1DB4   F0 22      BEQ &1DD8
 .RR2
-     1DB9   E6 2C      INC &2C
-     1DBB   C9 18      CMP #&18
-     1DBD   90 0A      BCC &1DC9
-     1DBF   48         PHA
-     1DC0   20 44 25   JSR &2544
-     1DC3   68         PLA
-     1DC4   A5 D2      LDA &D2
-     1DC6   4C 5E 1D   JMP &1D5E
+     1DB6   E6 2C      INC &2C
+     1DB8   C9 18      CMP #&18
+     1DBA   90 0A      BCC &1DC6
+     1DBC   48         PHA
+     1DBD   20 44 25   JSR &2544
+     1DC0   68         PLA
+     1DC1   A5 D2      LDA &D2
+     1DC3   4C 5E 1D   JMP &1D5E
 .RR3
-     1DC9   09 60      ORA #&60
+     1DC6   09 60      ORA #&60
 .RREN
-     1DCB   85 08      STA &08
+     1DC8   85 08      STA &08
+     1DCA   20 60 5F   JSR &5F60
      1DCD   A0 07      LDY #&07
 .RRL1
      1DCF   B1 1C      LDA (&1C),Y
@@ -20859,7 +20858,7 @@ S.ELTD &261F  &3124  &11E3  &261F
      33A1   86 1C      STX &1C
      33A3   84 1D      STY &1D
      33A5   A9 7D      LDA #&7D
-     33A7   4C CB 1D   JMP &1DCB
+     33A7   4C C8 1D   JMP &1DC8
 .SPBT
      33AA   E0
      33AB   E0
@@ -37078,11 +37077,10 @@ Macro FACE:
      5F5F   00
 End macro FACE
 .SwitchToMosRom
-     5F60   48         PHA
-     5F61   AD 30 FE   LDA &FE30
-     5F64   09 80      ORA #&80
-     5F66   8D 30 FE   STA &FE30
-     5F69   68         PLA
+     5F60   AD 30 FE   LDA &FE30
+     5F63   09 80      ORA #&80
+     5F65   85 F4      STA &F4
+     5F67   8D 30 FE   STA &FE30
      5F6A   60         RTS
      5F6B
 SHIPS
