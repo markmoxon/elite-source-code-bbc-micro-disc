@@ -39,13 +39,7 @@ _STH_DISC               = (_VARIANT = 2)
  EQUB 10, 13
  EQUS "Version: BBC Master 128 version of the"
  EQUB 10, 13
- EQUS "         original BBC Micro disc"
- EQUB 10, 13
- EQUS "         release"
- EQUB 10, 13
- EQUB 10, 13
- EQUS "BBC Master 128 conversion by Mark Moxon"
- EQUB 10, 13
+ EQUS "         original BBC Micro release"
  EQUB 10, 13
 
 IF _IB_DISC
@@ -66,6 +60,9 @@ ELIF _STH_DISC
 
 ENDIF
 
+ EQUB 10, 13
+ EQUS "BBC Master 128 conversion by Mark Moxon"
+ EQUB 10, 13
  EQUB 10, 13
  EQUS "See www.bbcelite.com for details"
  EQUB 10, 13
