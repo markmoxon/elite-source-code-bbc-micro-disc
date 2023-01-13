@@ -24,7 +24,7 @@
 \
 \ ******************************************************************************
 
-INCLUDE "1-source-files/main-sources/elite-header.h.asm"
+INCLUDE "1-source-files/main-sources/elite-build-options.asm"
 
 _IB_DISC                = (_VARIANT = 1)
 _STH_DISC               = (_VARIANT = 2)
