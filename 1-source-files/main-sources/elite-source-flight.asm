@@ -737,19 +737,23 @@ SKIP 1                 \ This byte appears to be unused
 
                         \ --- And replaced by: -------------------------------->
 
-.VGM_ZP
+.musicWorkspace
 
  SKIP 8                 \ Storage for the music player, &0092 to &0099 inclusive
 
-.VGM_ROM
+.musicRomNumber
 
  SKIP 1                 \ The bank number of the sideways ROM slot containing
                         \ the music player at &009A
 
-.VGM_PLAY
+.musicStatus
 
  SKIP 1                 \ A flag to determine whether to play the currently
-                        \ selected music
+                        \ selected music:
+                        \
+                        \   * 0 = do not play the music
+                        \
+                        \   * &FF = do play the music
 
 .RAT
 
@@ -2090,25 +2094,27 @@ LOAD_A% = LOAD%
 
 \ ******************************************************************************
 \
-\       Name: PlayMusic
+\       Name: IRQMusic
 \       Type: Subroutine
 \   Category: Music
-\    Summary: Initialise, play or stop music
+\    Summary: The IRQ handler for playing music
 \
 \ ******************************************************************************
 
                         \ --- Mod: Code added for music: ---------------------->
 
-.PIRQ
+.IRQMusic
 
- STA VIA+&45            \ Re-do the instruction we replaced
+ STA VIA+&45            \ Re-do the instruction we replaced when inserting this
+                        \ routine into the standard IRQ1 interrupt handler
 
- BIT VGM_PLAY           \ If music is enabled, jump to PIRQ1
- BEQ PIRQ1
+ BIT musicStatus        \ If bit 7 of the status flag is clear, then music is
+ BEQ mirq1              \ disabled, so jump to mirq1 to skip playing the
+                        \ currently selected music
 
- JSR PlayMusic+3        \ Play music
+ JSR PlayMusic+3        \ Play the currently selected music
 
-.PIRQ1
+.mirq1
 
  JMP LINSCN+12          \ Jump back to the normal interrupt handler
 
@@ -2119,41 +2125,61 @@ LOAD_A% = LOAD%
 \       Name: PlayMusic
 \       Type: Subroutine
 \   Category: Music
-\    Summary: Initialise, play or stop music
+\    Summary: Select, play or stop music
+\
+\ ------------------------------------------------------------------------------
+\
+\ Arguments:
+\
+\   A                   The action to perform:
+\
+\                         * 0 = Select the title music
+\
+\                         * 3 = Select the docking music
+\
+\                         * 6 = Play the currently selected music
+\
+\                         * &7C = Terminate the current;y selected music
 \
 \ ******************************************************************************
+
+                        \ --- Mod: Code added for music: ---------------------->
 
 .PlayMusic
 
  STA play1+1            \ Modify JSR to jump to &8000 + A
 
- LDA &F4
- PHA
+ LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
+ PHA                    \ store it on the stack
 
-\ LDA VGM_ROM
+\LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
  LDA #&D
  STA &F4
  STA &FE30
 
- TYA
+ TYA                    \ Store X and Y on the stack
  PHA
  TXA
  PHA
 
 .play1
 
- JSR &8006
+ JSR &8000              \ Call the relevant routine in the music ROM (this
+                        \ address is set to &80xx, where xx is the value of A
+                        \ that was passed to the routine)
 
- PLA
+ PLA                    \ Retrieve X and Y from the stack
  TAX
  PLA
  TAY
 
- PLA
- STA &F4
+ PLA                    \ Set the ROM number back to the value that we stored
+ STA &F4                \ above, to switch back to the previous ROM
  STA &FE30
 
- RTS
+ RTS                    \ Return from the subroutine
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -2630,12 +2656,13 @@ LOAD_A% = LOAD%
 
                         \ --- Mod: Code added for music: ---------------------->
 
- STA VGM_PLAY           \ Clear the playing flag to stop the music
+ STA musicStatus        \ Clear the status flag to indicate we are not playing
+                        \ any music
 
- LDA #&7C               \ Call &807C to terminate the music
+ LDA #&7C               \ Terminate the currently selected music
  JSR PlayMusic
 
- LDA #3                 \ Initialise the docking music, ready for the next time
+ LDA #3                 \ Select the docking music
  JSR PlayMusic
 
  LDA #6                 \ Modify the PlayMusic routine so it plays music on the
@@ -2694,8 +2721,8 @@ LOAD_A% = LOAD%
  LDA #6                 \ Modify the PlayMusic routine so it plays music on the
  STA play1+1            \ next call
 
- LDA #&FF               \ Set the playing flag to start the music
- STA VGM_PLAY
+ LDA #&FF               \ Set the status flag to indicate we are playing music,
+ STA musicStatus        \ so the docking music starts playing
 
                         \ --- End of added code ------------------------------->
 
