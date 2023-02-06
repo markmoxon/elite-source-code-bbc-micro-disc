@@ -736,7 +736,24 @@ SKIP 1                 \ This byte appears to be unused
 \
 \SKIP 4                 \ Temporary storage, used in a number of places
 
-                        \ --- End of removed code ----------------------------->
+
+                        \ --- And replaced by: -------------------------------->
+
+.VGM_ZP
+
+ SKIP 8                 \ Storage for the music player, &0092 to &0099 inclusive
+
+.VGM_ROM
+
+ SKIP 1                 \ The bank number of the sideways ROM slot containing
+                        \ the music player at &009A
+
+.VGM_PLAY
+
+ SKIP 1                 \ A flag to determine whether to play the currently
+                        \ selected music
+
+                        \ --- End of replacement ------------------------------>
 
 ORG &00D1
 
@@ -2077,6 +2094,46 @@ BRKV = P% - 2           \ The address of the destination address in the above
                         \ JMP BRBR1 instruction. This ensures that any code that
                         \ updates BRKV will update this instruction instead of
                         \ the actual vector
+
+
+LINSCN = &111C
+
+.PIRQ
+
+ STA VIA+&45            \ Re-do the instruction we replaced
+
+ BIT VGM_PLAY           \ If music is enabled, jump to PIRQ1
+ BEQ PIRQ1
+
+ JSR PLAY2              \ Play music
+
+.PIRQ1
+
+ JMP LINSCN+12          \ Jump back to the normal interrupt handler
+
+.PLAY
+ STA PLAY1+1            \ Modify JSR to jump to &8000 + A
+.PLAY2
+ LDA &F4
+ PHA
+\ LDA VGM_ROM
+ LDA #&D
+ STA &F4
+ STA &FE30
+ TYA
+ PHA
+ TXA
+ PHA
+.PLAY1
+ JSR &8006
+ PLA
+ TAX
+ PLA
+ TAY
+ PLA
+ STA &F4
+ STA &FE30
+ RTS
 
 \ ******************************************************************************
 \
@@ -10130,23 +10187,23 @@ LOAD_C% = LOAD% +P% - CODE%
 \ ******************************************************************************
 
 {
- LDX Q
- BEQ MU1
- DEX
- STX T
- LDA #0
- LDX #8
- LSR P
+\LDX Q
+\BEQ MU1
+\DEX
+\STX T
+\LDA #0
+\LDX #8
+\LSR P
 
-.MUL6
+\.MUL6
 
- BCC P%+4
- ADC T
- ROR A
- ROR P
- DEX
- BNE MUL6
- RTS
+\BCC P%+4
+\ADC T
+\ROR A
+\ROR P
+\DEX
+\BNE MUL6
+\RTS
 }
 
 \ ******************************************************************************
@@ -20947,6 +21004,31 @@ LOAD_F% = LOAD% + P% - CODE%
  JSR FX200              \ Disable the ESCAPE key and clear memory if the BREAK
                         \ key is pressed (*FX 200,3)
 
+                        \ --- Mod: Code added for music: ---------------------->
+
+ LDA #0                 \ Initialise the title music
+ JSR PLAY
+
+ LDA #6                 \ Modify the PLAY routine so it plays music on the next
+ STA PLAY1+1            \ call
+
+ SEI                    \ Disable interrupts so we can update the interrupt
+                        \ handler
+
+ LDA #&4C               \ Insert JMP PIRQ into the LINSCN handler, replacing the
+ STA LINSCN+9           \ STA VIA+&44 instruction
+ LDA #LO(PIRQ)
+ STA LINSCN+10
+ LDA #HI(PIRQ)
+ STA LINSCN+11
+
+ CLI                    \ Re-enable interrupts
+
+ LDA #&FF               \ Set the playing flag to indicate that music should
+ STA VGM_PLAY           \ start playing
+
+                        \ --- End of added code ------------------------------->
+
  LDX #CYL               \ Call TITLE to show a rotating Cobra Mk III (#CYL) and
  LDA #6                 \ token 6 ("LOAD NEW {single cap}COMMANDER {all caps}
  JSR TITLE              \ (Y/N)?{sentence case}{cr}{cr}"), returning with the
@@ -20987,6 +21069,22 @@ LOAD_F% = LOAD% + P% - CODE%
  LDX #KRA               \ 7 ("PRESS SPACE OR FIRE,{single cap}COMMANDER.{cr}
  JSR TITLE              \ {cr}"), returning with the internal number of the key
                         \ pressed in A
+
+                        \ --- Mod: Code added for music: ---------------------->
+
+ LDA #0                 \ Clear the playing flag to indicate we are not playing
+ STA VGM_PLAY           \ any music
+
+ LDA #&7C               \ Call &807C to terminate the music
+ JSR PLAY
+
+ LDA #3                 \ Initialise the docking music, ready for the flight
+ JSR PLAY               \ code
+
+ LDA #6                 \ Modify the PLAY routine so it plays music on the next
+ STA PLAY1+1            \ call
+
+                        \ --- End of added code ------------------------------->
 
  JSR ping               \ Set the target system coordinates (QQ9, QQ10) to the
                         \ current system coordinates (QQ0, QQ1) we just loaded
@@ -33223,8 +33321,16 @@ ENDMACRO
  FACE        0,        0,     -160,         31    \ Face 8
  FACE        0,      -27,        0,         31    \ Face 9
 
+                        \ --- Mod: Original Acornsoft code removed: ----------->
+
 \SKIP 171               \ These bytes appear to be unused
-SKIP 170
+
+                        \ --- And replaced by: -------------------------------->
+
+\SKIP 156               \ These bytes appear to be unused
+ORG &6000
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \

@@ -29,7 +29,7 @@ INCLUDE "1-source-files/main-sources/elite-build-options.asm"
 _IB_DISC                = (_VARIANT = 1)
 _STH_DISC               = (_VARIANT = 2)
 
-GUARD &6000             \ Guard against assembling over screen memory
+GUARD &5600             \ Guard against assembling over screen memory
 
 \ ******************************************************************************
 \
@@ -704,11 +704,15 @@ ORG &0000
 \.XX20
 \
 \SKIP 1                 \ Temporary storage, used in a number of places
-\
-\.XX14
-\
-\SKIP 1                 \ This byte appears to be unused
-\
+
+                        \ --- End of removed code ----------------------------->
+
+.XX14
+
+SKIP 1                 \ This byte appears to be unused
+
+                        \ --- Mod: Original Acornsoft code removed: ----------->
+
 \.RAT
 \
 \SKIP 1                 \ Used to store different signs depending on the current
@@ -723,7 +727,24 @@ ORG &0000
 \
 \SKIP 4                 \ Temporary storage, used in a number of places
 
-                        \ --- End of removed code ----------------------------->
+
+                        \ --- And replaced by: -------------------------------->
+
+.VGM_ZP
+
+ SKIP 8                 \ Storage for the music player, &0092 to &0099 inclusive
+
+.VGM_ROM
+
+ SKIP 1                 \ The bank number of the sideways ROM slot containing
+                        \ the music player at &009A
+
+.VGM_PLAY
+
+ SKIP 1                 \ A flag to determine whether to play the currently
+                        \ selected music
+
+                        \ --- End of replacement ------------------------------>
 
 ORG &00D1
 
@@ -2060,6 +2081,46 @@ LOAD_A% = LOAD%
 
  JMP BRBR1              \ BRKV is set to point here by elite-loader3.asm
 
+
+LINSCN = &111C
+
+.PIRQ
+
+ STA VIA+&45            \ Re-do the instruction we replaced
+
+ BIT VGM_PLAY           \ If music is enabled, jump to PIRQ1
+ BEQ PIRQ1
+
+ JSR PLAY2              \ Play music
+
+.PIRQ1
+
+ JMP LINSCN+12          \ Jump back to the normal interrupt handler
+
+.PLAY
+ STA PLAY1+1            \ Modify JSR to jump to &8000 + A
+.PLAY2
+ LDA &F4
+ PHA
+\ LDA VGM_ROM
+ LDA #&D
+ STA &F4
+ STA &FE30
+ TYA
+ PHA
+ TXA
+ PHA
+.PLAY1
+ JSR &8006
+ PLA
+ TAX
+ PLA
+ TAY
+ PLA
+ STA &F4
+ STA &FE30
+ RTS
+
 \ ******************************************************************************
 \
 \       Name: INBAY
@@ -2103,45 +2164,49 @@ LOAD_A% = LOAD%
 
 .scramble
 
- LDY #0                 \ We're going to work our way through a large number of
-                        \ encrypted bytes, so we set Y to 0 to be the index of
-                        \ the current byte within its page in memory
+                        \ --- Mod: Original Acornsoft code removed: ----------->
 
- STY SC                 \ Set the low byte of SC(1 0) to 0
+\LDY #0                 \ We're going to work our way through a large number of
+\                       \ encrypted bytes, so we set Y to 0 to be the index of
+\                       \ the current byte within its page in memory
+\
+\STY SC                 \ Set the low byte of SC(1 0) to 0
+\
+\LDX #&13               \ Set X to &13 to be the page number of the current
+\                       \ byte, so we start the decryption with the first byte
+\                       \ of page &13
+\
+\.scrl
+\
+\STX SCH                \ Set the high byte of SC(1 0) to X, so SC(1 0) now
+\                       \ points to the first byte of page X
+\
+\TYA                    \ Set A to Y, so A now contains the index of the current
+\                       \ byte within its page
+\
+\EOR (SC),Y             \ EOR the current byte with its index within the page
+\
+\EOR #&33               \ EOR the current byte with &33
+\
+\STA (SC),Y             \ Update the current byte
+\
+\                       \ The current byte is in page X at offset Y, and SC(1 0)
+\                       \ points to the first byte of page X, so we just did
+\                       \  this:
+\                       \
+\                       \   (X Y) = (X Y) EOR Y EOR &33
+\
+\DEY                    \ Decrement the index in Y to point to the next byte
+\
+\BNE scrl               \ Loop back to scrl to decrypt the next byte until we
+\                       \ have done the whole page
+\
+\INX                    \ Increment X to point to the next page in memory
+\
+\CPX #&56               \ Loop back to scrl to decrypt the next page until we
+\BNE scrl               \ reach the start of page &56
 
- LDX #&13               \ Set X to &13 to be the page number of the current
-                        \ byte, so we start the decryption with the first byte
-                        \ of page &13
-
-.scrl
-
- STX SCH                \ Set the high byte of SC(1 0) to X, so SC(1 0) now
-                        \ points to the first byte of page X
-
- TYA                    \ Set A to Y, so A now contains the index of the current
-                        \ byte within its page
-
- EOR (SC),Y             \ EOR the current byte with its index within the page
-
- EOR #&33               \ EOR the current byte with &33
-
- STA (SC),Y             \ Update the current byte
-
-                        \ The current byte is in page X at offset Y, and SC(1 0)
-                        \ points to the first byte of page X, so we just did
-                        \  this:
-                        \
-                        \   (X Y) = (X Y) EOR Y EOR &33
-
- DEY                    \ Decrement the index in Y to point to the next byte
-
- BNE scrl               \ Loop back to scrl to decrypt the next byte until we
-                        \ have done the whole page
-
- INX                    \ Increment X to point to the next page in memory
-
- CPX #&56               \ Loop back to scrl to decrypt the next page until we
- BNE scrl               \ reach the start of page &56
+                        \ --- End of replacement ------------------------------>
 
  JMP RSHIPS             \ Call RSHIPS to launch from the station, load a new set
                         \ of ship blueprints and jump into the main game loop
@@ -2529,6 +2594,21 @@ LOAD_A% = LOAD%
  LDA #0                 \ The "cancel docking computer" key is bring pressed,
  STA auto               \ so turn it off by setting auto to 0
 
+                        \ --- Mod: Code added for music: ---------------------->
+
+ STA VGM_PLAY           \ Clear the playing flag to stop the music
+
+ LDA #&7C               \ Call &807C to terminate the music
+ JSR PLAY
+
+ LDA #3                 \ Initialise the docking music, ready for the next time
+ JSR PLAY
+
+ LDA #6                 \ Modify the PLAY routine so it plays music on the next
+ STA PLAY1+1            \ call
+
+                        \ --- End of added code ------------------------------->
+
 .MA78
 
  LDA KY13               \ If ESCAPE is being pressed and we have an escape pod
@@ -2574,6 +2654,16 @@ LOAD_A% = LOAD%
 
  STA auto               \ Set auto to the non-zero value of A, so the docking
                         \ computer is activated
+
+                        \ --- Mod: Code added for music: ---------------------->
+
+ LDA #6                 \ Modify the PLAY routine so it plays music on the next
+ STA PLAY1+1            \ call
+
+ LDA #&FF               \ Set the playing flag to start the music
+ STA VGM_PLAY
+
+                        \ --- End of added code ------------------------------->
 
 .MA68
 
@@ -12352,25 +12442,29 @@ LOAD_C% = LOAD% +P% - CODE%
 \
 \ ******************************************************************************
 
-{
- LDX Q
- BEQ MU1
- DEX
- STX T
- LDA #0
- LDX #8
- LSR P
+                        \ --- Mod: Original Acornsoft code removed: ----------->
 
-.MUL6
+\{
+\LDX Q
+\BEQ MU1
+\DEX
+\STX T
+\LDA #0
+\LDX #8
+\LSR P
 
- BCC P%+4
- ADC T
- ROR A
- ROR P
- DEX
- BNE MUL6
- RTS
-}
+\.MUL6
+
+\BCC P%+4
+\ADC T
+\ROR A
+\ROR P
+\DEX
+\BNE MUL6
+\RTS
+\}
+
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -12479,13 +12573,17 @@ LOAD_C% = LOAD% +P% - CODE%
 
 .MUT3
 
- LDX ALP1               \ Set P = ALP1, though this gets overwritten by the
- STX P                  \ following, so this has no effect
+                        \ --- Mod: Original Acornsoft code removed: ----------->
+
+\LDX ALP1               \ Set P = ALP1, though this gets overwritten by the
+\STX P                  \ following, so this has no effect
 
                         \ Fall through into MUT2 to do the following:
                         \
                         \   (S R) = XX(1 0)
                         \   (A P) = Q * A
+
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -13760,17 +13858,21 @@ LOAD_C% = LOAD% +P% - CODE%
 \
 \ ******************************************************************************
 
- EQUB &8C, &E7
- EQUB &8D, &ED
- EQUB &8A, &E6
- EQUB &C1, &C8
- EQUB &C8, &8B
- EQUB &E0, &8A
- EQUB &E6, &D6
- EQUB &C5, &C6
- EQUB &C1, &CA
- EQUB &95, &9D
- EQUB &9C, &97
+                        \ --- Mod: Original Acornsoft code removed: ----------->
+
+\EQUB &8C, &E7
+\EQUB &8D, &ED
+\EQUB &8A, &E6
+\EQUB &C1, &C8
+\EQUB &C8, &8B
+\EQUB &E0, &8A
+\EQUB &E6, &D6
+\EQUB &C5, &C6
+\EQUB &C1, &CA
+\EQUB &95, &9D
+\EQUB &9C, &97
+
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -33301,6 +33403,8 @@ LOAD_H% = LOAD% + P% - CODE%
                         \ at the start of each screen refresh)
 
  RTS                    \ Return from the subroutine
+
+ORG &5600
 
 \ ******************************************************************************
 \
