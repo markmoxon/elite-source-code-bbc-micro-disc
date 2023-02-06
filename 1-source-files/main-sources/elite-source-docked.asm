@@ -121,6 +121,13 @@ LS% = &0CFF             \ The start of the descending ship line heap
 CATD = &0D7A            \ The address of the CATD routine that is put in place
                         \ by the third loader, as set in elite-loader3.asm
 
+                        \ --- Mod: Code added for music: ---------------------->
+
+LINSCN = &111C          \ The address of the part of the IRQ1 routine that gets
+                        \ run on the vertical sync, as set in elite-loader3.asm
+
+                        \ --- End of added code ------------------------------->
+
 IRQ1 = &114B            \ The address of the IRQ1 routine that implements the
                         \ split screen interrupt handler, as set in
                         \ elite-loader3.asm
@@ -753,6 +760,14 @@ SKIP 1                 \ This byte appears to be unused
  SKIP 1                 \ A flag to determine whether to play the currently
                         \ selected music
 
+.SWAP
+
+ SKIP 1                 \ Temporary storage, used to store a flag that records
+                        \ whether or not we had to swap a line's start and end
+                        \ coordinates around when clipping the line in routine
+                        \ LL145 (the flag is used in places like BLINE to swap
+                        \ them back)
+
                         \ --- End of replacement ------------------------------>
 
 ORG &00D1
@@ -776,7 +791,7 @@ ORG &00D1
 
 .XX2
 
- SKIP 3                \ Temporary storage, used to store the visibility of the
+ SKIP 4                \ Temporary storage, used to store the visibility of the
                         \ ship's faces during the ship-drawing routine at LL9
 
 .K2
@@ -827,14 +842,6 @@ ORG &00D1
                         \ call to the ball line routine in BLINE, so it knows
                         \ whether to wait for the second call before storing
                         \ segment data in the ball line heap
-
-.SWAP
-
- SKIP 1                 \ Temporary storage, used to store a flag that records
-                        \ whether or not we had to swap a line's start and end
-                        \ coordinates around when clipping the line in routine
-                        \ LL145 (the flag is used in places like BLINE to swap
-                        \ them back)
 
                         \ --- End of replacement ------------------------------>
 
@@ -2096,7 +2103,6 @@ BRKV = P% - 2           \ The address of the destination address in the above
                         \ the actual vector
 
 
-LINSCN = &111C
 
 .PIRQ
 
@@ -2105,15 +2111,14 @@ LINSCN = &111C
  BIT VGM_PLAY           \ If music is enabled, jump to PIRQ1
  BEQ PIRQ1
 
- JSR PLAY2              \ Play music
+ JSR PlayMusic+3        \ Play music
 
 .PIRQ1
 
  JMP LINSCN+12          \ Jump back to the normal interrupt handler
 
-.PLAY
- STA PLAY1+1            \ Modify JSR to jump to &8000 + A
-.PLAY2
+.PlayMusic
+ STA play1+1            \ Modify JSR to jump to &8000 + A
  LDA &F4
  PHA
 \ LDA VGM_ROM
@@ -2124,7 +2129,7 @@ LINSCN = &111C
  PHA
  TXA
  PHA
-.PLAY1
+.play1
  JSR &8006
  PLA
  TAX
@@ -21007,10 +21012,10 @@ LOAD_F% = LOAD% + P% - CODE%
                         \ --- Mod: Code added for music: ---------------------->
 
  LDA #0                 \ Initialise the title music
- JSR PLAY
+ JSR PlayMusic
 
- LDA #6                 \ Modify the PLAY routine so it plays music on the next
- STA PLAY1+1            \ call
+ LDA #6                 \ Modify the PlayMusic routine so it plays music on the
+ STA play1+1            \ next call
 
  SEI                    \ Disable interrupts so we can update the interrupt
                         \ handler
@@ -21076,13 +21081,13 @@ LOAD_F% = LOAD% + P% - CODE%
  STA VGM_PLAY           \ any music
 
  LDA #&7C               \ Call &807C to terminate the music
- JSR PLAY
+ JSR PlayMusic
 
  LDA #3                 \ Initialise the docking music, ready for the flight
- JSR PLAY               \ code
+ JSR PlayMusic          \ code
 
- LDA #6                 \ Modify the PLAY routine so it plays music on the next
- STA PLAY1+1            \ call
+ LDA #6                 \ Modify the PlayMusic routine so it plays music on the
+ STA play1+1            \ next call
 
                         \ --- End of added code ------------------------------->
 
