@@ -34,32 +34,44 @@ _STH_DISC               = (_VARIANT = 2)
  EQUB 10, 13
  EQUS "---------------------------------------"
  EQUB 10, 13
- EQUS "Acornsoft Elite"
+ EQUS "Acornsoft Elite... with music!"
  EQUB 10, 13
  EQUB 10, 13
- EQUS "Version: BBC Micro disc"
+ EQUS "For the BBC Micro with 16K sideways RAM"
+ EQUB 10, 13
+ EQUB 10, 13
+ EQUS "Based on the Acornsoft SNG38 release"
+ EQUB 10, 13
+ EQUS "of Elite by Ian Bell and David Braben"
+ EQUB 10, 13
+ EQUS "Copyright (c) Acornsoft 1984"
+ EQUB 10, 13
+ EQUB 10, 13
+ EQUS "Sound routines by Kieran Connell and"
+ EQUB 10, 13
+ EQUS "Simon Morris"
+ EQUB 10, 13
+ EQUB 10, 13
+ EQUS "Original music by Aidan Bell and Julie"
+ EQUB 10, 13
+ EQUS "Dunn (c) Firebird 1985, ported from the"
+ EQUB 10, 13
+ EQUS "Commodore 64 Elite by Negative Charge"
+ EQUB 10, 13
+ EQUB 10, 13
+ EQUS "Elite integration by Mark Moxon"
+ EQUB 10, 13
+ EQUB 10, 13
+ EQUS "Sideways RAM detection and loading"
+ EQUB 10, 13
+ EQUS "routines by Tricky and J.G.Harston"
+ EQUB 10, 13
  EQUB 10, 13
 
-IF _IB_DISC
-
- EQUS "Variant: Ian Bell's game disc"
- EQUB 10, 13
- EQUS "Product: Acornsoft SNG38"
- EQUB 10, 13
-
-ELIF _STH_DISC
-
- EQUS "Variant: Stairway to Hell archive"
- EQUB 10, 13
- EQUS "Product: Acornsoft SNG38"
- EQUB 10, 13
- EQUS "         Acornsoft SNG47"
- EQUB 10, 13
-
-ENDIF
-
- EQUB 10, 13
  EQUS "See www.bbcelite.com for details"
+ EQUB 10, 13
+ EQUB 10, 13
+ EQUS "Build: ", TIME$("%F %T")
  EQUB 10, 13
  EQUS "---------------------------------------"
  EQUB 10, 13

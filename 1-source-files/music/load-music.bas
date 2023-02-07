@@ -8,20 +8,20 @@ UsrDat = &FE60
 UsrDDR = &FE62
 romNumber = &009A
 
-PRINT"BBC Micro Elite... with music!"
+PRINT"Acornsoft Elite... with music!"
 PRINT"=============================="
-PRINT'"For the Model B with 16K sideways RAM"
-PRINT'"Sound routines by Kieran Connell and"
-PRINT"Simon Morris"
-PRINT'"Music ported from Commodore 64 Elite"
-PRINT"by Negative Charge, original music"
-PRINT"composed by David Dunn & Aidan Bell"
-PRINT'"Elite integration by Mark Moxon"
-PRINT'"Sideways RAM detection and loading"
-PRINT"routines by Tricky and J.G.Harston"
+PRINT'"For the BBC Micro with 16K sideways RAM"
 PRINT'"Based on the Acornsoft SNG38 release"
 PRINT"of Elite by Ian Bell and David Braben"
 PRINT"Copyright (c) Acornsoft 1984"
+PRINT'"Sound routines by Kieran Connell and"
+PRINT"Simon Morris"
+PRINT'"Original music by Aidan Bell and Julie"
+PRINT"Dunn (c) Firebird 1985, ported from the"
+PRINT"Commodore 64 by Negative Charge"
+PRINT'"Elite integration by Mark Moxon"
+PRINT'"Sideways RAM detection and loading"
+PRINT"routines by Tricky and J.G.Harston"
 
 REM Find 16 values distinct from the 16 rom values and each other and save the original rom values
 DIM CODE &100
