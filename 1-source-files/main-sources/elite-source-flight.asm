@@ -2717,9 +2717,6 @@ LOAD_A% = LOAD%
 
                         \ --- Mod: Code added for music: ---------------------->
 
- LDA #6                 \ Modify the PlayMusic routine so it plays music on the
- STA play1+1            \ next call
-
  LDA #&FF               \ Set the status flag to indicate we are playing music,
  STA musicStatus        \ so the docking music starts playing
 

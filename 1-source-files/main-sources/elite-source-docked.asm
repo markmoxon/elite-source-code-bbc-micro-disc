@@ -2298,16 +2298,17 @@ BRKV = P% - 2           \ The address of the destination address in the above
 
                         \ --- Mod: Code added for music: ---------------------->
 
- LDA musicStatus        \ If music is not playing, skip the following
- BEQ inby1
-
- INC musicStatus        \ Clear the status flag to indicate we are not playing
-                        \ any music
+ LDA #0                 \ Clear the status flag to indicate we are not playing
+ STA musicStatus        \ any music
 
  LDA #&7C               \ Terminate the currently selected music, so the docking
  JSR PlayMusic          \ music doesn't keep playing once we dock
 
-.inby1
+ LDA #3                 \ Select the docking music
+ JSR PlayMusic
+
+ LDA #6                 \ Modify the PlayMusic routine so it plays music on the
+ STA play1+1            \ next call
 
                         \ --- End of added code ------------------------------->
 
