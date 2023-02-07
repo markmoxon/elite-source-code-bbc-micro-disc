@@ -2191,6 +2191,12 @@ LOAD_A% = LOAD%
 
 .INBAY
 
+                        \ --- Mod: Code added for music: ---------------------->
+
+ JSR ResetMusic         \ Stop any music from playing
+
+                        \ --- End of added code ------------------------------->
+
  LDX #LO(LTLI)          \ Set (Y X) to point to LTLI ("L.T.CODE", which gets
  LDY #HI(LTLI)          \ modified to "R.T.CODE" in the DOENTRY routine)
 
@@ -2655,20 +2661,12 @@ LOAD_A% = LOAD%
 
                         \ --- Mod: Code added for music: ---------------------->
 
- STA musicStatus        \ Clear the status flag to indicate we are not playing
-                        \ any music
-
- LDA #&7C               \ Terminate the currently selected music
- JSR PlayMusic
-
- LDA #3                 \ Select the docking music
- JSR PlayMusic
+ JSR ResetMusic         \ Stop any music from playing
 
  LDA #6                 \ Modify the PlayMusic routine so it plays music on the
  STA play1+1            \ next call
 
                         \ --- End of added code ------------------------------->
-
 .MA78
 
  LDA KY13               \ If ESCAPE is being pressed and we have an escape pod
@@ -33460,6 +33458,18 @@ LOAD_H% = LOAD% + P% - CODE%
                         \ at the start of each screen refresh)
 
  RTS                    \ Return from the subroutine
+
+.ResetMusic
+
+ LDA #0
+ STA musicStatus        \ Clear the status flag to indicate we are not playing
+                        \ any music
+
+ LDA #&7C               \ Terminate the currently selected music
+ JSR PlayMusic
+
+ LDA #3                 \ Select the docking music
+ JMP PlayMusic
 
 ORG &5600
 
