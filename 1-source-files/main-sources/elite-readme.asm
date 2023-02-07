@@ -56,7 +56,7 @@ _STH_DISC               = (_VARIANT = 2)
  EQUB 10, 13
  EQUS "Dunn (c) Firebird 1985, ported from the"
  EQUB 10, 13
- EQUS "Commodore 64 Elite by Negative Charge"
+ EQUS "Commodore 64 by Negative Charge"
  EQUB 10, 13
  EQUB 10, 13
  EQUS "Elite integration by Mark Moxon"

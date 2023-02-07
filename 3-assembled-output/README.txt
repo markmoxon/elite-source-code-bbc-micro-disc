@@ -13,7 +13,7 @@
 
 Original music by Aidan Bell and Julie
 Dunn (c) Firebird 1985, ported from the
-Commodore 64 Elite by Negative Charge
+Commodore 64 by Negative Charge
 
 Elite integration by Mark Moxon
 
@@ -22,6 +22,6 @@
 
 See www.bbcelite.com for details
 
-Build: 2023-02-07 13:45:08
+Build: 2023-02-07 15:01:27
 ---------------------------------------
 
