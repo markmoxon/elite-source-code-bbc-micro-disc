@@ -85,14 +85,14 @@ RTS
 NEXT
 CALL CODE
 N%=16-?&90
-IF N%=0 THEN PRINT'"Can't run: no sideways RAM detected":END
+IF N%=0 THEN PRINT'"Can't run:";CHR$129;"no sideways RAM detected":END
 PRINT'"Detected ";16-?&90;" sideways RAM bank";
 IF N% > 1 THEN PRINT "s";
 REM IF N% > 0 THEN FOR X% = ?&90 TO 15 : PRINT;" ";X%?&90; : NEXT
 ?romNumber=?(&90+?&90):REM STORE RAM BANK USED SOMEWHERE IN ZERO PAGE
-PRINT'"Loading music into RAM bank ";?romNumber;"... ";
+PRINT'"Loading music into RAM bank ";?romNumber;"...";
 OSCLI "RUN SRLOAD MUSIC "+STR$(?romNumber)
-PRINT"done"
+PRINT CHR$130;"OK"
 PRINT'"Press any key to play Elite";
 A$=GET$
 *RUN ELITE2
