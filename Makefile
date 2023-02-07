@@ -97,4 +97,4 @@ verify:
 .PHONY:b2
 b2:
 	curl -G "http://localhost:48075/reset/b2" --data-urlencode "config=B/Acorn 1770"
-	curl -H "Content-Type:application/binary" --upload-file "5-compiled-game-discs/elite-disc$(suffix-disc).ssd" "http://localhost:48075/run/b2?name=elite-disc$(suffix-disc).ssd"
+	curl -H "Content-Type:application/binary" --upload-file "5-compiled-game-discs/elite-disc-music$(suffix-disc).ssd" "http://localhost:48075/run/b2?name=elite-disc-music$(suffix-disc).ssd"
