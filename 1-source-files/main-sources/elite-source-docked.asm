@@ -764,6 +764,12 @@ SKIP 1                 \ This byte appears to be unused
                         \
                         \   * &FF = do play the music
 
+.CNT2
+
+ SKIP 1                 \ Temporary storage, used in the planet-drawing routine
+                        \ to store the segment number where the arc of a partial
+                        \ circle should start
+
 .SWAP
 
  SKIP 1                 \ Temporary storage, used to store a flag that records
@@ -795,7 +801,7 @@ ORG &00D1
 
 .XX2
 
- SKIP 4                \ Temporary storage, used to store the visibility of the
+ SKIP 5                \ Temporary storage, used to store the visibility of the
                         \ ship's faces during the ship-drawing routine at LL9
 
 .K2
@@ -811,12 +817,6 @@ ORG &00D1
 
  SKIP 1                 \ Temporary storage, used to store the pitch and roll
                         \ signs when moving objects and stardust
-
-.CNT2
-
- SKIP 1                 \ Temporary storage, used in the planet-drawing routine
-                        \ to store the segment number where the arc of a partial
-                        \ circle should start
 
 .STP
 
