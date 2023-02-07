@@ -7,6 +7,22 @@ RamSel = &FE32
 UsrDat = &FE60
 UsrDDR = &FE62
 romNumber = &009A
+
+PRINT"BBC Micro Elite... with music!"
+PRINT"=============================="
+PRINT'"For the Model B with 16K sideways RAM"
+PRINT'"Sound routines by Kieran Connell and"
+PRINT"Simon Morris"
+PRINT'"Music ported from Commodore 64 Elite"
+PRINT"by Negative Charge, original music"
+PRINT"composed by David Dunn & Aidan Bell"
+PRINT'"Elite integration by Mark Moxon"
+PRINT'"Sideways RAM detection and loading"
+PRINT"routines by Tricky and J.G.Harston"
+PRINT'"Based on the Acornsoft SNG38 release"
+PRINT"of Elite by Ian Bell and David Braben"
+PRINT"Copyright (c) Acornsoft 1984"
+
 REM Find 16 values distinct from the 16 rom values and each other and save the original rom values
 DIM CODE &100
 FOR P = 0 TO 2 STEP 2
@@ -69,10 +85,14 @@ RTS
 NEXT
 CALL CODE
 N%=16-?&90
-IF N%=0 THEN PRINT'"No SWRAM detected.":END
-PRINT'"Detected ";16-?&90;" SWRAM banks:";
-IF N% > 0 THEN FOR X% = ?&90 TO 15 : PRINT;" ";X%?&90; : NEXT
+IF N%=0 THEN PRINT'"Can't run: no sideways RAM detected":END
+PRINT'"Detected ";16-?&90;" sideways RAM bank";
+IF N% > 1 THEN PRINT "s";
+REM IF N% > 0 THEN FOR X% = ?&90 TO 15 : PRINT;" ";X%?&90; : NEXT
 ?romNumber=?(&90+?&90):REM STORE RAM BANK USED SOMEWHERE IN ZERO PAGE
-PRINT'"Loading music to SWRAM bank: ";?romNumber
+PRINT'"Loading music into RAM bank ";?romNumber;"... ";
 OSCLI "RUN SRLOAD MUSIC "+STR$(?romNumber)
+PRINT"done"
+PRINT'"Press any key to play Elite";
+A$=GET$
 *RUN ELITE2
