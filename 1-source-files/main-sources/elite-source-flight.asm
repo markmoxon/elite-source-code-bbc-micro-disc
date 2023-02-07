@@ -20790,6 +20790,8 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing planets
 \    Summary: Draw a half-ellipse
+\  Deep dive: Drawing ellipses
+\             Drawing meridians and equators
 \
 \ ------------------------------------------------------------------------------
 \
@@ -20810,7 +20812,7 @@ LOAD_E% = LOAD% + P% - CODE%
 \       Type: Subroutine
 \   Category: Drawing planets
 \    Summary: Draw an ellipse or half-ellipse
-\  Deep dive: The sine, cosine and arctan tables
+\  Deep dive: Drawing ellipses
 \             Drawing meridians and equators
 \             Drawing craters
 \
