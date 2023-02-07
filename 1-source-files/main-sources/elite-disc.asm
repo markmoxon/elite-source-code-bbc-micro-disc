@@ -54,6 +54,8 @@ PUTFILE "3-assembled-output/D.MON.bin", "D.MON", &005600, &005600
 PUTFILE "3-assembled-output/D.MOO.bin", "D.MOO", &005600, &005600
 PUTFILE "3-assembled-output/D.MOP.bin", "D.MOP", &005600, &005600
 
+PUTFILE "1-source-files/other-files/E.MAX.bin", "E.MAX", &000000, &000000
+
 PUTFILE "3-assembled-output/README.txt", "README", &FFFFFF, &FFFFFF
 
 PUTFILE "1-source-files/boot-files/$.!BOOT.bin", "!BOOT", &FFFFFF, &FFFFFF
