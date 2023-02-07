@@ -2166,8 +2166,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
  LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
  PHA                    \ store it on the stack
 
-\LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
- LDA #&D
+ LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
  STA &F4
  STA &FE30
 
@@ -2299,11 +2298,16 @@ BRKV = P% - 2           \ The address of the destination address in the above
 
                         \ --- Mod: Code added for music: ---------------------->
 
- LDA #0                 \ Clear the status flag to indicate we are not playing
- STA musicStatus        \ any music
+ LDA musicStatus        \ If music is not playing, skip the following
+ BEQ inby1
+
+ INC musicStatus        \ Clear the status flag to indicate we are not playing
+                        \ any music
 
  LDA #&7C               \ Terminate the currently selected music, so the docking
  JSR PlayMusic          \ music doesn't keep playing once we dock
+
+.inby1
 
                         \ --- End of added code ------------------------------->
 
@@ -21331,18 +21335,22 @@ ENDIF
  LDA #96                \ Set nosev_z hi = 96 (96 is the value of unity in the
  STA INWK+14            \ rotation vector)
 
- LDA &9F                \ As part of the copy protection, location &9F is set to
- CMP #219               \ 219 in the OSBmod routine in elite-loader3.asm. This
- BEQ tiwe               \ jumps to tiwe if the value is unchanged, otherwise it
-                        \ crashes the game with the following (as presumably
-                        \ the game code has been tampered with)
+                        \ --- Mod: Original Acornsoft code removed: ----------->
 
- LDA #&10               \ Modify the STA DELTA instruction in RES2 to &10 &FE,
- STA modify+2           \ which is a BPL P%-2 instruction, to create an infinite
- LDA #&FE               \ loop and hang the game
- STA modify+3
+\LDA &9F                \ As part of the copy protection, location &9F is set to
+\CMP #219               \ 219 in the OSBmod routine in elite-loader3.asm. This
+\BEQ tiwe               \ jumps to tiwe if the value is unchanged, otherwise it
+\                       \ crashes the game with the following (as presumably
+\                       \ the game code has been tampered with)
+\
+\LDA #&10               \ Modify the STA DELTA instruction in RES2 to &10 &FE,
+\STA modify+2           \ which is a BPL P%-2 instruction, to create an infinite
+\LDA #&FE               \ loop and hang the game
+\STA modify+3
+\
+\.tiwe
 
-.tiwe
+                        \ --- End of removed code ----------------------------->
 
  STA INWK+7             \ Set z_hi, the high byte of the ship's z-coordinate,
                         \ to 96, which is the distance at which the rotating

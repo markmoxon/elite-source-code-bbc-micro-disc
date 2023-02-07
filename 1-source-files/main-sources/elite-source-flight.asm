@@ -2152,8 +2152,7 @@ LOAD_A% = LOAD%
  LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
  PHA                    \ store it on the stack
 
-\LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
- LDA #&D
+ LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
  STA &F4
  STA &FE30
 
