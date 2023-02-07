@@ -2163,7 +2163,7 @@ LOAD_A% = LOAD%
 
 .play1
 
- JSR &8000              \ Call the relevant routine in the music ROM (this
+ JSR &8006              \ Call the relevant routine in the music ROM (this
                         \ address is set to &80xx, where xx is the value of A
                         \ that was passed to the routine)
 
