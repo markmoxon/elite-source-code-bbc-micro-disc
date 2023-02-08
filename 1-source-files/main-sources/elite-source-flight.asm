@@ -7859,7 +7859,7 @@ NEXT
                         \
                         \ We'll refer to this below
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for BBC Master disc Elite: ---->
 
 \LDX #&BF               \ Set X to point to the first font page in ROM minus 1,
 \                       \ which is &C0 - 1, or &BF
@@ -7875,7 +7875,7 @@ NEXT
  ASL A                  \ then skip the following instruction
  BCC P%+4
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for BBC Master disc Elite: ---->
 
 \LDX #&C1               \ A is 64-126, so set X to point to page &C1
 
@@ -12295,7 +12295,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \
 \ ******************************************************************************
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for BBC Master disc Elite: ---->
 
 \{
 \LDX Q

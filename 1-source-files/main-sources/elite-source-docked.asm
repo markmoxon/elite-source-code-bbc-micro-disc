@@ -7459,7 +7459,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \ RR4 to restore the registers and return from the
                         \ subroutine
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for BBC Master disc Elite: ---->
 
 \CMP #7                 \ If this is a beep character (A = 7), jump to R5,
 \BEQ R5                 \ which will emit the beep, restore the registers and
@@ -7558,7 +7558,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
                         \
                         \ We'll refer to this below
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for BBC Master disc Elite: ---->
 
 \LDX #&BF               \ Set X to point to the first font page in ROM minus 1,
 \                       \ which is &C0 - 1, or &BF
@@ -7574,7 +7574,7 @@ DTW7 = MT16 + 1         \ Point DTW7 to the second byte of the instruction above
  ASL A                  \ then skip the following instruction
  BCC P%+4
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for BBC Master disc Elite: ---->
 
 \LDX #&C1               \ A is 64-126, so set X to point to page &C1
 
@@ -33185,7 +33185,7 @@ ENDMACRO
 \
 \ ******************************************************************************
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for BBC Master disc Elite: ---->
 
 \SKIP 171               \ These bytes appear to be unused
 
