@@ -26668,6 +26668,12 @@ LOAD_G% = LOAD% + P% - CODE%
  LDA XX2,X              \ If XX2+X is zero then we decided in part 5 that
  BEQ LL78               \ face 2 is hidden, so jump to LL78
 
+                        \ --- Mod: Code removed for flicker-free ships: ------->
+
+\JMP LL78               \ Face 2 is hidden, so jump to LL78
+
+                        \ --- End of removed code ----------------------------->
+
 .LL79
 
                         \ We now build the screen line for this edge, as
