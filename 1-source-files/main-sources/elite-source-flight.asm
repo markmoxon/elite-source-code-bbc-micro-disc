@@ -170,7 +170,7 @@ ORG &0000
  SKIP 4                 \ Four 8-bit seeds for the random number generation
                         \ system implemented in the DORND routine
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \.TRTB%
 \
@@ -650,7 +650,7 @@ ORG &0000
                         \ for counters when drawing explosion clouds and partial
                         \ circles
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \.SWAP
 \
@@ -679,7 +679,7 @@ ORG &0000
  SKIP 1                 \ Temporary storage, typically used for storing the
                         \ number of iterations required when looping
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \.CNT2
 \
@@ -718,7 +718,7 @@ ORG &0000
 
 SKIP 1                 \ This byte appears to be unused
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \.RAT
 \
@@ -791,7 +791,7 @@ ORG &00D1
 
  SKIP 0                 \ Temporary storage, used in a number of places
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \.XX2
 \
@@ -2229,7 +2229,7 @@ LOAD_A% = LOAD%
 
 .scramble
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \LDY #0                 \ We're going to work our way through a large number of
 \                       \ encrypted bytes, so we set Y to 0 to be the index of
@@ -12497,7 +12497,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \
 \ ******************************************************************************
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \{
 \LDX Q
@@ -12628,7 +12628,7 @@ LOAD_C% = LOAD% +P% - CODE%
 
 .MUT3
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \LDX ALP1               \ Set P = ALP1, though this gets overwritten by the
 \STX P                  \ following, so this has no effect
@@ -13913,7 +13913,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \
 \ ******************************************************************************
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \EQUB &8C, &E7
 \EQUB &8D, &ED
@@ -33470,8 +33470,6 @@ LOAD_H% = LOAD% + P% - CODE%
 
  LDA #3                 \ Select the docking music
  JMP PlayMusic
-
-ORG &5600
 
 \ ******************************************************************************
 \

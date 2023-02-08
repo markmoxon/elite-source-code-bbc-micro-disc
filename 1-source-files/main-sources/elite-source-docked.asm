@@ -179,7 +179,7 @@ ORG &0000
  SKIP 4                 \ Four 8-bit seeds for the random number generation
                         \ system implemented in the DORND routine
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \.TRTB%
 \
@@ -659,7 +659,7 @@ ORG &0000
                         \ for counters when drawing explosion clouds and partial
                         \ circles
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \.SWAP
 \
@@ -688,7 +688,7 @@ ORG &0000
  SKIP 1                 \ Temporary storage, typically used for storing the
                         \ number of iterations required when looping
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \.CNT2
 \
@@ -727,7 +727,7 @@ ORG &0000
 
 SKIP 1                 \ This byte appears to be unused
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \.RAT
 \
@@ -790,7 +790,7 @@ ORG &00D1
 
  SKIP 0                 \ Temporary storage, used in a number of places
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \.XX2
 \
@@ -21336,7 +21336,7 @@ ENDIF
  LDA #96                \ Set nosev_z hi = 96 (96 is the value of unity in the
  STA INWK+14            \ rotation vector)
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \LDA &9F                \ As part of the copy protection, location &9F is set to
 \CMP #219               \ 219 in the OSBmod routine in elite-loader3.asm. This
@@ -33400,14 +33400,13 @@ ENDMACRO
  FACE        0,        0,     -160,         31    \ Face 8
  FACE        0,      -27,        0,         31    \ Face 9
 
-                        \ --- Mod: Original Acornsoft code removed: ----------->
+                        \ --- Mod: Code removed for music: -------------------->
 
 \SKIP 171               \ These bytes appear to be unused
 
                         \ --- And replaced by: -------------------------------->
 
-\SKIP 156               \ These bytes appear to be unused
-ORG &6000
+ SKIP 97                \ These bytes appear to be unused
 
                         \ --- End of replacement ------------------------------>
 
