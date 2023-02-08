@@ -12483,7 +12483,7 @@ LOAD_C% = LOAD% +P% - CODE%
 
 \ ******************************************************************************
 \
-\       Name: Unused duplicate of MULTU
+\       Name: Unused duplicate of MULTU, Removed
 \       Type: Subroutine
 \   Category: Maths (Arithmetic)
 \    Summary: Unused duplicate of the MULTU routine
@@ -13905,7 +13905,7 @@ LOAD_C% = LOAD% +P% - CODE%
 
 \ ******************************************************************************
 \
-\       Name: Unused block
+\       Name: Unused block, Removed
 \       Type: Variable
 \   Category: Utility routines
 \    Summary: These bytes appear to be unused (the same block appears in both
