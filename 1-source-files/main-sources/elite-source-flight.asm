@@ -753,7 +753,7 @@ SKIP 1                 \ This byte appears to be unused
                         \
                         \   * 0 = do not play the music
                         \
-                        \   * &FF = do play the music
+                        \   * Non-zero = do play the music
 
 .RAT
 
@@ -2108,8 +2108,8 @@ LOAD_A% = LOAD%
  STA VIA+&45            \ Re-do the instruction we replaced when inserting this
                         \ routine into the standard IRQ1 interrupt handler
 
- BIT musicStatus        \ If bit 7 of the status flag is clear, then music is
- BCC mirq1              \ disabled, so jump to mirq1 to skip playing the
+ LDA musicStatus        \ If the music status flag is zero, then music is
+ BEQ mirq1              \ disabled, so jump to mirq1 to skip playing the
                         \ currently selected music
 
  JSR PlayMusic+3        \ Play the currently selected music
@@ -2715,8 +2715,8 @@ LOAD_A% = LOAD%
 
                         \ --- Mod: Code added for music: ---------------------->
 
- LDA #&FF               \ Set the status flag to indicate we are playing music,
- STA musicStatus        \ so the docking music starts playing
+ STA musicStatus        \ Set the status flag to a non-zero value to indicate we
+                        \ are playing music, so the docking music starts playing
 
                         \ --- End of added code ------------------------------->
 
