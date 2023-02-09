@@ -2109,7 +2109,7 @@ LOAD_A% = LOAD%
                         \ routine into the standard IRQ1 interrupt handler
 
  BIT musicStatus        \ If bit 7 of the status flag is clear, then music is
- BEQ mirq1              \ disabled, so jump to mirq1 to skip playing the
+ BCC mirq1              \ disabled, so jump to mirq1 to skip playing the
                         \ currently selected music
 
  JSR PlayMusic+3        \ Play the currently selected music
