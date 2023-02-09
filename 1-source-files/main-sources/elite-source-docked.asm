@@ -2153,7 +2153,12 @@ BRKV = P% - 2           \ The address of the destination address in the above
 \
 \                         * 6 = Play the currently selected music
 \
-\                         * &7C = Terminate the current;y selected music
+\                         * 9 = Stop the currently selected music
+\
+\ Other entry points:
+\
+\   PlayMusic+3         Repeat the last action (typically used to continue
+\                       playing in the interrupt routine)
 \
 \ ******************************************************************************
 
@@ -2298,17 +2303,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 
                         \ --- Mod: Code added for music: ---------------------->
 
- LDA #0                 \ Clear the status flag to indicate we are not playing
- STA musicStatus        \ any music
-
- LDA #&7C               \ Terminate the currently selected music, so the docking
- JSR PlayMusic          \ music doesn't keep playing once we dock
-
- LDA #3                 \ Select the docking music
- JSR PlayMusic
-
- LDA #6                 \ Modify the PlayMusic routine so it plays music on the
- STA play1+1            \ next call
+ JSR ResetMusic         \ Stop any music from playing
 
                         \ --- End of added code ------------------------------->
 
@@ -21148,17 +21143,7 @@ LOAD_F% = LOAD% + P% - CODE%
 
                         \ --- Mod: Code added for music: ---------------------->
 
- LDA #0                 \ Clear the status flag to indicate we are not playing
- STA musicStatus        \ any music
-
- LDA #&7C               \ Terminate the currently selected music
- JSR PlayMusic
-
- LDA #3                 \ Select the docking music, so it is ready to play in
- JSR PlayMusic          \ the flight code
-
- LDA #6                 \ Modify the PlayMusic routine so it plays music on the
- STA play1+1            \ next call
+ JSR ResetMusic         \ Stop any music from playing
 
                         \ --- End of added code ------------------------------->
 
@@ -33401,13 +33386,29 @@ ENDMACRO
  FACE        0,        0,     -160,         31    \ Face 8
  FACE        0,      -27,        0,         31    \ Face 9
 
+
+\ ******************************************************************************
+\
+\       Name: ResetMusic
+\       Type: Subroutine
+\   Category: Music
+\    Summary: Stop the music and reset the Elite sound envelopes
+\
+\ ******************************************************************************
+
                         \ --- Mod: Code removed for music: -------------------->
 
 \SKIP 171               \ These bytes appear to be unused
 
                         \ --- And replaced by: -------------------------------->
 
- SKIP 97                \ These bytes appear to be unused
+.ResetMusic
+
+ LDA #9                 \ Stop the currently selected music, reset the Elite
+ JMP PlayMusic          \ sound envelopes and select the docking music,
+                        \ returning from the subroutine using a tail call
+
+ SKIP 124               \ These bytes appear to be unused
 
                         \ --- End of replacement ------------------------------>
 

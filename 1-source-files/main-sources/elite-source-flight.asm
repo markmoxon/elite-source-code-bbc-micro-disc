@@ -2139,7 +2139,12 @@ LOAD_A% = LOAD%
 \
 \                         * 6 = Play the currently selected music
 \
-\                         * &7C = Terminate the current;y selected music
+\                         * 9 = Stop the currently selected music
+\
+\ Other entry points:
+\
+\   PlayMusic+3         Repeat the last action (typically used to continue
+\                       playing in the interrupt routine)
 \
 \ ******************************************************************************
 
@@ -2190,12 +2195,6 @@ LOAD_A% = LOAD%
 \ ******************************************************************************
 
 .INBAY
-
-                        \ --- Mod: Code added for music: ---------------------->
-
- JSR ResetMusic         \ Stop any music from playing
-
-                        \ --- End of added code ------------------------------->
 
  LDX #LO(LTLI)          \ Set (Y X) to point to LTLI ("L.T.CODE", which gets
  LDY #HI(LTLI)          \ modified to "R.T.CODE" in the DOENTRY routine)
@@ -2662,9 +2661,6 @@ LOAD_A% = LOAD%
                         \ --- Mod: Code added for music: ---------------------->
 
  JSR ResetMusic         \ Stop any music from playing
-
- LDA #6                 \ Modify the PlayMusic routine so it plays music on the
- STA play1+1            \ next call
 
                         \ --- End of added code ------------------------------->
 .MA78
@@ -3193,6 +3189,12 @@ LOAD_A% = LOAD%
 
                         \ If we arrive here, either the docking computer has
                         \ been activated, or we just docked successfully
+
+                        \ --- Mod: Code added for music: ---------------------->
+
+ JSR ResetMusic         \ Stop any music from playing
+
+                        \ --- End of added code ------------------------------->
 
  JSR RES2               \ Reset a number of flight variables and workspaces
 
@@ -33459,17 +33461,24 @@ LOAD_H% = LOAD% + P% - CODE%
 
  RTS                    \ Return from the subroutine
 
+\ ******************************************************************************
+\
+\       Name: ResetMusic
+\       Type: Subroutine
+\   Category: Music
+\    Summary: Stop the music and reset the Elite sound envelopes
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for music: ---------------------->
+
 .ResetMusic
 
- LDA #0
- STA musicStatus        \ Clear the status flag to indicate we are not playing
-                        \ any music
+ LDA #9                 \ Stop the currently selected music, reset the Elite
+ JMP PlayMusic          \ sound envelopes and select the docking music,
+                        \ returning from the subroutine using a tail call
 
- LDA #&7C               \ Terminate the currently selected music
- JSR PlayMusic
-
- LDA #3                 \ Select the docking music
- JMP PlayMusic
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
