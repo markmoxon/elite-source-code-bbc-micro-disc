@@ -2303,7 +2303,7 @@ BRKV = P% - 2           \ The address of the destination address in the above
 
                         \ --- Mod: Code added for music: ---------------------->
 
- JSR ResetMusic         \ Stop any music from playing
+ JSR StopMusic          \ Stop any music that is currently playing
 
                         \ --- End of added code ------------------------------->
 
@@ -21143,7 +21143,7 @@ LOAD_F% = LOAD% + P% - CODE%
 
                         \ --- Mod: Code added for music: ---------------------->
 
- JSR ResetMusic         \ Stop any music from playing
+ JSR StopMusic          \ Stop the title music
 
                         \ --- End of added code ------------------------------->
 
@@ -22145,6 +22145,12 @@ ENDIF
 \ ******************************************************************************
 
 .SVE
+
+                        \ --- Mod: Code added for music: ---------------------->
+
+ JSR StopMusic          \ Stop any music that is currently playing
+
+                        \ --- End of added code ------------------------------->
 
  JSR ZEBC               \ Call ZEBC to zero-fill pages &B and &C
 
@@ -33389,10 +33395,10 @@ ENDMACRO
 
 \ ******************************************************************************
 \
-\       Name: ResetMusic
+\       Name: StopMusic
 \       Type: Subroutine
 \   Category: Music
-\    Summary: Stop the music and reset the Elite sound envelopes
+\    Summary: Stop any music that is currently playing
 \
 \ ******************************************************************************
 
@@ -33402,13 +33408,13 @@ ENDMACRO
 
                         \ --- And replaced by: -------------------------------->
 
-.ResetMusic
+.StopMusic
 
- LDA #9                 \ Stop the currently selected music, reset the Elite
- JMP PlayMusic          \ sound envelopes and select the docking music,
-                        \ returning from the subroutine using a tail call
+ LDA #9                 \ Stop any music that is currently playing and select
+ JMP PlayMusic          \ the docking music, returning from the subroutine using
+                        \ a tail call
 
- SKIP 124               \ These bytes appear to be unused
+ SKIP 121               \ These bytes appear to be unused
 
                         \ --- End of replacement ------------------------------>
 

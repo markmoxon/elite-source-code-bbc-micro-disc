@@ -2660,9 +2660,10 @@ LOAD_A% = LOAD%
 
                         \ --- Mod: Code added for music: ---------------------->
 
- JSR ResetMusic         \ Stop any music from playing
+ JSR StopMusic          \ Stop any music that is currently playing
 
                         \ --- End of added code ------------------------------->
+
 .MA78
 
  LDA KY13               \ If ESCAPE is being pressed and we have an escape pod
@@ -3192,7 +3193,7 @@ LOAD_A% = LOAD%
 
                         \ --- Mod: Code added for music: ---------------------->
 
- JSR ResetMusic         \ Stop any music from playing
+ JSR StopMusic          \ Stop any music that is currently playing
 
                         \ --- End of added code ------------------------------->
 
@@ -33463,20 +33464,20 @@ LOAD_H% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
 \
-\       Name: ResetMusic
+\       Name: StopMusic
 \       Type: Subroutine
 \   Category: Music
-\    Summary: Stop the music and reset the Elite sound envelopes
+\    Summary: Stop any music that is currently playing
 \
 \ ******************************************************************************
 
                         \ --- Mod: Code added for music: ---------------------->
 
-.ResetMusic
+.StopMusic
 
- LDA #9                 \ Stop the currently selected music, reset the Elite
- JMP PlayMusic          \ sound envelopes and select the docking music,
-                        \ returning from the subroutine using a tail call
+ LDA #9                 \ Stop any music that is currently playing and select
+ JMP PlayMusic          \ the docking music, returning from the subroutine using
+                        \ a tail call
 
                         \ --- End of added code ------------------------------->
 
