@@ -17,11 +17,11 @@ PYTHON?=python
 ifeq ($(variant), ib-disc)
   variant-disc=1
   folder-disc=/ib-disc
-  suffix-disc=-ib-disc
+  suffix-disc=-flicker-free-ib-disc
 else
   variant-disc=2
   folder-disc=/sth
-  suffix-disc=-sth
+  suffix-disc=-flicker-free-sth
 endif
 
 .PHONY:build
@@ -55,7 +55,7 @@ build:
 	$(BEEBASM) -i 1-source-files/main-sources/elite-ships-p.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-readme.asm -v >> 3-assembled-output/compile.txt
 	$(PYTHON) 2-build-files/elite-checksum.py -u
-	$(BEEBASM) -i 1-source-files/main-sources/elite-disc.asm -do 5-compiled-game-discs/elite-disc-flicker-free$(suffix-disc).ssd -boot ELITE2 -title "E L I T E"
+	$(BEEBASM) -i 1-source-files/main-sources/elite-disc.asm -do 5-compiled-game-discs/elite-disc$(suffix-disc).ssd -boot ELITE2 -title "E L I T E"
 
 .PHONY:encrypt
 encrypt:
@@ -88,8 +88,13 @@ encrypt:
 	$(BEEBASM) -i 1-source-files/main-sources/elite-ships-p.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-readme.asm -v >> 3-assembled-output/compile.txt
 	$(PYTHON) 2-build-files/elite-checksum.py
-	$(BEEBASM) -i 1-source-files/main-sources/elite-disc.asm -do 5-compiled-game-discs/elite-disc-flicker-free$(suffix-disc).ssd -boot ELITE2 -title "E L I T E"
+	$(BEEBASM) -i 1-source-files/main-sources/elite-disc.asm -do 5-compiled-game-discs/elite-disc$(suffix-disc).ssd -boot ELITE2 -title "E L I T E"
 
 .PHONY:verify
 verify:
 	@$(PYTHON) 2-build-files/crc32.py 4-reference-binaries$(folder-disc) 3-assembled-output
+
+.PHONY:b2
+b2:
+	curl -G "http://localhost:48075/reset/b2"
+	curl -H "Content-Type:application/binary" --upload-file "5-compiled-game-discs/elite-disc$(suffix-disc).ssd" "http://localhost:48075/run/b2?name=elite-disc$(suffix-disc).ssd"
