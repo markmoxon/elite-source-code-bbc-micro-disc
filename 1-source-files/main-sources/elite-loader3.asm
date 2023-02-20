@@ -1147,13 +1147,13 @@ ORG CATDcode + P% - CATD
  LDA #&63
  STA ZP+1
 
- LDA #LO(ELITE)         \ Set P(1 0) = ELITE
+ LDA #&62               \ Set P(1 0) = &2A62
  STA P
- LDA #HI(ELITE)
+ LDA #&2A
  STA P+1
 
  LDX #8                 \ Call MVPG with X = 8 to copy 8 pages of memory from
- JSR MVPG               \ ELITE to &6300
+ JSR MVPG               \ the address in P(1 0) to the address in ZP(1 0)
 
 \ ******************************************************************************
 \
@@ -2340,3 +2340,12 @@ ENDIF
 PRINT "S.ELITE4 ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
 SAVE "3-assembled-output/ELITE4.unprot.bin", CODE%, P%, LOAD%
 
+PRINT "Addresses for the scramble routines in elite-checksum.py"
+PRINT "TVT1code = ", ~TVT1code
+PRINT "ELITE = ", ~ELITE
+PRINT "LOADcode = ", ~LOADcode
+PRINT "CATDcode = ", ~CATDcode
+PRINT "DIALS = ", ~DIALS
+PRINT "OSBmod = ", ~OSBmod
+PRINT "ELITE = ", ~ELITE
+PRINT "End of file = ", ~P%
