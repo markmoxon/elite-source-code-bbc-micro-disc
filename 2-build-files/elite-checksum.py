@@ -39,23 +39,23 @@ print("Encryption = ", Encrypt)
 load_address = 0x1900
 
 # TVT1code block
-scramble1_from = 0x2962
-scramble1_to = 0x2A62
+scramble1_from = 0x2962     # TVT1code
+scramble1_to = 0x2A62       # ELITE
 scramble1_eor = 0xA5
 
 # LOADcode block
-scramble2_from = 0x1AED
-scramble2_to = 0x1B4F
+scramble2_from = 0x1AED     # LOADcode
+scramble2_to = 0x1B4F       # CATDcode
 scramble2_eor = 0x18
 
 # DIALS, SHIP_MISSILE and WORDS blocks
-scramble3_from = 0x1D4B
-scramble3_to = 0x294B
+scramble3_from = 0x1D4B     # DIALS
+scramble3_to = 0x294B       # OSBmod
 scramble3_eor = 0xA5
 
 # ELITE, ASOFT and CpASOFT blocks, plus padding to the end of the file
-scramble4_from = 0x2A62
-scramble4_to = 0x2E00
+scramble4_from = 0x2A62     # ELITE
+scramble4_to = 0x2E00       # End of ELITE4 file
 scramble4_eor = 0xA5
 
 data_block = bytearray()

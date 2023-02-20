@@ -5384,6 +5384,15 @@ End macro FNE
 .CpASOFT
 S.ELITE4 &1900  &2E00  &1900  &1900 
 Saving file '3-assembled-output/ELITE4.unprot.bin'
+Addresses for the scramble routines in elite-checksum.py
+TVT1code = &2962 
+ELITE = &2A62 
+LOADcode = &1AED 
+CATDcode = &1B4F 
+DIALS = &1D4B 
+OSBmod = &294B 
+ELITE = &2A62 
+End of file = &2E00 
 .ZP
      0000
 .RAND
