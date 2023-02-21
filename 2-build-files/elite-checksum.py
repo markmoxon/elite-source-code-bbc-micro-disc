@@ -35,6 +35,7 @@ print("Disc Elite Checksum")
 print("Encryption = ", Encrypt)
 
 # Configuration variables for ELITE4
+# Values taken from compile.txt
 
 load_address = 0x1900
 
@@ -59,8 +60,8 @@ scramble4_to = 0x2E33       # End of ELITE4 file
 scramble4_eor = 0xA5
 
 # Commander file checksum
-tvt1 = 0x1100               # TVT1
 tvt1_code = 0x2975          # TVT1code
+tvt1 = 0x1100               # TVT1
 na_per_cent = 0x1181        # NA%
 chk2 = 0x11D3               # CHK2
 
