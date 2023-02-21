@@ -136,7 +136,7 @@ elite_file = open("3-assembled-output/D.CODE.unprot.bin", "rb")
 data_block.extend(elite_file.read())
 elite_file.close()
 
-# SC routine, which EORs bytes between &1300 and &9FFF
+# SC routine, which EORs bytes between &1300 and &55FF
 
 for n in range(scramble_from, scramble_to):
     data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
