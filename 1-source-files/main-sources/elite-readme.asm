@@ -34,7 +34,7 @@ _STH_DISC               = (_VARIANT = 2)
  EQUB 10, 13
  EQUS "---------------------------------------"
  EQUB 10, 13
- EQUS "Acornsoft Elite"
+ EQUS "Acornsoft Elite (flicker-free version)"
  EQUB 10, 13
  EQUB 10, 13
  EQUS "Version: BBC Master 128 version of the"
@@ -62,6 +62,11 @@ ENDIF
 
  EQUB 10, 13
  EQUS "BBC Master 128 conversion by Mark Moxon"
+ EQUB 10, 13
+ EQUB 10, 13
+ EQUS "Contains flicker-free planet drawing"
+ EQUB 10, 13
+ EQUS "routines by Mark Moxon"
  EQUB 10, 13
  EQUB 10, 13
  EQUS "See www.bbcelite.com for details"
