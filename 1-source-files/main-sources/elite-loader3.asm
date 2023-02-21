@@ -418,6 +418,22 @@ ENDMACRO
 
  JSR PROT3              \ Call PROT3 to do more checks on the CHKSM checksum
 
+                        \ --- Mod: Code added for flicker-free planets: ------->
+
+ LDA #&00               \ Set the following:
+ STA ZP                 \
+ LDA #&10               \   ZP(1 0) = &1000
+ STA ZP+1               \   P(1 0) = PlanetCode
+ LDA #LO(PlanetCode)
+ STA P
+ LDA #HI(PlanetCode)
+ STA P+1
+
+ JSR MVPG               \ Call MVPG to move and decrypt a page of memory from
+                        \ PlanetCode to &1000-&10FF
+
+                        \ --- End of added code ------------------------------->
+
  LDA #&00               \ Set the following:
  STA ZP                 \
  LDA #&11               \   ZP(1 0) = &1100
@@ -2317,19 +2333,29 @@ ORG TVT1code + P% - TVT1
 
  INCBIN "1-source-files/images/P.(C)ASFT.bin"
 
-IF _MATCH_ORIGINAL_BINARIES
+                        \ --- Mod: Code removed for flicker-free planets: ----->
 
- IF _STH_DISC
-  INCBIN "4-reference-binaries/sth/workspaces/loader3.bin"
- ELIF _IB_DISC
-  SKIP 158
- ENDIF
+\IF _MATCH_ORIGINAL_BINARIES
+\
+\ IF _STH_DISC
+\  INCBIN "4-reference-binaries/sth/workspaces/loader3.bin"
+\ ELIF _IB_DISC
+\  SKIP 158
+\ ENDIF
+\
+\ELSE
+\
+\  SKIP 158             \ These bytes appear to be unused
+\
+\ENDIF
 
-ELSE
+                        \ --- And replaced by: -------------------------------->
 
-  SKIP 158              \ These bytes appear to be unused
+.PlanetCode
 
-ENDIF
+ INCBIN "3-assembled-output/PLANETCODE.unprot.bin"
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -2341,6 +2367,7 @@ PRINT "S.ELITE4 ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
 SAVE "3-assembled-output/ELITE4.unprot.bin", CODE%, P%, LOAD%
 
 PRINT "Addresses for the scramble routines in elite-checksum.py"
+PRINT "Load address = ", ~CODE%
 PRINT "TVT1code = ", ~TVT1code
 PRINT "ELITE = ", ~ELITE
 PRINT "LOADcode = ", ~LOADcode
@@ -2348,4 +2375,8 @@ PRINT "CATDcode = ", ~CATDcode
 PRINT "DIALS = ", ~DIALS
 PRINT "OSBmod = ", ~OSBmod
 PRINT "ELITE = ", ~ELITE
-PRINT "End of file = ", ~P%
+PRINT "End of ELITE4 file = ", ~P%
+PRINT "TVT1code = ", ~TVT1code
+PRINT "TVT1 = ", ~TVT1
+PRINT "NA% = ", ~NA%
+PRINT "CHK2 = ", ~CHK2
