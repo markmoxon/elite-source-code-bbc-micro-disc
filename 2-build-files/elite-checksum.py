@@ -35,6 +35,7 @@ print("Disc Elite Checksum")
 print("Encryption = ", Encrypt)
 
 # Configuration variables for ELITE4
+# Values taken from compile.txt
 
 load_address = 0x1900
 
@@ -58,6 +59,12 @@ scramble4_from = 0x2A62     # ELITE
 scramble4_to = 0x2E00       # End of ELITE4 file
 scramble4_eor = 0xA5
 
+# Commander file checksum
+tvt1_code = 0x2962          # TVT1code
+tvt1 = 0x1100               # TVT1
+na_per_cent = 0x1181        # NA%
+chk2 = 0x11D3               # CHK2
+
 data_block = bytearray()
 
 # Load assembled code file
@@ -68,7 +75,7 @@ elite_file.close()
 
 # Commander data checksum
 
-na_per_cent_offset = 0x29E3 - load_address
+na_per_cent_offset = na_per_cent - tvt1 + tvt1_code - load_address
 CH = 0x4B - 2
 CY = 0
 for i in range(CH, 0, -1):
@@ -82,7 +89,7 @@ print("Commander checksum = ", CH)
 # Must have Commander checksum otherwise game will lock:
 
 if Encrypt:
-    checksum_offset = 0x2A35 - load_address
+    checksum_offset = chk2 - tvt1 + tvt1_code - load_address
     data_block[checksum_offset] = CH ^ 0xA9
     data_block[checksum_offset + 1] = CH
 

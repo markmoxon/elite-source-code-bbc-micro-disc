@@ -2341,6 +2341,7 @@ PRINT "S.ELITE4 ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
 SAVE "3-assembled-output/ELITE4.unprot.bin", CODE%, P%, LOAD%
 
 PRINT "Addresses for the scramble routines in elite-checksum.py"
+PRINT "Load address = ", ~CODE%
 PRINT "TVT1code = ", ~TVT1code
 PRINT "ELITE = ", ~ELITE
 PRINT "LOADcode = ", ~LOADcode
@@ -2348,4 +2349,8 @@ PRINT "CATDcode = ", ~CATDcode
 PRINT "DIALS = ", ~DIALS
 PRINT "OSBmod = ", ~OSBmod
 PRINT "ELITE = ", ~ELITE
-PRINT "End of file = ", ~P%
+PRINT "End of ELITE4 file = ", ~P%
+PRINT "TVT1code = ", ~TVT1code
+PRINT "TVT1 = ", ~TVT1
+PRINT "NA% = ", ~NA%
+PRINT "CHK2 = ", ~CHK2
