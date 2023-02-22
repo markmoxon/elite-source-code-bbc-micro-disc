@@ -10,11 +10,15 @@
 
 BBC Master 128 conversion by Mark Moxon
 
+Contains the flicker-free ship drawing
+routines from the BBC Master version,
+backported by Mark Moxon
+
 Contains flicker-free planet drawing
 routines by Mark Moxon
 
 See www.bbcelite.com for details
 
-Build: 2023-02-21 23:08:56
+Build: 2023-02-22 11:59:57
 ---------------------------------------
 
