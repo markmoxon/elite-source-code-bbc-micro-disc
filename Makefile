@@ -17,11 +17,11 @@ PYTHON?=python
 ifeq ($(variant), ib-disc)
   variant-disc=1
   folder-disc=/ib-disc
-  suffix-disc=-bbc-master-ib-disc
+  suffix-disc=-bbc-master-flicker-free-ib-disc
 else
   variant-disc=2
   folder-disc=/sth
-  suffix-disc=-bbc-master-sth
+  suffix-disc=-bbc-master-flicker-free-sth
 endif
 
 .PHONY:build
