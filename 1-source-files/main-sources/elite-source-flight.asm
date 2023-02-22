@@ -29885,10 +29885,22 @@ LOAD_G% = LOAD% + P% - CODE%
                         \ visibility distance for this edge, beyond which the
                         \ edge is not shown
 
+                        \ --- Mod: Code removed for flicker-free ships: ------->
+
+\CMP XX4                \ If XX4 > the visibility distance, where XX4 contains
+\BCC LL79-3             \ the ship's z-distance reduced to 0-31 (which we set in
+\                       \ part 2), then this edge is too far away to be visible,
+\                       \ so jump down to LL78 (via LL79-3) to move on to the
+\                       \ next edge
+
+                        \ --- And replaced by: -------------------------------->
+
  CMP XX4                \ If XX4 > the visibility distance, where XX4 contains
  BCC LL78               \ the ship's z-distance reduced to 0-31 (which we set in
                         \ part 2), then this edge is too far away to be visible,
                         \ so jump down to LL78 to move on to the next edge
+
+                        \ --- End of replacement ------------------------------>
 
  INY                    \ Increment Y to point to byte #1
 
@@ -30009,15 +30021,19 @@ LOAD_G% = LOAD% + P% - CODE%
                         \ clipped to fit on-screen, returning the clipped line's
                         \ end-points in (X1, Y1) and (X2, Y2)
 
- BCS LL78               \ If the C flag is set then the line is not visible on
-                        \ screen, so jump to LL78 so we don't store this line
-                        \ in the ship line heap
-
                         \ --- Mod: Code removed for flicker-free ships: ------->
 
+\BCS LL79-3             \ If the C flag is set then the line is not visible on
+\                       \ screen, so jump to LL78 (via LL79-3) so we don't store
+\                       \ this line in the ship line heap
+\
 \JMP LL80               \ Jump down to part 11 to draw this edge
 
                         \ --- And replaced by: -------------------------------->
+
+ BCS LL78               \ If the C flag is set then the line is not visible on
+                        \ screen, so jump to LL78 so we don't store this line
+                        \ in the ship line heap
 
  JSR LLX30              \ Draw this edge using smooth animation, by first
                         \ drawing the ship's new line and then erasing the
