@@ -1355,8 +1355,8 @@ ORG &0300
                         \
                         \ The enhanced versions of Elite set ENGY to 2 as the
                         \ reward for completing mission 2, where we receive a
-                        \ naval energy unit that recharges 50% faster than a
-                        \ standard energy unit, i.e. by 3 each time
+                        \ special naval energy unit that recharges at a fast
+                        \ rate than a standard energy unit, i.e. by 3 each time
 
 .DKCMP
 
@@ -11411,9 +11411,11 @@ LOAD_C% = LOAD% +P% - CODE%
  ORA #%00000100         \ both bits 2 and 3 are now set)
  STA TP
 
- LDA #2                 \ Set ENGY to 2 so our energy banks recharge at twice
- STA ENGY               \ the speed, as our mission reward is a special navy
-                        \ energy unit
+ LDA #2                 \ Set ENGY to 2 so our energy banks recharge at a faster
+ STA ENGY               \ rate, as our mission reward is a special navy energy
+                        \ unit that recharges at a rate of 3 units of energy on
+                        \ each iteration of the main loop, compared to a rate of
+                        \ 2 units of energy for the standard energy unit
 
  INC TALLY+1            \ Award 256 kill points for completing the mission
 

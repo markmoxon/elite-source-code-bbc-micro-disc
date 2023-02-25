@@ -1346,8 +1346,8 @@ ORG &0300
                         \
                         \ The enhanced versions of Elite set ENGY to 2 as the
                         \ reward for completing mission 2, where we receive a
-                        \ naval energy unit that recharges 50% faster than a
-                        \ standard energy unit, i.e. by 3 each time
+                        \ special naval energy unit that recharges at a fast
+                        \ rate than a standard energy unit, i.e. by 3 each time
 
 .DKCMP
 
@@ -16831,7 +16831,7 @@ LOAD_D% = LOAD% + P% - CODE%
 .ptg
 
  LSR COK                \ Set bit 0 of the competition flags in COK, so that the
- SEC                    \ copmpetition code will include the fact that we have
+ SEC                    \ competition code will include the fact that we have
  ROL COK                \ manually forced a mis-jump into witchspace
 
 .MJP
@@ -16854,7 +16854,8 @@ LOAD_D% = LOAD% + P% - CODE%
 
 .MJP1
 
- JSR GTHG               \ Call GTHG to spawn a Thargoid ship
+ JSR GTHG               \ Call GTHG to spawn a Thargoid ship and a Thargon
+                        \ companion
 
  LDA #3                 \ Fetch the number of Thargoid ships from MANY+THG, and
  CMP MANY+THG           \ if it is less than or equal to 3, loop back to MJP1 to
