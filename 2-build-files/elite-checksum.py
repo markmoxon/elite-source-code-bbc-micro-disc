@@ -35,28 +35,35 @@ print("Disc Elite Checksum")
 print("Encryption = ", Encrypt)
 
 # Configuration variables for ELITE4
+# Values taken from compile.txt
 
 load_address = 0x1900
 
 # TVT1code block
-scramble1_from = 0x2962
-scramble1_to = 0x2A62
+scramble1_from = 0x2962     # TVT1code
+scramble1_to = 0x2A62       # ELITE
 scramble1_eor = 0xA5
 
 # LOADcode block
-scramble2_from = 0x1AED
-scramble2_to = 0x1B4F
+scramble2_from = 0x1AED     # LOADcode
+scramble2_to = 0x1B4F       # CATDcode
 scramble2_eor = 0x18
 
 # DIALS, SHIP_MISSILE and WORDS blocks
-scramble3_from = 0x1D4B
-scramble3_to = 0x294B
+scramble3_from = 0x1D4B     # DIALS
+scramble3_to = 0x294B       # OSBmod
 scramble3_eor = 0xA5
 
 # ELITE, ASOFT and CpASOFT blocks, plus padding to the end of the file
-scramble4_from = 0x2A62
-scramble4_to = 0x2E00
+scramble4_from = 0x2A62     # ELITE
+scramble4_to = 0x2E00       # End of ELITE4 file
 scramble4_eor = 0xA5
+
+# Commander file checksum
+tvt1_code = 0x2962          # TVT1code
+tvt1 = 0x1100               # TVT1
+na_per_cent = 0x1181        # NA%
+chk2 = 0x11D3               # CHK2
 
 data_block = bytearray()
 
@@ -68,7 +75,7 @@ elite_file.close()
 
 # Commander data checksum
 
-na_per_cent_offset = 0x29E3 - load_address
+na_per_cent_offset = na_per_cent - tvt1 + tvt1_code - load_address
 CH = 0x4B - 2
 CY = 0
 for i in range(CH, 0, -1):
@@ -82,7 +89,7 @@ print("Commander checksum = ", CH)
 # Must have Commander checksum otherwise game will lock:
 
 if Encrypt:
-    checksum_offset = 0x2A35 - load_address
+    checksum_offset = chk2 - tvt1 + tvt1_code - load_address
     data_block[checksum_offset] = CH ^ 0xA9
     data_block[checksum_offset + 1] = CH
 
@@ -129,7 +136,7 @@ elite_file = open("3-assembled-output/D.CODE.unprot.bin", "rb")
 data_block.extend(elite_file.read())
 elite_file.close()
 
-# SC routine, which EORs bytes between &1300 and &9FFF
+# SC routine, which EORs bytes between &1300 and &55FF
 
 for n in range(scramble_from, scramble_to):
     data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
@@ -165,7 +172,6 @@ for n in range(scramble_from, scramble_to):
 # LOAD routine, which calculates checksum at &55FF in docked code
 # This checksum is not correct - need to fix this at some point
 
-load_address = 0x1100
 checksum_address = 0x55FF
 block_to_checksum = block_1100 + data_block
 
@@ -184,10 +190,10 @@ for x in range(0x11, 0x54):
     d_checksum = d_checksum % 256
 d_checksum = d_checksum % 256
 
-# if Encrypt:
-#     data_block[checksum_address - load_address] = d_checksum % 256
+if Encrypt:
+    data_block[checksum_address - load_address] = d_checksum
 
-print("&55FF docked code checksum = ", d_checksum)
+print("&55FF docked code checksum = ", hex(d_checksum))
 
 # Write output file for T.CODE
 
