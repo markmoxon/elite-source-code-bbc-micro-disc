@@ -4864,8 +4864,7 @@ End macro FNE
      0B2B   E0 54      CPX #&54
      0B2D   90 F4      BCC &0B23
      0B2F   CD FF 55   CMP &55FF
-     0B32   EA         NOP
-     0B33   EA         NOP
+     0B32   D0 FE      BNE &0B32
      0B34   4C E6 11   JMP &11E6
 .LTLI
      0B37   4C 2E 54 ...

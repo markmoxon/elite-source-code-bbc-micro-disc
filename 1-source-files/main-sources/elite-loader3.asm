@@ -698,7 +698,7 @@ ORG &0B00
                         \ in the docked file we just loaded, in the byte before
                         \ the ship hangar blueprints at XX21
 
-IF _REMOVE_CHECKSUMS OR TRUE \ Omit check as elite-checksum.py doesn't work yet
+IF _REMOVE_CHECKSUMS
 
  NOP                    \ If we have disabled checksums, then ignore the result
  NOP                    \ of the checksum comparison
