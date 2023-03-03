@@ -1477,8 +1477,8 @@ ORG &0300
                         \
                         \ The enhanced versions of Elite set ENGY to 2 as the
                         \ reward for completing mission 2, where we receive a
-                        \ naval energy unit that recharges 50% faster than a
-                        \ standard energy unit, i.e. by 3 each time
+                        \ special naval energy unit that recharges at a fast
+                        \ rate than a standard energy unit, i.e. by 3 each time
 
 .DKCMP
 
@@ -10187,6 +10187,10 @@ LOAD_C% = LOAD% +P% - CODE%
 \
 \   A = A * Q / 256
 \
+\ Returns:
+\
+\   C flag              The C flag is set
+\
 \ ******************************************************************************
 
 .FMLTU
@@ -10223,6 +10227,9 @@ LOAD_C% = LOAD% +P% - CODE%
                         \ (so we loop through the bits of P until we get to the
                         \ 1 we inserted before the loop, and then we stop)
 
+                        \ If we get here then the C flag is set as we just
+                        \ rotated a 1 out of the right end of P
+
  RTS                    \ Return from the subroutine
 
 .MU7
@@ -10237,6 +10244,9 @@ LOAD_C% = LOAD% +P% - CODE%
  BNE MUL3               \ Loop back to MUL3 if P still contains some set bits
                         \ (so we loop through the bits of P until we get to the
                         \ 1 we inserted before the loop, and then we stop)
+
+                        \ If we get here then the C flag is set as we just
+                        \ rotated a 1 out of the right end of P
 
  RTS                    \ Return from the subroutine
 
@@ -11632,9 +11642,11 @@ LOAD_C% = LOAD% +P% - CODE%
  ORA #%00000100         \ both bits 2 and 3 are now set)
  STA TP
 
- LDA #2                 \ Set ENGY to 2 so our energy banks recharge at twice
- STA ENGY               \ the speed, as our mission reward is a special navy
-                        \ energy unit
+ LDA #2                 \ Set ENGY to 2 so our energy banks recharge at a faster
+ STA ENGY               \ rate, as our mission reward is a special navy energy
+                        \ unit that recharges at a rate of 3 units of energy on
+                        \ each iteration of the main loop, compared to a rate of
+                        \ 2 units of energy for the standard energy unit
 
  INC TALLY+1            \ Award 256 kill points for completing the mission
 
@@ -15522,7 +15534,7 @@ LOAD_D% = LOAD% + P% - CODE%
 
 .TT151
 
- PHA                    \ Store the item number on the stack and in QQ14+4
+ PHA                    \ Store the item number on the stack and in QQ19+4
  STA QQ19+4
 
  ASL A                  \ Store the item number * 4 in QQ19, so this will act as
@@ -27156,7 +27168,7 @@ LOAD_G% = LOAD% + P% - CODE%
                         \ We now keep halving |delta_x| and |delta_y| until
                         \ both of them have zero in their high bytes
 
- TAX                    \ IF |delta_x_hi| is non-zero, skip the following
+ TAX                    \ If |delta_x_hi| is non-zero, skip the following
  BNE LL112
 
  LDX XX12+5             \ If |delta_y_hi| = 0, jump down to LL113 (as both
