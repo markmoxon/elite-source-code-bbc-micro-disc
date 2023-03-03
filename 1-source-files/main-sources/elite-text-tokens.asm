@@ -1357,11 +1357,20 @@ ENDMACRO
 \
 \ ------------------------------------------------------------------------------
 \
-\ To calculate the following:
+\ This lookup table contains sine values for the first half of a circle, from 0
+\ to 180 degrees (0 to PI radians). In terms of circle or ellipse line segments,
+\ there are 64 segments in a circle, so this contains sine values for segments
+\ 0 to 31.
+\
+\ In terms of segments, to calculate the sine of the angle at segment x, we look
+\ up the value in SNE + x, and to calculate the cosine of the angle we look up
+\ the value in SNE + ((x + 16) mod 32).
+\
+\ In terms of radians, to calculate the following:
 \
 \   sin(theta) * 256
 \
-\ where theta is in radians, look up the value in:
+\ where theta is in radians, we look up the value in:
 \
 \   SNE + (theta * 10)
 \
@@ -1401,26 +1410,35 @@ NEXT
 \
 \ ------------------------------------------------------------------------------
 \
-\ To calculate the following:
+\ This table contains lookup values for arctangent calculations involving angles
+\ in the range 0 to 45 degrees (or 0 to PI / 4 radians).
+\
+\ To calculate the value of theta in the following:
 \
 \   theta = arctan(t)
 \
-\ where 0 <= t < 1, look up the value in:
+\ where 0 <= t < 1, we look up the value in:
 \
 \   ACT + (t * 32)
 \
-\ The result will be an integer representing the angle in radians, with 256
-\ representing a full circle of 2 * PI radians.
+\ The result will be an integer representing the angle in radians, where 256
+\ represents a full circle of 360 degrees (2 * PI radians). The result of the
+\ lookup will therefore be an integer in the range 0 to 31, as this represents
+\ 0 to 45 degrees (0 to PI / 4 radians).
 \
-\ The table does not support values of t >= 1 or t < 0 directly, but we can use
-\ the following calculations instead:
+\ The table does not support values of t >= 1 or t < 0 directly, so if we need
+\ to calculate the arctangent for an angle greater than 45 degrees, we can apply
+\ the following calculation to the result from the table:
 \
 \   * For t > 1, arctan(t) = 64 - arctan(1 / t)
 \
+\ For negative values of t where -1 < t < 0, we can apply the following
+\ calculation to the result from the table:
+\
 \   * For t < 0, arctan(-t) = 128 - arctan(t)
 \
-\ If t < -1, we can do the first one to get arctan(|t|), then the second to get
-\ arctan(-|t|).
+\ Finally, if t < -1, we can do the first calculation to get arctan(|t|), and
+\ the second to get arctan(-|t|).
 \
 \ ******************************************************************************
 
