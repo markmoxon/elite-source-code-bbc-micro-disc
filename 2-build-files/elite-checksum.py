@@ -42,8 +42,9 @@ print("Encryption = ", Encrypt)
 # the following variables and plug them into the following, otherwise the game
 # will fail the checksum process and will hang on loading
 #
-# You can find the correct values for these variable by searching compile.txt
-# for "elite-checksum.py"
+# You can find the correct values for these variables by building your updated
+# source, and then searching compile.txt for "elite-checksum.py", where the new
+# values will be listed
 
 load_address = 0x1900
 
