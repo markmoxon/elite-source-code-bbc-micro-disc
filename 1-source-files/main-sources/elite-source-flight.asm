@@ -20791,7 +20791,7 @@ LOAD_E% = LOAD% + P% - CODE%
 
  JMP WPLS2              \ Call WPLS2 to remove the planet from the screen
 
-                        \ --- End of added code ------------------------------->
+                        \ --- End of replacement ------------------------------>
 
 .PL25
 
@@ -22269,11 +22269,6 @@ LOAD_E% = LOAD% + P% - CODE%
  LDY LSX2               \ If LSX2 is non-zero (which indicates the ball line
  BNE WP1                \ heap is empty), jump to WP1 to reset the line heap
                         \ without redrawing the planet
-
-                        \ Otherwise Y is now 0, so we can use it as a counter to
-                        \ loop through the lines in the line heap, redrawing
-                        \ each one to remove the planet from the screen, before
-                        \ resetting the line heap once we are done
 
                         \ --- Mod: Code removed for flicker-free planets: ----->
 
