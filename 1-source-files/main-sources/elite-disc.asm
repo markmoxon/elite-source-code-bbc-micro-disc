@@ -60,5 +60,5 @@ PUTFILE "3-assembled-output/README.txt", "README", &FFFFFF, &FFFFFF
 
 PUTFILE "1-source-files/boot-files/$.!BOOT.bin", "!BOOT", &FFFFFF, &FFFFFF
 PUTBASIC "1-source-files/music/load-music.bas", "ELITE"
-PUTFILE "1-source-files/music/elite-music.rom", "MUSIC", &008000, &008000
+PUTFILE "1-source-files/music/elite-music-disc.rom", "MUSIC", &008000, &008000
 PUTFILE "1-source-files/music/SRLoad.bin", "SRLOAD", &FF0900, &FF093D
