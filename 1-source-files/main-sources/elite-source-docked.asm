@@ -23505,11 +23505,30 @@ ENDIF
 
 .DK55
 
- CPX #&10               \ If "Q" is not being pressed, skip to DK7
- BNE DK7
+                        \ --- Mod: Code removed for music: -------------------->
 
- STX DNOIZ              \ "Q" is being pressed, so set DNOIZ to X, which is
-                        \ non-zero (&10), so this will turn the sound off
+\CPX #&10               \ If "Q" is not being pressed, skip to DK7
+\BNE DK7
+\
+\STX DNOIZ              \ "Q" is being pressed, so set DNOIZ to X, which is
+\                       \ non-zero (&10), so this will turn the sound off
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDA #12                \ Process the "Q" and music-related options
+ JSR PlayMusic
+
+
+ BCC DK7                \ If no music-related options were changed, then the C
+                        \ flag will be clear, so jump to DK7 to skip the
+                        \ following
+
+ JSR BELL               \ Make a beep sound so we know something has happened
+
+ JSR DELAY              \ Wait for Y vertical syncs (Y is between 64 and 70, so
+                        \ this is always a bit longer than a second)
+
+                        \ --- End of replacement ------------------------------>
 
 .DK7
 
@@ -33426,7 +33445,7 @@ ENDMACRO
  JMP PlayMusic          \ the docking music, returning from the subroutine using
                         \ a tail call
 
- SKIP 121               \ These bytes appear to be unused
+ SKIP 115               \ These bytes appear to be unused
 
                         \ --- End of replacement ------------------------------>
 
