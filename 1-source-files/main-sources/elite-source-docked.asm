@@ -21026,15 +21026,35 @@ LOAD_F% = LOAD% + P% - CODE%
 
  JSR BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
 
- LDX #(CATF-COMC)       \ We start by zeroing all the configuration variables
-                        \ between COMC and CATF, to set them to their default
+                        \ --- Mod: Code removed for music: -------------------->
+
+\LDX #(CATF-COMC)       \ We start by zeroing all the configuration variables
+\                       \ between COMC and CATF, to set them to their default
+\                       \ values, so set a counter in X for CATF - COMC bytes
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDX #(CATF-COMC+1)     \ We start by zeroing all the configuration variables
+                        \ between COMC-1 and CATF, to set them to their default
                         \ values, so set a counter in X for CATF - COMC bytes
+                        \
+                        \ This also zeroes the music option flag at COMC-1
+
+                        \ --- End of replacement ------------------------------>
 
  LDA #0                 \ Set A = 0 so we can zero the variables
 
 .BEL1
 
- STA COMC,X             \ Zero the X-th configuration variable
+                        \ --- Mod: Code removed for music: -------------------->
+
+\STA COMC,X             \ Zero the X-th configuration variable
+
+                        \ --- And replaced by: -------------------------------->
+
+ STA COMC-1,X           \ Zero the X-th configuration variable
+
+                        \ --- End of replacement ------------------------------>
 
  DEX                    \ Decrement the loop counter
 

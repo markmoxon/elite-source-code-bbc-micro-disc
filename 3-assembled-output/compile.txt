@@ -21607,10 +21607,10 @@ S.ELTE &3130  &3671  &11E3  &3130
      3889   20 AE 36   JSR &36AE
 .BEGIN
      388C   20 D5 12   JSR &12D5
-     388F   A2 0A      LDX #&0A
+     388F   A2 0B      LDX #&0B
      3891   A9 00      LDA #&00
 .BEL1
-     3893   9D C5 03   STA &03C5,X
+     3893   9D C4 03   STA &03C4,X
      3896   CA         DEX
      3897   10 FA      BPL &3893
 .TT170
