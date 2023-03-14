@@ -66,6 +66,11 @@ ENDIF
  EQUS "backported by Mark Moxon"
  EQUB 10, 13
  EQUB 10, 13
+ EQUS "Contains flicker-free planet drawing"
+ EQUB 10, 13
+ EQUS "routines by Mark Moxon"
+ EQUB 10, 13
+ EQUB 10, 13
  EQUS "See www.bbcelite.com for details"
  EQUB 10, 13
  EQUB 10, 13
