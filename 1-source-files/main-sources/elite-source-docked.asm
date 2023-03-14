@@ -172,11 +172,37 @@ ORG &0000
  SKIP 4                 \ Four 8-bit seeds for the random number generation
                         \ system implemented in the DORND routine
 
-.TRTB%
+                        \ --- Mod: Code removed for music: -------------------->
 
- SKIP 2                 \ Contains the address of the keyboard translation
-                        \ table, which is used to translate internal key
-                        \ numbers to ASCII
+\.TRTB%
+\
+\SKIP 2                 \ Contains the address of the keyboard translation
+\                       \ table, which is used to translate internal key
+\                       \ numbers to ASCII
+
+                        \ --- And replaced by: -------------------------------->
+
+.QQ29
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+.QQ3
+
+ SKIP 1                 \ The selected system's economy (0-7)
+                        \
+                        \   * 0 = Rich Industrial
+                        \   * 1 = Average Industrial
+                        \   * 2 = Poor Industrial
+                        \   * 3 = Mainly Industrial
+                        \   * 4 = Mainly Agricultural
+                        \   * 5 = Rich Agricultural
+                        \   * 6 = Average Agricultural
+                        \   * 7 = Poor Agricultural
+                        \
+                        \ See the deep dive on "Generating system data" for more
+                        \ information on economies
+
+                        \ --- End of replacement ------------------------------>
 
 .T1
 
@@ -1543,9 +1569,13 @@ NT% = SVC + 2 - TP      \ This sets the variable NT% to the size of the current
                         \ See the deep dive on "Generating system data" for more
                         \ information on economies
 
-.QQ29
+                        \ --- Mod: Code moved for flicker-free planets: ------->
 
- SKIP 1                 \ Temporary storage, used in a number of places
+\.QQ29
+\
+\SKIP 1                 \ Temporary storage, used in a number of places
+
+                        \ --- End of moved code ------------------------------->
 
 .gov
 
@@ -1580,21 +1610,25 @@ NT% = SVC + 2 - TP      \ This sets the variable NT% to the size of the current
                         \ See the deep dives on "Galaxy and system seeds" and
                         \ "Twisting the system seeds" for more details
 
-.QQ3
+                        \ --- Mod: Code moved for flicker-free planets: ------->
 
- SKIP 1                 \ The selected system's economy (0-7)
-                        \
-                        \   * 0 = Rich Industrial
-                        \   * 1 = Average Industrial
-                        \   * 2 = Poor Industrial
-                        \   * 3 = Mainly Industrial
-                        \   * 4 = Mainly Agricultural
-                        \   * 5 = Rich Agricultural
-                        \   * 6 = Average Agricultural
-                        \   * 7 = Poor Agricultural
-                        \
-                        \ See the deep dive on "Generating system data" for more
-                        \ information on economies
+\.QQ3
+\
+\SKIP 1                 \ The selected system's economy (0-7)
+\                       \
+\                       \   * 0 = Rich Industrial
+\                       \   * 1 = Average Industrial
+\                       \   * 2 = Poor Industrial
+\                       \   * 3 = Mainly Industrial
+\                       \   * 4 = Mainly Agricultural
+\                       \   * 5 = Rich Agricultural
+\                       \   * 6 = Average Agricultural
+\                       \   * 7 = Poor Agricultural
+\                       \
+\                       \ See the deep dive on "Generating system data" for more
+\                       \ information on economies
+
+                        \ --- End of moved code ------------------------------->
 
 .QQ4
 
@@ -23368,10 +23402,21 @@ ENDIF
  TAY                    \ Copy A to Y, so Y contains the internal key number
                         \ of the key pressed
 
- LDA (TRTB%),Y          \ The address in TRTB% points to the MOS key
+                        \ --- Mod: Code removed for music: -------------------->
+
+\LDA (TRTB%),Y          \ The address in TRTB% points to the MOS key
                         \ translation table, which is used to translate
                         \ internal key numbers to ASCII, so this fetches the
                         \ key's ASCII code into A
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDA &F02B,Y            \ The address &F02B points to the OS 1.20 MOS key
+                        \ translation table, which is used to translate
+                        \ internal key numbers to ASCII, so this fetches the
+                        \ key's ASCII code into A
+
+                        \ --- End of replacement ------------------------------>
 
  LDY YSAV               \ Restore the original value of Y we stored above
 
@@ -33631,7 +33676,7 @@ ENDMACRO
  FACE        0,        0,     -160,         31    \ Face 8
  FACE        0,      -27,        0,         31    \ Face 9
 
- SKIP 178               \ These bytes appear to be unused
+ SKIP 204               \ These bytes appear to be unused
 
 \ ******************************************************************************
 \
