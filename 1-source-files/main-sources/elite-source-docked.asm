@@ -23664,11 +23664,21 @@ ENDIF
  TAY                    \ Copy A to Y, so Y contains the internal key number
                         \ of the key pressed
 
- LDA &F02B,Y
+                        \ --- Mod: Code removed for music: -------------------->
+
 \LDA (TRTB%),Y          \ The address in TRTB% points to the MOS key
                         \ translation table, which is used to translate
                         \ internal key numbers to ASCII, so this fetches the
                         \ key's ASCII code into A
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDA &F02B,Y            \ The address &F02B points to the OS 1.20 MOS key
+                        \ translation table, which is used to translate
+                        \ internal key numbers to ASCII, so this fetches the
+                        \ key's ASCII code into A
+
+                        \ --- End of replacement ------------------------------>
 
  LDY YSAV               \ Restore the original value of Y we stored above
 
