@@ -5665,7 +5665,16 @@ NEXT
 
  STY LSP                \ Update LSP to point to the same as Y
 
+                        \ --- Mod: Code removed for flicker-free planets: ----->
+
  JSR LOIN               \ Draw a line from (X1, Y1) to (X2, Y2)
+
+                        \ --- And replaced by: -------------------------------->
+
+\JSR DrawNewPlanetLine  \ Draw a line from (X1, Y1) to (X2, Y2), but only if it
+\                       \ is different to the old line in K3+4 to K3+7
+
+                        \ --- End of added code ------------------------------->
 
  LDA XX13               \ If XX13 is non-zero, jump up to BL5 to add a &FF
  BNE BL5                \ marker to the end of the line heap. XX13 is non-zero
