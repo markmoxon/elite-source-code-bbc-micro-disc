@@ -1960,9 +1960,19 @@ LOAD_A% = LOAD%
 
 .S%
 
- JMP scramble           \ Decrypt the main flight code and join the main loop
+                        \ --- Mod: Code removed for flicker-free ships: ------->
 
- JMP scramble           \ Decrypt the main flight code and start a new game
+\JMP scramble           \ Decrypt the main flight code and join the main loop
+\
+\JMP scramble           \ Decrypt the main flight code and start a new game
+
+                        \ --- And replaced by: -------------------------------->
+
+ JMP RSHIPS             \ Join the main loop
+
+ JMP RSHIPS             \ Start a new game
+
+                        \ --- End of replacement ------------------------------>
 
  JMP TT26               \ WRCHV is set to point here by elite-loader3.asm
 
@@ -2011,50 +2021,54 @@ LOAD_A% = LOAD%
 \
 \ ******************************************************************************
 
-.scramble
+                        \ --- Mod: Code removed for flicker-free planets: ----->
 
- LDY #0                 \ We're going to work our way through a large number of
-                        \ encrypted bytes, so we set Y to 0 to be the index of
-                        \ the current byte within its page in memory
+\.scramble
+\
+\LDY #0                 \ We're going to work our way through a large number of
+\                       \ encrypted bytes, so we set Y to 0 to be the index of
+\                       \ the current byte within its page in memory
+\
+\STY SC                 \ Set the low byte of SC(1 0) to 0
+\
+\LDX #&13               \ Set X to &13 to be the page number of the current
+\                       \ byte, so we start the decryption with the first byte
+\                       \ of page &13
+\
+\.scrl
+\
+\STX SCH                \ Set the high byte of SC(1 0) to X, so SC(1 0) now
+\                       \ points to the first byte of page X
+\
+\TYA                    \ Set A to Y, so A now contains the index of the current
+\                       \ byte within its page
+\
+\EOR (SC),Y             \ EOR the current byte with its index within the page
+\
+\EOR #&33               \ EOR the current byte with &33
+\
+\STA (SC),Y             \ Update the current byte
+\
+\                       \ The current byte is in page X at offset Y, and SC(1 0)
+\                       \ points to the first byte of page X, so we just did
+\                       \  this:
+\                       \
+\                       \   (X Y) = (X Y) EOR Y EOR &33
+\
+\DEY                    \ Decrement the index in Y to point to the next byte
+\
+\BNE scrl               \ Loop back to scrl to decrypt the next byte until we
+\                       \ have done the whole page
+\
+\INX                    \ Increment X to point to the next page in memory
+\
+\CPX #&56               \ Loop back to scrl to decrypt the next page until we
+\BNE scrl               \ reach the start of page &56
+\
+\JMP RSHIPS             \ Call RSHIPS to launch from the station, load a new set
+\                       \ of ship blueprints and jump into the main game loop
 
- STY SC                 \ Set the low byte of SC(1 0) to 0
-
- LDX #&13               \ Set X to &13 to be the page number of the current
-                        \ byte, so we start the decryption with the first byte
-                        \ of page &13
-
-.scrl
-
- STX SCH                \ Set the high byte of SC(1 0) to X, so SC(1 0) now
-                        \ points to the first byte of page X
-
- TYA                    \ Set A to Y, so A now contains the index of the current
-                        \ byte within its page
-
- EOR (SC),Y             \ EOR the current byte with its index within the page
-
- EOR #&33               \ EOR the current byte with &33
-
- STA (SC),Y             \ Update the current byte
-
-                        \ The current byte is in page X at offset Y, and SC(1 0)
-                        \ points to the first byte of page X, so we just did
-                        \  this:
-                        \
-                        \   (X Y) = (X Y) EOR Y EOR &33
-
- DEY                    \ Decrement the index in Y to point to the next byte
-
- BNE scrl               \ Loop back to scrl to decrypt the next byte until we
-                        \ have done the whole page
-
- INX                    \ Increment X to point to the next page in memory
-
- CPX #&56               \ Loop back to scrl to decrypt the next page until we
- BNE scrl               \ reach the start of page &56
-
- JMP RSHIPS             \ Call RSHIPS to launch from the station, load a new set
-                        \ of ship blueprints and jump into the main game loop
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -12271,31 +12285,34 @@ LOAD_C% = LOAD% +P% - CODE%
 \
 \ ******************************************************************************
 
-{
- LDX Q
- BEQ MU1
- DEX
- STX T
- LDA #0
- LDX #8
- LSR P
-
-.MUL6
-
- BCC P%+4
- ADC T
- ROR A
- ROR P
- DEX
- 
                         \ --- Mod: Code removed for flicker-free ships: ------->
 
-\ BNE MUL6
+\{
+\LDX Q
 
                         \ --- End of removed code ----------------------------->
 
- RTS
-}
+                        \ --- Mod: Code removed for flicker-free ships: ------->
+
+\BEQ MU1
+\DEX
+\STX T
+\LDA #0
+\LDX #8
+\LSR P
+\
+\.MUL6
+\
+\BCC P%+4
+\ADC T
+\ROR A
+\ROR P
+\DEX
+\BNE MUL6
+\RTS
+\}
+
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -12402,15 +12419,19 @@ LOAD_C% = LOAD% +P% - CODE%
 \
 \ ******************************************************************************
 
-.MUT3
+                        \ --- Mod: Code removed for flicker-free ships: ------->
 
- LDX ALP1               \ Set P = ALP1, though this gets overwritten by the
- STX P                  \ following, so this has no effect
+\.MUT3
+\
+\LDX ALP1               \ Set P = ALP1, though this gets overwritten by the
+\STX P                  \ following, so this has no effect
+\
+\                       \ Fall through into MUT2 to do the following:
+\                       \
+\                       \   (S R) = XX(1 0)
+\                       \   (A P) = Q * A
 
-                        \ Fall through into MUT2 to do the following:
-                        \
-                        \   (S R) = XX(1 0)
-                        \   (A P) = Q * A
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -13693,17 +13714,21 @@ LOAD_C% = LOAD% +P% - CODE%
 \
 \ ******************************************************************************
 
- EQUB &8C, &E7
- EQUB &8D, &ED
- EQUB &8A, &E6
- EQUB &C1, &C8
- EQUB &C8, &8B
- EQUB &E0, &8A
- EQUB &E6, &D6
- EQUB &C5, &C6
- EQUB &C1, &CA
- EQUB &95, &9D
- EQUB &9C, &97
+                        \ --- Mod: Code removed for flicker-free ships: ------->
+
+\EQUB &8C, &E7
+\EQUB &8D, &ED
+\EQUB &8A, &E6
+\EQUB &C1, &C8
+\EQUB &C8, &8B
+\EQUB &E0, &8A
+\EQUB &E6, &D6
+\EQUB &C5, &C6
+\EQUB &C1, &CA
+\EQUB &95, &9D
+\EQUB &9C, &97
+
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
