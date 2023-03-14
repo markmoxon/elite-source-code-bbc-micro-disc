@@ -5730,16 +5730,24 @@ NEXT
 \   Category: Drawing lines
 \    Summary: Draw a ball line using flicker-free animation
 \
+\ ------------------------------------------------------------------------------
+\
+\ Other entry points:
+\
+\   DrawPlanetLine+4    If bit 7 of K3+8 is set, store the line coordinates in
+\                       K3+4 to K3+7 (X1, Y1, X2, Y2) and do not draw the line
+\
 \ ******************************************************************************
 
                         \ --- Mod: Code added for flicker-free planets: ------->
 
 .DrawPlanetLine
 
-\STZ K3+8               \ Clear bit 7 of K3+8 so we draw the current line below
+\LDA #0                 \ Clear bit 7 of K3+8 so we draw the current line below
+\STA K3+8
 \
-\STZ K3+9               \ Clear bit 7 of K3+9 to indicate that there is no line
-\                       \ to draw (we may change this below)
+\LDA #0                 \ Clear bit 7 of K3+9 to indicate that there is no line
+\STA K3+9               \ to draw (we may change this below)
 
  LDA XX14               \ If XX14 = 1, then this is the first point from the
  CMP #2                 \ heap, so jump to plin3 to set the previous coordinate
