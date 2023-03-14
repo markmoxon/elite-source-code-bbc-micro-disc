@@ -5849,6 +5849,67 @@ NEXT
 
 \ ******************************************************************************
 \
+\       Name: DrawNewPlanetLine
+\       Type: Subroutine
+\   Category: Drawing lines
+\    Summary: Draw a ball line, but only if it is different to the old line
+\
+\ ------------------------------------------------------------------------------
+\
+\ Arguments:
+\
+\   K3+4 to K3+7        The (X1, Y1) and (X2, Y2) coordinates of the old line
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for flicker-free planets: ------->
+
+\.DrawNewPlanetLine
+\
+\BIT K3+9               \ If bit 7 of K3+9 is clear, then there is no old line
+\BPL nlin2              \ to draw, so jump to nlin2 to draw the new line only
+\
+\LDA K3+4               \ If the old line equals the new line, jump to nlin3
+\CMP X1                 \ to skip drawing both lines
+\BNE nlin1
+\LDA K3+5
+\CMP Y1
+\BNE nlin1
+\LDA K3+6
+\CMP X2
+\BNE nlin1
+\LDA K3+7
+\CMP Y2
+\BEQ nlin3
+\
+\.nlin1
+\
+\                       \ If we get here then the old line is differnt to the new
+\                       \ line, so we draw them both
+\
+\JSR LL30               \ Draw the new line from (X1, Y1) to (X2, Y2)
+\
+\LDA K3+4               \ Set up the old line's coordinates
+\STA X1
+\LDA K3+5
+\STA Y1
+\LDA K3+6
+\STA X2
+\LDA K3+7
+\STA Y2
+\
+\.nlin2
+\
+\JSR LL30               \ Draw the old line to erase it
+\
+\.nlin3
+\
+\RTS                    \ Return from the subroutine
+
+                        \ --- End of added code ------------------------------->
+
+\ ******************************************************************************
+\
 \       Name: FLIP
 \       Type: Subroutine
 \   Category: Stardust
@@ -21987,13 +22048,14 @@ LOAD_E% = LOAD% + P% - CODE%
                         \            circle that's currently on-screen (or 0 if
                         \            there is no ship currently on-screen)
 
- LDY #1                 \ Set XX14 = 1, the offset of the first set of circle
- STY XX14               \ coordinates in the ball line heap
+ LDX #0                 \ Set XX14 = 0, to point to the offset before the first
+ STX XX14               \ set of circle coordinates in the ball line heap
 
- LDA LSP                \ Set XX14+1 to the last byte of the ball line heap
- STA XX14+1
+ LDX LSP                \ Set XX14+1 to the last byte of the ball line heap
+ STX XX14+1
 
- STY LSP                \ Set LSP = 1 to reset the ball line heap pointer
+ LDX #1                 \ Set LSP = 1 to reset the ball line heap pointer
+ STX LSP
 
                         \ --- End of added code ------------------------------->
 
