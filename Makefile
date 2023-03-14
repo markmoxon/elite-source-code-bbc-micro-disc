@@ -1,28 +1,10 @@
 BEEBASM?=beebasm
 PYTHON?=python
 
-# You can set the variant that gets built by adding 'variant=<rel>' to
-# the make command, where <rel> is one of:
-#
-#   ib-disc
-#   sth
-#
-# So, for example:
-#
-#   make encrypt verify variant=ib-disc
-#
-# will build the variant from the game disc on Ian Bell's site. If you omit
-# the variant parameter, it will build the Stairway to Hell variant.
-
-ifeq ($(variant), ib-disc)
-  variant-disc=1
-  folder-disc=/ib-disc
-  suffix-disc=-music-ib-disc
-else
-  variant-disc=2
-  folder-disc=/sth
-  suffix-disc=-music-sth
-endif
+# Music is only supported in the Stairway to Hell variant
+variant-disc=2
+folder-disc=/sth
+suffix-disc=-music-sth
 
 .PHONY:build
 build:
