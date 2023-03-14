@@ -5653,6 +5653,14 @@ NEXT
 
  JSR DrawPlanetLine     \ Draw the current line from the old planet
 
+\LDA #&FF               \ Set bit 7 of K3+8 so we do not draw the current line
+\STA K3+8               \ in the call to DrawPlanetLine, but store the
+\                       \ coordinates so we we can check them below
+\
+\JSR DrawPlanetLine+2   \ Calculate the current line from the old heap, but do
+\                       \ not draw it, but store the coordinates (X1, Y1) and
+\                      \ (X2, Y2) in K3+4 to K3+7
+
                         \ --- End of added code ------------------------------->
 
  LDA X2                 \ Store X2 in the LSP-th byte of LSX2
