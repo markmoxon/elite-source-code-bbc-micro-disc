@@ -21118,7 +21118,7 @@ LOAD_F% = LOAD% + P% - CODE%
                         \ handler
 
  LDA #&4C               \ Insert JMP IRQMusic into the LINSCN handler, replacing
- STA LINSCN+9           \ the STA VIA+&44 instruction, so the IRQMusic routine
+ STA LINSCN+9           \ the STA VIA+&45 instruction, so the IRQMusic routine
  LDA #LO(IRQMusic)      \ gets called on each vertical sync
  STA LINSCN+10
  LDA #HI(IRQMusic)
