@@ -8736,7 +8736,7 @@ S.ELTB &167A  &215A  &11E3  &167A
 .HFL2
      26BF   A9 01      LDA #&01
      26C1   85 6B      STA &6B
-     26C3   20 B4 3B   JSR &3BB4
+     26C3   20 A8 3B   JSR &3BA8
      26C6   06 40      ASL &40
      26C8   B0 06      BCS &26D0
      26CA   A5 40      LDA &40
@@ -9788,7 +9788,7 @@ S.ELTC &215A  &2B12  &11E3  &215A
      2DEE   86 6B      STX &6B
      2DF0   A2 02      LDX #&02
      2DF2   86 95      STX &95
-     2DF4   20 B4 3B   JSR &3BB4
+     2DF4   20 A8 3B   JSR &3BA8
      2DF7   60         RTS
 .TT210
      2DF8   A0 00      LDY #&00
@@ -11726,25 +11726,25 @@ S.ELTD &2B12  &331D  &11E3  &2B12
 .CIRCLE
      3B8E   20 79 3C   JSR &3C79
      3B91   B0 FA      BCS &3B8D
-     3B93   A2 00      LDX #&00
-     3B95   86 98      STX &98
-     3B97   A6 6B      LDX &6B
-     3B99   86 99      STX &99
-     3B9B   A2 01      LDX #&01
-     3B9D   86 6B      STX &6B
-     3B9F   A9 00      LDA #&00
-     3BA1   8D C0 0E   STA &0EC0
-     3BA4   A6 40      LDX &40
-     3BA6   A9 08      LDA #&08
-     3BA8   E0 08      CPX #&08
-     3BAA   90 06      BCC &3BB2
-     3BAC   4A         LSR A
-     3BAD   E0 3C      CPX #&3C
-     3BAF   90 01      BCC &3BB2
-     3BB1   4A         LSR A
+     3B93   A9 00      LDA #&00
+     3B95   8D C0 0E   STA &0EC0
+     3B98   A6 40      LDX &40
+     3B9A   A9 08      LDA #&08
+     3B9C   E0 08      CPX #&08
+     3B9E   90 06      BCC &3BA6
+     3BA0   4A         LSR A
+     3BA1   E0 3C      CPX #&3C
+     3BA3   90 01      BCC &3BA6
+     3BA5   4A         LSR A
 .PL89
-     3BB2   85 95      STA &95
+     3BA6   85 95      STA &95
 .CIRCLE2
+     3BA8   A2 00      LDX #&00
+     3BAA   86 98      STX &98
+     3BAC   A6 6B      LDX &6B
+     3BAE   86 99      STX &99
+     3BB0   A2 01      LDX #&01
+     3BB2   86 6B      STX &6B
      3BB4   A2 FF      LDX #&FF
      3BB6   86 92      STX &92
      3BB8   E8         INX
