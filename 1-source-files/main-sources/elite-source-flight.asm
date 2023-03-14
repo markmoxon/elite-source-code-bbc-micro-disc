@@ -13753,9 +13753,11 @@ LOAD_C% = LOAD% +P% - CODE%
  LDA DJD                \ If keyboard auto-recentre is disabled, then
  BNE RE2+2              \ jump to RE2+2 to restore A and return
 
- LDX #128               \ If keyboard auto-recentre is enabled, set X to 128
- BMI RE2+2              \ (the middle of our range) and jump to RE2+2 to
-                        \ restore A and return
+ LDX #128               \ If we get here then keyboard auto-recentre is enabled,
+ BMI RE2+2              \ so set X to 128 (the middle of our range) and jump to
+                        \ RE2+2 to restore A and return from the subroutine
+                        \ (this BMI is effectively a JMP as bit 7 of X is always
+                        \ set)
 
 \ ******************************************************************************
 \
@@ -13777,8 +13779,7 @@ LOAD_C% = LOAD% +P% - CODE%
 \
 \   tan(A) = P / Q
 \
-\ The result in A is an integer representing the angle in radians, where 256
-\ represents a full circle of 360 degrees, or 2 * PI radians. The routine
+\ The result in A is an integer representing the angle in radians. The routine
 \ returns values in the range 0 to 128, which covers 0 to 180 degrees (or 0 to
 \ PI radians).
 \
@@ -20840,7 +20841,9 @@ LOAD_E% = LOAD% + P% - CODE%
                         \   CNT2 = arctan(P / A) / 4
                         \        = arctan(-nosev_z_hi / roofv_z_hi) / 4
                         \
-                        \ and give the result the opposite sign to nosev_z_hi
+                        \ and do the following if nosev_z_hi >= 0:
+                        \
+                        \   CNT2 = CNT2 + PI
 
  LDX #9                 \ Set X to 9 so the call to PLS1 divides nosev_x
 
@@ -20876,7 +20879,9 @@ LOAD_E% = LOAD% + P% - CODE%
                         \   CNT2 = arctan(P / A) / 4
                         \        = arctan(-nosev_z_hi / sidev_z_hi) / 4
                         \
-                        \ and give the result the opposite sign to nosev_z_hi
+                        \ and do the following if nosev_z_hi >= 0:
+                        \
+                        \   CNT2 = CNT2 + PI
 
  LDX #21                \ Set X to 21 so the call to PLS5 divides sidev_x
 
@@ -22786,8 +22791,15 @@ LOAD_E% = LOAD% + P% - CODE%
 \
 \   CNT2 = arctan(P / A) / 4
 \
-\ giving the result the opposite sign to nosev_z_hi. This is called with the
-\ following arguments when calculating the equator and meridian for planets:
+\ and do the following if nosev_z_hi >= 0:
+\
+\   CNT2 = CNT2 + 32
+\
+\ which is the equivalent of adding 180 degrees to the result (or PI radians),
+\ as there are 64 segments in a full circle.
+\
+\ This routine is called with the following arguments when calculating the
+\ equator and meridian for planets:
 \
 \   * A = roofv_z_hi, P = -nosev_z_hi
 \
@@ -31091,6 +31103,9 @@ LOAD_G% = LOAD% + P% - CODE%
  CMP XX12+4             \ vertical than horizontal, jump to LL114
  BCC LL114
 
+                        \ If we get here then our line is more horizontal than
+                        \ vertical, so it is a shallow slope
+
  STA Q                  \ Set Q = delta_x_lo
 
  LDA XX12+4             \ Set A = delta_y_lo
@@ -31104,6 +31119,9 @@ LOAD_G% = LOAD% + P% - CODE%
 
 .LL114
 
+                        \ If we get here then our line is more vertical than
+                        \ horizontal, so it is a steep slope
+
  LDA XX12+4             \ Set Q = delta_y_lo
  STA Q
  LDA XX12+2             \ Set A = delta_x_lo
@@ -31113,7 +31131,8 @@ LOAD_G% = LOAD% + P% - CODE%
                         \   R = 256 * A / Q
                         \     = 256 * delta_x_lo / delta_y_lo
 
- DEC T                  \ T was set to 0 above, so this sets T = &FF
+ DEC T                  \ T was set to 0 above, so this sets T = &FF when our
+                        \ line is steep
 
 \ ******************************************************************************
 \
@@ -31130,11 +31149,11 @@ LOAD_G% = LOAD% + P% - CODE%
 \ clipping.
 \
 \ If we get here, then R has been set to the gradient of the line (x1, y1) to
-\ (x2, y2), with T indicating the type of slope:
+\ (x2, y2), with T indicating the gradient of slope:
 \
-\   * 0   = it's more vertical than horizontal
+\   * 0   = shallow slope (more horizontal than vertical)
 \
-\   * &FF = it's more horizontal than vertical
+\   * &FF = steep slope (more vertical than horizontal)
 \
 \ and XX13 has been set as follows:
 \
@@ -31590,11 +31609,11 @@ LOAD_G% = LOAD% + P% - CODE%
 \
 \                         * Negative (bit 7 set) = top right to bottom left
 \
-\   T                   The type of slope:
+\   T                   The gradient of slope:
 \
-\                         * 0 if it's more vertical than horizontal
+\                         * 0 if it's a shallow slope
 \
-\                         * &FF if it's more horizontal than vertical
+\                         * &FF if it's a steep slope
 \
 \ Returns:
 \
@@ -31775,11 +31794,19 @@ LOAD_G% = LOAD% + P% - CODE%
 \
 \ Calculate the following:
 \
-\   * If T = 0  (more vertical than horizontal), (Y X) = (S x1_lo) * XX12+2
+\   * If T = 0, this is a shallow slope, so calculate (Y X) = (S x1_lo) * XX12+2
 \
-\   * If T <> 0 (more horizontal than vertical), (Y X) = (S x1_lo) / XX12+2
+\   * If T <> 0, this is a steep slope, so calculate (Y X) = (S x1_lo) / XX12+2
 \
 \ giving (Y X) the opposite sign to the slope direction in XX12+3.
+\
+\ Arguments:
+\
+\   T                   The gradient of slope:
+\
+\                         * 0 if it's a shallow slope
+\
+\                         * &FF if it's a steep slope
 \
 \ Other entry points:
 \
@@ -31807,9 +31834,8 @@ LOAD_G% = LOAD% + P% - CODE%
 
  PHA                    \ Store A on the stack so we can use it later
 
- LDX T                  \ If T is non-zero, so it's more horizontal than
- BNE LL121              \ vertical, jump down to LL121 to calculate this
-                        \ instead:
+ LDX T                  \ If T is non-zero, then it's a steep slope, so jump
+ BNE LL121              \ down to LL121 to calculate this instead:
                         \
                         \   (Y X) = (S R) / Q
 
@@ -31880,9 +31906,9 @@ LOAD_G% = LOAD% + P% - CODE%
 \
 \ Calculate the following:
 \
-\   * If T = 0,  calculate (Y X) = (S R) / XX12+2
+\   * If T = 0, this is a shallow slope, so calculate (Y X) = (S R) / XX12+2
 \
-\   * If T <> 0, calculate (Y X) = (S R) * XX12+2
+\   * If T <> 0, this is a steep slope, so calculate (Y X) = (S R) * XX12+2
 \
 \ giving (Y X) the opposite sign to the slope direction in XX12+3.
 \
@@ -31895,6 +31921,12 @@ LOAD_G% = LOAD% + P% - CODE%
 \                         * Bit 7 clear means top left to bottom right
 \
 \                         * Bit 7 set means top right to bottom left
+\
+\   T                   The gradient of slope:
+\
+\                         * 0 if it's a shallow slope
+\
+\                         * &FF if it's a steep slope
 \
 \ Other entry points:
 \
@@ -31923,8 +31955,8 @@ LOAD_G% = LOAD% + P% - CODE%
 
  PHA                    \ Store A on the stack so we can use it later
 
- LDX T                  \ If T is non-zero, so it's more horizontal than
- BNE LL122              \ vertical, jump up to LL122 to calculate this instead:
+ LDX T                  \ If T is non-zero, then it's a steep slope, so jump up
+ BNE LL122              \ to LL122 to calculate this instead:
                         \
                         \   (Y X) = (S R) * Q
 

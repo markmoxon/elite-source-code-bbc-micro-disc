@@ -34,6 +34,7 @@ See the [introduction](#introduction) for more information.
   * [Build targets](#build-targets)
   * [Windows](#windows)
   * [Mac and Linux](#mac-and-linux)
+  * [Updating the checksum scripts if you change the code](#updating-the-checksum-scripts-if-you-change-the-code)
   * [Verifying the output](#verifying-the-output)
   * [Log files](#log-files)
   * [Auto-deploying to the b2 emulator](#auto-deploying-to-the-b2-emulator)
@@ -128,7 +129,7 @@ There are five main folders in this repository, which reflect the order of the b
 
 ## Flicker-free Elite
 
-This repository also includes a flicker-free version, which incorporates the backported flicker-free ship-drawing routines from the BBC Master. The flicker-free code is in a separate branch called `flicker-free`, and apart from the code differences for reducing flicker, this branch is identical to the main branch and the same build process applies.
+This repository also includes a flicker-free version, which incorporates the backported flicker-free ship-drawing routines from the BBC Master, as well as a fix for planets so they no longer flicker. The flicker-free code is in a separate branch called `flicker-free`, and apart from the code differences for reducing flicker, this branch is identical to the main branch and the same build process applies.
 
 The annotated source files in the `flicker-free` branch contain both the original Acornsoft code and all of the modifications for flicker-free Elite, so you can look through the source to see exactly what's changed. Any code that I've removed from the original version is commented out in the source files, so when they are assembled they produce the flicker-free binaries, while still containing details of all the modifications. You can find all the diffs by searching the sources for `Mod:`.
 
@@ -141,6 +142,8 @@ For more information on flicker-free Elite, see the [hacks section of the accomp
 This repository also includes a version of BBC Micro Elite that includes the music from the Commodore 64 version. The music-specific code is in a separate branch called `music`, and apart from the code differences for adding the music, this branch is identical to the main branch and the same build process applies.
 
 The annotated source files in the `music` branch contain both the original Acornsoft code and all of the modifications for the musical version of Elite, so you can look through the source to see exactly what's changed. Any code that I've removed from the original version is commented out in the source files, so when they are assembled they produce the music-enabled binaries, while still containing details of all the modifications. You can find all the diffs by searching the sources for `Mod:`.
+
+The music itself is built as a sideways ROM using the code in the [elite-music repository](https://github.com/markmoxon/elite-music/).
 
 For more information on the music, see the [hacks section of the accompanying website](https://www.bbcelite.com/hacks/bbc_elite_with_music.html).
 
@@ -214,6 +217,12 @@ make encrypt
 ```
 
 will produce a file called `elite-disc-sth.ssd` in the `5-compiled-game-discs` folder that contains the Stairway to Hell variant, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
+
+### Updating the checksum scripts if you change the code
+
+If you change the source code in any way, you may break the game; if so, it will typically hang at the loading screen, though in some versions it may hang when launching from the space station.
+
+To fix this, you may need to update some of the hard-coded addresses in the checksum script so that they match the new addresses in your changed version of the code. See the comments in the [elite-checksum.py](2-build-files/elite-checksum.py) script for details.
 
 ### Verifying the output
 
