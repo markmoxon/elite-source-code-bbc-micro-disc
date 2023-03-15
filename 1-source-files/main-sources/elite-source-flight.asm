@@ -20773,9 +20773,6 @@ LOAD_E% = LOAD% + P% - CODE%
 
                         \ --- Mod: Code removed for flicker-free planets: ----->
 
- RTS                    \ The planet doesn't fit on-screen, so return from the
-                        \ subroutine
-
 \RTS                    \ The planet doesn't fit on-screen, so return from the
 \                       \ subroutine
 
