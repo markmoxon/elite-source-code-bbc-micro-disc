@@ -24,12 +24,12 @@
 \
 \ ******************************************************************************
 
-INCLUDE "1-source-files/main-sources/elite-build-options.asm"
+ INCLUDE "1-source-files/main-sources/elite-build-options.asm"
 
-_IB_DISC                = (_VARIANT = 1)
-_STH_DISC               = (_VARIANT = 2)
+ _IB_DISC               = (_VARIANT = 1)
+ _STH_DISC              = (_VARIANT = 2)
 
-GUARD &7C00             \ Guard against assembling over screen memory
+ GUARD &7C00            \ Guard against assembling over screen memory
 
 \ ******************************************************************************
 \
@@ -37,14 +37,14 @@ GUARD &7C00             \ Guard against assembling over screen memory
 \
 \ ******************************************************************************
 
-OSNEWL = &FFE7          \ The address for the OSNEWL routine
-OSWRCH = &FFEE          \ The address for the OSWRCH routine
-OSBYTE = &FFF4          \ The address for the OSBYTE routine
-OSWORD = &FFF1          \ The address for the OSWORD routine
-OSCLI = &FFF7           \ The address for the OSCLI vector
+ OSNEWL = &FFE7         \ The address for the OSNEWL routine
+ OSWRCH = &FFEE         \ The address for the OSWRCH routine
+ OSBYTE = &FFF4         \ The address for the OSBYTE routine
+ OSWORD = &FFF1         \ The address for the OSWORD routine
+ OSCLI = &FFF7          \ The address for the OSCLI vector
 
-CODE% = &5700
-LOAD% = &5700
+ CODE% = &5700
+ LOAD% = &5700
 
 \ ******************************************************************************
 \
@@ -56,7 +56,7 @@ LOAD% = &5700
 \
 \ ******************************************************************************
 
-ORG &0004
+ ORG &0004
 
 .TRTB%
 
@@ -64,7 +64,7 @@ ORG &0004
                         \ table, which is used to translate internal key
                         \ numbers to ASCII
 
-ORG &0070
+ ORG &0070
 
 .S
 
@@ -90,7 +90,7 @@ ORG &0070
 
  SKIP 1                 \ Temporary storage, used in a number of places
 
-ORG &0081
+ ORG &0081
 
 .SC
 
@@ -113,7 +113,7 @@ ORG &0081
 \
 \ ******************************************************************************
 
-ORG CODE%
+ ORG CODE%
 
 \ ******************************************************************************
 \
@@ -326,7 +326,7 @@ ENDIF
 
 .LOADcode
 
-ORG &0400
+ ORG &0400
 
 \ ******************************************************************************
 \
@@ -615,9 +615,9 @@ ORG &0400
  EQUB &00, &00, &00, &00, &00, &00, &00, &00
  EQUB &00, &00, &00, &00, &00, &00, &00, &00
 
-COPYBLOCK LOAD, P%, LOADcode
+ COPYBLOCK LOAD, P%, LOADcode
 
-ORG LOADcode + P% - LOAD
+ ORG LOADcode + P% - LOAD
 
  SKIP 487               \ These bytes appear to be unused
 
@@ -1484,6 +1484,6 @@ ORG LOADcode + P% - LOAD
 \
 \ ******************************************************************************
 
-PRINT "S.ELITE3 ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
-SAVE "3-assembled-output/ELITE3.bin", CODE%, P%, LOAD%
+ PRINT "S.ELITE3 ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
+ SAVE "3-assembled-output/ELITE3.bin", CODE%, P%, LOAD%
 
