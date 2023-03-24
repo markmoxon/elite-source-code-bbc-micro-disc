@@ -24,12 +24,12 @@
 \
 \ ******************************************************************************
 
-INCLUDE "1-source-files/main-sources/elite-build-options.asm"
+ INCLUDE "1-source-files/main-sources/elite-build-options.asm"
 
-_IB_DISC                = (_VARIANT = 1)
-_STH_DISC               = (_VARIANT = 2)
+ _IB_DISC               = (_VARIANT = 1)
+ _STH_DISC              = (_VARIANT = 2)
 
-GUARD &7C00             \ Guard against assembling over screen memory
+ GUARD &7C00            \ Guard against assembling over screen memory
 
 \ ******************************************************************************
 \
@@ -37,13 +37,13 @@ GUARD &7C00             \ Guard against assembling over screen memory
 \
 \ ******************************************************************************
 
-BYTEV = &020A           \ The BYTEV vector that we check as part of the copy
+ BYTEV = &020A          \ The BYTEV vector that we check as part of the copy
                         \ protection
 
-OSWRCH = &FFEE          \ The address for the OSWRCH routine
-OSBYTE = &FFF4          \ The address for the OSBYTE routine
-OSWORD = &FFF1          \ The address for the OSWORD routine
-OSCLI = &FFF7           \ The address for the OSCLI routine
+ OSWRCH = &FFEE         \ The address for the OSWRCH routine
+ OSBYTE = &FFF4         \ The address for the OSBYTE routine
+ OSWORD = &FFF1         \ The address for the OSWORD routine
+ OSCLI = &FFF7          \ The address for the OSCLI routine
 
 \ ******************************************************************************
 \
@@ -55,7 +55,7 @@ OSCLI = &FFF7           \ The address for the OSCLI routine
 \
 \ ******************************************************************************
 
-ORG &0001
+ ORG &0001
 
 .ZP
 
@@ -67,10 +67,10 @@ ORG &0001
 \
 \ ******************************************************************************
 
-CODE% = &2F00
-LOAD% = &2F00
+ CODE% = &2F00
+ LOAD% = &2F00
 
-ORG CODE%
+ ORG CODE%
 
 \ ******************************************************************************
 \
@@ -457,5 +457,5 @@ ORG CODE%
 \
 \ ******************************************************************************
 
-PRINT "S.ELITE2 ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
-SAVE "3-assembled-output/ELITE2.bin", CODE%, P%, LOAD%
+ PRINT "S.ELITE2 ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
+ SAVE "3-assembled-output/ELITE2.bin", CODE%, P%, LOAD%
