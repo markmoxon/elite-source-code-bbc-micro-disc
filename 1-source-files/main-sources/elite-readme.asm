@@ -24,10 +24,10 @@
 \
 \ ******************************************************************************
 
-INCLUDE "1-source-files/main-sources/elite-build-options.asm"
+ INCLUDE "1-source-files/main-sources/elite-build-options.asm"
 
-_IB_DISC                = (_VARIANT = 1)
-_STH_DISC               = (_VARIANT = 2)
+ _IB_DISC               = (_VARIANT = 1)
+ _STH_DISC              = (_VARIANT = 2)
 
 .readme
 
@@ -76,5 +76,5 @@ _STH_DISC               = (_VARIANT = 2)
  EQUS "---------------------------------------"
  EQUB 10, 13
 
-SAVE "3-assembled-output/README.txt", readme, P%
+ SAVE "3-assembled-output/README.txt", readme, P%
 
