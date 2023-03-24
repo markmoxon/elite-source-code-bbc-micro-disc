@@ -24,12 +24,12 @@
 \
 \ ******************************************************************************
 
-INCLUDE "1-source-files/main-sources/elite-build-options.asm"
+ INCLUDE "1-source-files/main-sources/elite-build-options.asm"
 
-_IB_DISC                = (_VARIANT = 1)
-_STH_DISC               = (_VARIANT = 2)
+ _IB_DISC               = (_VARIANT = 1)
+ _STH_DISC              = (_VARIANT = 2)
 
-GUARD &6000             \ Guard against assembling over screen memory
+ GUARD &6000            \ Guard against assembling over screen memory
 
 \ ******************************************************************************
 \
@@ -37,53 +37,53 @@ GUARD &6000             \ Guard against assembling over screen memory
 \
 \ ******************************************************************************
 
-Q% = _REMOVE_CHECKSUMS  \ Set Q% to TRUE to max out the default commander, FALSE
+ Q% = _REMOVE_CHECKSUMS \ Set Q% to TRUE to max out the default commander, FALSE
                         \ for the standard default commander (this is set to
                         \ TRUE if checksums are disabled, just for convenience)
 
-N% = 67                 \ N% is set to the number of bytes in the VDU table, so
+ N% = 67                \ N% is set to the number of bytes in the VDU table, so
                         \ we can loop through them below
 
-VSCAN = 57              \ Defines the split position in the split-screen mode
+ VSCAN = 57             \ Defines the split position in the split-screen mode
 
-POW = 15                \ Pulse laser power
+ POW = 15               \ Pulse laser power
 
-VEC = &7FFE             \ VEC is where we store the original value of the IRQ1
+ VEC = &7FFE            \ VEC is where we store the original value of the IRQ1
                         \ vector, matching the address in the elite-missile.asm
                         \ source
 
-BRKV = &0202            \ The break vector that we intercept to enable us to
+ BRKV = &0202           \ The break vector that we intercept to enable us to
                         \ handle and display system errors
 
-IRQ1V = &0204           \ The IRQ1V vector that we intercept to implement the
+ IRQ1V = &0204          \ The IRQ1V vector that we intercept to implement the
                         \ split-screen mode
 
-WRCHV = &020E           \ The WRCHV vector that we intercept with our custom
+ WRCHV = &020E          \ The WRCHV vector that we intercept with our custom
                         \ text printing routine
 
-NETV = &0224            \ The NETV vector that we intercept as part of the copy
+ NETV = &0224           \ The NETV vector that we intercept as part of the copy
                         \ protection
 
-LASCT = &0346           \ The laser pulse count for the current laser, matching
+ LASCT = &0346          \ The laser pulse count for the current laser, matching
                         \ the address in the main game code
 
-HFX = &0348             \ A flag that toggles the hyperspace colour effect,
+ HFX = &0348            \ A flag that toggles the hyperspace colour effect,
                         \ matching the address in the main game code
 
-ESCP = &0386            \ The flag that determines whether we have an escape pod
+ ESCP = &0386           \ The flag that determines whether we have an escape pod
                         \ fitted, matching the address in the main game code
 
-S% = &11E3              \ The adress of the main entry point workspace in the
+ S% = &11E3             \ The adress of the main entry point workspace in the
                         \ main game code
 
-VIA = &FE00             \ Memory-mapped space for accessing internal hardware,
+ VIA = &FE00            \ Memory-mapped space for accessing internal hardware,
                         \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
                         \ known as SHEILA)
 
-OSWRCH = &FFEE          \ The address for the OSWRCH routine
-OSBYTE = &FFF4          \ The address for the OSBYTE routine
-OSWORD = &FFF1          \ The address for the OSWORD routine
-OSCLI = &FFF7           \ The address for the OSCLI vector
+ OSWRCH = &FFEE         \ The address for the OSWRCH routine
+ OSBYTE = &FFF4         \ The address for the OSBYTE routine
+ OSWORD = &FFF1         \ The address for the OSWORD routine
+ OSCLI = &FFF7          \ The address for the OSCLI vector
 
 \ ******************************************************************************
 \
@@ -95,7 +95,7 @@ OSCLI = &FFF7           \ The address for the OSCLI vector
 \
 \ ******************************************************************************
 
-ORG &0070
+ ORG &0070
 
 .ZP
 
@@ -136,7 +136,7 @@ ORG &0070
 
  SKIP 2                 \ Used in the copy protection code
 
-ORG &008B
+ ORG &008B
 
 .DL
 
@@ -154,10 +154,10 @@ ORG &008B
 \
 \ ******************************************************************************
 
-CODE% = &1900
-LOAD% = &1900
+ CODE% = &1900
+ LOAD% = &1900
 
-ORG CODE%
+ ORG CODE%
 
 \ ******************************************************************************
 \
@@ -316,11 +316,11 @@ ORG CODE%
 
 MACRO FNE I%
 
-  LDX #LO(E%+I%*14)     \ Set (Y X) to point to the I%-th set of envelope data
-  LDY #HI(E%+I%*14)     \ in E%
+ LDX #LO(E%+I%*14)      \ Set (Y X) to point to the I%-th set of envelope data
+ LDY #HI(E%+I%*14)      \ in E%
 
-  LDA #8                \ Call OSWORD with A = 8 to set up sound envelope I%
-  JSR OSWORD
+ LDA #8                 \ Call OSWORD with A = 8 to set up sound envelope I%
+ JSR OSWORD
 
 ENDMACRO
 
@@ -640,7 +640,7 @@ ENDMACRO
 
 .LOADcode
 
-ORG &0B00
+ ORG &0B00
 
 \ ******************************************************************************
 \
@@ -736,9 +736,9 @@ ENDIF
 
  EQUS "Does your mother know you do this?"
 
-COPYBLOCK LOAD, P%, LOADcode
+ COPYBLOCK LOAD, P%, LOADcode
 
-ORG LOADcode + P% - LOAD
+ ORG LOADcode + P% - LOAD
 
 \ ******************************************************************************
 \
@@ -752,7 +752,7 @@ ORG LOADcode + P% - LOAD
 
 .CATDcode
 
-ORG &0D7A
+ ORG &0D7A
 
 \ ******************************************************************************
 \
@@ -797,9 +797,9 @@ ORG &0D7A
  EQUB %00100001         \ 9 = Load 1 sector of 256 bytes
  EQUB 0                 \ 10 = The result of the OSWORD call is returned here
 
-COPYBLOCK CATD, P%, CATDcode
+ COPYBLOCK CATD, P%, CATDcode
 
-ORG CATDcode + P% - CATD
+ ORG CATDcode + P% - CATD
 
 \ ******************************************************************************
 \
@@ -1091,17 +1091,21 @@ ORG CATDcode + P% - CATD
                         \ In terms of signed 8-bit integers, this is a random
                         \ number from -32 to 31. Let's call it r7
 
- ADC YY                 \ Set X = A + YY
- TAX                    \       = r7 + r6
+ ADC YY                 \ Set A = A + YY
+                        \       = r7 + r6
 
- JSR SQUA2              \ Set (A P) = r7 * r7
+ TAX                    \ Set X = A
+                        \       = r6 + r7
+
+ JSR SQUA2              \ Set (A P) = A * A
+                        \           = (r6 + r7)^2
 
  TAY                    \ Set Y = A
-                        \       = r7 * r7 / 256
+                        \       = (r6 + r7)^2 / 256
 
  ADC ZP+1               \ Set A = A + ZP+1
-                        \       = r7^2 / 256 + (r5^2 + r6^2) / 256
-                        \       = (r5^2 + r6^2 + r7^2) / 256
+                        \       = (r6 + r7)^2 / 256 + (r5^2 + r6^2) / 256
+                        \       = ((r6 + r7)^2 + r5^2 + r6^2) / 256
 
  BCS PLC3               \ If the addition overflowed, jump down to PLC3 to skip
                         \ to the next pixel
@@ -1113,16 +1117,29 @@ ORG CATDcode + P% - CATD
  BCC PLC3
 
  TYA                    \ Set A = Y + T
- ADC T                  \       = r7^2 / 256 + r6^2 / 256
-                        \       = (r6^2 + r7^2) / 256
+ ADC T                  \       = (r6 + r7)^2 / 256 + r6^2 / 256
+                        \       = ((r6 + r7)^2 + r6^2) / 256
 
- CMP #16                \ If A > 16, skip to PL1 to plot the pixel
+ CMP #16                \ If A >= 16, skip to PL1 to plot the pixel
  BCS PL1
 
- LDA ZP                 \ If ZP is positive (50% chance), jump down to PLC3 to
+ LDA ZP                 \ If ZP is positive (i.e. r5 < 128), jump down to PLC3 to
  BPL PLC3               \ skip to the next pixel
 
 .PL1
+
+                        \ If we get here then the following is true:
+                        \
+                        \   32 <= ((r6 + r7)^2 + r5^2 + r6^2) / 256 < 80
+                        \
+                        \ and either this is true:
+                        \
+                        \   ((r6 + r7)^2 + r6^2) / 256 >= 16
+                        \
+                        \ or both these are true:
+                        \
+                        \   ((r6 + r7)^2 + r6^2) / 256 < 16
+                        \   r5 >= 128
 
  LDA YY                 \ Set A = YY
                         \       = r6
@@ -1143,8 +1160,12 @@ ORG CATDcode + P% - CATD
                         \   x = r5 + r7
                         \   y = r5
                         \
-                        \   32 <= (r5^2 + r6^2 + r7^2) / 256 <= 79
-                        \   Draw 50% fewer pixels when (r6^2 + r7^2) / 256 <= 16
+                        \   32 <= ((r6 + r7)^2 + r5^2 + r6^2) / 256 < 80
+                        \
+                        \   Either: ((r6 + r7)^2 + r6^2) / 256 >= 16
+                        \
+                        \   Or:     ((r6 + r7)^2 + r6^2) / 256 <  16
+                        \           r5 >= 128
                         \
                         \ which is what we want
 
@@ -1788,7 +1809,7 @@ ORG CATDcode + P% - CATD
 
 .TVT1code
 
-ORG &1100
+ ORG &1100
 
 \ ******************************************************************************
 \
@@ -2285,9 +2306,9 @@ ENDIF
  EQUB &63, &00, &B6
  EQUB &3C, &C6
 
-COPYBLOCK TVT1, P%, TVT1code
+ COPYBLOCK TVT1, P%, TVT1code
 
-ORG TVT1code + P% - TVT1
+ ORG TVT1code + P% - TVT1
 
 \ ******************************************************************************
 \
@@ -2368,20 +2389,20 @@ ORG TVT1code + P% - TVT1
 \
 \ ******************************************************************************
 
-PRINT "S.ELITE4 ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
-SAVE "3-assembled-output/ELITE4.unprot.bin", CODE%, P%, LOAD%
+ PRINT "S.ELITE4 ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
+ SAVE "3-assembled-output/ELITE4.unprot.bin", CODE%, P%, LOAD%
 
-PRINT "Addresses for the scramble routines in elite-checksum.py"
-PRINT "Load address = ", ~CODE%
-PRINT "TVT1code = ", ~TVT1code
-PRINT "ELITE = ", ~ELITE
-PRINT "LOADcode = ", ~LOADcode
-PRINT "CATDcode = ", ~CATDcode
-PRINT "DIALS = ", ~DIALS
-PRINT "OSBmod = ", ~OSBmod
-PRINT "ELITE = ", ~ELITE
-PRINT "End of ELITE4 file = ", ~P%
-PRINT "TVT1code = ", ~TVT1code
-PRINT "TVT1 = ", ~TVT1
-PRINT "NA% = ", ~NA%
-PRINT "CHK2 = ", ~CHK2
+ PRINT "Addresses for the scramble routines in elite-checksum.py"
+ PRINT "Load address = ", ~CODE%
+ PRINT "TVT1code = ", ~TVT1code
+ PRINT "ELITE = ", ~ELITE
+ PRINT "LOADcode = ", ~LOADcode
+ PRINT "CATDcode = ", ~CATDcode
+ PRINT "DIALS = ", ~DIALS
+ PRINT "OSBmod = ", ~OSBmod
+ PRINT "ELITE = ", ~ELITE
+ PRINT "End of ELITE4 file = ", ~P%
+ PRINT "TVT1code = ", ~TVT1code
+ PRINT "TVT1 = ", ~TVT1
+ PRINT "NA% = ", ~NA%
+ PRINT "CHK2 = ", ~CHK2

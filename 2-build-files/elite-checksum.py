@@ -34,8 +34,17 @@ if argc > 1 and argv[1] == "-u":
 print("Disc Elite Checksum")
 print("Encryption = ", Encrypt)
 
-# Configuration variables for ELITE4
-# Values taken from compile.txt
+# Configuration variables for scrambling code and calculating checksums
+#
+# Values must match those in 3-assembled-output/compile.txt
+#
+# If you alter the source code, then you should extract the correct values for
+# the following variables and plug them into the following, otherwise the game
+# will fail the checksum process and will hang on loading
+#
+# You can find the correct values for these variables by building your updated
+# source, and then searching compile.txt for "elite-checksum.py", where the new
+# values will be listed
 
 load_address = 0x1900
 
@@ -65,9 +74,9 @@ tvt1 = 0x1100               # TVT1
 na_per_cent = 0x1181        # NA%
 chk2 = 0x11D3               # CHK2
 
-data_block = bytearray()
+# Load assembled code file for ELITE4
 
-# Load assembled code file
+data_block = bytearray()
 
 elite_file = open("3-assembled-output/ELITE4.unprot.bin", "rb")
 data_block.extend(elite_file.read())
@@ -84,7 +93,7 @@ for i in range(CH, 0, -1):
     CH = CH % 256
     CH = CH ^ data_block[na_per_cent_offset + i + 8]
 
-print("Commander checksum = ", CH)
+print("Commander checksum = ", hex(CH))
 
 # Must have Commander checksum otherwise game will lock:
 
@@ -128,9 +137,9 @@ scramble_from = 0x1300
 scramble_to = 0x5600
 scramble_eor = 0x33
 
-data_block = bytearray()
+# Load assembled code file for D.CODE
 
-# Load assembled code file
+data_block = bytearray()
 
 elite_file = open("3-assembled-output/D.CODE.unprot.bin", "rb")
 data_block.extend(elite_file.read())
@@ -156,9 +165,9 @@ scramble_from = 0x1300
 scramble_to = 0x6000
 scramble_eor = 0x33
 
-data_block = bytearray()
+# Load assembled code file for T.CODE
 
-# Load assembled code file
+data_block = bytearray()
 
 elite_file = open("3-assembled-output/T.CODE.unprot.bin", "rb")
 data_block.extend(elite_file.read())
