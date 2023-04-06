@@ -327,7 +327,40 @@ By default the build process builds the Stairway to Hell variant, but you can bu
 
 You can add `variant=sth` to produce the `elite-disc-sth.ssd` file containing the Stairway to Hell variant, though that's the default value so it isn't necessary.
 
-The verification checksums for this version are shown above.
+The verification checksums for this version are as follows:
+
+```
+Results for variant: sth
+[--originals--]  [---output----]
+Checksum   Size  Checksum   Size  Match  Filename
+-----------------------------------------------------------
+a9ee9d74  17437  a9ee9d74  17437   Yes   D.CODE.bin
+dad7d3a3  17437  dad7d3a3  17437   Yes   D.CODE.unprot.bin
+9f4a04fd   2560  9f4a04fd   2560   Yes   D.MOA.bin
+d9eb34f9   2560  d9eb34f9   2560   Yes   D.MOB.bin
+93fe2e13   2560  93fe2e13   2560   Yes   D.MOC.bin
+64e8ebb4   2560  64e8ebb4   2560   Yes   D.MOD.bin
+80afbff9   2560  80afbff9   2560   Yes   D.MOE.bin
+b86fe100   2560  b86fe100   2560   Yes   D.MOF.bin
+72f99614   2560  72f99614   2560   Yes   D.MOG.bin
+29b6ce81   2560  29b6ce81   2560   Yes   D.MOH.bin
+0eeab415   2560  0eeab415   2560   Yes   D.MOI.bin
+7911181d   2560  7911181d   2560   Yes   D.MOJ.bin
+851d789f   2560  851d789f   2560   Yes   D.MOK.bin
+3025e5d8   2560  3025e5d8   2560   Yes   D.MOL.bin
+d6c01098   2560  d6c01098   2560   Yes   D.MOM.bin
+6930e1c7   2560  6930e1c7   2560   Yes   D.MON.bin
+43caddc7   2560  43caddc7   2560   Yes   D.MOO.bin
+ac1d57b2   2560  ac1d57b2   2560   Yes   D.MOP.bin
+c73d535a    256  c73d535a    256   Yes   ELITE2.bin
+17eefeec   2816  17eefeec   2816   Yes   ELITE3.bin
+ec04b4d2   5376  ec04b4d2   5376   Yes   ELITE4.bin
+10417c14   5376  10417c14   5376   Yes   ELITE4.unprot.bin
+0f9e270b    256  0f9e270b    256   Yes   MISSILE.bin
+42f42f63  19997  42f42f63  19997   Yes   T.CODE.bin
+8819c78b  19997  8819c78b  19997   Yes   T.CODE.unprot.bin
+52bac547   1024  52bac547   1024   Yes   WORDS.bin
+```
 
 ### Building the Ian Bell disc variant
 
