@@ -16957,7 +16957,7 @@
                         \ and set up data blocks and slots for the planet and
                         \ sun
 
- JSR LSHIPS             \ Call LSHIPS to load a new ship blueprints file
+ JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
 
  LDA QQ11               \ If the current view in QQ11 is not a space view (0) or
  AND #%00111111         \ one of the charts (64 or 128), return from the
@@ -24870,7 +24870,7 @@ ENDIF
 
 .RSHIPS
 
- JSR LSHIPS             \ Call LSHIPS to load a new ship blueprints file
+ JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
 
  JSR RESET              \ Call RESET to reset most variables
 
@@ -24888,7 +24888,7 @@ ENDIF
 
 \ ******************************************************************************
 \
-\       Name: LSHIPS
+\       Name: LOMOD
 \       Type: Subroutine
 \   Category: Loader
 \    Summary: Load a new ship blueprints file
@@ -24896,7 +24896,7 @@ ENDIF
 \
 \ ******************************************************************************
 
-.LSHIPS
+.LOMOD
 
  JSR THERE              \ Call THERE to see if we are in the Constrictor's
                         \ system in mission 1

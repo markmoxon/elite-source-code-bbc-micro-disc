@@ -12690,7 +12690,7 @@ S.ELTE &330A  &3E90  &11E3  &330A
      424E   85 87      STA &87
      4250   A9 20      LDA #&20
      4252   4C FB 40   JMP &40FB
-.LSHIPS
+.LOMOD
      4255   20 B8 3E   JSR &3EB8
      4258   A9 06      LDA #&06
      425A   B0 22      BCS &427E
