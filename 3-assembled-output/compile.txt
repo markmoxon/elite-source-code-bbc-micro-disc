@@ -5803,11 +5803,11 @@ WP workspace from  &E00  to &FD3
 .LTLI
      11F8   4C 2E 54 ...
      1200   0D
-.scramble
+.DEEOR
      1201   A0 00      LDY #&00
      1203   84 07      STY &07
      1205   A2 13      LDX #&13
-.scrl
+.DEEORL
      1207   86 08      STX &08
      1209   98         TYA
      120A   51 07      EOR (&07),Y
@@ -15977,11 +15977,11 @@ WP workspace from  &E00  to &FD3
 .DOBEGIN
      11FB   20 01 12   JSR &1201
      11FE   4C 75 38   JMP &3875
-.scramble
+.DEEOR
      1201   A0 00      LDY #&00
      1203   84 07      STY &07
      1205   A2 13      LDX #&13
-.scrl
+.DEEORL
      1207   86 08      STX &08
      1209   98         TYA
      120A   51 07      EOR (&07),Y
