@@ -685,9 +685,29 @@
 
  SKIP 1                 \ Temporary storage, used in a number of places
 
-.XX14
+                        \ --- Mod: Code removed for flicker-free ships: ------->
 
- SKIP 1                 \ This byte appears to be unused
+\.XX14
+\
+\SKIP 1                 \ This byte appears to be unused
+
+                        \ --- And replaced by: -------------------------------->
+
+.LSNUM
+
+ SKIP 1                 \ The pointer to the current position in the ship line
+                        \ heap as we work our way through the new ship's edges
+                        \ (and the corresponding old ship's edges) when drawing
+                        \ the ship in the main ship-drawing routine at LL9
+
+.LSNUM2
+
+ SKIP 0                 \ The size of the existing ship line heap for the ship
+                        \ we are drawing in LL9, i.e. the number of lines in the
+                        \ old ship that is currently shown on-screen and which
+                        \ we need to erase
+
+                        \ --- End of replacement ------------------------------>
 
 .RAT
 
@@ -5678,11 +5698,11 @@
 
 .EraseRestOfPlanet
 
- LDY XX14               \ Set Y to the offset in XX14, which points to the part
+ LDY LSNUM              \ Set Y to the offset in LSNUM, which points to the part
                         \ of the heap that we are overwriting with new points
 
- CPY XX14+1             \ If XX14 >= XX14+1, then we have already redrawn all of
- BCS eras1              \ the lines from the old circle's ball line heap, so
+ CPY LSNUM2             \ If LSNUM >= LSNUM2, then we have already redrawn all
+ BCS eras1              \ of the lines from the old circle's ball line heap, so
                         \ skip the following
 
  JSR DrawPlanetLine     \ Erase the next planet line from the ball line heap
@@ -5721,7 +5741,7 @@
  LDA #0                 \ Clear bit 7 of K3+9 to indicate that there is no line
  STA K3+9               \ to draw (we may change this below)
 
- LDA XX14               \ If XX14 = 1, then this is the first point from the
+ LDA LSNUM              \ If LSNUM = 1, then this is the first point from the
  CMP #2                 \ heap, so jump to plin3 to set the previous coordinate
  BCC plin3              \ and return from the subroutine
 
@@ -5736,11 +5756,11 @@
  TYA
  PHA
 
- LDY XX14               \ Set Y to the offset in XX14, which points to the part
+ LDY LSNUM              \ Set Y to the offset in LSNUM, which points to the part
                         \ of the heap that we are overwriting with new points
 
- CPY XX14+1             \ If XX14 >= XX14+1, then we have already redrawn all of
- BCS plin1              \ the lines from the old circle's ball line heap, so
+ CPY LSNUM2             \ If LSNUM >= LSNUM2, then we have already redrawn all
+ BCS plin1              \ of the lines from the old circle's ball line heap, so
                         \ jump to plin1 to return from the subroutine
 
                         \ Otherwise we need to draw the line from the heap, to
@@ -5752,19 +5772,19 @@
  LDA K3+3               \ Set Y1 = K3+3 = screen y-coordinate of previous point
  STA Y1                 \ from the old heap
 
- LDA LSX2,Y             \ Set X2 to the y-coordinate from the XX14-th point in
+ LDA LSX2,Y             \ Set X2 to the y-coordinate from the LSNUM-th point in
  STA X2                 \ the heap
 
  STA K3+2               \ Store the x-coordinate of the point we are overwriting
                         \ in K3+2, so we can use it on the next iteration
 
- LDA LSY2,Y             \ Set Y2 to the y-coordinate from the XX14-th point in
+ LDA LSY2,Y             \ Set Y2 to the y-coordinate from the LSNUM-th point in
  STA Y2                 \ the heap
 
  STA K3+3               \ Store the y-coordinate of the point we are overwriting
                         \ in K3+3, so we can use it on the next iteration
 
- INC XX14               \ Increment XX14 to point to the next coordinate, so we
+ INC LSNUM              \ Increment LSNUM to point to the next coordinate, so we
                         \ work our way through the current heap
 
  LDA Y1                 \ If Y1 or Y2 = &FF then this indicates a break in the
@@ -5820,7 +5840,7 @@
  LDA LSY2+1
  STA K3+3
 
- INC XX14               \ Increment XX14 to point to the next coordinate, so we
+ INC LSNUM              \ Increment LSNUM to point to the next coordinate, so we
                         \ work our way through the current heap
 
  RTS                    \ Return from the subroutine
@@ -22130,18 +22150,18 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
                         \ We now set things up for flicker-free circle plotting,
                         \ by setting the following:
                         \
-                        \   XX14 = offset to the first coordinate in the ball
-                        \          line heap
+                        \   LSNUM = offset to the first coordinate in the ball
+                        \           line heap
                         \
-                        \   XX14+1 = the number of bytes in the heap for the
+                        \   LSNUM2 = the number of bytes in the heap for the
                         \            circle that's currently on-screen (or 0 if
                         \            there is no ship currently on-screen)
 
- LDX #0                 \ Set XX14 = 0, to point to the offset before the first
- STX XX14               \ set of circle coordinates in the ball line heap
+ LDX #0                 \ Set LSNUM = 0, to point to the offset before the first
+ STX LSNUM              \ set of circle coordinates in the ball line heap
 
- LDX LSP                \ Set XX14+1 to the last byte of the ball line heap
- STX XX14+1
+ LDX LSP                \ Set LSNUM2 to the last byte of the ball line heap
+ STX LSNUM2
 
  LDX #1                 \ Set LSP = 1 to reset the ball line heap pointer
  STX LSP
@@ -22330,12 +22350,12 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
                         \ --- And replaced by: -------------------------------->
 
- STY XX14               \ Reset XX14 to the start of the ball line heap (we can
+ STY LSNUM              \ Reset LSNUM to the start of the ball line heap (we can
                         \ set this to 0 rather than 1 to take advantage of the
                         \ fact that Y is 0 - the effect is the same)
 
- LDA LSP                \ Set XX14+1 to the end of the ball line heap
- STA XX14+1
+ LDA LSP                \ Set LSNUM2 to the end of the ball line heap
+ STA LSNUM2
 
  JSR EraseRestOfPlanet  \ Draw the contents of the ball line heap to erase the
                         \ old planet
@@ -27998,7 +28018,7 @@ ENDMACRO
  STA X2                 \ Store the x-coordinate of the ship dot in X1, as this
                         \ is where the dash starts
 
- JMP LLX30              \ Draw this edge using smooth animation, by first
+ JMP LSPUT              \ Draw this edge using smooth animation, by first
                         \ drawing the ship's new line and then erasing the
                         \ corresponding old line from the screen, and return
                         \ from the subroutine using a tail call
@@ -28457,15 +28477,15 @@ ENDMACRO
                         \ We now set things up for smooth ship plotting, by
                         \ setting the following:
                         \
-                        \   XX14 = offset to the first coordinate in the ship's
-                        \          line heap
+                        \   LSNUM = offset to the first coordinate in the ship's
+                        \           line heap
                         \
-                        \   XX14+1 = the number of bytes in the heap for the
+                        \   LSNUM2 = the number of bytes in the heap for the
                         \            ship that's currently on-screen (or 0 if
                         \            there is no ship currently on-screen)
 
- LDY #1                 \ Set XX14 = 1, the offset of the first set of line
- STY XX14               \ coordinates in the ship line heap
+ LDY #1                 \ Set LSNUM = 1, the offset of the first set of line
+ STY LSNUM              \ coordinates in the ship line heap
 
  DEY                    \ Decrement Y to 0
 
@@ -28474,7 +28494,7 @@ ENDMACRO
  BNE P%+5               \ following two instructions
 
  LDA #0                 \ The ship is not being drawn on screen, so set A = 0
-                        \ so that XX14+1 gets set to 0 below (as there are no
+                        \ so that LSNUM2 gets set to 0 below (as there are no
                         \ existing coordinates on the ship line heap for this
                         \ ship)
  
@@ -28482,8 +28502,8 @@ ENDMACRO
                         \ &2C &B1 &BD, or BIT &BDB1 which does nothing apart
                         \ from affect the flags
 
- LDA (XX19),Y           \ Set XX14+1 to the first byte of the ship's line heap,
- STA XX14+1             \ which contains the number of bytes in the heap
+ LDA (XX19),Y           \ Set LSNUM2 to the first byte of the ship's line heap,
+ STA LSNUM2             \ which contains the number of bytes in the heap
 
                         \ --- End of added code ------------------------------->
 
@@ -30411,7 +30431,7 @@ ENDMACRO
 
                         \ --- And replaced by: -------------------------------->
 
- JSR LLX30              \ Draw the laser line using smooth animation, by first
+ JSR LSPUT              \ Draw the laser line using smooth animation, by first
                         \ drawing the new laser line and then erasing the
                         \ corresponding old line from the screen
 
@@ -30637,7 +30657,7 @@ ENDMACRO
                         \ screen, so jump to LL78 so we don't store this line in
                         \ the ship line heap
 
- JSR LLX30              \ Draw this edge using smooth animation, by first
+ JSR LSPUT              \ Draw this edge using smooth animation, by first
                         \ drawing the ship's new line and then erasing the
                         \ corresponding old line from the screen
 
@@ -30715,11 +30735,11 @@ ENDMACRO
 
 .LL78
 
- LDA XX14               \ If XX14 >= CNT, skip to LL81 so we don't loop back for
- CMP CNT                \ the next edge (CNT was set to the maximum heap size
- BCS LL81               \ for this ship in part 10, so this checks whether we
-                        \ have just run out of space in the ship line heap, and
-                        \ stops drawing edges if we have)
+ LDA LSNUM              \ If LSNUM >= CNT, skip to LL81 so we don't loop back
+ CMP CNT                \ for the next edge (CNT was set to the maximum heap
+ BCS LL81               \ size for this ship in part 10, so this checks whether
+                        \ we have just run out of space in the ship line heap,
+                        \ and stops drawing edges if we have)
 
  LDA V                  \ Increment V by 4 so V(1 0) points to the data for the
  CLC                    \ next edge
@@ -31408,17 +31428,17 @@ ENDMACRO
 
 .LL155
 
- LDY XX14               \ Set Y to the offset in the line heap XX14
+ LDY LSNUM              \ Set Y to the offset in the line heap LSNUM
 
 .LL27
 
- CPY XX14+1             \ If Y >= XX14+1, jump to LLEX to return from the ship
+ CPY LSNUM2             \ If Y >= LSNUM2, jump to LLEX to return from the ship
  BCS LLEX               \ drawing routine, because the index in Y is greater
                         \ than the size of the existing ship line heap, which
                         \ means we have alrady erased all the old ships lines
                         \ when drawing the new ship
 
-                        \ If we get here then Y < XX14+1, which means Y is
+                        \ If we get here then Y < LSNUM2, which means Y is
                         \ pointing to an on-screen line from the old ship that
                         \ we need to erase
 
@@ -31462,7 +31482,7 @@ ENDMACRO
 
 .LLEX
 
- LDA XX14               \ Store XX14 in the first byte of the ship line heap
+ LDA LSNUM              \ Store LSNUM in the first byte of the ship line heap
  LDY #0
  STA (XX19),Y
 
@@ -31474,7 +31494,7 @@ ENDMACRO
 
 \ ******************************************************************************
 \
-\       Name: LLX30
+\       Name: LSPUT
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Draw a ship line using smooth animation, by drawing the ship's new
@@ -31490,13 +31510,16 @@ ENDMACRO
 \ Here's the new approach in this routine:
 \
 \   * Draw the new line
-\   * Fetch the corresponding existing line (in position XX14) from the heap
+\
+\   * Fetch the corresponding existing line (in position LSNUM) from the heap
+\
 \   * Store the new line in the heap at this position, replacing the old one
+\
 \   * If the existing line we just took from the heap is on-screen, erase it
 \
 \ Arguments:
 \
-\   XX14                The offset within the line heap where we add the new
+\   LSNUM               The offset within the line heap where we add the new
 \                       line's coordinates
 \
 \   X1                  The screen x-coordinate of the start of the line to add
@@ -31516,18 +31539,18 @@ ENDMACRO
 \
 \ Returns:
 \
-\   XX14                The offset of the next line in the line heap
+\   LSNUM               The offset of the next line in the line heap
 \
 \ ******************************************************************************
 
                         \ --- Mod: Code added for flicker-free ships: --------->
 
-.LLX30
+.LSPUT
 
- LDY XX14               \ Set Y = XX14, to get the offset within the ship line
+ LDY LSNUM              \ Set Y = LSNUM, to get the offset within the ship line
                         \ heap where we want to insert our new line
 
- CPY XX14+1             \ Compare XX14 and XX14+1 and store the flags on the
+ CPY LSNUM2             \ Compare LSNUM and LSNUM2 and store the flags on the
  PHP                    \ stack so we can retrieve them later
 
  LDX #3                 \ We now want to copy the line coordinates (X1, Y1) and
@@ -31576,13 +31599,13 @@ ENDMACRO
  STA (XX19),Y
 
  INY                    \ Increment the index to point to the next coordinate
- STY XX14               \ and store the updated index in XX14
+ STY LSNUM              \ and store the updated index in LSNUM
 
  PLP                    \ Restore the result of the comparison above, so if the
- BCS LL82               \ original value of XX14 >= XX14+1, then we have already
-                        \ redrawn all the lines from the old ship's line heap,
-                        \ so return from the subroutine (as LL82 contains an
-                        \ RTS)
+ BCS LL82               \ original value of LSNUM >= LSNUM2, then we have
+                        \ alreadyredrawn all the lines from the old ship's line
+                        \ heap, so return from the subroutine (as LL82 contains
+                        \ an RTS)
 
  JMP LL30               \ Otherwise there are still more lines to erase from the
                         \ old ship on-screen, so the coordinates in (X1, Y1) and

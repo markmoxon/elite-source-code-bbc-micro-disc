@@ -4651,8 +4651,10 @@ Saving file '3-assembled-output/ELITE3.bin'
      0096
 .XX20
      0097
-.XX14
+.LSNUM
      0098
+.LSNUM2
+     0099
 .RAT
      0099
 .RAT2
@@ -13839,7 +13841,7 @@ S.ELTF &3E85  &4767  &11E3  &3E85
      4F56   91 67      STA (&67),Y
 .LL82
      4F58   60         RTS
-.LLX30
+.LSPUT
      4F59   A4 98      LDY &98
      4F5B   C4 99      CPY &99
      4F5D   08         PHP
@@ -14923,8 +14925,10 @@ Saving file '3-assembled-output/D.CODE.unprot.bin'
      0096
 .XX20
      0097
-.XX14
+.LSNUM
      0098
+.LSNUM2
+     0099
 .RAT
      0099
 .RAT2
@@ -22920,7 +22924,7 @@ S.ELTF &365E  &3F03  &11E3  &365E
      46E0   91 67      STA (&67),Y
 .LL82
      46E2   60         RTS
-.LLX30
+.LSPUT
      46E3   A4 98      LDY &98
      46E5   C4 99      CPY &99
      46E7   08         PHP

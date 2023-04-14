@@ -2377,11 +2377,7 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
-<<<<<<< HEAD
 .PlanetCode
-=======
- SKIP 158               \ These bytes appear to be unused
->>>>>>> bbc-master
 
  INCBIN "3-assembled-output/PLANETCODE.unprot.bin"
 
