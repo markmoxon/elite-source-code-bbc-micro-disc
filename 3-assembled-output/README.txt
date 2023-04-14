@@ -12,8 +12,8 @@
 Simon Morris
 
 Original music by Aidan Bell and Julie
-Dunn (c) Firebird 1985, ported from the
-Commodore 64 by Negative Charge
+Dunn (c) D. Braben and I. Bell 1985,
+ported from the C64 by Negative Charge
 
 Elite integration by Mark Moxon
 
@@ -22,6 +22,6 @@
 
 See www.bbcelite.com for details
 
-Build: 2023-03-13 12:12:08
+Build: 2023-04-14 13:56:31
 ---------------------------------------
 

@@ -54,9 +54,9 @@
  EQUB 10, 13
  EQUS "Original music by Aidan Bell and Julie"
  EQUB 10, 13
- EQUS "Dunn (c) Firebird 1985, ported from the"
+ EQUS "Dunn (c) D. Braben and I. Bell 1985,"
  EQUB 10, 13
- EQUS "Commodore 64 by Negative Charge"
+ EQUS "ported from the C64 by Negative Charge"
  EQUB 10, 13
  EQUB 10, 13
  EQUS "Elite integration by Mark Moxon"
