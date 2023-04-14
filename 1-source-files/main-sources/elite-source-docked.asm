@@ -2227,14 +2227,14 @@ ORG &00D1
 
 .DOBEGIN
 
- JSR scramble           \ Decrypt the main docked code between &1300 and &5FFF
+ JSR DEEOR              \ Decrypt the main docked code between &1300 and &5FFF
 
  JMP BEGIN              \ Jump to BEGIN to initialise the configuration
                         \ variables and start the game
 
 \ ******************************************************************************
 \
-\       Name: scramble
+\       Name: DEEOR
 \       Type: Subroutine
 \   Category: Loader
 \    Summary: Decrypt the main docked code between &1300 and &5FFF and
@@ -2242,7 +2242,7 @@ ORG &00D1
 \
 \ ******************************************************************************
 
-.scramble
+.DEEOR
 
  LDY #0                 \ We're going to work our way through a large number of
                         \ encrypted bytes, so we set Y to 0 to be the index of
@@ -2254,7 +2254,7 @@ ORG &00D1
                         \ byte, so we start the decryption with the first byte
                         \ of page &13
 
-.scrl
+.DEEORL
 
  STX SCH                \ Set the high byte of SC(1 0) to X, so SC(1 0) now
                         \ points to the first byte of page X
@@ -2276,13 +2276,13 @@ ORG &00D1
 
  DEY                    \ Decrement the index in Y to point to the next byte
 
- BNE scrl               \ Loop back to scrl to decrypt the next byte until we
+ BNE DEEORL             \ Loop back to DEEORL to decrypt the next byte until we
                         \ have done the whole page
 
  INX                    \ Increment X to point to the next page in memory
 
- CPX #&60               \ Loop back to scrl to decrypt the next page until we
- BNE scrl               \ reach the start of page &60
+ CPX #&60               \ Loop back to DEEORL to decrypt the next page until we
+ BNE DEEORL             \ reach the start of page &60
 
  JMP BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
                         \ and return from the subroutine using a tail call
@@ -2299,7 +2299,7 @@ ORG &00D1
 
 .DOENTRY
 
- JSR scramble           \ Decrypt the newly loaded code
+ JSR DEEOR              \ Decrypt the newly loaded code
 
                         \ --- Mod: Code added for music: ---------------------->
 
@@ -2455,7 +2455,7 @@ ORG &00D1
 
 .SCRAM
 
- JSR scramble           \ Decrypt the main docked code between &1300 and &5FFF
+ JSR DEEOR              \ Decrypt the main docked code between &1300 and &5FFF
 
  JSR RES2               \ Reset a number of flight variables and workspaces
 
@@ -23284,6 +23284,10 @@ ENDIF
  LDA #128               \ Call OSBYTE with A = 128 to fetch the 16-bit value
  JSR OSBYTE             \ from ADC channel X, returning (Y X), i.e. the high
                         \ byte in Y and the low byte in X
+                        \
+                        \   * Channel 1 is the x-axis: 0 = right, 65520 = left
+                        \
+                        \   * Channel 2 is the y-axis: 0 = down,  65520 = up
 
  TYA                    \ Copy Y to A, so the result is now in (A X)
 
@@ -26488,7 +26492,7 @@ ENDMACRO
  STA XX3,X              \ Store the high byte of the result in the X-th byte of
                         \ the heap at XX3
 
- JMP LL50               \ Jump to LL68 to skip the division for y_lo < z_lo
+ JMP LL50               \ Jump to LL50 to move on to the next vertex
 
 .LL67
 
@@ -27473,7 +27477,8 @@ ENDMACRO
  ADC #4                 \ next edge
  STA V
 
- BCC ll81               \ If the above addition didn't overflow, jump to ll81
+ BCC ll81               \ If the above addition didn't overflow, jump to ll81 to
+                        \ skip the following instruction
 
  INC V+1                \ Otherwise increment the high byte of V(1 0), as we
                         \ just moved the V(1 0) pointer past a page boundary

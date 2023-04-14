@@ -2082,9 +2082,9 @@ ORG &00D1
 
 .S%
 
- JMP scramble           \ Decrypt the main flight code and join the main loop
+ JMP DEEOR              \ Decrypt the main flight code and join the main loop
 
- JMP scramble           \ Decrypt the main flight code and start a new game
+ JMP DEEOR              \ Decrypt the main flight code and start a new game
 
  JMP TT26               \ WRCHV is set to point here by elite-loader3.asm
 
@@ -2218,7 +2218,7 @@ ORG &00D1
 
 \ ******************************************************************************
 \
-\       Name: scramble
+\       Name: DEEOR
 \       Type: Subroutine
 \   Category: Loader
 \    Summary: Decrypt the main flight code between &1300 and &55FF and jump into
@@ -2226,7 +2226,7 @@ ORG &00D1
 \
 \ ******************************************************************************
 
-.scramble
+.DEEOR
 
                         \ --- Mod: Code removed for music: -------------------->
 
@@ -2240,7 +2240,7 @@ ORG &00D1
 \                       \ byte, so we start the decryption with the first byte
 \                       \ of page &13
 \
-\.scrl
+\.DEEORL
 \
 \STX SCH                \ Set the high byte of SC(1 0) to X, so SC(1 0) now
 \                       \ points to the first byte of page X
@@ -2262,13 +2262,13 @@ ORG &00D1
 \
 \DEY                    \ Decrement the index in Y to point to the next byte
 \
-\BNE scrl               \ Loop back to scrl to decrypt the next byte until we
+\BNE DEEORL             \ Loop back to DEEORL to decrypt the next byte until we
 \                       \ have done the whole page
 \
 \INX                    \ Increment X to point to the next page in memory
 \
-\CPX #&56               \ Loop back to scrl to decrypt the next page until we
-\BNE scrl               \ reach the start of page &56
+\CPX #&56               \ Loop back to DEEORL to decrypt the next page until we
+\BNE DEEORL             \ reach the start of page &56
 
                         \ --- End of replacement ------------------------------>
 
@@ -17207,7 +17207,7 @@ ORG &00D1
                         \ and set up data blocks and slots for the planet and
                         \ sun
 
- JSR LSHIPS             \ Call LSHIPS to load a new ship blueprints file
+ JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
 
  LDA QQ11               \ If the current view in QQ11 is not a space view (0) or
  AND #%00111111         \ one of the charts (64 or 128), return from the
@@ -25120,7 +25120,7 @@ ENDIF
 
 .RSHIPS
 
- JSR LSHIPS             \ Call LSHIPS to load a new ship blueprints file
+ JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
 
  JSR RESET              \ Call RESET to reset most variables
 
@@ -25138,7 +25138,7 @@ ENDIF
 
 \ ******************************************************************************
 \
-\       Name: LSHIPS
+\       Name: LOMOD
 \       Type: Subroutine
 \   Category: Loader
 \    Summary: Load a new ship blueprints file
@@ -25146,7 +25146,7 @@ ENDIF
 \
 \ ******************************************************************************
 
-.LSHIPS
+.LOMOD
 
  JSR THERE              \ Call THERE to see if we are in the Constrictor's
                         \ system in mission 1
@@ -26355,6 +26355,10 @@ ENDIF
  LDA #128               \ Call OSBYTE with A = 128 to fetch the 16-bit value
  JSR OSBYTE             \ from ADC channel X, returning (Y X), i.e. the high
                         \ byte in Y and the low byte in X
+                        \
+                        \   * Channel 1 is the x-axis: 0 = right, 65520 = left
+                        \
+                        \   * Channel 2 is the y-axis: 0 = down,  65520 = up
 
  TYA                    \ Copy Y to A, so the result is now in (A X)
 
@@ -29875,7 +29879,7 @@ ENDMACRO
  STA XX3,X              \ Store the high byte of the result in the X-th byte of
                         \ the heap at XX3
 
- JMP LL50               \ Jump to LL68 to skip the division for y_lo < z_lo
+ JMP LL50               \ Jump to LL50 to move on to the next vertex
 
 .LL67
 
@@ -30860,7 +30864,8 @@ ENDMACRO
  ADC #4                 \ next edge
  STA V
 
- BCC ll81               \ If the above addition didn't overflow, jump to ll81
+ BCC ll81               \ If the above addition didn't overflow, jump to ll81 to
+                        \ skip the following instruction
 
  INC V+1                \ Otherwise increment the high byte of V(1 0), as we
                         \ just moved the V(1 0) pointer past a page boundary

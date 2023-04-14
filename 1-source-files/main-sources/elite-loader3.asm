@@ -1107,8 +1107,8 @@ ENDIF
  CMP #16                \ If A >= 16, skip to PL1 to plot the pixel
  BCS PL1
 
- LDA ZP                 \ If ZP is positive (i.e. r5 < 128), jump down to PLC3 to
- BPL PLC3               \ skip to the next pixel
+ LDA ZP                 \ If ZP is positive (i.e. r5 < 128), jump down to PLC3
+ BPL PLC3               \ to skip to the next pixel
 
 .PL1
 
@@ -2353,7 +2353,7 @@ IF _MATCH_ORIGINAL_BINARIES
 
 ELSE
 
-  SKIP 158              \ These bytes appear to be unused
+ SKIP 158               \ These bytes appear to be unused
 
 ENDIF
 

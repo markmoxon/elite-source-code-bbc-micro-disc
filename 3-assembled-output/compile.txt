@@ -5835,7 +5835,7 @@ WP workspace from  &E00  to &FD3
 .LTLI
      1224   4C 2E 54 ...
      122C   0D
-.scramble
+.DEEOR
      122D   4C 2F 42   JMP &422F
 .DOENTRY
      1230   A9 52      LDA #&52
@@ -12672,7 +12672,7 @@ S.ELTE &32F5  &3E7B  &11E3  &32F5
      4239   85 87      STA &87
      423B   A9 20      LDA #&20
      423D   4C E6 40   JMP &40E6
-.LSHIPS
+.LOMOD
      4240   20 A3 3E   JSR &3EA3
      4243   A9 06      LDA #&06
      4245   B0 22      BCS &4269
@@ -15996,11 +15996,11 @@ WP workspace from  &E00  to &FD3
 .DOBEGIN
      1227   20 2D 12   JSR &122D
      122A   4C 8C 38   JMP &388C
-.scramble
+.DEEOR
      122D   A0 00      LDY #&00
      122F   84 07      STY &07
      1231   A2 13      LDX #&13
-.scrl
+.DEEORL
      1233   86 08      STX &08
      1235   98         TYA
      1236   51 07      EOR (&07),Y
