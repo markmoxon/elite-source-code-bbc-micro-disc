@@ -12684,7 +12684,7 @@ S.ELTE &331D  &3E88  &11E3  &331D
      4246   85 87      STA &87
      4248   A9 20      LDA #&20
      424A   4C F3 40   JMP &40F3
-.LSHIPS
+.LOMOD
      424D   20 B0 3E   JSR &3EB0
      4250   A9 06      LDA #&06
      4252   B0 22      BCS &4276
@@ -15973,11 +15973,11 @@ WP workspace from  &E00  to &FD3
 .DOBEGIN
      11FB   20 01 12   JSR &1201
      11FE   4C 51 38   JMP &3851
-.scramble
+.DEEOR
      1201   A0 00      LDY #&00
      1203   84 07      STY &07
      1205   A2 13      LDX #&13
-.scrl
+.DEEORL
      1207   86 08      STX &08
      1209   98         TYA
      120A   51 07      EOR (&07),Y
