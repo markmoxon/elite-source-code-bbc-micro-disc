@@ -2717,7 +2717,7 @@
                         \ do the reverse of the copy we did before, this time
                         \ copying from INWK to INF
 
- LDY #(NI%-1)           \ Set a counter in Y so we can loop through the NI%
+ LDY #NI%-1             \ Set a counter in Y so we can loop through the NI%
                         \ bytes in the ship data block
 
 .MAL3
@@ -19807,7 +19807,7 @@
  STA NEWB               \ bits 0-3 and 5-6 in NEWB if they are set in the E%
                         \ byte
 
- LDY #(NI%-1)           \ The final step is to copy the new ship's data block
+ LDY #NI%-1             \ The final step is to copy the new ship's data block
                         \ from INWK to INF, so set up a counter for NI% bytes
                         \ in Y
 
