@@ -3466,7 +3466,7 @@
  JSR MAS1               \
                         \   (x_sign x_hi x_lo) += (nosev_x_hi nosev_x_lo) * 2
                         \
-                        \   A = |x_hi|
+                        \   A = |x_sign|
 
  BNE MA23S              \ If A > 0, jump to MA23S to skip the following, as we
                         \ are too far from the planet in the x-direction to
@@ -3476,7 +3476,7 @@
  LDY #11                \
  JSR MAS1               \   (y_sign y_hi y_lo) += (nosev_y_hi nosev_y_lo) * 2
                         \
-                        \   A = |y_hi|
+                        \   A = |y_sign|
 
  BNE MA23S              \ If A > 0, jump to MA23S to skip the following, as we
                         \ are too far from the planet in the y-direction to
@@ -3486,7 +3486,7 @@
  LDY #13                \
  JSR MAS1               \   (z_sign z_hi z_lo) += (nosev_z_hi nosev_z_lo) * 2
                         \
-                        \   A = |z_hi|
+                        \   A = |z_sign|
 
  BNE MA23S              \ If A > 0, jump to MA23S to skip the following, as we
                         \ are too far from the planet in the z-direction to
@@ -6464,8 +6464,8 @@
 \
 \ Returns:
 \
-\   A                   The high byte of the result with the sign cleared (e.g.
-\                       |x_hi| if X = 0, etc.)
+\   A                   The highest byte of the result with the sign cleared
+\                       (e.g. |x_sign| when X = 0, etc.)
 \
 \ Other entry points:
 \
@@ -6495,7 +6495,8 @@
  LDY K+2
  STY INWK+1,X
 
- AND #%01111111         \ Set A to the sign byte with the sign cleared
+ AND #%01111111         \ Set A to the sign byte with the sign cleared,
+                        \ i.e. |x_sign| when X = 0
 
 .MA9
 
