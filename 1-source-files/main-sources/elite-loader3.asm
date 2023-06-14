@@ -73,7 +73,7 @@
  ESCP = &0386           \ The flag that determines whether we have an escape pod
                         \ fitted, matching the address in the main game code
 
- S% = &11E3             \ The adress of the main entry point workspace in the
+ S% = &11E3             \ The address of the main entry point workspace in the
                         \ main game code
 
  VIA = &FE00            \ Memory-mapped space for accessing internal hardware,
@@ -307,8 +307,8 @@
 \
 \ The following macro is used to define the four sound envelopes used in the
 \ game. It uses OSWORD 8 to create an envelope using the 14 parameters in the
-\ the I%-th block of 14 bytes at location E%. This OSWORD call is the same as
-\ BBC BASIC's ENVELOPE command.
+\ I%-th block of 14 bytes at location E%. This OSWORD call is the same as BBC
+\ BASIC's ENVELOPE command.
 \
 \ See variable E% for more details of the envelopes themselves.
 \
@@ -392,7 +392,7 @@ ENDMACRO
  LDX #128               \ the function keys to return ASCII codes for SHIFT-fn
  JSR OSB                \ keys (i.e. add 128)
 
- LDA #12                \ Set A = 12 and  X = 0 to pretend that this is an to
+ LDA #12                \ Set A = 12 and X = 0 to pretend that this is an
  LDX #0                 \ innocent call to OSBYTE to reset the keyboard delay
                         \ and auto-repeat rate to the default, when in reality
                         \ the OSB address in the next instruction gets modified
@@ -675,7 +675,7 @@ ENDMACRO
  LDX #&11               \ Set X = &11, so ZP(1 0) will point to &1100 when we
                         \ stick X in ZP+1 below
 
- TXA                    \ Set A = &11 = 17, to set the intial value of the
+ TXA                    \ Set A = &11 = 17, to set the initial value of the
                         \ checksum to 18 (17 plus carry)
 
 .l1
@@ -1774,7 +1774,8 @@ ENDIF
  LDY #&00               \ Set ZP(1 0) = &0F00
  STY ZP                 \
  LDA #&0F               \ and at the same time set a byte counter in Y and set
- STA ZP+1               \ the intial value of the checksum to 16 (15 plus carry)
+ STA ZP+1               \ the initial value of the checksum to 16 (15 plus
+                        \ carry)
 
 .osb1
 

@@ -796,7 +796,7 @@ ENDIF
  LDA (ZP),Y             \           = PROT1 + jsr1 + 1 - PROT1
  ADC ZP+1               \           = jsr1 + 1
  STA SC+1               \
-                        \ which is the address of the destination adress in the
+                        \ which is the address of the destination address in the
                         \ JSR instruction at jsr1
 
  LDX #0                 \ Add ZP(1 0), i.e. PROT1, to the word at SC(1 0),
@@ -874,7 +874,7 @@ ENDIF
                         \ its own version of the Acornsoft loading screen
                         \ despite not having the BBC Micro's teletext mode 7
                         \
-                        \ The comand to define a character is as follows:
+                        \ The command to define a character is as follows:
                         \
                         \   VDU 23, n, b0, b1, b2, b3, b4, b5, b6, b7
                         \
