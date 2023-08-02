@@ -2134,7 +2134,7 @@ ENDIF
                         \ used for up/down lasers, but they were dropped),
                         \ #20-21
 
- EQUB 22+(15 AND Q%)    \ CRGO = Cargo capacity, #22
+ EQUB 22 + (15 AND Q%)  \ CRGO = Cargo capacity, #22
 
  EQUB 0                 \ QQ20+0  = Amount of food in cargo hold, #23
  EQUB 0                 \ QQ20+1  = Amount of textiles in cargo hold, #24
@@ -2170,7 +2170,7 @@ ENDIF
 
  EQUD 0                 \ These four bytes appear to be unused, #47-50
 
- EQUB 3+(Q% AND 1)      \ NOMSL = Number of missiles, #51
+ EQUB 3 + (Q% AND 1)    \ NOMSL = Number of missiles, #51
 
  EQUB 0                 \ FIST = Legal status ("fugitive/innocent status"), #52
 
