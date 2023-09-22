@@ -22005,6 +22005,7 @@ S.ELTE &3119  &365A  &11E3  &3119
      3B84   A0 00      LDY #&00
      3B86   A9 C8      LDA #&C8
      3B88   4C F4 FF   JMP &FFF4
+.GTNMES
      3B8B   20 AC 39   JSR &39AC
      3B8E   60         RTS
 .SPS1

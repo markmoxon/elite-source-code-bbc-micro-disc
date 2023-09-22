@@ -934,8 +934,7 @@
                         \ of universe
                         \
                         \ The number of ships of type X in the local bubble is
-                        \ stored at MANY+X, so the number of Sidewinders is at
-                        \ MANY+1, the number of Mambas is at MANY+2, and so on
+                        \ stored at MANY+X
                         \
                         \ See the deep dive on "Ship blueprints" for a list of
                         \ ship types
@@ -1994,7 +1993,7 @@
 \       Name: INBAY
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: This routine is unused and is never run
+\    Summary: An unused routine that is never run
 \
 \ ******************************************************************************
 
@@ -10054,7 +10053,7 @@
 \       Name: Unused duplicate of MULTU
 \       Type: Subroutine
 \   Category: Maths (Arithmetic)
-\    Summary: Unused duplicate of the MULTU routine
+\    Summary: An unused duplicate of the MULTU routine
 \
 \ ------------------------------------------------------------------------------
 \
@@ -10181,7 +10180,7 @@
 \       Name: MUT3
 \       Type: Subroutine
 \   Category: Maths (Arithmetic)
-\    Summary: Unused routine that does the same as MUT2
+\    Summary: An unused routine that does the same as MUT2
 \
 \ ------------------------------------------------------------------------------
 \
@@ -20113,7 +20112,7 @@ ENDIF
 
  STA INWK+22            \ Set byte #22 = sidev_x_hi = 96 = 1
 
- ORA #128               \ Flip the sign of A to represent a -1
+ ORA #%10000000         \ Flip the sign of A to represent a -1
 
  STA INWK+14            \ Set byte #14 = nosev_z_hi = -96 = -1
 
@@ -22301,15 +22300,18 @@ ENDIF
 
 \ ******************************************************************************
 \
-\       Name: Unused routine
+\       Name: GTNMES
 \       Type: Subroutine
 \   Category: Utility routines
-\    Summary: This code appears to be unused
+\    Summary: An unused routine that fetches the name of a commander file
 \
 \ ******************************************************************************
 
- JSR GTNME              \ This code appears to be unused, but it would fetch the
- RTS                    \ name of a commander file to save or load
+.GTNMES
+
+ JSR GTNME              \ Fetch the name of a commander file to save or load
+
+ RTS                    \ Return from the subroutine
 
 \ ******************************************************************************
 \
