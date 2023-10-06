@@ -8,7 +8,7 @@ This repository contains source code for the disc version of Elite on the BBC Mi
 
 It is a companion to the [bbcelite.com website](https://www.bbcelite.com).
 
-See the [introduction](#introduction) for more information.
+See the [introduction](#introduction) for more information, or jump straight into the [documented source code](1-source-files/main-sources).
 
 ## Contents
 
