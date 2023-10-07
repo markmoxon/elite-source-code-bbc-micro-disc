@@ -325,7 +325,19 @@ By default the build process builds the Stairway to Hell variant, but you can bu
 
 ### Building the Stairway to Hell variant
 
-You can add `variant=sth` to produce the `elite-disc-sth.ssd` file containing the Stairway to Hell variant, though that's the default value so it isn't necessary.
+You can add `variant=sth` to produce the `elite-disc-sth.ssd` file containing the Stairway to Hell variant, though that's the default value so it isn't necessary. In other words, you can build it like this:
+
+```
+make.bat encrypt verify variant=sth
+```
+
+or this on a Mac or Linux:
+
+```
+make encrypt verify variant=sth
+```
+
+This will produce a file called `elite-disc-sth.NES` in the `5-compiled-game-discs` folder that contains the Stairway to Hell variant.
 
 The verification checksums for this version are as follows:
 
