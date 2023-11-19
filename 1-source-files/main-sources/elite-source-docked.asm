@@ -7453,6 +7453,8 @@
 \                       the screen address pointed to by (A SC). Used by the
 \                       BULB routine
 \
+\   R5-1                Contains an RTS
+\
 \ ******************************************************************************
 
 .CHPR

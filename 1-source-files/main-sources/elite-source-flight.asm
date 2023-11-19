@@ -9586,6 +9586,8 @@
 \
 \   TA151               Make the ship head towards the planet
 \
+\   TA9-1               Contains an RTS
+\
 \ ******************************************************************************
 
 .TA4
