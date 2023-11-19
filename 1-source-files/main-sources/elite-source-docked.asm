@@ -18817,6 +18817,8 @@ ENDIF
 \ This part draws the new sun. By the time we get to this point, the following
 \ variables should have been set up by parts 1 and 2:
 \
+\ Arguments:
+\
 \   V                   As we draw lines for the new sun, V contains the
 \                       vertical distance between the line we're drawing and the
 \                       centre of the new sun. As we draw lines and move up the
@@ -22698,7 +22700,6 @@ ENDIF
 \ We have killed a ship, so increase the kill tally, displaying an iconic
 \ message of encouragement if the kill total is a multiple of 256, and then
 \ make a nearby explosion sound.
-\
 \
 \ ******************************************************************************
 
