@@ -24944,6 +24944,12 @@ ENDIF
 \    Summary: Load a new ship blueprints file
 \  Deep dive: Ship blueprints in the disc version
 \
+\ ------------------------------------------------------------------------------
+\
+\ Other entry points:
+\
+\   SHIPinA             Load the ship blueprints file specified in A
+\
 \ ******************************************************************************
 
 .LOMOD
@@ -26604,6 +26610,10 @@ ENDIF
 \
 \   * If this is a space view, scan for secondary flight keys and update the
 \     relevant bytes in the key logger
+\
+\ Other entry points:
+\
+\   DK5                 Contains an RTS
 \
 \ ******************************************************************************
 
@@ -29537,6 +29547,9 @@ ENDMACRO
 \
 \   LL70+1              Contains an RTS (as the first byte of an LDA
 \                       instruction)
+\
+\   LL66                A re-entry point into the ship-drawing routine, used by
+\                       the LL62 routine to store 128 - (U R) on the XX3 heap
 \
 \ ******************************************************************************
 

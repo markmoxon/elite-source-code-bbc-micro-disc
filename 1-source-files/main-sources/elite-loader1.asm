@@ -176,6 +176,13 @@
 \    Summary: Reset vectors, change to mode 7, and load and run the ELITE3
 \             loader
 \
+\ ------------------------------------------------------------------------------
+\
+\ Other entry points:
+\
+\   load3               Load and run the next part of the loader in the ELITE3
+\                       binary
+\
 \ ******************************************************************************
 
 .ENTRY

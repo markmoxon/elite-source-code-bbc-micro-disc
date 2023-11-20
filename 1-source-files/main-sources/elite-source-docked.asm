@@ -20890,6 +20890,11 @@ ENDIF
 \
 \ BRKV is set to point to BR1 by the loading process.
 \
+\ Other entry points:
+\
+\   QU5                 Restart the game using the last saved commander without
+\                       asking whether to load a new commander file
+\
 \ ******************************************************************************
 
 .BR1
@@ -21401,6 +21406,10 @@ ENDIF
 \   INWK                The full filename, including drive and directory, in
 \                       the form ":0.E.JAMESON", for example, terminated by a
 \                       return character (13)
+\
+\ Other entry points:
+\
+\   GTNME               Skip the delay at the start of the routine
 \
 \ ******************************************************************************
 
@@ -22211,6 +22220,10 @@ ENDIF
 \ ------------------------------------------------------------------------------
 \
 \ The filename should be stored at INWK, terminated with a carriage return (13).
+\
+\ Other entry points:
+\
+\   LOR                 Set the C flag and return from the subroutine
 \
 \ ******************************************************************************
 
@@ -26091,6 +26104,9 @@ ENDMACRO
 \
 \   LL70+1              Contains an RTS (as the first byte of an LDA
 \                       instruction)
+\
+\   LL66                A re-entry point into the ship-drawing routine, used by
+\                       the LL62 routine to store 128 - (U R) on the XX3 heap
 \
 \ ******************************************************************************
 
