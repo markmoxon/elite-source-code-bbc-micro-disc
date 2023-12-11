@@ -26,16 +26,19 @@ FOR P = 0 TO 2 STEP 2
 P%=CODE
 [OPT P
 SEI
-LDY #15        			\\ Unique values (-1) to find
-TYA            			\\ A can start anywhere less than 256-64 as it just needs to allow for enough numbers not to clash with rom, tst and uninitialised tst values
+LDA &F4                 \\ Store &F4 on stack
+PHA
+LDY #15                 \\ Unique values (-1) to find
+TYA                     \\ A can start anywhere less than 256-64 as it just needs to allow for enough numbers not to clash with rom, tst and uninitialised tst values
 .next_val
-LDX #15        			\\ Sideways bank
-ADC #1         			\\ Will inc mostly by 2, but doesn't matter
+LDX #15                 \\ Sideways bank
+ADC #1                  \\ Will inc mostly by 2, but doesn't matter
 .next_slot
+STX &F4
 STX RomSel
 CMP tstaddr
 BEQ next_val
-CMP unique,X   			\\ Doesn't matter that we haven't checked these yet as it just excludes unnecessary values, but is safe
+CMP unique,X            \\ Doesn't matter that we haven't checked these yet as it just excludes unnecessary values, but is safe
 BEQ next_val
 DEX
 BPL next_slot
@@ -44,20 +47,22 @@ LDX tstaddr
 STX values,Y
 DEY
 BPL next_val
-LDX #0         			\\ Try to swap each rom value with a unique test value
+LDX #0                  \\ Try to swap each rom value with a unique test value
 .swap
-STX RomSel     			\\ Set RomSel as it will be needed to read, but is also sometimes used to select write
+STX &F4
+STX RomSel              \\ Set RomSel as it will be needed to read, but is also sometimes used to select write
 LDA unique,X
 STA tstaddr
 INX
 CPX #16
 BNE swap
-LDY #16        			\\ Count matching values and restore old values - reverse order to swapping is safe
+LDY #16                 \\ Count matching values and restore old values - reverse order to swapping is safe
 LDX #15
 .tst_restore
+STX &F4
 STX RomSel
 LDA tstaddr
-CMP unique,X   			\\ If it has changed, but is not this value, it will be picked up in a later bank
+CMP unique,X            \\ If it has changed, but is not this value, it will be picked up in a later bank
 BNE not_swr
 LDA values,X
 STA tstaddr
@@ -67,8 +72,9 @@ STX values,Y
 DEX
 BPL tst_restore
 STY values
-LDA &F4
-STA RomSel     			\\ Restore original ROM
+PLA                     \\ Restore original value of &F4
+STA &F4
+STA RomSel              \\ Restore original ROM
 CLI
 RTS
 ]
