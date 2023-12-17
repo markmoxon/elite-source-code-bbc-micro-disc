@@ -2367,9 +2367,32 @@ ENDIF
 IF _MATCH_ORIGINAL_BINARIES
 
  IF _STH_DISC
-  INCBIN "4-reference-binaries/sth/workspaces/loader3.bin"
+
+  EQUB &F0, &00, &00, &00, &00, &00, &00, &00   \ These bytes appear to be
+  EQUB &F0, &00, &00, &00, &00, &00, &00, &00   \ unused and just contain random
+  EQUB &F0, &00, &00, &00, &00, &00, &00, &00   \ workspace noise left over from
+  EQUB &F0, &80, &80, &80, &80, &C0, &A4, &96   \ the BBC Micro assembly process
+  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+  EQUB &F0, &00, &33, &22, &33, &22, &33, &00
+  EQUB &F0, &00, &AA, &22, &22, &22, &BB, &00
+  EQUB &F0, &00, &22, &22, &22, &22, &AA, &00
+  EQUB &F0, &00, &EE, &44, &44, &44, &44, &00
+  EQUB &F0, &00, &EE, &88, &CC, &88, &EE, &00
+  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+  EQUB &F0, &00, &00, &00, &00, &00
+
  ELIF _IB_DISC
-  SKIP 158
+
+  SKIP 158              \ These bytes appear to be unused
+
  ENDIF
 
 ELSE
