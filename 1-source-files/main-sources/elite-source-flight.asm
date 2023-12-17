@@ -24138,8 +24138,7 @@ ENDIF
 \       Name: Main game loop (Part 4 of 6)
 \       Type: Subroutine
 \   Category: Main loop
-\    Summary: Potentially spawn a lone bounty hunter, a Thargoid, or up to four
-\             pirates
+\    Summary: Potentially spawn a lone bounty hunter or up to four pirates
 \  Deep dive: Program flow of the main game loop
 \             Ship data blocks
 \             Fixing ship positions
@@ -24149,9 +24148,9 @@ ENDIF
 \ This section covers the following:
 \
 \   * Potentially spawn (47% chance) either a lone bounty hunter (a Cobra Mk
-\     III, Asp Mk II, Python or Fer-de-lance), a Thargoid, or a group of up to 4
-\     pirates (a mix of Sidewinders, Mambas, Kraits, Adders, Geckos, Cobras Mk I
-\     and III, and Worms)
+\     III, Asp Mk II, Python or Fer-de-lance), or a group of up to 4 pirates (a
+\     mix of Sidewinders, Mambas, Kraits, Adders, Geckos, Cobras Mk I and III,
+\     and Worms)
 \
 \   * Also potentially spawn a Constrictor if this is the mission 1 endgame, or
 \     Thargoids if mission 2 is in progress
@@ -24206,8 +24205,8 @@ ENDIF
 
 .LABEL_2
 
-                        \ Now to spawn a lone bounty hunter, a Thargoid or a
-                        \ group of pirates
+                        \ Now to spawn a lone bounty hunter or a group of
+                        \ pirates
 
  JSR Ze                 \ Call Ze to initialise INWK to a potentially hostile
                         \ ship, and set A and X to random values
@@ -24220,7 +24219,7 @@ ENDIF
 
  CMP #100               \ If the random number in A >= 100 (61% chance), jump
  BCS mt1                \ to mt1 to spawn pirates, otherwise keep going to
-                        \ spawn a lone bounty hunter or a Thargoid
+                        \ spawn a lone bounty hunter
 
  INC EV                 \ Increase the extra vessels spawning counter, to
                         \ prevent the next attempt to spawn extra vessels
@@ -24280,7 +24279,7 @@ ENDIF
 
 .focoug
 
- JSR NWSHP              \ Spawn the new ship, whether it's a pirate, Thargoid or
+ JSR NWSHP              \ Spawn the new ship, whether it's a pirate or
                         \ Constrictor
 
 .mj1
