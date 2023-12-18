@@ -175,6 +175,8 @@ For details of how the build process works, see the [build documentation on bbce
 
 Let's look at how to build Elite from the source.
 
+### Windows
+
 For Windows users, there is a batch file called `make.bat` which you can use to build the game. Before this will work, you should edit the batch file and change the values of the `BEEBASM` and `PYTHON` variables to point to the locations of your `beebasm.exe` and `python.exe` executables. You also need to change directory to the repository folder (i.e. the same folder as `make.bat`).
 
 All being well, entering the following into a command window:
