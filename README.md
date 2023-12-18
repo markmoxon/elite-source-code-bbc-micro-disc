@@ -205,8 +205,8 @@ By default the build process will create a typical Elite game disc with a standa
 
 * `variant=<release>` - Build the specified variant:
 
-  * `sth` (default)
-  * `ib-disc`
+  * `variant=sth` (default)
+  * `variant=ib-disc`
 
 * `commander=max` - Start with a maxed-out commander
 
@@ -215,6 +215,12 @@ By default the build process will create a typical Elite game disc with a standa
 * `match=no` - Do not attempt to match the original game binaries (i.e. omit workspace noise)
 
 * `verify=no` - Disable crc32 verification of the game binaries
+
+So, for example:
+
+`make variant=ib-disc commander=max encrypt=no match=no verify=no`
+
+will build an unencrypted version of the variant from Ian Bell's website, with a maxed-out commander, no workspace noise and no crc32 verification.
 
 The unencrypted version should be more useful for anyone who wants to make modifications to the game code. As this argument produces unencrypted files, the binaries produced will be quite different to the binaries on the original source disc, which are encrypted.
 
