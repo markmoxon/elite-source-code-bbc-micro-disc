@@ -353,7 +353,7 @@
 \
 \       Name: B%
 \       Type: Variable
-\   Category: Screen mode
+\   Category: Drawing the screen
 \    Summary: VDU commands for switching to a mode 7 screen
 \
 \ ******************************************************************************
