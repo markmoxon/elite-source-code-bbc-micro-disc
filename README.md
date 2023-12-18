@@ -203,7 +203,7 @@ will produce a file called `elite-disc-sth.ssd` in the `5-compiled-game-discs` f
 
 By default the build process will create a typical Elite game disc with a standard commander and verified binaries. There are various arguments you can pass to the build to change how it works. They are:
 
-* `variant=<release>` - Build the specified variant:
+* `variant=<name>` - Build the specified variant:
 
   * `variant=sth` (default)
   * `variant=ib-disc`
