@@ -37,9 +37,8 @@
 \
 \ ******************************************************************************
 
- Q% = _REMOVE_CHECKSUMS \ Set Q% to TRUE to max out the default commander, FALSE
-                        \ for the standard default commander (this is set to
-                        \ TRUE if checksums are disabled, just for convenience)
+ Q% = _MAX_COMMANDER    \ Set Q% to TRUE to max out the default commander, FALSE
+                        \ for the standard default commander
 
  N% = 67                \ N% is set to the number of bytes in the VDU table, so
                         \ we can loop through them below
@@ -163,7 +162,7 @@
 \
 \       Name: B%
 \       Type: Variable
-\   Category: Screen mode
+\   Category: Drawing the screen
 \    Summary: VDU commands for setting the square mode 4 screen
 \  Deep dive: The split-screen mode in BBC Micro Elite
 \             Drawing monochrome pixels in mode 4
@@ -1836,7 +1835,7 @@ ENDIF
 \
 \       Name: TVT1
 \       Type: Variable
-\   Category: Screen mode
+\   Category: Drawing the screen
 \    Summary: Palette data for space and the two dashboard colour schemes
 \
 \ ------------------------------------------------------------------------------
@@ -1904,7 +1903,7 @@ ENDIF
 \
 \       Name: IRQ1
 \       Type: Subroutine
-\   Category: Screen mode
+\   Category: Drawing the screen
 \    Summary: The main screen-mode interrupt handler (IRQ1V points here)
 \  Deep dive: The split-screen mode in BBC Micro Elite
 \
@@ -2385,9 +2384,32 @@ ENDIF
 \IF _MATCH_ORIGINAL_BINARIES
 \
 \ IF _STH_DISC
-\  INCBIN "4-reference-binaries/sth/workspaces/loader3.bin"
+\
+\  EQUB &F0, &00, &00, &00, &00, &00, &00, &00  \ These bytes appear to be
+\  EQUB &F0, &00, &00, &00, &00, &00, &00, &00  \ unused and just contain random
+\  EQUB &F0, &00, &00, &00, &00, &00, &00, &00  \ workspace noise left over from
+\  EQUB &F0, &80, &80, &80, &80, &C0, &A4, &96  \ the BBC Micro assembly process
+\  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\  EQUB &F0, &00, &33, &22, &33, &22, &33, &00
+\  EQUB &F0, &00, &AA, &22, &22, &22, &BB, &00
+\  EQUB &F0, &00, &22, &22, &22, &22, &AA, &00
+\  EQUB &F0, &00, &EE, &44, &44, &44, &44, &00
+\  EQUB &F0, &00, &EE, &88, &CC, &88, &EE, &00
+\  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\  EQUB &F0, &00, &00, &00, &00, &00
+\
 \ ELIF _IB_DISC
-\  SKIP 158
+\
+\  SKIP 158             \ These bytes appear to be unused
+\
 \ ENDIF
 \
 \ELSE
