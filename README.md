@@ -31,9 +31,9 @@ See the [introduction](#introduction) for more information, or jump straight int
 * [Building Elite from the source](#building-elite-from-the-source)
 
   * [Requirements](#requirements)
-  * [Build targets](#build-targets)
   * [Windows](#windows)
   * [Mac and Linux](#mac-and-linux)
+  * [Build options](#build-options)
   * [Updating the checksum scripts if you change the code](#updating-the-checksum-scripts-if-you-change-the-code)
   * [Verifying the output](#verifying-the-output)
   * [Log files](#log-files)
@@ -159,6 +159,8 @@ For more information on the port to the BBC Master, see the [hacks section of th
 
 ## Building Elite from the source
 
+Builds are supported for both Windows and Mac/Linux systems. In all cases the build process is defined in the `Makefile` provided.
+
 ### Requirements
 
 You will need the following to build Elite from the source:
@@ -173,31 +175,14 @@ For details of how the build process works, see the [build documentation on bbce
 
 Let's look at how to build Elite from the source.
 
-### Build targets
-
-There are two main build targets available. They are:
-
-* `build` - An unencrypted version
-* `encrypt` - An encrypted version that includes the same obfuscation as the released version of the game
-
-The unencrypted version should be more useful for anyone who wants to make modifications to the game code. It includes a default commander with lots of cash and equipment, which makes it easier to test the game. As this target produces unencrypted files, the binaries produced will be quite different to the binaries on the original source disc, which are encrypted.
-
-The encrypted version contains an obfuscated version of the game binary, along with the standard default commander.
-
-Builds are supported for both Windows and Mac/Linux systems. In all cases the build process is defined in the `Makefile` provided.
-
 ### Windows
 
-For Windows users, there is a batch file called `make.bat` to which you can pass one of the build targets above. Before this will work, you should edit the batch file and change the values of the `BEEBASM` and `PYTHON` variables to point to the locations of your `beebasm.exe` and `python.exe` executables. You also need to change directory to the repository folder (i.e. the same folder as `make.bat`).
+For Windows users, there is a batch file called `make.bat` which you can use to build the game. Before this will work, you should edit the batch file and change the values of the `BEEBASM` and `PYTHON` variables to point to the locations of your `beebasm.exe` and `python.exe` executables. You also need to change directory to the repository folder (i.e. the same folder as `make.bat`).
 
-All being well, doing one of the following:
-
-```
-make.bat build
-```
+All being well, entering the following into a command window:
 
 ```
-make.bat encrypt
+make.bat
 ```
 
 will produce a file called `elite-disc-sth.ssd` in the `5-compiled-game-discs` folder that contains the Stairway to Hell variant, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
@@ -206,17 +191,40 @@ will produce a file called `elite-disc-sth.ssd` in the `5-compiled-game-discs` f
 
 The build process uses a standard GNU `Makefile`, so you just need to install `make` if your system doesn't already have it. If BeebAsm or Python are not on your path, then you can either fix this, or you can edit the `Makefile` and change the `BEEBASM` and `PYTHON` variables in the first two lines to point to their locations. You also need to change directory to the repository folder (i.e. the same folder as `Makefile`).
 
-All being well, doing one of the following:
+All being well, entering the following into a terminal window:
 
 ```
-make build
-```
-
-```
-make encrypt
+make
 ```
 
 will produce a file called `elite-disc-sth.ssd` in the `5-compiled-game-discs` folder that contains the Stairway to Hell variant, which you can then load into an emulator, or into a real BBC Micro using a device like a Gotek.
+
+### Build options
+
+By default the build process will create a typical Elite game disc with a standard commander and verified binaries. There are various arguments you can pass to the build to change how it works. They are:
+
+* `variant=<name>` - Build the specified variant:
+
+  * `variant=sth` (default)
+  * `variant=ib-disc`
+
+* `commander=max` - Start with a maxed-out commander (specifically, this is the test commander file from the original source, which is almost but not quite maxed-out)
+
+* `encrypt=no` - Disable encryption and checksum routines
+
+* `match=no` - Do not attempt to match the original game binaries (i.e. omit workspace noise)
+
+* `verify=no` - Disable crc32 verification of the game binaries
+
+So, for example:
+
+`make variant=ib-disc commander=max encrypt=no match=no verify=no`
+
+will build an unencrypted version of the variant from Ian Bell's website, with a maxed-out commander, no workspace noise and no crc32 verification.
+
+The unencrypted version should be more useful for anyone who wants to make modifications to the game code. As this argument produces unencrypted files, the binaries produced will be quite different to the binaries on the original source disc, which are encrypted.
+
+See below for more on the verification process.
 
 ### Updating the checksum scripts if you change the code
 
@@ -226,35 +234,11 @@ To fix this, you may need to update some of the hard-coded addresses in the chec
 
 ### Verifying the output
 
-The build process also supports a verification target that prints out checksums of all the generated files, along with the checksums of the files from the original sources.
-
-You can run this verification step on its own, or you can run it once a build has finished. To run it on its own, use the following command on Windows:
-
-```
-make.bat verify
-```
-
-or on Mac/Linux:
-
-```
-make verify
-```
-
-To run a build and then verify the results, you can add two targets, like this on Windows:
-
-```
-make.bat encrypt verify
-```
-
-or this on Mac/Linux:
-
-```
-make encrypt verify
-```
+The default build process prints out checksums of all the generated files, along with the checksums of the files from the original sources. You can disable verification by passing `verify=no` to the build.
 
 The Python script `crc32.py` in the `2-build-files` folder does the actual verification, and shows the checksums and file sizes of both sets of files, alongside each other, and with a Match column that flags any discrepancies. If you are building an unencrypted set of files then there will be lots of differences, while the encrypted files should mostly match (see the Differences section below for more on this).
 
-The binaries in the `4-reference-binaries` folder are those extracted from the released version of the game, while those in the `3-assembled-output` folder are produced by the build process. For example, if you don't make any changes to the code and build the project with `make encrypt verify`, then this is the output of the verification process:
+The binaries in the `4-reference-binaries` folder are those extracted from the released version of the game, while those in the `3-assembled-output` folder are produced by the build process. For example, if you don't make any changes to the code and build the project with `make`, then this is the output of the verification process:
 
 ```
 Results for variant: sth
@@ -299,17 +283,19 @@ During compilation, details of every step are output in a file called `compile.t
 
 For users of the excellent [b2 emulator](https://github.com/tom-seddon/b2), you can include the build parameter `b2` to automatically load and boot the assembled disc image in b2. The b2 emulator must be running for this to work.
 
-For example, to build, verify and load into b2, you can do this on Windows:
+For example, to build, verify and load the game into b2, you can do this on Windows:
 
 ```
-make.bat encrypt verify b2
+make.bat all b2
 ```
 
 or this on Mac/Linux:
 
 ```
-make encrypt verify b2
+make all b2
 ```
+
+If you omit the `all` target then b2 will start up with the results of the last successful build.
 
 Note that you should manually choose the correct platform in b2 (I intentionally haven't automated this part to make it easier to test across multiple platforms).
 
@@ -328,13 +314,13 @@ By default the build process builds the Stairway to Hell variant, but you can bu
 You can add `variant=sth` to produce the `elite-disc-sth.ssd` file containing the Stairway to Hell variant, though that's the default value so it isn't necessary. In other words, you can build it like this:
 
 ```
-make.bat encrypt verify variant=sth
+make.bat variant=sth
 ```
 
 or this on a Mac or Linux:
 
 ```
-make encrypt verify variant=sth
+make variant=sth
 ```
 
 This will produce a file called `elite-disc-sth.NES` in the `5-compiled-game-discs` folder that contains the Stairway to Hell variant.
@@ -379,13 +365,13 @@ ec04b4d2   5376  ec04b4d2   5376   Yes   ELITE4.bin
 You can build the Ian Bell disc variant by appending `variant=ib-disc` to the `make` command, like this on Windows:
 
 ```
-make.bat encrypt verify variant=ib-disc
+make.bat variant=ib-disc
 ```
 
 or this on a Mac or Linux:
 
 ```
-make encrypt verify variant=ib-disc
+make variant=ib-disc
 ```
 
 This will produce a file called `elite-disc-ib-disc.ssd` in the `5-compiled-game-discs` folder that contains the Ian Bell disc variant.
@@ -444,7 +430,7 @@ In other words, the Ian Bell variant appears to be the very first release of the
 
 See the [accompanying website](https://www.bbcelite.com/disc/releases.html) for a comprehensive list of differences between the variants.
 
-Note that I have only included differences that appear in the main game code, rather than those that appear in the loaders, as these files can differ extensively between variants without affecting the game itself. The variant on Ian Bell's personal website contains a whole load of copy protection differences when compared to the same code in the Stairway to Hell variant, and it also contains two more binary files (`ELITE5` and `ELITE6`), plus a `!BOOT` file that contains even more copy protection code. I haven't disassembled the loader files from this variant as that's a whole different rabbit hole, so if you build the Ian Bell variant with `make encrypt verify`, the compiled loader binaries will not match those extracted from the original disc. The main binaries will match, however, which is the interesting part from a digital archaeology perspective, as that's where the bug fixes live.
+Note that I have only included differences that appear in the main game code, rather than those that appear in the loaders, as these files can differ extensively between variants without affecting the game itself. The variant on Ian Bell's personal website contains a whole load of copy protection differences when compared to the same code in the Stairway to Hell variant, and it also contains two more binary files (`ELITE5` and `ELITE6`), plus a `!BOOT` file that contains even more copy protection code. I haven't disassembled the loader files from this variant as that's a whole different rabbit hole, so if you build the Ian Bell variant with `make`, the compiled loader binaries will not match those extracted from the original disc. The main binaries will match, however, which is the interesting part from a digital archaeology perspective, as that's where the bug fixes live.
 
 ---
 

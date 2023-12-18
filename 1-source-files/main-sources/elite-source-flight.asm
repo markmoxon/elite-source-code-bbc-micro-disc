@@ -792,7 +792,7 @@
 
 .XX3
 
- SKIP 0                 \ Temporary storage, typically used for storing tables
+ SKIP 256               \ Temporary storage, typically used for storing tables
                         \ of values such as screen coordinates or ship data
 
 \ ******************************************************************************
@@ -1873,7 +1873,7 @@
 
 .K%
 
- SKIP 0                 \ Ship data blocks and ship line heap
+ SKIP NOSH * NI%        \ Ship data blocks and ship line heap
 
 \ ******************************************************************************
 \
@@ -14308,6 +14308,25 @@
 \
 \ This routine twists the three 16-bit seeds in QQ15 once.
 \
+\ If we start with seeds s0, s1 and s2 and we want to work out their new values
+\ after we perform a twist (let's call the new values s0´, s1´ and s2´), then:
+\
+\  s0´ = s1
+\  s1´ = s2
+\  s2´ = s0 + s1 + s2
+\
+\ So given an existing set of seeds in s0, s1 and s2, we can get the new values
+\ s0´, s1´ and s2´ simply by doing the above sums. And if we want to do the
+\ above in-place without creating three new w´ variables, then we can do the
+\ following:
+\
+\  tmp = s0 + s1
+\  s0 = s1
+\  s1 = s2
+\  s2 = tmp + s1
+\
+\ So this is what we do in this routine, where each seed is a 16-bit number.
+\
 \ ******************************************************************************
 
 .TT54
@@ -14348,7 +14367,7 @@
 \
 \       Name: TT146
 \       Type: Subroutine
-\   Category: Text
+\   Category: Universe
 \    Summary: Print the distance to the selected system in light years
 \
 \ ------------------------------------------------------------------------------
@@ -14471,7 +14490,7 @@
 \
 \       Name: TT70
 \       Type: Subroutine
-\   Category: Text
+\   Category: Universe
 \    Summary: Display "MAINLY " and jump to TT72
 \
 \ ------------------------------------------------------------------------------
@@ -16458,7 +16477,7 @@
 \
 \       Name: ee3
 \       Type: Subroutine
-\   Category: Text
+\   Category: Flight
 \    Summary: Print the hyperspace countdown in the top-left of the screen
 \
 \ ------------------------------------------------------------------------------
@@ -16546,7 +16565,7 @@
 \
 \       Name: TT147
 \       Type: Subroutine
-\   Category: Text
+\   Category: Flight
 \    Summary: Print an error when a system is out of hyperspace range
 \
 \ ------------------------------------------------------------------------------
@@ -17619,7 +17638,7 @@
 \
 \       Name: cpl
 \       Type: Subroutine
-\   Category: Text
+\   Category: Universe
 \    Summary: Print the selected system name
 \  Deep dive: Generating system names
 \             Galaxy and system seeds
@@ -17702,7 +17721,7 @@
 \
 \       Name: cmn
 \       Type: Subroutine
-\   Category: Text
+\   Category: Status
 \    Summary: Print the commander's name
 \
 \ ------------------------------------------------------------------------------
@@ -17739,7 +17758,7 @@
 \
 \       Name: ypl
 \       Type: Subroutine
-\   Category: Text
+\   Category: Universe
 \    Summary: Print the current system name
 \
 \ ------------------------------------------------------------------------------
@@ -17791,7 +17810,7 @@
 \
 \       Name: tal
 \       Type: Subroutine
-\   Category: Text
+\   Category: Universe
 \    Summary: Print the current galaxy number
 \
 \ ------------------------------------------------------------------------------
@@ -17820,7 +17839,7 @@
 \
 \       Name: fwl
 \       Type: Subroutine
-\   Category: Text
+\   Category: Status
 \    Summary: Print fuel and cash levels
 \
 \ ------------------------------------------------------------------------------
@@ -17856,7 +17875,7 @@
 \
 \       Name: csh
 \       Type: Subroutine
-\   Category: Text
+\   Category: Status
 \    Summary: Print the current amount of cash
 \
 \ ------------------------------------------------------------------------------
@@ -19220,7 +19239,7 @@
 \
 \       Name: DET1
 \       Type: Subroutine
-\   Category: Screen mode
+\   Category: Drawing the screen
 \    Summary: Show or hide the dashboard (for when we die)
 \
 \ ------------------------------------------------------------------------------
@@ -23751,16 +23770,16 @@
 
 .SFX
 
- EQUB &12,&01,&00,&10   \ 0  - Lasers fired by us
- EQUB &12,&02,&2C,&08   \ 8  - We're being hit by lasers
- EQUB &11,&03,&F0,&18   \ 16 - We died 1 / We made a hit or kill 2
- EQUB &10,&F1,&07,&1A   \ 24 - We died 2 / We made a hit or kill 1
- EQUB &03,&F1,&BC,&01   \ 32 - Short, high beep
- EQUB &13,&F4,&0C,&08   \ 40 - Long, low beep
- EQUB &10,&F1,&06,&0C   \ 48 - Missile launched / Ship launched from station
- EQUB &10,&02,&60,&10   \ 56 - Hyperspace drive engaged
- EQUB &13,&04,&C2,&FF   \ 64 - E.C.M. on
- EQUB &13,&00,&00,&00   \ 72 - E.C.M. off
+ EQUB &12, &01, &00, &10    \ 0  - Lasers fired by us
+ EQUB &12, &02, &2C, &08    \ 8  - We're being hit by lasers
+ EQUB &11, &03, &F0, &18    \ 16 - We died 1 / We made a hit or kill 2
+ EQUB &10, &F1, &07, &1A    \ 24 - We died 2 / We made a hit or kill 1
+ EQUB &03, &F1, &BC, &01    \ 32 - Short, high beep
+ EQUB &13, &F4, &0C, &08    \ 40 - Long, low beep
+ EQUB &10, &F1, &06, &0C    \ 48 - Missile launched / Ship launched from station
+ EQUB &10, &02, &60, &10    \ 56 - Hyperspace drive engaged
+ EQUB &13, &04, &C2, &FF    \ 64 - E.C.M. on
+ EQUB &13, &00, &00, &00    \ 72 - E.C.M. off
 
 \ ******************************************************************************
 \
@@ -24064,7 +24083,7 @@
 \
 \       Name: me2
 \       Type: Subroutine
-\   Category: Text
+\   Category: Flight
 \    Summary: Remove an in-flight message from the space view
 \
 \ ******************************************************************************
@@ -24541,8 +24560,7 @@ ENDIF
 \       Name: Main game loop (Part 4 of 6)
 \       Type: Subroutine
 \   Category: Main loop
-\    Summary: Potentially spawn a lone bounty hunter, a Thargoid, or up to four
-\             pirates
+\    Summary: Potentially spawn a lone bounty hunter or up to four pirates
 \  Deep dive: Program flow of the main game loop
 \             Ship data blocks
 \             Fixing ship positions
@@ -24552,9 +24570,9 @@ ENDIF
 \ This section covers the following:
 \
 \   * Potentially spawn (47% chance) either a lone bounty hunter (a Cobra Mk
-\     III, Asp Mk II, Python or Fer-de-lance), a Thargoid, or a group of up to 4
-\     pirates (a mix of Sidewinders, Mambas, Kraits, Adders, Geckos, Cobras Mk I
-\     and III, and Worms)
+\     III, Asp Mk II, Python or Fer-de-lance), or a group of up to 4 pirates (a
+\     mix of Sidewinders, Mambas, Kraits, Adders, Geckos, Cobras Mk I and III,
+\     and Worms)
 \
 \   * Also potentially spawn a Constrictor if this is the mission 1 endgame, or
 \     Thargoids if mission 2 is in progress
@@ -24609,8 +24627,8 @@ ENDIF
 
 .LABEL_2
 
-                        \ Now to spawn a lone bounty hunter, a Thargoid or a
-                        \ group of pirates
+                        \ Now to spawn a lone bounty hunter or a group of
+                        \ pirates
 
  JSR Ze                 \ Call Ze to initialise INWK to a potentially hostile
                         \ ship, and set A and X to random values
@@ -24623,7 +24641,7 @@ ENDIF
 
  CMP #100               \ If the random number in A >= 100 (61% chance), jump
  BCS mt1                \ to mt1 to spawn pirates, otherwise keep going to
-                        \ spawn a lone bounty hunter or a Thargoid
+                        \ spawn a lone bounty hunter
 
  INC EV                 \ Increase the extra vessels spawning counter, to
                         \ prevent the next attempt to spawn extra vessels
@@ -24683,7 +24701,7 @@ ENDIF
 
 .focoug
 
- JSR NWSHP              \ Spawn the new ship, whether it's a pirate, Thargoid or
+ JSR NWSHP              \ Spawn the new ship, whether it's a pirate or
                         \ Constrictor
 
 .mj1
@@ -27175,7 +27193,7 @@ ENDIF
 \
 \       Name: me1
 \       Type: Subroutine
-\   Category: Text
+\   Category: Flight
 \    Summary: Erase an old in-flight message and display a new one
 \
 \ ------------------------------------------------------------------------------
@@ -27211,7 +27229,7 @@ ENDIF
 \
 \       Name: ou2
 \       Type: Subroutine
-\   Category: Text
+\   Category: Flight
 \    Summary: Display "E.C.M.SYSTEM DESTROYED" as an in-flight message
 \
 \ ******************************************************************************
@@ -27229,7 +27247,7 @@ ENDIF
 \
 \       Name: ou3
 \       Type: Subroutine
-\   Category: Text
+\   Category: Flight
 \    Summary: Display "FUEL SCOOPS DESTROYED" as an in-flight message
 \
 \ ******************************************************************************
@@ -27242,7 +27260,7 @@ ENDIF
 \
 \       Name: MESS
 \       Type: Subroutine
-\   Category: Text
+\   Category: Flight
 \    Summary: Display an in-flight message
 \
 \ ------------------------------------------------------------------------------
@@ -27280,7 +27298,7 @@ ENDIF
 \
 \       Name: mes9
 \       Type: Subroutine
-\   Category: Text
+\   Category: Flight
 \    Summary: Print a text token, possibly followed by " DESTROYED"
 \
 \ ------------------------------------------------------------------------------
@@ -33749,7 +33767,7 @@ ENDMACRO
 \
 \       Name: TT66
 \       Type: Subroutine
-\   Category: Utility routines
+\   Category: Drawing the screen
 \    Summary: Clear the screen and set the current view type
 \
 \ ------------------------------------------------------------------------------
@@ -33775,7 +33793,7 @@ ENDMACRO
 \
 \       Name: TTX66
 \       Type: Subroutine
-\   Category: Utility routines
+\   Category: Drawing the screen
 \    Summary: Clear the top part of the screen and draw a white border
 \
 \ ------------------------------------------------------------------------------
@@ -33960,7 +33978,7 @@ ENDMACRO
 \
 \       Name: CLYNS
 \       Type: Subroutine
-\   Category: Utility routines
+\   Category: Drawing the screen
 \    Summary: Clear the bottom three text rows of the mode 4 screen
 \
 \ ------------------------------------------------------------------------------
@@ -34014,7 +34032,7 @@ ENDMACRO
 \
 \       Name: LYN
 \       Type: Subroutine
-\   Category: Utility routines
+\   Category: Drawing the screen
 \    Summary: Clear most of a row of pixels
 \
 \ ------------------------------------------------------------------------------
@@ -34399,7 +34417,7 @@ ENDMACRO
 \
 \       Name: WSCAN
 \       Type: Subroutine
-\   Category: Screen mode
+\   Category: Drawing the screen
 \    Summary: Wait for the vertical sync
 \
 \ ------------------------------------------------------------------------------
