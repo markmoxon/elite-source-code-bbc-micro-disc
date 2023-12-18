@@ -51,11 +51,11 @@ endif
 ifeq ($(variant), ib-disc)
   variant-number=1
   folder=/ib-disc
-  suffix=flicker-free-ib-disc
+  suffix=-flicker-free-ib-disc
 else
   variant-number=2
   folder=/sth
-  suffix=flicker-free-sth
+  suffix=-flicker-free-sth
 endif
 
 .PHONY:all
