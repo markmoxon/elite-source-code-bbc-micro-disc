@@ -1334,11 +1334,15 @@ ENDIF
 \
 \ See the PIXEL routine in the main game code for more details.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   The screen x-coordinate of the pixel to draw
 \
 \   A                   The screen y-coordinate of the pixel to draw, negated
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
