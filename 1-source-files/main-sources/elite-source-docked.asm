@@ -2411,6 +2411,8 @@
 \
 \   A                   The recursive token to be printed, in the range 0-255
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   A                   A is preserved
@@ -2460,6 +2462,8 @@
 \
 \   A                   The recursive token to be printed, in the range 1-255
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   A                   A is preserved
@@ -2467,6 +2471,8 @@
 \   Y                   Y is preserved
 \
 \   V(1 0)              V(1 0) is preserved
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -2604,6 +2610,8 @@
 \
 \   A                   The token to be printed (1-255)
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   A                   A is preserved
@@ -2611,6 +2619,8 @@
 \   Y                   Y is preserved
 \
 \   V(1 0)              V(1 0) is preserved
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -3197,6 +3207,8 @@
 \
 \   A                   The character to be tested
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   C flag              The C flag is set if the character is a vowel, otherwise
@@ -3364,6 +3376,8 @@
 \ This routine has multiple stages. This stage does the following:
 \
 \   * Tidy the orientation vectors for one of the ship slots
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -3594,6 +3608,8 @@
 \ The comments below assume we are adding delta to the x-axis, though the axis
 \ is determined by the value of X.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   (A R)               The signed delta, so A = delta_hi and R = delta_lo
@@ -3605,6 +3621,8 @@
 \                         * X = 3 adds the delta to (y_lo, y_hi, y_sign)
 \
 \                         * X = 6 adds the delta to (z_lo, z_hi, z_sign)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -3738,6 +3756,8 @@
 \
 \ The INWK coordinate to add to K(3 2 1) is specified by X.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   The coordinate to add to K(3 2 1), as follows:
@@ -3747,6 +3767,8 @@
 \                         * If X = 3, add (y_sign y_hi y_lo)
 \
 \                         * If X = 6, add (z_sign z_hi z_lo)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -3857,6 +3879,8 @@
 \ If that paragraph makes sense to you, then you should probably be writing
 \ this commentary! For the rest of us, there's a detailed explanation of all
 \ this in the deep dive on "Pitching and rolling".
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -3985,6 +4009,8 @@
 \
 \   roofv_x = roofv_x * (1 - 1/512)  + sidev_x / 16
 \   sidev_x = sidev_x * (1 - 1/512)  - roofv_x / 16
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -4168,6 +4194,8 @@
 \ A is a sign bit and is not included in the calculation, but bits 0-6 of A are
 \ preserved. Bit 7 is set to the sign of the result.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The sign of P(2 1) in bit 7
@@ -4181,6 +4209,8 @@
 \                         * If X = 3, add to (y_sign y_hi y_lo)
 \
 \                         * If X = 6, add to (z_sign z_hi z_lo)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -4394,6 +4424,8 @@
 \ This routine draws a line from (X1, Y1) to (X2, Y2). It has multiple stages.
 \ This stage calculates the line deltas.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X1                  The screen x-coordinate of the start of the line
@@ -4404,9 +4436,13 @@
 \
 \   Y2                  The screen y-coordinate of the end of the line
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   Y                   Y is preserved
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -5063,6 +5099,8 @@
 \   * Draw from (X1, Y1) at bottom left to (X2, Y2) at top right, omitting the
 \     first pixel
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   HL6                 Contains an RTS
@@ -5230,6 +5268,8 @@
 \ This draws a line from (2, A) to (254, A), which is almost screen-wide and
 \ fits in nicely between the white borders without clashing with it.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The pixel row on which to draw the horizontal line
@@ -5269,6 +5309,8 @@
 \
 \   * Draw a horizontal line from (X1, Y) to (X2, Y)
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   YY(1 0)             The x-coordinate of the centre point of the line
@@ -5278,6 +5320,8 @@
 \
 \   Y                   The number of the entry in the sun line heap (which is
 \                       also the y-coordinate of the line)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -5312,6 +5356,8 @@
 \
 \ To understand how this routine works, you might find it helpful to read the
 \ deep dive on "Drawing monochrome pixels in mode 4".
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -5577,6 +5623,8 @@
 \ a distant point (i.e. where the distance ZZ >= &90). See the PIXEL routine for
 \ details, as this routine is effectively part of PIXEL.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   The x-coordinate of the pixel within the character block
@@ -5614,6 +5662,8 @@
 \   (YY+1 SYL+Y) = (A P) + (S R)
 \
 \ and draw a stardust particle at (X1,Y1) with distance ZZ.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -5654,6 +5704,8 @@
 \
 \ Draw a point (X1, Y1) from the middle of the screen with a size determined by
 \ a distance value. Used to draw stardust particles.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -5725,6 +5777,8 @@
 \ distance in ZZ. This applies to the top part of the screen (the monochrome
 \ mode 4 portion).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   The screen x-coordinate of the point to draw
@@ -5733,9 +5787,13 @@
 \
 \   ZZ                  The distance of the point (further away = smaller point)
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   Y                   Y is preserved
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -5818,6 +5876,8 @@
 \
 \ Draw a single segment of a circle, adding the point to the ball line heap.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   CNT                 The number of this segment
@@ -5848,6 +5908,8 @@
 \                       ball line heap (if this is not the first point)
 \
 \   SWAP                If non-zero, we swap (X1, Y1) and (X2, Y2)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -6393,6 +6455,8 @@
 \ Print a text token followed by a newline, and indent the next line to text
 \ column 6.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The text token to be printed
@@ -6450,11 +6514,15 @@
 \ with fewer than 3 digits (so numbers < 100 are right-aligned). Optionally
 \ include a decimal point.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   The number to print
 \
 \   C flag              If set, include a decimal point
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -6483,6 +6551,8 @@
 \ Print the 16-bit number in (Y X) to a specific number of digits, left-padding
 \ with spaces for numbers with fewer digits (so lower numbers will be right-
 \ aligned). Optionally include a decimal point.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -6531,6 +6601,8 @@
 \
 \ See the deep dive on "Printing decimal numbers" for details of the algorithm
 \ used in this routine.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -7142,11 +7214,15 @@
 \
 \   A                   The character to print
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   X                   X is preserved
 \
 \   C flag              The C flag is cleared
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -7477,6 +7553,8 @@
 \
 \ WRCHV is set to point here by the loading process.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The character to be printed. Can be one of the
@@ -7496,6 +7574,8 @@
 \
 \   YC                  Contains the line number to print on (the y-coordinate)
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   A                   A is preserved
@@ -7505,6 +7585,8 @@
 \   Y                   Y is preserved
 \
 \   C flag              The C flag is cleared
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -8179,6 +8261,8 @@
 \ depending on the dashboard palette), while in &0F each pixel is %01, or colour
 \ 1 (red).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   A                   The colour to use for indicators with dangerous values
@@ -8226,6 +8310,8 @@
 \ called. For the default entry point of DILX, the range is 0-255 (as the value
 \ passed in A is one byte). The other entry points are shown below.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The value to be shown on the indicator (so the larger
@@ -8244,6 +8330,8 @@
 \
 \   SC(1 0)             The screen address of the first character block in the
 \                       indicator
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -8425,11 +8513,15 @@
 \ the vertical bar never appears in the leftmost position (though it does appear
 \ in the rightmost).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The offset of the vertical bar to show in the indicator,
 \                       from 0 at the far left, to 8 in the middle, and 15 at
 \                       the far right
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -9190,6 +9282,8 @@
 \   * The z-coordinate is positive, with both z_hi (which is 1 or 2) and z_lo
 \     coming from the arguments
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   XX15                Bits 0-7 = Ship's z_lo
@@ -9340,6 +9434,8 @@
 \ pixel row at screen address SC(1 0), and aborting if we bump into something
 \ that's already on-screen.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   HA3                 Contains an RTS
@@ -9478,6 +9574,8 @@
 \ The routine name, UNWISE, sums up this approach - if anything goes wrong, the
 \ results would be messy.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   HA1                 Contains an RTS
@@ -9589,10 +9687,14 @@
 \ all coloured and zig-zaggy, while the launch screen is in the normal
 \ monochrome mode 4 screen.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The step size of the straight lines making up the rings
 \                       (4 for launch, 8 for hyperspace)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -10046,6 +10148,8 @@
 \
 \   A = A * Q / 256
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   C flag              The C flag is set
@@ -10182,9 +10286,13 @@
 \ the algorithm is still the shift-and-add approach explained in MULT1, just
 \ with more bits.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   Q                   Q is preserved
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -10448,6 +10556,8 @@
 \   (A X) = vect . XX15
 \         = vect_x * XX15 + vect_y * XX15+1 + vect_z * XX15+2
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   Y                   The orientation vector:
@@ -10457,6 +10567,8 @@
 \                         * If Y = 16, calculate roofv . XX15
 \
 \                         * If Y = 22, calculate sidev . XX15
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -10653,6 +10765,8 @@
 \ This uses the same shift-and-subtract algorithm as TIS2, just with the
 \ quotient A hard-coded to 96.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   Q                   Gets set to the value of argument X
@@ -10740,9 +10854,13 @@
 \ This uses the same shift-and-subtract algorithm as TIS2, but this time we
 \ keep the remainder.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   Y                   The number of the stardust particle to process
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -10780,6 +10898,8 @@
 \
 \ This uses the same shift-and-subtract algorithm as TIS2, but this time we
 \ keep the remainder.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -10820,6 +10940,8 @@
 \
 \ This uses the same shift-and-subtract algorithm as TIS2, but this time we
 \ keep the remainder.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -10893,6 +11015,8 @@
 \ divides the two highest bytes with the simple 8-bit routine in LL31, and
 \ shifts the result by the difference in the number of shifts, which acts as a
 \ scale factor to get the correct result.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -11178,6 +11302,8 @@
 \ pitch in the left half of the indicator, when increasing the roll or pitch
 \ should jump us straight to the mid-point.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   RE2+2               Restore A from T and return from the subroutine
@@ -11240,6 +11366,8 @@
 \ reduce X down to the mid-point, 128. This is the equivalent of having a roll
 \ or pitch in the right half of the indicator, when decreasing the roll or pitch
 \ should jump us straight to the mid-point.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -11308,6 +11436,8 @@
 \ table is shown instead. If mission 1 is in progress, then a number of systems
 \ along the route of that mission's story will show custom mission-related
 \ directives in place of that system's normal "goat soup" phrase.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -11926,6 +12056,8 @@
 \ Clear the top part of the screen, draw a white border, and set the current
 \ view type in QQ11 to A.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The type of the new current view (see QQ11 for a list of
@@ -11951,6 +12083,8 @@
 \
 \ Clear the top part of the screen (the space view) and draw a white border
 \ along the top and sides.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -12088,6 +12222,8 @@
 \ Wait for the number of vertical syncs given in Y, so this effectively waits
 \ for Y/50 of a second (as the vertical sync occurs 50 times a second).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   Y                   The number of vertical sync events to wait for
@@ -12127,6 +12263,8 @@
 \ which clears the three bottom text rows of the mode 4 screen (rows 21 to 23),
 \ clearing each row from text column 1 to 30 (so it doesn't overwrite the box
 \ border in columns 0 and 32, or the last usable column in column 31).
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -12178,14 +12316,20 @@
 \
 \ Set pixels 0-233 to the value in A, starting at the pixel pointed to by SC.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The value to store in pixels 1-233 (the only value that
 \                       is actually used is A = 0, which clears those pixels)
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   Y                   Y is set to 0
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -12221,6 +12365,8 @@
 \
 \ Draw a double-height mode 5 dot (2 pixels high, 2 pixels wide).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X1                  The screen pixel x-coordinate of the bottom-left corner
@@ -12254,6 +12400,8 @@
 \ ------------------------------------------------------------------------------
 \
 \ Draw a single-height mode 5 dash (1 pixel high, 2 pixels wide).
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -12416,12 +12564,16 @@
 \ For items measured in kg (gold, platinum), g (gem-stones) and alien items,
 \ the individual limit on each of these is 200 units.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The number of units of this market item
 \
 \   QQ29                The type of market item (see QQ23 for a list of market
 \                       item numbers)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -12666,6 +12818,8 @@
 \ paragraphs) by moving the cursor down a line, setting Sentence Case, and then
 \ printing a newline.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The text token to be printed
@@ -12762,6 +12916,8 @@
 \
 \ Print a text token (i.e. a character, control code, two-letter token or
 \ recursive token) followed by a space.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -13314,6 +13470,8 @@
 \ For all views except the Short-range Chart, the centre is drawn 24 pixels to
 \ the right of the y-coordinate given.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   QQ19                The pixel x-coordinate of the centre of the crosshairs
@@ -13528,6 +13686,8 @@
 \ ------------------------------------------------------------------------------
 \
 \ Draw a circle with the centre at (QQ19, QQ19+1) and radius K.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -13768,9 +13928,13 @@
 \ code greater than ASCII "9" will jump to the Inventory screen (so that
 \ includes all letters and most punctuation).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   QQ25                The maximum number allowed
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -13952,6 +14116,8 @@
 \ Sell Cargo screen) or without (the Inventory screen), depending on the current
 \ view.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   QQ11                The current view:
@@ -13959,6 +14125,8 @@
 \                           * 4 = Sell Cargo
 \
 \                           * 8 = Inventory
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -14151,6 +14319,8 @@
 \
 \   A                   The text token to print before the "Y/N?" prompt
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   C flag              Set if the response was "yes", clear otherwise
@@ -14197,6 +14367,8 @@
 \ ------------------------------------------------------------------------------
 \
 \ Move the chart crosshairs by the amount in X and Y.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -14303,16 +14475,22 @@
 \ overflow. The coordinate is in a single axis, so it's either an x-coordinate
 \ or a y-coordinate.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The galactic coordinate to update
 \
 \   QQ19+3              The delta (can be positive or negative)
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   QQ19+4              The updated coordinate after moving by the delta (this
 \                       will be the same as A if moving by the delta overflows)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -14703,11 +14881,15 @@
 \ Given a set of galactic coordinates in (QQ9, QQ10), find the nearest system
 \ to this point in the galaxy, and set this as the currently selected system.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   QQ9                 The x-coordinate near which we want to find a system
 \
 \   QQ10                The y-coordinate near which we want to find a system
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -14724,6 +14906,8 @@
 \                       original coordinates
 \
 \   ZZ                  The system number of the nearest system
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -15002,6 +15186,8 @@
 \ and if all the pre-jump checks are passed, we print the destination on-screen
 \ and start the countdown.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   TTX111              Used to rejoin this routine from the call to TTX110
@@ -15159,6 +15345,8 @@
 \ We always arrive in a new galaxy at galactic coordinates (96, 96), and then
 \ find the nearest system and set that as our location.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   zZ+1                Contains an RTS
@@ -15250,6 +15438,8 @@
 \
 \   (QQ0, QQ1)          The galactic coordinates of the new system
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   hy5                 Contains an RTS
@@ -15280,6 +15470,8 @@
 \ Print the 8-bit number in X at text location (1, 1). Print the number to
 \ 5 digits, left-padding with spaces for numbers with fewer than 3 digits (so
 \ numbers < 10000 are right-aligned), with no decimal point.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -15312,6 +15504,8 @@
 \ numbers with fewer than 3 digits (so numbers < 10000 are right-aligned),
 \ with no decimal point.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   The low byte of the number to print
@@ -15338,6 +15532,8 @@
 \ Print the 16-bit number in (Y X) to 5 digits, left-padding with spaces for
 \ numbers with fewer than 3 digits (so numbers < 10000 are right-aligned).
 \ Optionally include a decimal point.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -15411,6 +15607,8 @@
 \
 \   A                   The number of the market item to print, 0-16 (see QQ23
 \                       for details of item numbers)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -15737,6 +15935,8 @@
 \ This routine forms part of the calculations for market item prices (TT151)
 \ and availability (GVL).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   QQ19+1              Byte #1 of the market prices table for this market item
@@ -15796,6 +15996,8 @@
 \ Do a hyperspace jump to the system closest to galactic coordinates
 \ (QQ9, QQ10), and set up the current system's state to those of the new system.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   (QQ0, QQ1)          The galactic coordinates of the new system
@@ -15809,6 +16011,8 @@
 \   tek                 The new system's tech level
 \
 \   gov                 The new system's government
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -15921,6 +16125,8 @@
 \
 \   CASH(0 1 2 3) = CASH(0 1 2 3) - (0 0 Y X)
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   C flag              If set, there was enough cash to do the subtraction
@@ -15975,6 +16181,8 @@
 \ calculates:
 \
 \   CASH(0 1 2 3) = CASH(0 1 2 3) + (Y X)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -16533,6 +16741,8 @@
 \ from our cash pot and return from the subroutine. If we don't have enough
 \ cash, exit to the docking bay (i.e. show the Status Mode screen).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The item number of the piece of equipment (0-11) as
@@ -16570,14 +16780,20 @@
 \
 \ This routine returns the price of equipment as listed in the table at PRXS.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The item number of the piece of equipment (0-13) as
 \                       shown in the table at PRXS
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   (Y X)               The item price in Cr * 10 (Y = high byte, X = low byte)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -16623,6 +16839,8 @@
 \
 \ Also print a "View ?" prompt and ask for a view number. The menu is shown
 \ when we choose to buy a new laser in the Equip Ship screen.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -16747,6 +16965,8 @@
 \   A                   The power of the new laser to be fitted
 \
 \   X                   The view number for fitting the new laser (0-3)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -16971,6 +17191,8 @@ ENDIF
 \
 \ Print control code 4 (the commander's name).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   cmn-1               Contains an RTS
@@ -17010,6 +17232,8 @@ ENDIF
 \ ------------------------------------------------------------------------------
 \
 \ Print control code 2 (the current system name).
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -17231,6 +17455,8 @@ ENDIF
 \ Print a text token (i.e. a character, control code, two-letter token or
 \ recursive token).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The text token to be printed
@@ -17363,6 +17589,8 @@ ENDIF
 \                         * 32-95 (ASCII capital letters, numbers and
 \                           punctuation)
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   TT44                Jumps to TT26 to print the character in A (used to
@@ -17406,6 +17634,8 @@ ENDIF
 \       * If character is punctuation, just print it
 \
 \       * If character is a letter, set QQ17 bit 6 and print letter as a capital
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -17465,6 +17695,8 @@ ENDIF
 \ Print a recursive token where the token number is in 128-145 (so the value
 \ passed to TT27 is in the range 14-31).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   A value from 128-145, which refers to a recursive token
@@ -17518,6 +17750,8 @@ ENDIF
 \
 \   * Otherwise this is punctuation, so clear bit 6 in QQ17 and print
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The character to be printed. Can be one of the
@@ -17564,6 +17798,8 @@ ENDIF
 \
 \ Print a character and clear bit 6 in QQ17, so that the next letter that gets
 \ printed after this will start with a capital letter.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -17625,6 +17861,8 @@ ENDIF
 \
 \ Print a two-letter token, or a recursive token where the token number is in
 \ 0-95 (so the value passed to TT27 is in the range 160-255).
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -17690,9 +17928,13 @@ ENDIF
 \ right place. This approach might not be terribly speed efficient, but it is
 \ certainly memory-efficient.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The recursive token to be printed, in the range 0-148
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -17915,6 +18157,8 @@ ENDIF
 \ Reset the sun line heap at LSO by zero-filling it and setting the first byte
 \ to &FF.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   A                   A is set to 0
@@ -17964,10 +18208,14 @@ ENDIF
 \ the dashboard reappear, as the dashboard's screen memory doesn't get touched
 \ by this process.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   The number of text rows to display on the screen (24
 \                       will hide the dashboard, 31 will make it reappear)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -18000,6 +18248,8 @@ ENDIF
 \
 \ Charge up a shield, and if it needs charging, drain some energy from the
 \ energy banks.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -18072,6 +18322,8 @@ ENDIF
 \ The comments below are written for copying the planet's x-coordinate into
 \ K3(2 1 0).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   Determines which coordinate to copy, and to where:
@@ -18114,6 +18366,8 @@ ENDIF
 \ address is fetched from the UNIV table, which stores the addresses of the 13
 \ ship data blocks in workspace K%.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   The ship slot number for which we want the data block
@@ -18149,10 +18403,14 @@ ENDIF
 \ empty slot in FRIN, and adds a pointer to the ship data into UNIV. If there
 \ isn't enough free memory for the new ship, it isn't added.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The type of the ship to add (see variable XX21 for a
 \                       list of ship types)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -18401,9 +18659,13 @@ ENDIF
 \ Flip the sign of the INWK byte at offset X, and increment X by 2. This is
 \ used by the space station creation routine at NWSPS.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   The offset of the INWK byte to be flipped
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -18455,6 +18717,8 @@ ENDIF
 \ ------------------------------------------------------------------------------
 \
 \ Set the lock target for the leftmost missile and update the dashboard.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -18525,6 +18789,8 @@ ENDIF
 \                       be drawn (i.e. ECBT for the E.C.M. bulb, or SPBT for the
 \                       space station bulb)
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   BULB-2              Set the Y screen address
@@ -18585,6 +18851,8 @@ ENDIF
 \ Each indicator is a rectangle that's 3 pixels wide and 5 pixels high. If the
 \ indicator is set to black, this effectively removes a missile.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   The number of the missile indicator to update (counting
@@ -18600,6 +18868,8 @@ ENDIF
 \                         * &E0 = yellow/white (armed)
 \
 \                         * &EE = green/cyan (disarmed)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -18676,6 +18946,8 @@ ENDIF
 \ star systems on the Short-range Chart.
 \
 \ The first part sets up all the variables needed to draw the new sun.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -18907,6 +19179,8 @@ ENDIF
 \
 \ This part draws the new sun. By the time we get to this point, the following
 \ variables should have been set up by parts 1 and 2:
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -19163,6 +19437,8 @@ ENDIF
 \ This part erases any remaining traces of the old sun, now that we have drawn
 \ all the way to the top of the new sun.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   RTS2                Contains an RTS
@@ -19226,6 +19502,8 @@ ENDIF
 \ Draw a circle with the centre at (K3, K4) and radius K. Used to draw the
 \ planet's main outline.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   K                   The planet's radius
@@ -19276,6 +19554,8 @@ ENDIF
 \ Draw a circle with the centre at (K3, K4) and radius K. Used to draw the
 \ planet and the chart circles.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   STP                 The step size for the circle
@@ -19285,6 +19565,8 @@ ENDIF
 \   K3(1 0)             Pixel x-coordinate of the centre of the circle
 \
 \   K4(1 0)             Pixel y-coordinate of the centre of the circle
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -19432,6 +19714,8 @@ ENDIF
 \ We do this by redrawing it using the lines stored in the sun line heap when
 \ the sun was originally drawn by the SUN routine.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   SUNX(1 0)           The x-coordinate of the vertical centre axis of the sun
@@ -19498,11 +19782,15 @@ ENDIF
 \ calculation doesn't overflow, we return with the C flag clear, otherwise the C
 \ flag gets set to indicate failure and the Y-th LSO entry gets set to 0.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The half-length of the line
 \
 \   YY(1 0)             The centre x-coordinate
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -19513,6 +19801,8 @@ ENDIF
 \   LSO+Y               If the line doesn't fit, LSO+Y is set to 0
 \
 \   Y                   Y is preserved
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -19625,6 +19915,8 @@ ENDIF
 \   K3(1 0)             Pixel x-coordinate of the centre of the circle
 \
 \   K4(1 0)             Pixel y-coordinate of the centre of the circle
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -19774,6 +20066,8 @@ ENDIF
 \
 \   * For keyboard, X and Y are integers between -1 and +1 depending on which
 \     keys are pressed
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -20087,6 +20381,8 @@ ENDIF
 \ after hyperspace, launch an escape pod, or die a cold, lonely death in the
 \ depths of space.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   Y                   Y is set to &FF
@@ -20162,6 +20458,8 @@ ENDIF
 \
 \ Zero-fill the INWK ship workspace and reset the orientation vectors, with
 \ nosev pointing out of the screen, towards us.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -20363,6 +20661,8 @@ ENDIF
 \ the value of the C flag on entry doesn't affect the outcome, as otherwise we
 \ might not get the same sequence of numbers if the C flag changes.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   DORND2              Make sure the C flag doesn't affect the outcome
@@ -20410,6 +20710,8 @@ ENDIF
 \ This section covers the following:
 \
 \   * Potentially spawn a trader, asteroid or cargo canister
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -20526,6 +20828,8 @@ ENDIF
 \
 \   * Make calls to update the dashboard
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   MLOOP               The entry point for the main game loop. This entry point
@@ -20582,6 +20886,8 @@ ENDIF
 \ f8), and when we finish buying or selling cargo in BAY2 to jump to the
 \ Inventory (red key f9).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   FRCE                The entry point for the main game loop if we want to
@@ -20622,6 +20928,8 @@ ENDIF
 \ This routine also checks for the "F" key press (search for a system), which
 \ applies to enhanced versions only.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The internal key number of the key pressed (see p.142 of
@@ -20631,6 +20939,8 @@ ENDIF
 \   X                   The amount to move the crosshairs in the x-axis
 \
 \   Y                   The amount to move the crosshairs in the y-axis
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -20822,6 +21132,8 @@ ENDIF
 \ station carrying 25 tonnes of slaves/narcotics, or 50 tonnes of firearms
 \ across multiple trips, is enough to make us a fugitive.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   A                   A value that determines how bad we are from the amount
@@ -20978,6 +21290,8 @@ ENDIF
 \ ------------------------------------------------------------------------------
 \
 \ BRKV is set to point to BR1 by the loading process.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -21177,6 +21491,8 @@ ENDIF
 \ Display the title screen, with a rotating ship and a text token at the bottom
 \ of the screen.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The number of the recursive token to show below the
@@ -21185,6 +21501,8 @@ ENDIF
 \
 \   X                   The type of the ship to show (see variable XX21 for a
 \                       list of ship types)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -21383,6 +21701,8 @@ ENDIF
 \
 \ This algorithm is also implemented in elite-checksum.py.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   A                   The checksum for the last saved commander data block
@@ -21491,11 +21811,15 @@ ENDIF
 \ If ESCAPE is pressed or a blank name is entered, then the name stored is set
 \ to the name from the last saved commander block.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   INWK                The full filename, including drive and directory, in
 \                       the form ":0.E.JAMESON", for example, terminated by a
 \                       return character (13)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -21563,6 +21887,8 @@ ENDIF
 \
 \ If ESCAPE is pressed or a blank name is entered, then an empty string is
 \ returned.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -21711,6 +22037,8 @@ ENDIF
 \
 \ Zero-fill from address (X SC) + Y to (X SC) + &FF.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   The high byte (i.e. the page) of the starting point of
@@ -21721,6 +22049,8 @@ ENDIF
 \
 \   SC                  The low byte (i.e. the offset into the page) of the
 \                       starting point of the zero-fill
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -21790,6 +22120,8 @@ ENDIF
 \ command at CTLI so that when that command is run, it catalogues the correct
 \ drive.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   C flag              Clear if a valid drive number was entered (0-3), set
@@ -21854,6 +22186,8 @@ ENDIF
 \ it displays a catalogue of the disc in that drive. It then asks for a filename
 \ to delete, updates the OS command at DELI so that when that command is run, it
 \ deletes the correct file, and then it does the deletion.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -22202,6 +22536,8 @@ ENDIF
 \ The filename should be stored at INWK, terminated with a carriage return (13).
 \ The routine should be called with Y set to &C.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   File operation to be performed. Can be one of the
@@ -22311,6 +22647,8 @@ ENDIF
 \
 \ The filename should be stored at INWK, terminated with a carriage return (13).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   LOR                 Set the C flag and return from the subroutine
@@ -22381,6 +22719,8 @@ ENDIF
 \ This is the equivalent of a *FX 200 command, which controls the behaviour of
 \ the ESCAPE and BREAK keys.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   Controls the behaviour as follows:
@@ -22429,6 +22769,8 @@ ENDIF
 \
 \ ------------------------------------------------------------------------------
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   SPS1+1              A BRK instruction
@@ -22470,6 +22812,8 @@ ENDIF
 \ we can then take the high bytes and use them as the most accurate 8-bit vector
 \ to normalise. Then the next stage (in routine NORM) does the normalisation.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   K3(2 1 0)           The 16-bit x-coordinate as (x_sign x_hi x_lo), where
@@ -22481,6 +22825,8 @@ ENDIF
 \   K3(8 7 6)           The 16-bit z-coordinate as (z_sign z_hi z_lo), where
 \                       z_sign is just bit 7
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   XX15                The normalised vector, with:
@@ -22490,6 +22836,8 @@ ENDIF
 \                         * The y-coordinate in XX15+1
 \
 \                         * The z-coordinate in XX15+2
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -22575,6 +22923,8 @@ ENDIF
 \ represent -1. This enables us to represent fractional values of less than 1
 \ using integers.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   XX15                The vector to normalise, with:
@@ -22585,11 +22935,15 @@ ENDIF
 \
 \                         * The z-coordinate in XX15+2
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   XX15                The normalised vector
 \
 \   Q                   The length of the original XX15 vector
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -22681,6 +23035,8 @@ ENDIF
 \
 \ This routine is effectively the same as OSBYTE 122, though the OSBYTE call
 \ preserves A, unlike this routine.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -22841,6 +23197,8 @@ ENDIF
 \ the volume of the first explosion, with a higher X giving a quieter sound
 \ (so X can be used to differentiate a laser strike from an explosion).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   The larger the value of X, the fainter the explosion.
@@ -22851,6 +23209,8 @@ ENDIF
 \
 \                         * 15 = explosion is quieter (i.e. this is just a laser
 \                                strike)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -22906,6 +23266,8 @@ ENDIF
 \       Type: Subroutine
 \   Category: Sound
 \    Summary: Make the sound whose number is in A
+\
+\ ------------------------------------------------------------------------------
 \
 \ ------------------------------------------------------------------------------
 \
@@ -22974,6 +23336,8 @@ ENDIF
 \   SOUND &13, &F4, &0C, &08
 \
 \ as the high bytes are always zero.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -23053,6 +23417,8 @@ ENDIF
 \                       the Advanced User Guide for a list of internal key
 \                       numbers)
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   A                   If the key in A is being pressed, A contains the
@@ -23115,6 +23481,8 @@ ENDIF
 \ will be inverted if the game has been configured to reverse both joystick
 \ channels (which can be done by pausing the game and pressing J).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   X                   The ADC channel to read:
@@ -23123,11 +23491,15 @@ ENDIF
 \
 \                         * 2 = joystick Y
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   (A X)               The 16-bit value read from channel X, with the value
 \                       inverted if the game has been configured to reverse the
 \                       joystick
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -23183,6 +23555,8 @@ ENDIF
 \ has been pressed in X, and the configuration option to check it against in Y,
 \ so this routine is typically called in a loop that loops through the various
 \ configuration options.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -23329,6 +23703,8 @@ ENDIF
 \   * If this is a space view, scan for secondary flight keys and update the
 \     relevant bytes in the key logger
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   DK9                 Set the Bitstik configuration option to the value in A
@@ -23465,6 +23841,8 @@ ENDIF
 \ released first (so this routine detects the first key down event following
 \ the subroutine call).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   X                   The ASCII code of the key that was pressed
@@ -23472,6 +23850,8 @@ ENDIF
 \   A                   Contains the same as X
 \
 \   Y                   Y is preserved
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -23574,6 +23954,8 @@ ENDIF
 \ Display an in-flight message in capitals at the bottom of the space view,
 \ erasing any existing in-flight message first.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   A                   The text token to be printed
@@ -23643,6 +24025,8 @@ ENDIF
 \ It inserts an item into the market prices table at QQ23. See the deep dive on
 \ "Market item prices and availability" for more information on how the market
 \ system works.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -24015,6 +24399,8 @@ ENDMACRO
 \
 \   X = 2, Y = 4, A = 0 ->
 \         A = -(nosev_y * roofv_y + nosev_z * roofv_z) / nosev_x
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -24436,10 +24822,14 @@ ENDMACRO
 \ This routine uses the same shift-and-subtract algorithm that's documented in
 \ TIS2, but it leaves the fractional result in the integer range 0-255.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   C flag              Set if the answer is too big for one byte, clear if the
 \                       division was a success
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -24523,6 +24913,8 @@ ENDMACRO
 \
 \ where the sign bytes only contain the sign bits, not magnitudes.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   C flag              Set if the addition overflowed, clear otherwise
@@ -24598,11 +24990,15 @@ ENDMACRO
 \ When called from part 6 of LL9, XX12 contains the vector [x y z] of the vertex
 \ we're analysing, and XX16 contains the transposed orientation vectors with
 \ each of them containing the x, y and z elements of the original vectors, so it
-\ returns:
+\ ------------------------------------------------------------------------------
+\
+\ Returns:
 \
 \   [ x ]   [ sidev_x ]         [ x ]   [ sidev_y ]         [ x ]   [ sidev_z ]
 \   [ y ] . [ roofv_x ]         [ y ] . [ roofv_y ]         [ y ] . [ roofv_z ]
 \   [ z ]   [ nosev_x ]         [ z ]   [ nosev_y ]         [ z ]   [ nosev_z ]
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -24629,6 +25025,8 @@ ENDMACRO
 \                         * x, y, z magnitudes in XX16+12, XX16+14, XX16+16
 \
 \                         * x, y, z signs in XX16+13, XX16+15, XX16+17
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -24739,6 +25137,8 @@ ENDMACRO
 \ In this code, XX1 is used to point to the current ship's data block at INWK
 \ (the two labels are interchangeable).
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   XX1                 XX1 shares its location with INWK, which contains the
@@ -24752,6 +25152,8 @@ ENDMACRO
 \                       contains the ship line heap address pointer
 \
 \   XX0                 The address of the blueprint for this ship
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -24914,6 +25316,8 @@ ENDMACRO
 \
 \ This part checks whether the ship is in our field of view, and whether it is
 \ close enough to be fully drawn (if not, we jump to SHPPT to draw it as a dot).
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -26169,6 +26573,8 @@ ENDMACRO
 \ XX3, where X points to the first free byte on the heap. Return by jumping down
 \ to LL66.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   X                   X is incremented by 1
@@ -26309,6 +26715,8 @@ ENDMACRO
 \
 \ Note that U is always zero when we get to this point, as the vertex is always
 \ in front of us (so it has a positive z-coordinate, into the screen).
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -27075,6 +27483,8 @@ ENDMACRO
 \ This part sets XX13 to reflect which of the two points are on-screen and
 \ off-screen.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   XX15(1 0)           x1 as a 16-bit coordinate (x1_hi x1_lo)
@@ -27084,6 +27494,8 @@ ENDMACRO
 \   XX15(5 4)           x2 as a 16-bit coordinate (x2_hi x2_lo)
 \
 \   XX12(1 0)           y2 as a 16-bit coordinate (y2_hi y2_lo)
+\
+\ ------------------------------------------------------------------------------
 \
 \ Returns:
 \
@@ -27114,6 +27526,8 @@ ENDMACRO
 \                         * 0 if the coordinates are still in the same order
 \
 \   Y                   Y is preserved
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -27580,6 +27994,8 @@ ENDMACRO
 \ This part adds all the visible edges to the ship line heap, so we can draw
 \ them in part 12.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Other entry points:
 \
 \   LL81+2              Draw the contents of the ship line heap, used to draw
@@ -27903,6 +28319,8 @@ ENDMACRO
 \
 \ See the deep dive on "Line-clipping" for more details.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   XX15(1 0)           x1 as a 16-bit coordinate (x1_hi x1_lo)
@@ -27923,11 +28341,15 @@ ENDMACRO
 \
 \                         * &FF if it's a steep slope
 \
+\ ------------------------------------------------------------------------------
+\
 \ Returns:
 \
 \   XX15                x1 as an 8-bit coordinate
 \
 \   XX15+2              y1 as an 8-bit coordinate
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -28108,6 +28530,8 @@ ENDMACRO
 \
 \ giving (Y X) the opposite sign to the slope direction in XX12+3.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   T                   The gradient of slope:
@@ -28115,6 +28539,8 @@ ENDMACRO
 \                         * 0 if it's a shallow slope
 \
 \                         * &FF if it's a steep slope
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -28220,6 +28646,8 @@ ENDMACRO
 \
 \ giving (Y X) the opposite sign to the slope direction in XX12+3.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   XX12+2              The line's gradient * 256 (so 1.0 = 256)
@@ -28235,6 +28663,8 @@ ENDMACRO
 \                         * 0 if it's a shallow slope
 \
 \                         * &FF if it's a steep slope
+\
+\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
@@ -28445,6 +28875,8 @@ ENDMACRO
 \ See the deep dive on "Printing extended text tokens" for details on how jump
 \ tokens are stored in the extended token table.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   n                   The jump number to insert into the table
@@ -28475,6 +28907,8 @@ ENDMACRO
 \
 \ See the deep dive on "Printing extended text tokens" for details on how
 \ characters are stored in the extended token table.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -28509,6 +28943,8 @@ ENDMACRO
 \ See the deep dive on "Printing extended text tokens" for details on how
 \ recursive tokens are stored in the extended token table.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   n                   The number of the recursive token to insert into the
@@ -28540,6 +28976,8 @@ ENDMACRO
 \
 \ See the deep dive on "Printing extended text tokens" for details on how
 \ two-letter tokens are stored in the extended token table.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -28617,6 +29055,8 @@ ENDMACRO
 \ See the deep dive on "Printing extended text tokens" for details on how
 \ random tokens are stored in the extended token table.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   n                   The number of the random token to insert into the
@@ -28652,6 +29092,8 @@ ENDMACRO
 \
 \ See the deep dive on "Printing text tokens" for details on how recursive
 \ tokens are stored in the recursive token table.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
@@ -32865,6 +33307,8 @@ ENDIF
 \ in the ship blueprints, and the deep dive on "Drawing ships" for information
 \ on how vertices are used to draw 3D wireframe ships.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   x                   The vertex's x-coordinate
@@ -32935,6 +33379,8 @@ ENDMACRO
 \ in the ship blueprints, and the deep dive on "Drawing ships" for information
 \ on how edges are used to draw 3D wireframe ships.
 \
+\ ------------------------------------------------------------------------------
+\
 \ Arguments:
 \
 \   vertex1             The number of the vertex at the start of the edge
@@ -32974,6 +33420,8 @@ ENDMACRO
 \ See the deep dive on "Ship blueprints" for details of how faces are stored
 \ in the ship blueprints, and the deep dive on "Drawing ships" for information
 \ on how faces are used to draw 3D wireframe ships.
+\
+\ ------------------------------------------------------------------------------
 \
 \ Arguments:
 \
