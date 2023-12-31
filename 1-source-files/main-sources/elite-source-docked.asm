@@ -571,6 +571,28 @@
  SKIP 1                 \ Temporary storage for saving the value of the Y
                         \ register, used in a number of places
 
+                        \ --- Mod: Code added for music: ---------------------->
+
+.musicWorkspace
+
+ SKIP 8                 \ Storage for the music player, &0092 to &0099 inclusive
+
+.musicRomNumber
+
+ SKIP 1                 \ The bank number of the sideways ROM slot containing
+                        \ the music player at &009A
+
+.musicStatus
+
+ SKIP 1                 \ A flag to determine whether to play the currently
+                        \ selected music:
+                        \
+                        \   * 0 = do not play the music
+                        \
+                        \   * Non-zero = do play the music
+
+                        \ --- End of added code ------------------------------->
+
 .XX17
 
  SKIP 1                 \ Temporary storage, used in BPRNT to store the number
@@ -746,26 +768,7 @@ SKIP 1                 \ This byte appears to be unused
 \
 \SKIP 4                 \ Temporary storage, used in a number of places
 
-
                         \ --- And replaced by: -------------------------------->
-
-.musicWorkspace
-
- SKIP 8                 \ Storage for the music player, &0092 to &0099 inclusive
-
-.musicRomNumber
-
- SKIP 1                 \ The bank number of the sideways ROM slot containing
-                        \ the music player at &009A
-
-.musicStatus
-
- SKIP 1                 \ A flag to determine whether to play the currently
-                        \ selected music:
-                        \
-                        \   * 0 = do not play the music
-                        \
-                        \   * Non-zero = do play the music
 
 .CNT2
 
@@ -23998,7 +24001,6 @@ ENDIF
 
  LDA #12                \ Process the "Q" and music-related options
  JSR PlayMusic
-
 
  BCC DK7                \ If no music-related options were changed, then the C
                         \ flag will be clear, so jump to DK7 to skip the
