@@ -14489,7 +14489,7 @@
 \
 \ So given an existing set of seeds in s0, s1 and s2, we can get the new values
 \ s0´, s1´ and s2´ simply by doing the above sums. And if we want to do the
-\ above in-place without creating three new w´ variables, then we can do the
+\ above in-place without creating three new s´ variables, then we can do the
 \ following:
 \
 \  tmp = s0 + s1
@@ -25964,8 +25964,6 @@ ENDIF
 \
 \ ------------------------------------------------------------------------------
 \
-\ ------------------------------------------------------------------------------
-\
 \ Other entry points:
 \
 \   SPS1+1              A BRK instruction
@@ -26665,8 +26663,6 @@ ENDIF
 \       Type: Subroutine
 \   Category: Sound
 \    Summary: Make the sound whose number is in A
-\
-\ ------------------------------------------------------------------------------
 \
 \ ------------------------------------------------------------------------------
 \
@@ -30879,8 +30875,8 @@ ENDMACRO
                         \
                         \   XX12(1 0) = y-coordinate of the end of the beam
                         \
-                        \ The end of the laser beam will be set positioned to
-                        \ look good, rather than being directly aimed at us, as
+                        \ The end of the laser beam will be positioned to look
+                        \ good, rather than being directly aimed at us, as
                         \ otherwise we would only see a flashing point of light
                         \ as they unleashed their attack
 
@@ -31828,8 +31824,6 @@ ENDMACRO
 \
 \ This part adds all the visible edges to the ship line heap, so we can draw
 \ them in part 12.
-\
-\ ------------------------------------------------------------------------------
 \
 \ Other entry points:
 \
