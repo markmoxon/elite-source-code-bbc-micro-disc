@@ -91,4 +91,5 @@ OSCLI "RUN SRLOAD MUSIC "+STR$(?romNumber)
 PRINT CHR$130;"OK"
 PRINT'"Press any key to play Elite";
 A$=GET$
+*DRIVE 2
 *RUN ELITED
