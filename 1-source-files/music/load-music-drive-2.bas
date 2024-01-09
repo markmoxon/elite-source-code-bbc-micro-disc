@@ -87,9 +87,9 @@ IF N% > 1 THEN PRINT "s";
 REM IF N% > 0 THEN FOR X% = ?&90 TO 15 : PRINT;" ";X%?&90; : NEXT
 ?romNumber=?(&90+?&90):REM STORE RAM BANK USED SOMEWHERE IN ZERO PAGE
 PRINT'"Loading music into RAM bank ";?romNumber;"...";
-OSCLI "RUN SRLOAD MUSIC "+STR$(?romNumber)
+*DRIVE 2
+OSCLI "SRLOAD MUSIC 8000 "+STR$(?romNumber)
 PRINT CHR$130;"OK"
 PRINT'"Press any key to play Elite";
 A$=GET$
-*DRIVE 2
 *RUN ELITED
