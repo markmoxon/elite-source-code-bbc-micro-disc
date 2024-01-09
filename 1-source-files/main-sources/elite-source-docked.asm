@@ -124,6 +124,13 @@
  CATD = &0D7A           \ The address of the CATD routine that is put in place
                         \ by the third loader, as set in elite-loader3.asm
 
+                        \ --- Mod: Code added for music: ---------------------->
+
+ LINSCN = &111C         \ The address of the part of the IRQ1 routine that gets
+                        \ run on the vertical sync, as set in elite-loader3.asm
+
+                        \ --- End of added code ------------------------------->
+
  IRQ1 = &114B           \ The address of the IRQ1 routine that implements the
                         \ split screen interrupt handler, as set in
                         \ elite-loader3.asm
@@ -175,11 +182,25 @@
  SKIP 4                 \ Four 8-bit seeds for the random number generation
                         \ system implemented in the DORND routine
 
-.TRTB%
+                        \ --- Mod: Code removed for music: -------------------->
 
- SKIP 2                 \ Contains the address of the keyboard translation
-                        \ table, which is used to translate internal key
-                        \ numbers to ASCII
+\.TRTB%
+\
+\SKIP 2                 \ Contains the address of the keyboard translation
+\                       \ table, which is used to translate internal key
+\                       \ numbers to ASCII
+
+                        \ --- And replaced by: -------------------------------->
+
+.XX4
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+.XX20
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+                        \ --- End of replacement ------------------------------>
 
 .T1
 
@@ -550,6 +571,28 @@
  SKIP 1                 \ Temporary storage for saving the value of the Y
                         \ register, used in a number of places
 
+                        \ --- Mod: Code added for music: ---------------------->
+
+.musicWorkspace
+
+ SKIP 8                 \ Storage for the music player, &0092 to &0099 inclusive
+
+.musicRomNumber
+
+ SKIP 1                 \ The bank number of the sideways ROM slot containing
+                        \ the music player at &009A
+
+.musicStatus
+
+ SKIP 1                 \ A flag to determine whether to play the currently
+                        \ selected music:
+                        \
+                        \   * 0 = do not play the music
+                        \
+                        \   * Non-zero = do play the music
+
+                        \ --- End of added code ------------------------------->
+
 .XX17
 
  SKIP 1                 \ Temporary storage, used in BPRNT to store the number
@@ -641,61 +684,69 @@
                         \ for counters when drawing explosion clouds and partial
                         \ circles
 
-.SWAP
+                        \ --- Mod: Code removed for music: -------------------->
 
- SKIP 1                 \ Temporary storage, used to store a flag that records
-                        \ whether or not we had to swap a line's start and end
-                        \ coordinates around when clipping the line in routine
-                        \ LL145 (the flag is used in places like BLINE to swap
-                        \ them back)
+\.SWAP
+\
+\SKIP 1                 \ Temporary storage, used to store a flag that records
+\                       \ whether or not we had to swap a line's start and end
+\                       \ coordinates around when clipping the line in routine
+\                       \ LL145 (the flag is used in places like BLINE to swap
+\                       \ them back)
+\
+\.COL
+\
+\SKIP 1                 \ Temporary storage, used to store colour information
+\                       \ when drawing pixels in the dashboard
+\
+\.FLAG
+\
+\SKIP 1                 \ A flag that's used to define whether this is the first
+\                       \ call to the ball line routine in BLINE, so it knows
+\                       \ whether to wait for the second call before storing
+\                       \ segment data in the ball line heap
 
-.COL
-
- SKIP 1                 \ Temporary storage, used to store colour information
-                        \ when drawing pixels in the dashboard
-
-.FLAG
-
- SKIP 1                 \ A flag that's used to define whether this is the first
-                        \ call to the ball line routine in BLINE, so it knows
-                        \ whether to wait for the second call before storing
-                        \ segment data in the ball line heap
+                        \ --- End of removed code ----------------------------->
 
 .CNT
 
  SKIP 1                 \ Temporary storage, typically used for storing the
                         \ number of iterations required when looping
 
-.CNT2
+                        \ --- Mod: Code removed for music: -------------------->
 
- SKIP 1                 \ Temporary storage, used in the planet-drawing routine
-                        \ to store the segment number where the arc of a partial
-                        \ circle should start
+\.CNT2
+\
+\SKIP 1                 \ Temporary storage, used in the planet-drawing routine
+\                       \ to store the segment number where the arc of a partial
+\                       \ circle should start
+\
+\.STP
+\
+\SKIP 1                 \ The step size for drawing circles
+\                       \
+\                       \ Circles in Elite are split up into 64 points, and the
+\                       \ step size determines how many points to skip with each
+\                       \ straight-line segment, so the smaller the step size,
+\                       \ the smoother the circle. The values used are:
+\                       \
+\                       \   * 2 for big planets and the circles on the charts
+\                       \   * 4 for medium planets and the launch tunnel
+\                       \   * 8 for small planets and the hyperspace tunnel
+\                       \
+\                       \ As the step size increases we move from smoother
+\                       \ circles at the top to more polygonal at the bottom.
+\                       \ See the CIRCLE2 routine for more details
+\
+\.XX4
+\
+\SKIP 1                 \ Temporary storage, used in a number of places
+\
+\.XX20
+\
+\SKIP 1                 \ Temporary storage, used in a number of places
 
-.STP
-
- SKIP 1                 \ The step size for drawing circles
-                        \
-                        \ Circles in Elite are split up into 64 points, and the
-                        \ step size determines how many points to skip with each
-                        \ straight-line segment, so the smaller the step size,
-                        \ the smoother the circle. The values used are:
-                        \
-                        \   * 2 for big planets and the circles on the charts
-                        \   * 4 for medium planets and the launch tunnel
-                        \   * 8 for small planets and the hyperspace tunnel
-                        \
-                        \ As the step size increases we move from smoother
-                        \ circles at the top to more polygonal at the bottom.
-                        \ See the CIRCLE2 routine for more details
-
-.XX4
-
- SKIP 1                 \ Temporary storage, used in a number of places
-
-.XX20
-
- SKIP 1                 \ Temporary storage, used in a number of places
+                        \ --- End of removed code ----------------------------->
 
                         \ --- Mod: Code removed for flicker-free ships: ------->
 
@@ -721,6 +772,68 @@
 
                         \ --- End of replacement ------------------------------>
 
+                        \ --- Mod: Code removed for music: -------------------->
+
+\.RAT
+\
+\SKIP 1                 \ Used to store different signs depending on the current
+\                       \ space view, for use in calculating stardust movement
+\
+\.RAT2
+\
+\SKIP 1                 \ Temporary storage, used to store the pitch and roll
+\                       \ signs when moving objects and stardust
+\
+\.K2
+\
+\SKIP 4                 \ Temporary storage, used in a number of places
+
+                        \ --- And replaced by: -------------------------------->
+
+.CNT2
+
+ SKIP 1                 \ Temporary storage, used in the planet-drawing routine
+                        \ to store the segment number where the arc of a partial
+                        \ circle should start
+
+.SWAP
+
+ SKIP 1                 \ Temporary storage, used to store a flag that records
+                        \ whether or not we had to swap a line's start and end
+                        \ coordinates around when clipping the line in routine
+                        \ LL145 (the flag is used in places like BLINE to swap
+                        \ them back)
+
+                        \ --- End of replacement ------------------------------>
+
+ORG &00D1
+
+.T
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+.K3
+
+ SKIP 0                 \ Temporary storage, used in a number of places
+
+                        \ --- Mod: Code removed for music: -------------------->
+
+\.XX2
+\
+\SKIP 14                \ Temporary storage, used to store the visibility of the
+\                       \ ship's faces during the ship-drawing routine at LL9
+
+                        \ --- And replaced by: -------------------------------->
+
+.XX2
+
+ SKIP 5                 \ Temporary storage, used to store the visibility of the
+                        \ ship's faces during the ship-drawing routine at LL9
+
+.K2
+
+ SKIP 4                 \ Temporary storage, used in a number of places
+
 .RAT
 
  SKIP 1                 \ Used to store different signs depending on the current
@@ -731,24 +844,36 @@
  SKIP 1                 \ Temporary storage, used to store the pitch and roll
                         \ signs when moving objects and stardust
 
-.K2
+.STP
 
- SKIP 4                 \ Temporary storage, used in a number of places
+ SKIP 1                 \ The step size for drawing circles
+                        \
+                        \ Circles in Elite are split up into 64 points, and the
+                        \ step size determines how many points to skip with each
+                        \ straight-line segment, so the smaller the step size,
+                        \ the smoother the circle. The values used are:
+                        \
+                        \   * 2 for big planets and the circles on the charts
+                        \   * 4 for medium planets and the launch tunnel
+                        \   * 8 for small planets and the hyperspace tunnel
+                        \
+                        \ As the step size increases we move from smoother
+                        \ circles at the top to more polygonal at the bottom.
+                        \ See the CIRCLE2 routine for more details
 
- ORG &00D1
+.COL
 
-.T
+ SKIP 1                 \ Temporary storage, used to store colour information
+                        \ when drawing pixels in the dashboard
 
- SKIP 1                 \ Temporary storage, used in a number of places
+.FLAG
 
-.K3
+ SKIP 1                 \ A flag that's used to define whether this is the first
+                        \ call to the ball line routine in BLINE, so it knows
+                        \ whether to wait for the second call before storing
+                        \ segment data in the ball line heap
 
- SKIP 0                 \ Temporary storage, used in a number of places
-
-.XX2
-
- SKIP 14                \ Temporary storage, used to store the visibility of the
-                        \ ship's faces during the ship-drawing routine at LL9
+                        \ --- End of replacement ------------------------------>
 
 .K4
 
@@ -2011,6 +2136,125 @@
 
 \ ******************************************************************************
 \
+\       Name: IRQMusic
+\       Type: Subroutine
+\   Category: Music
+\    Summary: The IRQ handler for playing music
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for music: ---------------------->
+
+.IRQMusic
+
+ STA VIA+&45            \ Re-do the instruction we replaced when inserting this
+                        \ routine into the standard IRQ1 interrupt handler
+
+ LDA musicStatus        \ If the music status flag is zero, then music is
+ BEQ mirq1              \ disabled, so jump to mirq1 to skip playing the
+                        \ currently selected music
+
+ JSR PlayMusic+3        \ Play the currently selected music
+
+.mirq1
+
+ JMP LINSCN+12          \ Jump back to the normal interrupt handler
+
+                        \ --- End of added code ------------------------------->
+
+\ ******************************************************************************
+\
+\       Name: PlayMusic
+\       Type: Subroutine
+\   Category: Music
+\    Summary: Select, play or stop music
+\
+\ ------------------------------------------------------------------------------
+\
+\ Arguments:
+\
+\   A                   The action to perform:
+\
+\                         * 0 = Select the title music
+\
+\                         * 3 = Select the docking music
+\
+\                         * 6 = Play the currently selected music
+\
+\                         * 9 = Stop the currently selected music
+\
+\ Other entry points:
+\
+\   PlayMusic+3         Repeat the last action (typically used to continue
+\                       playing in the interrupt routine)
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for music: ---------------------->
+
+.PlayMusic
+
+ STA play1+1            \ Modify JSR to jump to &8000 + A
+
+ LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
+ PHA                    \ store it on the stack
+
+ LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
+ STA &F4
+ STA &FE30
+
+ TYA                    \ Store X and Y on the stack
+ PHA
+ TXA
+ PHA
+
+.play1
+
+ JSR &8006              \ Call the relevant routine in the music ROM (this
+                        \ address is set to &80xx, where xx is the value of A
+                        \ that was passed to the routine)
+
+ PLA                    \ Retrieve X and Y from the stack
+ TAX
+ PLA
+ TAY
+
+ PLA                    \ Set the ROM number back to the value that we stored
+ STA &F4                \ above, to switch back to the previous ROM
+ STA &FE30
+
+ RTS                    \ Return from the subroutine
+
+                        \ --- End of added code ------------------------------->
+
+\ ******************************************************************************
+\
+\       Name: SFX
+\       Type: Variable
+\   Category: Sound
+\    Summary: Sound data
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code moved for music: ---------------------->
+
+.SFX
+
+ EQUB &12, &01, &00, &10    \ 0  - Lasers fired by us
+ EQUB &12, &02, &2C, &08    \ 8  - We're being hit by lasers
+ EQUB &11, &03, &F0, &18    \ 16 - We died 1 / We made a hit or kill 2
+ EQUB &10, &F1, &07, &1A    \ 24 - We died 2 / We made a hit or kill 1
+ EQUB &03, &F1, &BC, &01    \ 32 - Short, high beep
+ EQUB &13, &F4, &0C, &08    \ 40 - Long, low beep
+ EQUB &10, &F1, &06, &0C    \ 48 - Missile launched / Ship launched from station
+ EQUB &10, &02, &60, &10    \ 56 - Hyperspace drive engaged
+ EQUB &13, &04, &C2, &FF    \ 64 - E.C.M. on
+ EQUB &13, &00, &00, &00    \ 72 - E.C.M. off
+
+                        \ --- End of moved code ------------------------------->
+
+\ ******************************************************************************
+\
 \       Name: INBAY
 \       Type: Subroutine
 \   Category: Loader
@@ -2112,6 +2356,13 @@
 .DOENTRY
 
  JSR DEEOR              \ Decrypt the newly loaded code
+
+                        \ --- Mod: Code added for music: ---------------------->
+
+ JSR StopMusic          \ Stop any music that is currently playing and update
+                        \ the volume of sound effects in SFX
+
+                        \ --- End of added code ------------------------------->
 
  JSR RES2               \ Reset a number of flight variables and workspaces
 
@@ -10242,31 +10493,29 @@
 \
 \ ******************************************************************************
 
+                        \ --- Mod: Code removed for Compendium: --------------->
+
 {
+\LDX Q
+\BEQ MU1
+\DEX
+\STX T
+\LDA #0
+\LDX #8
+\LSR P
 
-                        \ --- Mod: Code removed for flicker-free ships: ------->
+\.MUL6
 
-\ LDX Q
-\ BEQ MU1
-\ DEX
-\ STX T
-\ LDA #0
+\BCC P%+4
+\ADC T
+\ROR A
+\ROR P
+\DEX
+\BNE MUL6
+\RTS
+}
 
                         \ --- End of removed code ----------------------------->
-
- LDX #8
- LSR P
-
-.MUL6
-
- BCC P%+4
- ADC T
- ROR A
- ROR P
- DEX
- BNE MUL6
- RTS
-}
 
 \ ******************************************************************************
 \
@@ -20297,18 +20546,22 @@ ENDIF
 \
 \ ******************************************************************************
 
-.SFX
+                        \ --- Mod: Code moved for music: ---------------------->
 
- EQUB &12, &01, &00, &10    \ 0  - Lasers fired by us
- EQUB &12, &02, &2C, &08    \ 8  - We're being hit by lasers
- EQUB &11, &03, &F0, &18    \ 16 - We died 1 / We made a hit or kill 2
- EQUB &10, &F1, &07, &1A    \ 24 - We died 2 / We made a hit or kill 1
- EQUB &03, &F1, &BC, &01    \ 32 - Short, high beep
- EQUB &13, &F4, &0C, &08    \ 40 - Long, low beep
- EQUB &10, &F1, &06, &0C    \ 48 - Missile launched / Ship launched from station
- EQUB &10, &02, &60, &10    \ 56 - Hyperspace drive engaged
- EQUB &13, &04, &C2, &FF    \ 64 - E.C.M. on
- EQUB &13, &00, &00, &00    \ 72 - E.C.M. off
+\.SFX
+\
+\EQUB &12, &01, &00, &10    \ 0  - Lasers fired by us
+\EQUB &12, &02, &2C, &08    \ 8  - We're being hit by lasers
+\EQUB &11, &03, &F0, &18    \ 16 - We died 1 / We made a hit or kill 2
+\EQUB &10, &F1, &07, &1A    \ 24 - We died 2 / We made a hit or kill 1
+\EQUB &03, &F1, &BC, &01    \ 32 - Short, high beep
+\EQUB &13, &F4, &0C, &08    \ 40 - Long, low beep
+\EQUB &10, &F1, &06, &0C    \ 48 - Missile launched / Ship launched from station
+\EQUB &10, &02, &60, &10    \ 56 - Hyperspace drive engaged
+\EQUB &13, &04, &C2, &FF    \ 64 - E.C.M. on
+\EQUB &13, &00, &00, &00    \ 72 - E.C.M. off
+
+                        \ --- End of moved code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -21254,15 +21507,35 @@ ENDIF
 
  JSR BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
 
- LDX #(CATF-COMC)       \ We start by zeroing all the configuration variables
-                        \ between COMC and CATF, to set them to their default
+                        \ --- Mod: Code removed for music: -------------------->
+
+\LDX #(CATF-COMC)       \ We start by zeroing all the configuration variables
+\                       \ between COMC and CATF, to set them to their default
+\                       \ values, so set a counter in X for CATF - COMC bytes
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDX #(CATF-COMC+1)     \ We start by zeroing all the configuration variables
+                        \ between COMC-1 and CATF, to set them to their default
                         \ values, so set a counter in X for CATF - COMC bytes
+                        \
+                        \ This also zeroes the music option flag at COMC-1
+
+                        \ --- End of replacement ------------------------------>
 
  LDA #0                 \ Set A = 0 so we can zero the variables
 
 .BEL1
 
- STA COMC,X             \ Zero the X-th configuration variable
+                        \ --- Mod: Code removed for music: -------------------->
+
+\STA COMC,X             \ Zero the X-th configuration variable
+
+                        \ --- And replaced by: -------------------------------->
+
+ STA COMC-1,X           \ Zero the X-th configuration variable
+
+                        \ --- End of replacement ------------------------------>
 
  DEX                    \ Decrement the loop counter
 
@@ -21319,6 +21592,32 @@ ENDIF
  JSR FX200              \ Disable the ESCAPE key and clear memory if the BREAK
                         \ key is pressed (*FX 200,3)
 
+                        \ --- Mod: Code added for music: ---------------------->
+
+ LDA #0                 \ Select the title music
+ JSR PlayMusic
+
+ LDA #6                 \ Modify the PlayMusic routine so it plays music on the
+ STA play1+1            \ next call
+
+ SEI                    \ Disable interrupts so we can update the interrupt
+                        \ handler
+
+ LDA #&4C               \ Insert JMP IRQMusic into the LINSCN handler, replacing
+ STA LINSCN+9           \ the STA VIA+&45 instruction, so the IRQMusic routine
+ LDA #LO(IRQMusic)      \ gets called on each vertical sync
+ STA LINSCN+10
+ LDA #HI(IRQMusic)
+ STA LINSCN+11
+
+ CLI                    \ Re-enable interrupts
+
+ LDA #&FF               \ Set the status flag to a non-zero value to indicate
+ STA musicStatus        \ we are playing music, so the title music starts
+                        \ playing
+
+                        \ --- End of added code ------------------------------->
+
  LDX #CYL               \ Call TITLE to show a rotating Cobra Mk III (#CYL) and
  LDA #6                 \ token 6 ("LOAD NEW {single cap}COMMANDER {all caps}
  JSR TITLE              \ (Y/N)?{sentence case}{cr}{cr}"), returning with the
@@ -21359,6 +21658,12 @@ ENDIF
  LDX #KRA               \ 7 ("PRESS SPACE OR FIRE,{single cap}COMMANDER.{cr}
  JSR TITLE              \ {cr}"), returning with the internal number of the key
                         \ pressed in A
+
+                        \ --- Mod: Code added for music: ---------------------->
+
+ JSR StopMusic          \ Stop the title music
+
+                        \ --- End of added code ------------------------------->
 
  JSR ping               \ Set the target system coordinates (QQ9, QQ10) to the
                         \ current system coordinates (QQ0, QQ1) we just loaded
@@ -21540,18 +21845,22 @@ ENDIF
  LDA #96                \ Set nosev_z hi = 96 (96 is the value of unity in the
  STA INWK+14            \ rotation vector)
 
- LDA &9F                \ As part of the copy protection, location &9F is set to
- CMP #219               \ 219 in the OSBmod routine in elite-loader3.asm. This
- BEQ tiwe               \ jumps to tiwe if the value is unchanged, otherwise it
-                        \ crashes the game with the following (as presumably
-                        \ the game code has been tampered with)
+                        \ --- Mod: Code removed for music: -------------------->
 
- LDA #&10               \ Modify the STA DELTA instruction in RES2 to &10 &FE,
- STA modify+2           \ which is a BPL P%-2 instruction, to create an infinite
- LDA #&FE               \ loop and hang the game
- STA modify+3
+\LDA &9F                \ As part of the copy protection, location &9F is set to
+\CMP #219               \ 219 in the OSBmod routine in elite-loader3.asm. This
+\BEQ tiwe               \ jumps to tiwe if the value is unchanged, otherwise it
+\                       \ crashes the game with the following (as presumably
+\                       \ the game code has been tampered with)
+\
+\LDA #&10               \ Modify the STA DELTA instruction in RES2 to &10 &FE,
+\STA modify+2           \ which is a BPL P%-2 instruction, to create an infinite
+\LDA #&FE               \ loop and hang the game
+\STA modify+3
+\
+\.tiwe
 
-.tiwe
+                        \ --- End of removed code ----------------------------->
 
  STA INWK+7             \ Set z_hi, the high byte of the ship's z-coordinate,
                         \ to 96, which is the distance at which the rotating
@@ -22378,6 +22687,12 @@ ENDIF
 \ ******************************************************************************
 
 .SVE
+
+                        \ --- Mod: Code added for music: ---------------------->
+
+ JSR StopMusic          \ Stop any music that is currently playing
+
+                        \ --- End of added code ------------------------------->
 
  JSR ZEBC               \ Call ZEBC to zero-fill pages &B and &C
 
@@ -23768,11 +24083,29 @@ ENDIF
 
 .DK55
 
- CPX #&10               \ If "Q" is not being pressed, skip to DK7
- BNE DK7
+                        \ --- Mod: Code removed for music: -------------------->
 
- STX DNOIZ              \ "Q" is being pressed, so set DNOIZ to X, which is
-                        \ non-zero (&10), so this will turn the sound off
+\CPX #&10               \ If "Q" is not being pressed, skip to DK7
+\BNE DK7
+\
+\STX DNOIZ              \ "Q" is being pressed, so set DNOIZ to X, which is
+\                       \ non-zero (&10), so this will turn the sound off
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDA #12                \ Process the "Q" and music-related options
+ JSR PlayMusic
+
+ BCC DK7                \ If no music-related options were changed, then the C
+                        \ flag will be clear, so jump to DK7 to skip the
+                        \ following
+
+ JSR BELL               \ Make a beep sound so we know something has happened
+
+ JSR DELAY              \ Wait for Y vertical syncs (Y is between 64 and 70, so
+                        \ this is always a bit longer than a second)
+
+                        \ --- End of replacement ------------------------------>
 
 .DK7
 
@@ -23889,13 +24222,41 @@ ENDIF
 
  BEQ t2                 \ Keep looping up to t2 until a key is pressed
 
+                        \ --- Mod: Code removed for music: -------------------->
+
+\TAY                    \ Copy A to Y, so Y contains the internal key number
+\                       \ of the key pressed
+\
+\LDA (TRTB%),Y          \ The address in TRTB% points to the MOS key
+\                       \ translation table, which is used to translate
+\                       \ internal key numbers to ASCII, so this fetches the
+\                       \ key's ASCII code into A
+
+                        \ --- And replaced by: -------------------------------->
+
+ PHA                    \ Store the key pressed in A on the stack
+
+ LDA #172               \ Call OSBYTE 172 to read the address of the MOS
+ LDX #0                 \ keyboard translation table into (Y X)
+ LDY #&FF
+ JSR OSBYTE
+
+ STX trtb+1             \ Store the address of the keyboard translation table in
+ STY trtb+2             \ the LDA &FFFF,Y instruction below
+
+ PLA                    \ Retrieve A from the stack
+
  TAY                    \ Copy A to Y, so Y contains the internal key number
                         \ of the key pressed
 
- LDA (TRTB%),Y          \ The address in TRTB% points to the MOS key
+.trtb
+
+ LDA &FFFF,Y            \ This is modified by the above to point to the MOS key
                         \ translation table, which is used to translate
                         \ internal key numbers to ASCII, so this fetches the
                         \ key's ASCII code into A
+
+                        \ --- End of replacement ------------------------------>
 
  LDY YSAV               \ Restore the original value of Y we stored above
 
@@ -34309,11 +34670,7 @@ ENDMACRO
 \
 \ ******************************************************************************
 
-                        \ --- Mod: Code removed for BBC Master disc Elite: ---->
-
-\SKIP 171               \ These bytes appear to be unused
-
-                        \ --- And replaced by: -------------------------------->
+                        \ --- Mod: Code added for BBC Master disc Elite: ------>
 
 .SwitchToMosRom
 
@@ -34324,7 +34681,34 @@ ENDMACRO
 
  RTS                    \ Return from the subroutine
 
- SKIP 154               \ These bytes appear to be unused
+                        \ --- End of added code ------------------------------->
+
+\ ******************************************************************************
+\
+\       Name: StopMusic
+\       Type: Subroutine
+\   Category: Music
+\    Summary: Stop any music that is currently playing
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for music: ---------------------->
+
+.StopMusic
+
+ LDA #9                 \ Stop any music that is currently playing and select
+ JMP PlayMusic          \ the docking music, returning from the subroutine using
+                        \ a tail call
+
+                        \ --- End of added code ------------------------------->
+
+                        \ --- Mod: Code removed for Compendium: --------------->
+
+\SKIP 171               \ These bytes appear to be unused
+
+                        \ --- And replaced by: -------------------------------->
+
+ SKIP 72               \ These bytes appear to be unused
 
                         \ --- End of added code ------------------------------->
 

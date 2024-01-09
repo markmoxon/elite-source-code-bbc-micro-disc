@@ -65,7 +65,7 @@ scramble3_eor = 0xA5
 
 # ELITE, ASOFT and CpASOFT blocks, plus padding to the end of the file
 scramble4_from = 0x2A75     # ELITE
-scramble4_to = 0x2E33       # End of ELITE4 file
+scramble4_to = 0x2E43       # End of ELITE4 file
 scramble4_eor = 0xA5
 
 # Commander file checksum
@@ -147,8 +147,8 @@ elite_file.close()
 
 # SC routine, which EORs bytes between &1300 and &55FF
 
-for n in range(scramble_from, scramble_to):
-    data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
+# for n in range(scramble_from, scramble_to):
+#     data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
 
 # Write output file for D.CODE
 

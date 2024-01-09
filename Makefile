@@ -1,32 +1,7 @@
 BEEBASM?=beebasm
 PYTHON?=python
 
-# A make command with no arguments will build the Stairway to Hell variant
-# with encrypted binaries, checksums enabled, the standard commander and
-# crc32 verification of the game binaries
-#
-# Optional arguments for the make command are:
-#
-#   variant=<release>   Build the specified variant:
-#
-#                         sth (default)
-#                         ib-disc
-#
-#   commander=max       Start with a maxed-out commander
-#
-#   encrypt=no          Disable encryption and checksum routines
-#
-#   match=no            Do not attempt to match the original game binaries
-#                       (i.e. omit workspace noise)
-#
-#   verify=no           Disable crc32 verification of the game binaries
-#
-# So, for example:
-#
-#   make variant=ib-disc commander=max encrypt=no match=no verify=no
-#
-# will build an unencrypted Ian Bell disc variant with a maxed-out commander,
-# no workspace noise and no crc32 verification
+# Music is only supported in the Stairway to Hell variant
 
 ifeq ($(commander), max)
   max-commander=TRUE
@@ -48,15 +23,9 @@ else
   match-original-binaries=TRUE
 endif
 
-ifeq ($(variant), ib-disc)
-  variant-number=1
-  folder=/ib-disc
-  suffix=-bbc-master-flicker-free-ib-disc
-else
-  variant-number=2
-  folder=/sth
-  suffix=-bbc-master-flicker-free-sth
-endif
+variant-number=2
+folder=/sth
+suffix=-elite-compendium-sth
 
 .PHONY:all
 all:
@@ -90,7 +59,7 @@ all:
 	$(BEEBASM) -i 1-source-files/main-sources/elite-ships-p.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-readme.asm -v >> 3-assembled-output/compile.txt
 	$(PYTHON) 2-build-files/elite-checksum.py $(unencrypt) -rel$(variant-number)
-	$(BEEBASM) -i 1-source-files/main-sources/elite-disc.asm -do 5-compiled-game-discs/elite-disc$(suffix).ssd -boot ELITE2 -title "E L I T E"
+	$(BEEBASM) -i 1-source-files/main-sources/elite-disc.asm -do 5-compiled-game-discs/elite-disc$(suffix).ssd -opt 3 -title "E L I T E"
 ifneq ($(verify), no)
 	@$(PYTHON) 2-build-files/crc32.py 4-reference-binaries$(folder) 3-assembled-output
 endif

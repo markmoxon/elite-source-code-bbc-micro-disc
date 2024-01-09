@@ -135,7 +135,15 @@
 
  SKIP 2                 \ Used in the copy protection code
 
- ORG &008B
+                        \ --- Mod: Code removed for music: -------------------->
+
+\ORG &008B
+
+                        \ --- And replaced by: -------------------------------->
+
+ ORG &0095
+
+                        \ --- End of replacement ------------------------------>
 
 .DL
 

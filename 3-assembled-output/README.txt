@@ -1,14 +1,8 @@
 
 ---------------------------------------
-Acornsoft Elite (flicker-free version)
+Acornsoft Elite (compendium version)
 
-Version: BBC Master 128 version of the
-         original BBC Micro release
-Variant: Stairway to Hell archive
-Product: Acornsoft SNG38
-         Acornsoft SNG47
-
-BBC Master 128 conversion by Mark Moxon
+For the BBC Micro with 16K sideways RAM
 
 Contains the flicker-free ship drawing
 routines from the BBC Master version,
@@ -17,8 +11,24 @@
 Contains flicker-free planet drawing
 routines by Mark Moxon
 
+Based on the Acornsoft SNG38 release
+of Elite by Ian Bell and David Braben
+Copyright (c) Acornsoft 1984
+
+Sound routines by Kieran Connell and
+Simon Morris
+
+Original music by Aidan Bell and Julie
+Dunn (c) D. Braben and I. Bell 1985,
+ported from the C64 by Negative Charge
+
+Elite integration by Mark Moxon
+
+Sideways RAM detection and loading
+routines by Tricky and J.G.Harston
+
 See www.bbcelite.com for details
 
-Build: 2023-02-22 11:59:57
+Build: 2024-01-09 12:34:30
 ---------------------------------------
 
