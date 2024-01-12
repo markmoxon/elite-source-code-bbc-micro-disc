@@ -28,6 +28,8 @@ See the [introduction](#introduction) for more information, or jump straight int
 
 * [BBC Micro Elite on the BBC Master](#bbc-micro-elite-on-the-bbc-master)
 
+* [Elite Compendium](#elite-compendium)
+
 * [Building Elite from the source](#building-elite-from-the-source)
 
   * [Requirements](#requirements)
@@ -156,6 +158,14 @@ The annotated source files in the `bbc-master` branch contain both the original 
 The repository also includes a variant of the BBC Master version that incorporates both the flicker-free ship-drawing routines and a fix for planets so they no longer flicker. The flicker-free code is in a separate branch called `bbc-master-flicker-free`.
 
 For more information on the port to the BBC Master, see the [hacks section of the accompanying website](https://www.bbcelite.com/hacks/bbc_master_disc_elite.html).
+
+## Elite Compendium
+
+This repository also includes a version of BBC Micro disc Elite for the Elite Compendium, which incorporates all the available hacks in one game. The Compendium version is in a separate branch called `elite-compendium`, which is included in the [Elite Compendium](https://github.com/markmoxon/elite-compendium) repository as a submodule.
+
+The annotated source files in the `elite-compendium` branch contain both the original Acornsoft code and all of the modifications for the Elite Compendium, so you can look through the source to see exactly what's changed. Any code that I've removed from the original version is commented out in the source files, so when they are assembled they produce the Compendium binaries, while still containing details of all the modifications. You can find all the diffs by searching the sources for `Mod:`.
+
+For more information on the Elite Compendium, see the [hacks section of the accompanying website](https://www.bbcelite.com/hacks/elite_compendium.html).
 
 ## Building Elite from the source
 
