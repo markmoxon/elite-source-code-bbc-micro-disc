@@ -11,7 +11,7 @@
 \ in the documentation are entirely my fault
 \
 \ The terminology and notations used in this commentary are explained at
-\ https://www.bbcelite.com/about_site/terminology_used_in_this_commentary.html
+\ https://www.bbcelite.com/terminology
 \
 \ The deep dive articles referred to in this commentary can be found at
 \ https://www.bbcelite.com/deep_dives
@@ -37,12 +37,19 @@
 \
 \ ******************************************************************************
 
+ CODE% = &2F00          \ The address where the code will be run
+
+ LOAD% = &2F00          \ The address where the code will be loaded
+
  BYTEV = &020A          \ The BYTEV vector that we check as part of the copy
                         \ protection
 
  OSWRCH = &FFEE         \ The address for the OSWRCH routine
+
  OSBYTE = &FFF4         \ The address for the OSBYTE routine
+
  OSWORD = &FFF1         \ The address for the OSWORD routine
+
  OSCLI = &FFF7          \ The address for the OSCLI routine
 
 \ ******************************************************************************
@@ -66,9 +73,6 @@
 \ ELITE LOADER
 \
 \ ******************************************************************************
-
- CODE% = &2F00
- LOAD% = &2F00
 
  ORG CODE%
 
