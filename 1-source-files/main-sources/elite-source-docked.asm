@@ -11,7 +11,7 @@
 \ in the documentation are entirely my fault
 \
 \ The terminology and notations used in this commentary are explained at
-\ https://www.bbcelite.com/about_site/terminology_used_in_this_commentary.html
+\ https://www.bbcelite.com/terminology
 \
 \ The deep dive articles referred to in this commentary can be found at
 \ https://www.bbcelite.com/deep_dives
@@ -37,6 +37,10 @@
 \
 \ ******************************************************************************
 
+ CODE% = &11E3          \ The address where the code will be run
+
+ LOAD% = &11E3          \ The address where the code will be loaded
+
  NOST = 18              \ The number of stardust particles in normal space (this
                         \ goes down to 3 in witchspace)
 
@@ -46,24 +50,43 @@
  NTY = 31               \ The number of different ship types
 
  MSL = 1                \ Ship type for a missile
+
  SST = 2                \ Ship type for a Coriolis space station
+
  ESC = 3                \ Ship type for an escape pod
+
  PLT = 4                \ Ship type for an alloy plate
+
  OIL = 5                \ Ship type for a cargo canister
+
  AST = 7                \ Ship type for an asteroid
+
  SPL = 8                \ Ship type for a splinter
+
  SHU = 9                \ Ship type for a Shuttle
+
  CYL = 11               \ Ship type for a Cobra Mk III
+
  ANA = 14               \ Ship type for an Anaconda
+
  COPS = 16              \ Ship type for a Viper
+
  SH3 = 17               \ Ship type for a Sidewinder
+
  KRA = 19               \ Ship type for a Krait
+
  ADA = 20               \ Ship type for an Adder
+
  WRM = 23               \ Ship type for a Worm
+
  CYL2 = 24              \ Ship type for a Cobra Mk III (pirate)
+
  ASP = 25               \ Ship type for an Asp Mk II
+
  THG = 29               \ Ship type for a Thargoid
+
  TGL = 30               \ Ship type for a Thargon
+
  CON = 31               \ Ship type for a Constrictor
 
  JL = ESC               \ Junk is defined as starting from the escape pod
@@ -84,17 +107,27 @@
                         \ stored in INWK and K%)
 
  X = 128                \ The centre x-coordinate of the 256 x 192 space view
+
  Y = 96                 \ The centre y-coordinate of the 256 x 192 space view
 
  f0 = &20               \ Internal key number for red key f0 (Launch, Front)
+
  f1 = &71               \ Internal key number for red key f1 (Buy Cargo, Rear)
+
  f2 = &72               \ Internal key number for red key f2 (Sell Cargo, Left)
+
  f3 = &73               \ Internal key number for red key f3 (Equip Ship, Right)
+
  f4 = &14               \ Internal key number for red key f4 (Long-range Chart)
+
  f5 = &74               \ Internal key number for red key f5 (Short-range Chart)
+
  f6 = &75               \ Internal key number for red key f6 (Data on System)
+
  f7 = &16               \ Internal key number for red key f7 (Market Price)
+
  f8 = &76               \ Internal key number for red key f8 (Status Mode)
+
  f9 = &77               \ Internal key number for red key f9 (Inventory)
 
  NRU% = 25              \ The number of planetary systems with extended system
@@ -148,9 +181,13 @@
                         \ known as SHEILA)
 
  OSBYTE = &FFF4         \ The address for the OSBYTE routine
+
  OSWORD = &FFF1         \ The address for the OSWORD routine
+
  OSFILE = &FFDD         \ The address for the OSFILE routine
+
  OSWRCH = &FFEE         \ The address for the OSWRCH routine
+
  OSCLI = &FFF7          \ The address for the OSCLI routine
 
 \ ******************************************************************************
@@ -1954,9 +1991,6 @@
 \ ELITE A FILE
 \
 \ ******************************************************************************
-
- CODE% = &11E3
- LOAD% = &11E3
 
  ORG CODE%
 
@@ -4280,6 +4314,7 @@
 \ ******************************************************************************
 
  CODE_B% = P%
+
  LOAD_B% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
@@ -8765,6 +8800,7 @@
 \ ******************************************************************************
 
  CODE_C% = P%
+
  LOAD_C% = LOAD% +P% - CODE%
 
 \ ******************************************************************************
@@ -12530,6 +12566,7 @@
 \ ******************************************************************************
 
  CODE_D% = P%
+
  LOAD_D% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
@@ -17082,6 +17119,7 @@ ENDIF
 \ ******************************************************************************
 
  CODE_E% = P%
+
  LOAD_E% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
@@ -20225,6 +20263,7 @@ ENDIF
 \ ******************************************************************************
 
  CODE_F% = P%
+
  LOAD_F% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
@@ -24505,6 +24544,7 @@ ENDMACRO
 \ ******************************************************************************
 
  CODE_G% = P%
+
  LOAD_G% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
@@ -28334,6 +28374,7 @@ ENDMACRO
 \ ******************************************************************************
 
  CODE_H% = P%
+
  LOAD_H% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
@@ -32676,6 +32717,7 @@ ENDIF
 \ ******************************************************************************
 
  CODE_SHIPS% = P%
+
  LOAD_SHIPS% = LOAD% + P% - CODE%
 
 \ ******************************************************************************
