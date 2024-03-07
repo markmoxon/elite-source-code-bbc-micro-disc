@@ -37,14 +37,19 @@
 \
 \ ******************************************************************************
 
- OSNEWL = &FFE7         \ The address for the OSNEWL routine
- OSWRCH = &FFEE         \ The address for the OSWRCH routine
- OSBYTE = &FFF4         \ The address for the OSBYTE routine
- OSWORD = &FFF1         \ The address for the OSWORD routine
- OSCLI = &FFF7          \ The address for the OSCLI vector
+ CODE% = &5700			\ The address where the code will be run
 
- CODE% = &5700
- LOAD% = &5700
+ LOAD% = &5700			\ The address where the code will be loaded
+
+ OSNEWL = &FFE7         \ The address for the OSNEWL routine
+
+ OSWRCH = &FFEE         \ The address for the OSWRCH routine
+
+ OSBYTE = &FFF4         \ The address for the OSBYTE routine
+
+ OSWORD = &FFF1         \ The address for the OSWORD routine
+
+ OSCLI = &FFF7          \ The address for the OSCLI vector
 
 \ ******************************************************************************
 \

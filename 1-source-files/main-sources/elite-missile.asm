@@ -40,8 +40,9 @@
 \
 \ ******************************************************************************
 
- CODE% = &7F00
- LOAD% = &244B
+ CODE% = &7F00			\ The address where the code will be run
+
+ LOAD% = &244B			\ The address where the code will be loaded
 
  ORG CODE%
 

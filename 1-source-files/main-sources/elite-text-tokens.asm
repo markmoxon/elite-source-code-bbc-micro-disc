@@ -47,11 +47,12 @@
 \
 \ ******************************************************************************
 
+ CODE_WORDS% = &0400    \ The address where the text data will be run
+
+ LOAD_WORDS% = &254B    \ The address where the text data will be loaded
+
  RE = &23               \ The obfuscation byte used to hide the recursive tokens
                         \ table from crackers viewing the binary code
-
- CODE_WORDS% = &0400
- LOAD_WORDS% = &254B
 
  ORG CODE_WORDS%
 

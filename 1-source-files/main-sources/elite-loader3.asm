@@ -37,6 +37,10 @@
 \
 \ ******************************************************************************
 
+ CODE% = &1900          \ The address where the code will be run
+
+ LOAD% = &1900          \ The address where the code will be loaded
+
  Q% = _MAX_COMMANDER    \ Set Q% to TRUE to max out the default commander, FALSE
                         \ for the standard default commander
 
@@ -80,8 +84,11 @@
                         \ known as SHEILA)
 
  OSWRCH = &FFEE         \ The address for the OSWRCH routine
+
  OSBYTE = &FFF4         \ The address for the OSBYTE routine
+
  OSWORD = &FFF1         \ The address for the OSWORD routine
+
  OSCLI = &FFF7          \ The address for the OSCLI vector
 
 \ ******************************************************************************
@@ -152,9 +159,6 @@
 \ ELITE LOADER
 \
 \ ******************************************************************************
-
- CODE% = &1900
- LOAD% = &1900
 
  ORG CODE%
 
