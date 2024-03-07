@@ -1,6 +1,6 @@
 # Fully documented source code for the disc version of Elite on the BBC Micro
 
-[BBC Micro cassette Elite](https://github.com/markmoxon/cassette-elite-beebasm) | **BBC Micro disc Elite** | [6502 Second Processor Elite](https://github.com/markmoxon/6502sp-elite-beebasm) | [BBC Master Elite](https://github.com/markmoxon/master-elite-beebasm) | [Acorn Electron Elite](https://github.com/markmoxon/electron-elite-beebasm) | [NES Elite](https://github.com/markmoxon/nes-elite-beebasm) | [Elite-A](https://github.com/markmoxon/elite-a-beebasm) | [Teletext Elite](https://github.com/markmoxon/teletext-elite) | [Elite Universe Editor](https://github.com/markmoxon/elite-universe-editor) | [Flicker-free C64 Elite](https://github.com/markmoxon/c64-elite-flicker-free) | [Aviator](https://github.com/markmoxon/aviator-beebasm) | [Revs](https://github.com/markmoxon/revs-beebasm)
+[BBC Micro cassette Elite](https://github.com/markmoxon/cassette-elite-beebasm) | **BBC Micro disc Elite** | [6502 Second Processor Elite](https://github.com/markmoxon/6502sp-elite-beebasm) | [BBC Master Elite](https://github.com/markmoxon/master-elite-beebasm) | [Acorn Electron Elite](https://github.com/markmoxon/electron-elite-beebasm) | [NES Elite](https://github.com/markmoxon/nes-elite-beebasm) | [Elite-A](https://github.com/markmoxon/elite-a-beebasm) | [Teletext Elite](https://github.com/markmoxon/teletext-elite) | [Elite Universe Editor](https://github.com/markmoxon/elite-universe-editor) | [Elite Compendium](https://github.com/markmoxon/elite-compendium) | [Elite over Econet](https://github.com/markmoxon/elite-over-econet) | [Flicker-free Commodore 64 Elite](https://github.com/markmoxon/c64-elite-flicker-free) | [BBC Micro Aviator](https://github.com/markmoxon/aviator-beebasm) | [BBC Micro Revs](https://github.com/markmoxon/revs-beebasm) | [Archimedes Lander](https://github.com/markmoxon/archimedes-lander)
 
 ![Screenshot of the first mission in the disc version of Elite on the BBC Micro](https://www.bbcelite.com/images/github/mission1a.png)
 
@@ -27,6 +27,8 @@ See the [introduction](#introduction) for more information, or jump straight int
 * [BBC Micro Elite with music](#bbc-micro-elite-with-music)
 
 * [BBC Micro Elite on the BBC Master](#bbc-micro-elite-on-the-bbc-master)
+
+* [Elite Compendium](#elite-compendium)
 
 * [Building Elite from the source](#building-elite-from-the-source)
 
@@ -99,7 +101,7 @@ If you want to browse the source in an IDE, you might find the following useful.
 
   * The game's loader is in the [elite-loader1.asm](1-source-files/main-sources/elite-loader1.asm), [elite-loader2.asm](1-source-files/main-sources/elite-loader2.asm) and [elite-loader3.asm](1-source-files/main-sources/elite-loader3.asm) files - these are mainly concerned with setup and copy protection.
 
-* It's probably worth skimming through the [notes on terminology and notations](https://www.bbcelite.com/about_site/terminology_used_in_this_commentary.html) on the accompanying website, as this explains a number of terms used in the commentary, without which it might be a bit tricky to follow at times (in particular, you should understand the terminology I use for multi-byte numbers).
+* It's probably worth skimming through the [notes on terminology and notations](https://www.bbcelite.com/terminology/) on the accompanying website, as this explains a number of terms used in the commentary, without which it might be a bit tricky to follow at times (in particular, you should understand the terminology I use for multi-byte numbers).
 
 * The accompanying website contains [a number of "deep dive" articles](https://www.bbcelite.com/deep_dives/), each of which goes into an aspect of the game in detail. Routines that are explained further in these articles are tagged with the label `Deep dive:` and the relevant article name.
 
@@ -157,6 +159,14 @@ The repository also includes a variant of the BBC Master version that incorporat
 
 For more information on the port to the BBC Master, see the [hacks section of the accompanying website](https://www.bbcelite.com/hacks/bbc_master_disc_elite.html).
 
+## Elite Compendium
+
+This repository also includes a version of BBC Micro disc Elite for the Elite Compendium, which incorporates all the available hacks in one game. The Compendium version is in a separate branch called `elite-compendium`, which is included in the [Elite Compendium](https://github.com/markmoxon/elite-compendium) repository as a submodule.
+
+The annotated source files in the `elite-compendium` branch contain both the original Acornsoft code and all of the modifications for the Elite Compendium, so you can look through the source to see exactly what's changed. Any code that I've removed from the original version is commented out in the source files, so when they are assembled they produce the Compendium binaries, while still containing details of all the modifications. You can find all the diffs by searching the sources for `Mod:`.
+
+For more information on the Elite Compendium, see the [hacks section of the accompanying website](https://www.bbcelite.com/hacks/elite_compendium.html).
+
 ## Building Elite from the source
 
 Builds are supported for both Windows and Mac/Linux systems. In all cases the build process is defined in the `Makefile` provided.
@@ -167,7 +177,7 @@ You will need the following to build Elite from the source:
 
 * BeebAsm, which can be downloaded from the [BeebAsm repository](https://github.com/stardot/beebasm). Mac and Linux users will have to build their own executable with `make code`, while Windows users can just download the `beebasm.exe` file.
 
-* Python. Both versions 2.7 and 3.x should work.
+* Python. The build process has only been tested on 3.x, but 2.7 should work.
 
 * Mac and Linux users may need to install `make` if it isn't already present (for Windows users, `make.exe` is included in this repository).
 

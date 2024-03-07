@@ -11,7 +11,7 @@
 \ in the documentation are entirely my fault
 \
 \ The terminology and notations used in this commentary are explained at
-\ https://www.bbcelite.com/about_site/terminology_used_in_this_commentary.html
+\ https://www.bbcelite.com/terminology
 \
 \ The deep dive articles referred to in this commentary can be found at
 \ https://www.bbcelite.com/deep_dives
@@ -37,14 +37,19 @@
 \
 \ ******************************************************************************
 
- OSNEWL = &FFE7         \ The address for the OSNEWL routine
- OSWRCH = &FFEE         \ The address for the OSWRCH routine
- OSBYTE = &FFF4         \ The address for the OSBYTE routine
- OSWORD = &FFF1         \ The address for the OSWORD routine
- OSCLI = &FFF7          \ The address for the OSCLI vector
+ CODE% = &5700			\ The address where the code will be run
 
- CODE% = &5700
- LOAD% = &5700
+ LOAD% = &5700			\ The address where the code will be loaded
+
+ OSNEWL = &FFE7         \ The address for the OSNEWL routine
+
+ OSWRCH = &FFEE         \ The address for the OSWRCH routine
+
+ OSBYTE = &FFF4         \ The address for the OSBYTE routine
+
+ OSWORD = &FFF1         \ The address for the OSWORD routine
+
+ OSCLI = &FFF7          \ The address for the OSCLI vector
 
 \ ******************************************************************************
 \
