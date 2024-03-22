@@ -333,7 +333,7 @@ or this on a Mac or Linux:
 make variant=sth
 ```
 
-This will produce a file called `elite-disc-sth.NES` in the `5-compiled-game-discs` folder that contains the Stairway to Hell variant.
+This will produce a file called `elite-disc-sth.ssd` in the `5-compiled-game-discs` folder that contains the Stairway to Hell variant.
 
 The verification checksums for this version are as follows:
 
