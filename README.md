@@ -502,7 +502,7 @@ The sideways RAM variant has the following extra features:
 
 * The missile blueprint is the version from the non-disc versions
 
-* The scanner shows space station, asteroids, escape pods and cargo in red, as opposed to the yellow/green of the original
+* The scanner shows the space station, asteroids, escape pods and cargo in red, as opposed to the yellow/green of the original
 
 * Different parts of the copy protection are disabled compared to the other variants
 
