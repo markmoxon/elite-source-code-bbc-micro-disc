@@ -58,7 +58,7 @@ else ifeq ($(variant), sideways-ram)
   variant-number=3
   folder=/sideways-ram
   suffix=-flicker-free-sideways-ram
-  boot=-opt 2
+  boot=-opt 3
 else
   variant-number=2
   folder=/sth
