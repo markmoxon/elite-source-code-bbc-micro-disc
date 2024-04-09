@@ -28,6 +28,7 @@
 
  _IB_DISC               = (_VARIANT = 1)
  _STH_DISC              = (_VARIANT = 2)
+ _SRAM_DISC             = (_VARIANT = 3)
 
  GUARD &7C00            \ Guard against assembling over screen memory
 
@@ -37,9 +38,9 @@
 \
 \ ******************************************************************************
 
- CODE% = &5700			\ The address where the code will be run
+ CODE% = &5700          \ The address where the code will be run
 
- LOAD% = &5700			\ The address where the code will be loaded
+ LOAD% = &5700          \ The address where the code will be loaded
 
  OSNEWL = &FFE7         \ The address for the OSNEWL routine
 
