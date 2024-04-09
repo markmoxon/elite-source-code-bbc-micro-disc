@@ -45,13 +45,14 @@ See the [introduction](#introduction) for more information, or jump straight int
 
   * [Building the Stairway to Hell variant](#building-the-stairway-to-hell-variant)
   * [Building the Ian Bell disc variant](#building-the-ian-bell-disc-variant)
+  * [Building the sideways RAM variant](#building-the-sideways-ram-variant)
   * [Differences between the variants](#differences-between-the-variants)
 
 ## Introduction
 
 This repository contains source code for the disc version of Elite on the BBC Micro, with every single line documented and (for the most part) explained.
 
-You can build the fully functioning game from this source. [Two variants](#building-different-variants-of-the-disc-version-of-elite) are currently supported: the version from Ian Bell's personal website, and the version from the Stairway to Hell archive.
+You can build the fully functioning game from this source. [Three variants](#building-different-variants-of-the-disc-version-of-elite) are currently supported: the disc version from Ian Bell's personal website, the disc version from the Stairway to Hell archive, and the unreleased sideways RAM variant from Ian Bell's personal website.
 
 It is a companion to the [bbcelite.com website](https://www.bbcelite.com), which contains all the code from this repository, but laid out in a much more human-friendly fashion. The links at the top of this page will take you to repositories for the other versions of Elite that are covered by this project.
 
@@ -217,6 +218,7 @@ By default the build process will create a typical Elite game disc with a standa
 
   * `variant=sth` (default)
   * `variant=ib-disc`
+  * `variant=sideways-ram`
 
 * `commander=max` - Start with a maxed-out commander (specifically, this is the test commander file from the original source, which is almost but not quite maxed-out)
 
@@ -317,6 +319,8 @@ This repository contains the source code for two different variants of the disc 
 
 * The variant from the game disc on Ian Bell's website
 
+* The sideways RAM variant from Ian Bell's website
+
 By default the build process builds the Stairway to Hell variant, but you can build a specified variant using the `variant=` build parameter.
 
 ### Building the Stairway to Hell variant
@@ -368,6 +372,7 @@ ec04b4d2   5376  ec04b4d2   5376   Yes   ELITE4.bin
 42f42f63  19997  42f42f63  19997   Yes   T.CODE.bin
 8819c78b  19997  8819c78b  19997   Yes   T.CODE.unprot.bin
 52bac547   1024  52bac547   1024   Yes   WORDS.bin
+-             -  fbf74546    883    -    MNUCODE.bin
 ```
 
 ### Building the Ian Bell disc variant
@@ -422,21 +427,88 @@ e99072dc    256  -             -    -    ELITE6.bin
 6b22a971  19997  6b22a971  19997   Yes   T.CODE.bin
 a1cf4199  19997  a1cf4199  19997   Yes   T.CODE.unprot.bin
 52bac547   1024  52bac547   1024   Yes   WORDS.bin
+-             -  fbf74546    883    -    MNUCODE.bin
 ```
 
 The failed matches are because I haven't yet converted the loader into BeebAsm source files (see the next section for details).
 
+### Building the sideways RAM variant
+
+You can build the sideways RAM variant by appending `variant=sideways-ram` to the `make` command, like this on Windows:
+
+```
+make.bat variant=sideways-ram
+```
+
+or this on a Mac or Linux:
+
+```
+make variant=sideways-ram
+```
+
+This will produce a file called `elite-disc-sideways-ram.ssd` in the `5-compiled-game-discs` folder that contains the sideways RAM variant.
+
+The verification checksums for this version are as follows:
+
+```
+Results for variant: sideways-ram
+[--originals--]  [---output----]
+Checksum   Size  Checksum   Size  Match  Filename
+-----------------------------------------------------------
+5917731b  17437  5917731b  17437   Yes   D.CODE.bin
+5917731b  17437  5917731b  17437   Yes   D.CODE.unprot.bin
+9f4a04fd   2560  9f4a04fd   2560   Yes   D.MOA.bin
+d9eb34f9   2560  d9eb34f9   2560   Yes   D.MOB.bin
+93fe2e13   2560  93fe2e13   2560   Yes   D.MOC.bin
+64e8ebb4   2560  64e8ebb4   2560   Yes   D.MOD.bin
+80afbff9   2560  80afbff9   2560   Yes   D.MOE.bin
+b86fe100   2560  b86fe100   2560   Yes   D.MOF.bin
+72f99614   2560  72f99614   2560   Yes   D.MOG.bin
+29b6ce81   2560  29b6ce81   2560   Yes   D.MOH.bin
+0eeab415   2560  0eeab415   2560   Yes   D.MOI.bin
+7911181d   2560  7911181d   2560   Yes   D.MOJ.bin
+851d789f   2560  851d789f   2560   Yes   D.MOK.bin
+3025e5d8   2560  3025e5d8   2560   Yes   D.MOL.bin
+d6c01098   2560  d6c01098   2560   Yes   D.MOM.bin
+6930e1c7   2560  6930e1c7   2560   Yes   D.MON.bin
+43caddc7   2560  43caddc7   2560   Yes   D.MOO.bin
+ac1d57b2   2560  ac1d57b2   2560   Yes   D.MOP.bin
+f1c2e0e6   5376  f1c2e0e6   5376   Yes   ELITE4.bin
+5a89086e   5376  5a89086e   5376   Yes   ELITE4.unprot.bin
+4f2febe4    256  4f2febe4    256   Yes   MISSILE.bin
+fbf74546    883  fbf74546    883   Yes   MNUCODE.bin
+201036b2  19997  201036b2  19997   Yes   T.CODE.bin
+201036b2  19997  201036b2  19997   Yes   T.CODE.unprot.bin
+52bac547   1024  52bac547   1024   Yes   WORDS.bin
+-             -  c73d535a    256    -    ELITE2.bin
+-             -  17eefeec   2816    -    ELITE3.bin
+```
+
 ### Differences between the variants
 
-You can see the differences between the variants by searching the source code for `_STH_DISC` (for features in the Stairway to Hell variant) or `_IB_DISC` (for features in the Ian Bell game disc variant). There are only a few differences:
+You can see the differences between the variants by searching the source code for `_STH_DISC` (for features in the Stairway to Hell variant), `_IB_DISC` (for features in the Ian Bell game disc variant) or `_SRAM_DISC` (for features in the sideways RAM variant). There are only a few differences between the Ian Bell variant and the others:
 
-* The Ian Bell variant contains the refund bug, which has been fixed in the Stairway to Hell variant
+* The Ian Bell variant contains the refund bug, which has been fixed in the other variants
 
-* The Ian Bell variant never spawns asteroids, which has been fixed in the Stairway to Hell variant
+* The Ian Bell variant never spawns asteroids, which has been fixed in the other variants
 
-* The Ian Bell variant sets bit 2 of the competition flag in the commander file, while the Stairway to Hell variant sets bit 5
+* The Ian Bell variant sets bit 2 of the competition flag in the commander file, while the other variants set bit 5
 
-In other words, the Ian Bell variant appears to be the very first release of the disc version of Elite, while the Stairway to Hell variant has both bugs fixed and a bumped-up number in the competition flag.
+In other words, the Ian Bell variant appears to be the very first release of the disc version of Elite, while the Stairway to Hell and sideways RAM variants have both bugs fixed and a bumped-up number in the competition flag.
+
+The sideways RAM variant has the following extra features:
+
+* The missile blueprint is the version from the non-disc versions
+
+* The scanner shows space station, asteroids, escape pods and cargo in red, as opposed to the yellow/green of the original
+
+* All ship blueprints are available in sideways RAM at the same time, so all ship types can appear at any time without the restrictions of the disc version's blueprint files, and loading is quicker on launch and there is no disc access at all when hyperspacing
+
+* Different parts of the copy protection are disabled compared to the other variants
+
+* The main docked and flight binaries in D.CODE and T.CODE are not encrypted
+
+* The sideways RAM loader is a mod in the true sense, in that it works with the normal disc version, converting it to work with sideways RAM
 
 See the [accompanying website](https://www.bbcelite.com/disc/releases.html) for a comprehensive list of differences between the variants.
 
