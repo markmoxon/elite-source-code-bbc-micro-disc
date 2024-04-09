@@ -889,8 +889,8 @@
                         \ contains the address of the edges data for the
                         \ blueprint we are processing
                         \
-                        \ We now use these valus to calculate the offset for the
-                        \ edges data within sideways RAM
+                        \ We now use these values to calculate the offset for
+                        \ the edges data within sideways RAM
                         \
                         \ First, we take the address in (U T), which is an
                         \ address within the X-th blueprint in the loaded ship
@@ -945,7 +945,7 @@
 \       Type: Subroutine
 \   Category: Loader
 \    Summary: Fetch details on all the ROMs in the BBC Micro (i.e. the host) and
-\             populate the sram%, used%, dpl% and eliterom% variables
+\             populate the sram%, used%, dupl% and eliterom% variables
 \
 \ ******************************************************************************
 
@@ -980,7 +980,7 @@
 
 .tbbc2
 
- PLA                    \ Retrieve the type of of ROM in bank X and store it in
+ PLA                    \ Retrieve the type of ROM in bank X and store it in
  STA &8000+6            \ byte #6 of the ROM header, to reverse the above change
 
                         \ We now check if ROM bank X contains a ROM image, and
@@ -1193,7 +1193,7 @@
 \       Name: titleMatch
 \       Type: Variable
 \   Category: Loader
-\    Summary: The title of the the Elite ROM, used to check whether the ROM is
+\    Summary: The title of the Elite ROM, used to check whether the ROM is
 \             already installed in a ROM bank
 \
 \ ******************************************************************************
