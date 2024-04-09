@@ -498,15 +498,15 @@ In other words, the Ian Bell variant appears to be the very first release of the
 
 The sideways RAM variant has the following extra features:
 
+* All ship blueprints are available in sideways RAM at the same time, so all ship types can appear at any time without the restrictions of the disc version's blueprint files, and loading is quicker on launch and there is no disc access at all when hyperspacing
+
 * The missile blueprint is the version from the non-disc versions
 
 * The scanner shows space station, asteroids, escape pods and cargo in red, as opposed to the yellow/green of the original
 
-* All ship blueprints are available in sideways RAM at the same time, so all ship types can appear at any time without the restrictions of the disc version's blueprint files, and loading is quicker on launch and there is no disc access at all when hyperspacing
-
 * Different parts of the copy protection are disabled compared to the other variants
 
-* The main docked and flight binaries in D.CODE and T.CODE are not encrypted
+* The main docked and flight binaries in T.CODE and D.CODE are not encrypted
 
 * The sideways RAM loader is a mod in the true sense, in that it works with the normal disc version, converting it to work with sideways RAM
 
