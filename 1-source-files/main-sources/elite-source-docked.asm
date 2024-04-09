@@ -28,6 +28,7 @@
 
  _IB_DISC               = (_VARIANT = 1)
  _STH_DISC              = (_VARIANT = 2)
+ _SRAM_DISC             = (_VARIANT = 3)
 
  GUARD &6000            \ Guard against assembling over screen memory
 
@@ -2068,6 +2069,8 @@
 
 .DEEOR
 
+IF _STH_DISC OR _IB_DISC
+
  LDY #0                 \ We're going to work our way through a large number of
                         \ encrypted bytes, so we set Y to 0 to be the index of
                         \ the current byte within its page in memory
@@ -2111,6 +2114,36 @@
  JMP BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
                         \ and return from the subroutine using a tail call
 
+ELIF _SRAM_DISC
+
+ NOP                    \ The sideways RAM variant is not encrypted, so the
+ NOP                    \ decryption code is disabled and is replaced by NOPs
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+
+ JMP BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
+                        \ and return from the subroutine using a tail call
+
+ENDIF
 \ ******************************************************************************
 \
 \       Name: DOENTRY
@@ -16953,7 +16986,7 @@
 \
 \ ******************************************************************************
 
-IF _STH_DISC
+IF _STH_DISC OR _SRAM_DISC
 
  NOP                    \ In the first version of disc Elite, there was a nasty
  NOP                    \ bug where buying a laser that you already owned
@@ -21438,7 +21471,7 @@ ENDIF
 
 .tZ
 
-IF _STH_DISC
+IF _STH_DISC OR _SRAM_DISC
 
  ORA #%00100000         \ Set bit 5 of A to denote that this is the disc version
                         \ with the refund bug fixed (in versions before the bug
@@ -32607,7 +32640,7 @@ ENDMACRO
 \
 \ ******************************************************************************
 
-IF _STH_DISC
+IF _STH_DISC OR _SRAM_DISC
 
  EQUB &45, &4E          \ These bytes appear to be unused
  EQUB &44, &2D

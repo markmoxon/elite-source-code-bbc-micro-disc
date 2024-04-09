@@ -30,9 +30,25 @@
 
  INCLUDE "1-source-files/main-sources/elite-build-options.asm"
 
+ _IB_DISC               = (_VARIANT = 1)
+ _STH_DISC              = (_VARIANT = 2)
+ _SRAM_DISC             = (_VARIANT = 3)
+
+IF _STH_DISC OR _IB_DISC
+
  PUTFILE "3-assembled-output/ELITE2.bin", "ELITE2", &FF2F00, &FF2F23
  PUTFILE "3-assembled-output/ELITE3.bin", "ELITE3", &FF5700, &FF5700
  PUTFILE "3-assembled-output/ELITE4.bin", "ELITE4", &FF1900, &FF197B
+
+ELIF _SRAM_DISC
+
+ PUTFILE "1-source-files/boot-files/$.!BOOT.bin", "!BOOT", &FFFFFF, &FFFFFF
+ PUTFILE "1-source-files/boot-files/$.MENU.bin", "MENU", &FF1900, &FF8023
+ PUTFILE "1-source-files/boot-files/$.SCREEN.bin", "SCREEN", &007800, &007BE8
+ PUTFILE "3-assembled-output/MNUCODE.bin", "MNUCODE", &007400, &00743B
+ PUTFILE "3-assembled-output/ELITE4.bin", "INTRO", &001900, &00197B
+
+ENDIF
 
  PUTFILE "3-assembled-output/D.CODE.bin", "D.CODE", &0011E3, &0011E3
  PUTFILE "3-assembled-output/T.CODE.bin", "T.CODE", &0011E3, &0011E3

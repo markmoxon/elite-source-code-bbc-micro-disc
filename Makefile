@@ -11,6 +11,7 @@ PYTHON?=python
 #
 #                         sth (default)
 #                         ib-disc
+#                         sideways-ram
 #
 #   commander=max       Start with a maxed-out commander
 #
@@ -52,10 +53,17 @@ ifeq ($(variant), ib-disc)
   variant-number=1
   folder=/ib-disc
   suffix=-ib-disc
+  boot=-boot ELITE2
+else ifeq ($(variant), sideways-ram)
+  variant-number=3
+  folder=/sideways-ram
+  suffix=-sideways-ram
+  boot=-opt 2
 else
   variant-number=2
   folder=/sth
   suffix=-sth
+  boot=-boot ELITE2
 endif
 
 .PHONY:all
@@ -70,6 +78,7 @@ all:
 	$(BEEBASM) -i 1-source-files/main-sources/elite-loader1.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-loader2.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-loader3.asm -v >> 3-assembled-output/compile.txt
+	$(BEEBASM) -i 1-source-files/main-sources/elite-loader-sideways-ram.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-source-flight.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-source-docked.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-ships-a.asm -v >> 3-assembled-output/compile.txt
@@ -90,7 +99,7 @@ all:
 	$(BEEBASM) -i 1-source-files/main-sources/elite-ships-p.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-readme.asm -v >> 3-assembled-output/compile.txt
 	$(PYTHON) 2-build-files/elite-checksum.py $(unencrypt) -rel$(variant-number)
-	$(BEEBASM) -i 1-source-files/main-sources/elite-disc.asm -do 5-compiled-game-discs/elite-disc$(suffix).ssd -boot ELITE2 -title "E L I T E"
+	$(BEEBASM) -i 1-source-files/main-sources/elite-disc.asm -do 5-compiled-game-discs/elite-disc$(suffix).ssd $(boot) -title "E L I T E"
 ifneq ($(verify), no)
 	@$(PYTHON) 2-build-files/crc32.py 4-reference-binaries$(folder) 3-assembled-output
 endif
