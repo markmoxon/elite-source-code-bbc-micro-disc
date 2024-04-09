@@ -6577,9 +6577,23 @@
  STA SZ,Y               \ z_hi so the new particle starts in the far distance
  STA ZZ
 
+IF _STH_DISC OR _IB_DISC
+
  LDA Y1                 \ Set A to the new value of y_hi. This has no effect as
                         \ STC1 starts with a jump to PIXEL2, which starts with a
                         \ LDA instruction
+
+ELIF _SRAM_DISC
+
+                        \ --- Mod: Code removed for flicker-free ships: ------->
+
+\LDA Y1                 \ Set A to the new value of y_hi. This has no effect as
+\                       \ STC1 starts with a jump to PIXEL2, which starts with a
+\                       \ LDA instruction
+
+                        \ --- End of removed code ----------------------------->
+
+ENDIF
 
  JMP STC1               \ Jump up to STC1 to draw this new particle
 
@@ -13775,11 +13789,27 @@
  LDA S                  \ Set A = |S|
  AND #%01111111
 
+IF _STH_DISC OR _IB_DISC
+
  BMI DV9                \ If bit 7 of A is set, jump down to DV9 to skip the
                         \ left-shifting of the denominator (though this branch
                         \ instruction has no effect as bit 7 of the above AND
                         \ can never be set, which is why this instruction was
                         \ removed from later versions)
+
+ELIF _SRAM_DISC
+
+                        \ --- Mod: Code removed for flicker-free ships: ------->
+
+\BMI DV9                \ If bit 7 of A is set, jump down to DV9 to skip the
+\                       \ left-shifting of the denominator (though this branch
+\                       \ instruction has no effect as bit 7 of the above AND
+\                       \ can never be set, which is why this instruction was
+\                       \ removed from later versions)
+
+                        \ --- End of removed code ----------------------------->
+
+ENDIF
 
 .DVL6
 
@@ -33995,9 +34025,9 @@ ENDMACRO
                         \ add them together to get the result we're after, and
                         \ then set the sign afterwards
 
- LDA K                  \ We now do the following sum:
- CLC                    \
- ADC K2                 \   (A y_hi y_lo -) = K(3 2 1 0) + K2(3 2 1 0)
+LDA K                   \ We now do the following sum:
+CLC                     \
+ADC K2                  \   (A y_hi y_lo -) = K(3 2 1 0) + K2(3 2 1 0)
                         \
                         \ starting with the low bytes (which we don't keep)
                         \
@@ -34746,13 +34776,26 @@ ELIF _SRAM_DISC
 
                         \ --- And replaced by: -------------------------------->
 
+ LDX #&F0               \ Set X to the default scanner colour of yellow/white
+                        \ (a 4-pixel mode 5 byte in colour 2)
+ 
+ CMP #MSL               \ If the ship type in A is that of a missile, then jump
+ BEQ scol1              \ to scol1 to return from the subroutine with the colour
+                        \ set to yellow/white
+ 
  LDX #&FF               \ Set X to the default scanner colour of green/cyan
                         \ (a 4-pixel mode 5 byte in colour 3)
+ 
+ CMP #SHU               \ If the ship type in A is that of a Shuttle or greater,
+ BCS scol1              \ then it is a ship, so jump to scol1 to return from the
+                        \ subroutine with the colour set to green/cyan
+ 
+ LDX #&0F               \ Otherwise set X to the default scanner colour of red
+                        \ (a 4-pixel mode 5 byte in colour 1), to use as the
+                        \ scanner colour for the space station, asteroids,
+                        \ escape pods and cargo
 
- CMP #MSL               \ If this is not a missile, skip the following
- BNE P%+4               \ instruction
-
- LDX #&F0               \ This is a missile, so set X to colour 2 (yellow/white)
+.scol1
 
                         \ --- End of replacement ------------------------------>
 
