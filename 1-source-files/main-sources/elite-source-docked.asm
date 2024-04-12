@@ -32894,6 +32894,14 @@ ENDMACRO
  EQUB 120               \ Token 36: a random extended token between 120 and 124
  EQUB 125               \ Token 37: a random extended token between 125 and 129
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+\ INSERT ECONET CODE HERE
+
+PRINT "Free space for Econet = ", ~(&55FF - P%)
+
+                        \ --- End of replacement ------------------------------>
+
 \ ******************************************************************************
 \
 \       Name: Checksum
@@ -32903,45 +32911,56 @@ ENDMACRO
 \
 \ ******************************************************************************
 
-IF _STH_DISC OR _SRAM_DISC
+                        \ --- Mod: Code removed for Elite-A: ------------------>
 
- EQUB &45, &4E          \ These bytes appear to be unused
- EQUB &44, &2D
- EQUB &45, &4E
- EQUB &44, &2D
- EQUB &45, &4E
- EQUB &44, &52
- EQUB &50, &53
- EQUB &00, &8E
- EQUB &11, &D8
- EQUB &00, &00
- EQUB &06, &56
- EQUB &52, &49
- EQUB &45
+\IF _STH_DISC OR _SRAM_DISC
+\
+\ EQUB &45, &4E         \ These bytes appear to be unused
+\ EQUB &44, &2D
+\ EQUB &45, &4E
+\ EQUB &44, &2D
+\ EQUB &45, &4E
+\ EQUB &44, &52
+\ EQUB &50, &53
+\ EQUB &00, &8E
+\ EQUB &11, &D8
+\ EQUB &00, &00
+\ EQUB &06, &56
+\ EQUB &52, &49
+\ EQUB &45
+\
+\ EQUB &E6              \ This checksum is at location &55FF, and is checked in
+\                       \ the LOAD routine in elite-loader3.asm
+\
+\ELIF _IB_DISC
+\
+\ EQUB &45, &4E         \ These bytes appear to be unused
+\ EQUB &44, &2D
+\ EQUB &45, &4E
+\ EQUB &44, &2D
+\ EQUB &45, &4E
+\ EQUB &44, &8E
+\ EQUB &13, &1C
+\ EQUB &00, &00
+\ EQUB &73, &56
+\ EQUB &52, &49
+\ EQUB &53, &00
+\ EQUB &8E, &13
+\ EQUB &34
+\
+\ EQUB &B3              \ This checksum is at location &55FF, and is checked in
+\                       \ the LOAD routine in elite-loader3.asm
+\
+\ENDIF
+
+                        \ --- And replaced by: -------------------------------->
+
+ ORG &55FF
 
  EQUB &E6               \ This checksum is at location &55FF, and is checked in
                         \ the LOAD routine in elite-loader3.asm
 
-ELIF _IB_DISC
-
- EQUB &45, &4E          \ These bytes appear to be unused
- EQUB &44, &2D
- EQUB &45, &4E
- EQUB &44, &2D
- EQUB &45, &4E
- EQUB &44, &8E
- EQUB &13, &1C
- EQUB &00, &00
- EQUB &73, &56
- EQUB &52, &49
- EQUB &53, &00
- EQUB &8E, &13
- EQUB &34
-
- EQUB &B3               \ This checksum is at location &55FF, and is checked in
-                        \ the LOAD routine in elite-loader3.asm
-
-ENDIF
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
