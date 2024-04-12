@@ -14653,8 +14653,8 @@ ENDIF
  JSR spc                \ 67 + A, followed by a space, so:
                         \
                         \   A = 0 prints token 67 ("LARGE") and a space
-                        \   A = 1 prints token 67 ("FIERCE") and a space
-                        \   A = 2 prints token 67 ("SMALL") and a space
+                        \   A = 1 prints token 68 ("FIERCE") and a space
+                        \   A = 2 prints token 69 ("SMALL") and a space
 
 .TT205
 
@@ -14708,14 +14708,14 @@ ENDIF
 
  ADC #242               \ A = 0 to 7, so print recursive token 82 + A, so:
  JSR TT27               \
-                        \   A = 0 prints token 76 ("RODENT")
-                        \   A = 1 prints token 76 ("FROG")
-                        \   A = 2 prints token 76 ("LIZARD")
-                        \   A = 3 prints token 76 ("LOBSTER")
-                        \   A = 4 prints token 76 ("BIRD")
-                        \   A = 5 prints token 76 ("HUMANOID")
-                        \   A = 6 prints token 76 ("FELINE")
-                        \   A = 7 prints token 76 ("INSECT")
+                        \   A = 0 prints token 82 ("RODENT")
+                        \   A = 1 prints token 83 ("FROG")
+                        \   A = 2 prints token 84 ("LIZARD")
+                        \   A = 3 prints token 85 ("LOBSTER")
+                        \   A = 4 prints token 86 ("BIRD")
+                        \   A = 5 prints token 87 ("HUMANOID")
+                        \   A = 6 prints token 88 ("FELINE")
+                        \   A = 7 prints token 89 ("INSECT")
 
 .TT76
 
@@ -16581,6 +16581,12 @@ ENDIF
 \ Arguments:
 \
 \   A                   The text token to be printed
+\
+\ ------------------------------------------------------------------------------
+\
+\ Other entry points:
+\
+\   prq+3               Print a question mark
 \
 \ ******************************************************************************
 
