@@ -3643,116 +3643,120 @@ ENDIF
 \
 \ ******************************************************************************
 
- AND #%10000000         \ Clear bits 0-6 of A
+                        \ --- Mod: Code removed for Econet: ------------------->
 
-.MVT1
+\ AND #%10000000        \ Clear bits 0-6 of A
+\
+\.MVT1
+\
+\ ASL A                 \ Set the C flag to the sign bit of the delta, leaving
+\                       \ delta_hi << 1 in A
+\
+\ STA S                 \ Set S = delta_hi << 1
+\                       \
+\                       \ This also clears bit 0 of S
+\
+\ LDA #0                \ Set T = just the sign bit of delta (in bit 7)
+\ ROR A
+\ STA T
+\
+\ LSR S                 \ Set S = delta_hi >> 1
+\                       \       = |delta_hi|
+\                       \
+\                       \ This also clear the C flag, as we know that bit 0 of
+\                       \ S was clear before the LSR
+\
+\ EOR INWK+2,X          \ If T EOR x_sign has bit 7 set, then x_sign and delta
+\ BMI MV10              \ have different signs, so jump to MV10
+\
+\                       \ At this point, we know x_sign and delta have the same
+\                       \ sign, that sign is in T, and S contains |delta_hi|,
+\                       \ so now we want to do:
+\                       \
+\                       \   (x_sign x_hi x_lo) = (x_sign x_hi x_lo) + (S R)
+\                       \
+\                       \ and then set the sign of the result to the same sign
+\                       \ as x_sign and delta
+\
+\ LDA R                 \ First we add the low bytes, so:
+\ ADC INWK,X            \
+\ STA INWK,X            \   x_lo = x_lo + R
+\
+\ LDA S                 \ Then we add the high bytes:
+\ ADC INWK+1,X          \
+\ STA INWK+1,X          \   x_hi = x_hi + S
+\
+\ LDA INWK+2,X          \ And finally we add any carry into x_sign, and if the
+\ ADC #0                \ sign of x_sign and delta in T is negative, make sure
+\ ORA T                 \ the result is negative (by OR'ing with T)
+\ STA INWK+2,X
+\
+\ RTS                   \ Return from the subroutine
+\
+\.MV10
+\
+\                       \ If we get here, we know x_sign and delta have
+\                       \ different signs, with delta's sign in T, and
+\                       \ |delta_hi| in S, so now we want to do:
+\                       \
+\                       \   (x_sign x_hi x_lo) = (x_sign x_hi x_lo) - (S R)
+\                       \
+\                       \ and then set the sign of the result according to
+\                       \ the signs of x_sign and delta
+\
+\ LDA INWK,X            \ First we subtract the low bytes, so:
+\ SEC                   \
+\ SBC R                 \   x_lo = x_lo - R
+\ STA INWK,X
+\
+\ LDA INWK+1,X          \ Then we subtract the high bytes:
+\ SBC S                 \
+\ STA INWK+1,X          \   x_hi = x_hi - S
+\
+\ LDA INWK+2,X          \ And finally we subtract any borrow from bits 0-6 of
+\ AND #%01111111        \ x_sign, and give the result the opposite sign bit to T
+\ SBC #0                \ (i.e. give it the sign of the original x_sign)
+\ ORA #%10000000
+\ EOR T
+\ STA INWK+2,X
+\
+\ BCS MV11              \ If the C flag is set by the above SBC, then our sum
+\                       \ above didn't underflow and is correct - to put it
+\                       \ another way, (x_sign x_hi x_lo) >= (S R) so the result
+\                       \ should indeed have the same sign as x_sign, so jump to
+\                       \ MV11 to return from the subroutine
+\
+\                       \ Otherwise our subtraction underflowed because
+\                       \ (x_sign x_hi x_lo) < (S R), so we now need to flip the
+\                       \ subtraction around by using two's complement to this:
+\                       \
+\                       \   (S R) - (x_sign x_hi x_lo)
+\                       \
+\                       \ and then we need to give the result the same sign as
+\                       \ (S R), the delta, as that's the dominant figure in the
+\                       \ sum
+\
+\ LDA #1                \ First we subtract the low bytes, so:
+\ SBC INWK,X            \
+\ STA INWK,X            \   x_lo = 1 - x_lo
+\
+\ LDA #0                \ Then we subtract the high bytes:
+\ SBC INWK+1,X          \
+\ STA INWK+1,X          \   x_hi = 0 - x_hi
+\
+\ LDA #0                \ And then we subtract the sign bytes:
+\ SBC INWK+2,X          \
+\                       \   x_sign = 0 - x_sign
+\
+\ AND #%01111111        \ Finally, we set the sign bit to the sign in T, the
+\ ORA T                 \ sign of the original delta, as the delta is the
+\ STA INWK+2,X          \ dominant figure in the sum
+\
+\.MV11
+\
+\ RTS                   \ Return from the subroutine
 
- ASL A                  \ Set the C flag to the sign bit of the delta, leaving
-                        \ delta_hi << 1 in A
-
- STA S                  \ Set S = delta_hi << 1
-                        \
-                        \ This also clears bit 0 of S
-
- LDA #0                 \ Set T = just the sign bit of delta (in bit 7)
- ROR A
- STA T
-
- LSR S                  \ Set S = delta_hi >> 1
-                        \       = |delta_hi|
-                        \
-                        \ This also clear the C flag, as we know that bit 0 of
-                        \ S was clear before the LSR
-
- EOR INWK+2,X           \ If T EOR x_sign has bit 7 set, then x_sign and delta
- BMI MV10               \ have different signs, so jump to MV10
-
-                        \ At this point, we know x_sign and delta have the same
-                        \ sign, that sign is in T, and S contains |delta_hi|,
-                        \ so now we want to do:
-                        \
-                        \   (x_sign x_hi x_lo) = (x_sign x_hi x_lo) + (S R)
-                        \
-                        \ and then set the sign of the result to the same sign
-                        \ as x_sign and delta
-
- LDA R                  \ First we add the low bytes, so:
- ADC INWK,X             \
- STA INWK,X             \   x_lo = x_lo + R
-
- LDA S                  \ Then we add the high bytes:
- ADC INWK+1,X           \
- STA INWK+1,X           \   x_hi = x_hi + S
-
- LDA INWK+2,X           \ And finally we add any carry into x_sign, and if the
- ADC #0                 \ sign of x_sign and delta in T is negative, make sure
- ORA T                  \ the result is negative (by OR'ing with T)
- STA INWK+2,X
-
- RTS                    \ Return from the subroutine
-
-.MV10
-
-                        \ If we get here, we know x_sign and delta have
-                        \ different signs, with delta's sign in T, and
-                        \ |delta_hi| in S, so now we want to do:
-                        \
-                        \   (x_sign x_hi x_lo) = (x_sign x_hi x_lo) - (S R)
-                        \
-                        \ and then set the sign of the result according to
-                        \ the signs of x_sign and delta
-
- LDA INWK,X             \ First we subtract the low bytes, so:
- SEC                    \
- SBC R                  \   x_lo = x_lo - R
- STA INWK,X
-
- LDA INWK+1,X           \ Then we subtract the high bytes:
- SBC S                  \
- STA INWK+1,X           \   x_hi = x_hi - S
-
- LDA INWK+2,X           \ And finally we subtract any borrow from bits 0-6 of
- AND #%01111111         \ x_sign, and give the result the opposite sign bit to T
- SBC #0                 \ (i.e. give it the sign of the original x_sign)
- ORA #%10000000
- EOR T
- STA INWK+2,X
-
- BCS MV11               \ If the C flag is set by the above SBC, then our sum
-                        \ above didn't underflow and is correct - to put it
-                        \ another way, (x_sign x_hi x_lo) >= (S R) so the result
-                        \ should indeed have the same sign as x_sign, so jump to
-                        \ MV11 to return from the subroutine
-
-                        \ Otherwise our subtraction underflowed because
-                        \ (x_sign x_hi x_lo) < (S R), so we now need to flip the
-                        \ subtraction around by using two's complement to this:
-                        \
-                        \   (S R) - (x_sign x_hi x_lo)
-                        \
-                        \ and then we need to give the result the same sign as
-                        \ (S R), the delta, as that's the dominant figure in the
-                        \ sum
-
- LDA #1                 \ First we subtract the low bytes, so:
- SBC INWK,X             \
- STA INWK,X             \   x_lo = 1 - x_lo
-
- LDA #0                 \ Then we subtract the high bytes:
- SBC INWK+1,X           \
- STA INWK+1,X           \   x_hi = 0 - x_hi
-
- LDA #0                 \ And then we subtract the sign bytes:
- SBC INWK+2,X           \
-                        \   x_sign = 0 - x_sign
-
- AND #%01111111         \ Finally, we set the sign bit to the sign in T, the
- ORA T                  \ sign of the original delta, as the delta is the
- STA INWK+2,X           \ dominant figure in the sum
-
-.MV11
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -3791,85 +3795,89 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MVT3
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA K+3                \ Set S = K+3
- STA S
+\.MVT3
+\
+\ LDA K+3               \ Set S = K+3
+\ STA S
+\
+\ AND #%10000000        \ Set T = sign bit of K(3 2 1)
+\ STA T
+\
+\ EOR INWK+2,X          \ If x_sign has a different sign to K(3 2 1), jump to
+\ BMI MV13              \ MV13 to process the addition as a subtraction
+\
+\ LDA K+1               \ Set K(3 2 1) = K(3 2 1) + (x_sign x_hi x_lo)
+\ CLC                   \ starting with the low bytes
+\ ADC INWK,X
+\ STA K+1
+\
+\ LDA K+2               \ Then the middle bytes
+\ ADC INWK+1,X
+\ STA K+2
+\
+\ LDA K+3               \ And finally the high bytes
+\ ADC INWK+2,X
+\
+\ AND #%01111111        \ Setting the sign bit of K+3 to T, the original sign
+\ ORA T                 \ of K(3 2 1)
+\ STA K+3
+\
+\ RTS                   \ Return from the subroutine
+\
+\.MV13
+\
+\ LDA S                 \ Set S = |K+3| (i.e. K+3 with the sign bit cleared)
+\ AND #%01111111
+\ STA S
+\
+\ LDA INWK,X            \ Set K(3 2 1) = (x_sign x_hi x_lo) - K(3 2 1)
+\ SEC                   \ starting with the low bytes
+\ SBC K+1
+\ STA K+1
+\
+\ LDA INWK+1,X          \ Then the middle bytes
+\ SBC K+2
+\ STA K+2
+\
+\ LDA INWK+2,X          \ And finally the high bytes, doing A = |x_sign| - |K+3|
+\ AND #%01111111        \ and setting the C flag for testing below
+\ SBC S
+\
+\ ORA #%10000000        \ Set the sign bit of K+3 to the opposite sign of T,
+\ EOR T                 \ i.e. the opposite sign to the original K(3 2 1)
+\ STA K+3
+\
+\ BCS MV14              \ If the C flag is set, i.e. |x_sign| >= |K+3|, then
+\                       \ the sign of K(3 2 1). In this case, we want the
+\                       \ result to have the same sign as the largest argument,
+\                       \ which is (x_sign x_hi x_lo), which we know has the
+\                       \ opposite sign to K(3 2 1), and that's what we just set
+\                       \ the sign of K(3 2 1) to... so we can jump to MV14 to
+\                       \ return from the subroutine
+\
+\ LDA #1                \ We need to swap the sign of the result in K(3 2 1),
+\ SBC K+1               \ which we do by calculating 0 - K(3 2 1), which we can
+\ STA K+1               \ do with 1 - C - K(3 2 1), as we know the C flag is
+\                       \ clear. We start with the low bytes
+\
+\ LDA #0                \ Then the middle bytes
+\ SBC K+2
+\ STA K+2
+\
+\ LDA #0                \ And finally the high bytes
+\ SBC K+3
+\
+\ AND #%01111111        \ Set the sign bit of K+3 to the same sign as T,
+\ ORA T                 \ i.e. the same sign as the original K(3 2 1), as
+\ STA K+3               \ that's the largest argument
+\
+\.MV14
+\
+\ RTS                   \ Return from the subroutine
 
- AND #%10000000         \ Set T = sign bit of K(3 2 1)
- STA T
-
- EOR INWK+2,X           \ If x_sign has a different sign to K(3 2 1), jump to
- BMI MV13               \ MV13 to process the addition as a subtraction
-
- LDA K+1                \ Set K(3 2 1) = K(3 2 1) + (x_sign x_hi x_lo)
- CLC                    \ starting with the low bytes
- ADC INWK,X
- STA K+1
-
- LDA K+2                \ Then the middle bytes
- ADC INWK+1,X
- STA K+2
-
- LDA K+3                \ And finally the high bytes
- ADC INWK+2,X
-
- AND #%01111111         \ Setting the sign bit of K+3 to T, the original sign
- ORA T                  \ of K(3 2 1)
- STA K+3
-
- RTS                    \ Return from the subroutine
-
-.MV13
-
- LDA S                  \ Set S = |K+3| (i.e. K+3 with the sign bit cleared)
- AND #%01111111
- STA S
-
- LDA INWK,X             \ Set K(3 2 1) = (x_sign x_hi x_lo) - K(3 2 1)
- SEC                    \ starting with the low bytes
- SBC K+1
- STA K+1
-
- LDA INWK+1,X           \ Then the middle bytes
- SBC K+2
- STA K+2
-
- LDA INWK+2,X           \ And finally the high bytes, doing A = |x_sign| - |K+3|
- AND #%01111111         \ and setting the C flag for testing below
- SBC S
-
- ORA #%10000000         \ Set the sign bit of K+3 to the opposite sign of T,
- EOR T                  \ i.e. the opposite sign to the original K(3 2 1)
- STA K+3
-
- BCS MV14               \ If the C flag is set, i.e. |x_sign| >= |K+3|, then
-                        \ the sign of K(3 2 1). In this case, we want the
-                        \ result to have the same sign as the largest argument,
-                        \ which is (x_sign x_hi x_lo), which we know has the
-                        \ opposite sign to K(3 2 1), and that's what we just set
-                        \ the sign of K(3 2 1) to... so we can jump to MV14 to
-                        \ return from the subroutine
-
- LDA #1                 \ We need to swap the sign of the result in K(3 2 1),
- SBC K+1                \ which we do by calculating 0 - K(3 2 1), which we can
- STA K+1                \ do with 1 - C - K(3 2 1), as we know the C flag is
-                        \ clear. We start with the low bytes
-
- LDA #0                 \ Then the middle bytes
- SBC K+2
- STA K+2
-
- LDA #0                 \ And finally the high bytes
- SBC K+3
-
- AND #%01111111         \ Set the sign bit of K+3 to the same sign as T,
- ORA T                  \ i.e. the same sign as the original K(3 2 1), as
- STA K+3                \ that's the largest argument
-
-.MV14
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -4231,74 +4239,78 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MVT6
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- TAY                    \ Store argument A into Y, for later use
+\.MVT6
+\
+\ TAY                   \ Store argument A into Y, for later use
+\
+\ EOR INWK+2,X          \ Set A = A EOR x_sign
+\
+\ BMI MV50              \ If the sign is negative, i.e. A and x_sign have
+\                       \ different signs, jump to MV50
+\
+\                       \ The signs are the same, so we can add the two
+\                       \ arguments and keep the sign to get the result
+\
+\ LDA P+1               \ First we add the low bytes:
+\ CLC                   \
+\ ADC INWK,X            \   P+1 = P+1 + x_lo
+\ STA P+1
+\
+\ LDA P+2               \ And then the high bytes:
+\ ADC INWK+1,X          \
+\ STA P+2               \   P+2 = P+2 + x_hi
+\
+\ TYA                   \ Restore the original A argument that we stored earlier
+\                       \ so that we keep the original sign
+\
+\ RTS                   \ Return from the subroutine
+\
+\.MV50
+\
+\ LDA INWK,X            \ First we subtract the low bytes:
+\ SEC                   \
+\ SBC P+1               \   P+1 = x_lo - P+1
+\ STA P+1
+\
+\ LDA INWK+1,X          \ And then the high bytes:
+\ SBC P+2               \
+\ STA P+2               \   P+2 = x_hi - P+2
+\
+\ BCC MV51              \ If the last subtraction underflowed, then the C flag
+\                       \ will be clear and x_hi < P+2, so jump to MV51 to
+\                       \ negate the result
+\
+\ TYA                   \ Restore the original A argument that we stored earlier
+\ EOR #%10000000        \ but flip bit 7, which flips the sign. We do this
+\                       \ because x_hi >= P+2 so we want the result to have the
+\                       \ same sign as x_hi (as it's the dominant side in this
+\                       \ calculation). The sign of x_hi is x_sign, and x_sign
+\                       \ has the opposite sign to A, so we flip the sign in A
+\                       \ to return the correct result
+\
+\ RTS                   \ Return from the subroutine
+\
+\.MV51
+\
+\ LDA #1                \ Our subtraction underflowed, so we negate the result
+\ SBC P+1               \ using two's complement, first with the low byte:
+\ STA P+1               \
+\                       \   P+1 = 1 - P+1
+\
+\ LDA #0                \ And then the high byte:
+\ SBC P+2               \
+\ STA P+2               \   P+2 = 0 - P+2
+\
+\ TYA                   \ Restore the original A argument that we stored earlier
+\                       \ as this is the correct sign for the result. This is
+\                       \ because x_hi < P+2, so we want to return the same sign
+\                       \ as P+2, the dominant side
+\
+\ RTS                   \ Return from the subroutine
 
- EOR INWK+2,X           \ Set A = A EOR x_sign
-
- BMI MV50               \ If the sign is negative, i.e. A and x_sign have
-                        \ different signs, jump to MV50
-
-                        \ The signs are the same, so we can add the two
-                        \ arguments and keep the sign to get the result
-
- LDA P+1                \ First we add the low bytes:
- CLC                    \
- ADC INWK,X             \   P+1 = P+1 + x_lo
- STA P+1
-
- LDA P+2                \ And then the high bytes:
- ADC INWK+1,X           \
- STA P+2                \   P+2 = P+2 + x_hi
-
- TYA                    \ Restore the original A argument that we stored earlier
-                        \ so that we keep the original sign
-
- RTS                    \ Return from the subroutine
-
-.MV50
-
- LDA INWK,X             \ First we subtract the low bytes:
- SEC                    \
- SBC P+1                \   P+1 = x_lo - P+1
- STA P+1
-
- LDA INWK+1,X           \ And then the high bytes:
- SBC P+2                \
- STA P+2                \   P+2 = x_hi - P+2
-
- BCC MV51               \ If the last subtraction underflowed, then the C flag
-                        \ will be clear and x_hi < P+2, so jump to MV51 to
-                        \ negate the result
-
- TYA                    \ Restore the original A argument that we stored earlier
- EOR #%10000000         \ but flip bit 7, which flips the sign. We do this
-                        \ because x_hi >= P+2 so we want the result to have the
-                        \ same sign as x_hi (as it's the dominant side in this
-                        \ calculation). The sign of x_hi is x_sign, and x_sign
-                        \ has the opposite sign to A, so we flip the sign in A
-                        \ to return the correct result
-
- RTS                    \ Return from the subroutine
-
-.MV51
-
- LDA #1                 \ Our subtraction underflowed, so we negate the result
- SBC P+1                \ using two's complement, first with the low byte:
- STA P+1                \
-                        \   P+1 = 1 - P+1
-
- LDA #0                 \ And then the high byte:
- SBC P+2                \
- STA P+2                \   P+2 = 0 - P+2
-
- TYA                    \ Restore the original A argument that we stored earlier
-                        \ as this is the correct sign for the result. This is
-                        \ because x_hi < P+2, so we want to return the same sign
-                        \ as P+2, the dominant side
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -5695,17 +5707,21 @@ ENDIF
 \
 \ ******************************************************************************
 
-.PIX1
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- JSR ADD                \ Set (A X) = (A P) + (S R)
+\.PIX1
+\
+\ JSR ADD               \ Set (A X) = (A P) + (S R)
+\
+\ STA YY+1              \ Set YY+1 to A, the high byte of the result
+\
+\ TXA                   \ Set SYL+Y to X, the low byte of the result
+\ STA SYL,Y
+\
+\                       \ Fall through into PIX1 to draw the stardust particle
+\                       \ at (X1,Y1)
 
- STA YY+1               \ Set YY+1 to A, the high byte of the result
-
- TXA                    \ Set SYL+Y to X, the low byte of the result
- STA SYL,Y
-
-                        \ Fall through into PIX1 to draw the stardust particle
-                        \ at (X1,Y1)
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -5732,50 +5748,54 @@ ENDIF
 \
 \ ******************************************************************************
 
-.PIXEL2
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA X1                 \ Fetch the x-coordinate offset into A
+\.PIXEL2
+\
+\ LDA X1                \ Fetch the x-coordinate offset into A
+\
+\ BPL PX1               \ If the x-coordinate offset is positive, jump to PX1
+\                       \ to skip the following negation
+\
+\ EOR #%01111111        \ The x-coordinate offset is negative, so flip all the
+\ CLC                   \ bits apart from the sign bit and add 1, to convert it
+\ ADC #1                \ from a sign-magnitude number to a signed number
+\
+\.PX1
+\
+\ EOR #%10000000        \ Set X = X1 + 128
+\ TAX                   \
+\                       \ So X is now the offset converted to an x-coordinate,
+\                       \ centred on x-coordinate 128
+\
+\ LDA Y1                \ Fetch the y-coordinate offset into A and clear the
+\ AND #%01111111        \ sign bit, so A = |Y1|
+\
+\ CMP #96               \ If |Y1| >= 96 then it's off the screen (as 96 is half
+\ BCS PX4               \ the screen height), so return from the subroutine (as
+\                       \ PX4 contains an RTS)
+\
+\ LDA Y1                \ Fetch the y-coordinate offset into A
+\
+\ BPL PX2               \ If the y-coordinate offset is positive, jump to PX2
+\                       \ to skip the following negation
+\
+\ EOR #%01111111        \ The y-coordinate offset is negative, so flip all the
+\ ADC #1                \ bits apart from the sign bit and subtract 1, to negate
+\                       \ it to a positive number, i.e. A is now |Y1|
+\
+\.PX2
+\
+\ STA T                 \ Set A = 97 - Y1
+\ LDA #97               \
+\ SBC T                 \ So if Y is positive we display the point up from the
+\                       \ centre at y-coordinate 97, while a negative Y means
+\                       \ down from the centre
+\
+\                       \ Fall through into PIXEL to draw the stardust at the
+\                       \ screen coordinates in (X, A)
 
- BPL PX1                \ If the x-coordinate offset is positive, jump to PX1
-                        \ to skip the following negation
-
- EOR #%01111111         \ The x-coordinate offset is negative, so flip all the
- CLC                    \ bits apart from the sign bit and add 1, to convert it
- ADC #1                 \ from a sign-magnitude number to a signed number
-
-.PX1
-
- EOR #%10000000         \ Set X = X1 + 128
- TAX                    \
-                        \ So X is now the offset converted to an x-coordinate,
-                        \ centred on x-coordinate 128
-
- LDA Y1                 \ Fetch the y-coordinate offset into A and clear the
- AND #%01111111         \ sign bit, so A = |Y1|
-
- CMP #96                \ If |Y1| >= 96 then it's off the screen (as 96 is half
- BCS PX4                \ the screen height), so return from the subroutine (as
-                        \ PX4 contains an RTS)
-
- LDA Y1                 \ Fetch the y-coordinate offset into A
-
- BPL PX2                \ If the y-coordinate offset is positive, jump to PX2
-                        \ to skip the following negation
-
- EOR #%01111111         \ The y-coordinate offset is negative, so flip all the
- ADC #1                 \ bits apart from the sign bit and subtract 1, to negate
-                        \ it to a positive number, i.e. A is now |Y1|
-
-.PX2
-
- STA T                  \ Set A = 97 - Y1
- LDA #97                \
- SBC T                  \ So if Y is positive we display the point up from the
-                        \ centre at y-coordinate 97, while a negative Y means
-                        \ down from the centre
-
-                        \ Fall through into PIXEL to draw the stardust at the
-                        \ screen coordinates in (X, A)
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -6115,36 +6135,40 @@ ENDIF
 \
 \ ******************************************************************************
 
-.FLIP
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDY NOSTM              \ Set Y to the current number of stardust particles, so
-                        \ we can use it as a counter through all the stardust
+\.FLIP
+\
+\ LDY NOSTM             \ Set Y to the current number of stardust particles, so
+\                       \ we can use it as a counter through all the stardust
+\
+\.FLL1
+\
+\ LDX SY,Y              \ Copy the Y-th particle's y-coordinate from SY+Y into X
+\
+\ LDA SX,Y              \ Copy the Y-th particle's x-coordinate from SX+Y into
+\ STA Y1                \ both Y1 and the particle's y-coordinate
+\ STA SY,Y
+\
+\ TXA                   \ Copy the Y-th particle's original y-coordinate into
+\ STA X1                \ both X1 and the particle's x-coordinate, so the x- and
+\ STA SX,Y              \ y-coordinates are now swapped and (X1, Y1) contains
+\                       \ the particle's new coordinates
+\
+\ LDA SZ,Y              \ Fetch the Y-th particle's distance from SZ+Y into ZZ
+\ STA ZZ
+\
+\ JSR PIXEL2            \ Draw a stardust particle at (X1,Y1) with distance ZZ
+\
+\ DEY                   \ Decrement the counter to point to the next particle of
+\                       \ stardust
+\
+\ BNE FLL1              \ Loop back to FLL1 until we have moved all the stardust
+\                       \ particles
+\
+\ RTS                   \ Return from the subroutine
 
-.FLL1
-
- LDX SY,Y               \ Copy the Y-th particle's y-coordinate from SY+Y into X
-
- LDA SX,Y               \ Copy the Y-th particle's x-coordinate from SX+Y into
- STA Y1                 \ both Y1 and the particle's y-coordinate
- STA SY,Y
-
- TXA                    \ Copy the Y-th particle's original y-coordinate into
- STA X1                 \ both X1 and the particle's x-coordinate, so the x- and
- STA SX,Y               \ y-coordinates are now swapped and (X1, Y1) contains
-                        \ the particle's new coordinates
-
- LDA SZ,Y               \ Fetch the Y-th particle's distance from SZ+Y into ZZ
- STA ZZ
-
- JSR PIXEL2             \ Draw a stardust particle at (X1,Y1) with distance ZZ
-
- DEY                    \ Decrement the counter to point to the next particle of
-                        \ stardust
-
- BNE FLL1               \ Loop back to FLL1 until we have moved all the stardust
-                        \ particles
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -9632,27 +9656,31 @@ ENDIF
 \
 \ ******************************************************************************
 
-.LL164
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA #56                \ Call the NOISE routine with A = 56 to make the sound
- JSR NOISE              \ of the hyperspace drive being engaged
+\.LL164
+\
+\ LDA #56               \ Call the NOISE routine with A = 56 to make the sound
+\ JSR NOISE             \ of the hyperspace drive being engaged
+\
+\ LDA #1                \ Set HFX to 1, which switches the screen mode to a full
+\ STA HFX               \ mode 5 screen, therefore making the hyperspace rings
+\                       \ multi-coloured and all zig-zaggy (see the IRQ1 routine
+\                       \ for details)
+\
+\ LDA #4                \ Set the step size for the hyperspace rings to 4, so
+\                       \ there are more sections in the rings and they are
+\                       \ quite round (compared to the step size of 8 used in
+\                       \ the much more polygonal launch rings)
+\
+\ JSR HFS2              \ Call HFS2 to draw the hyperspace tunnel rings
+\
+\ DEC HFX               \ Set HFX back to 0, so we switch back to the normal
+\                       \ split-screen mode
+\
+\ RTS                   \ Return from the subroutine
 
- LDA #1                 \ Set HFX to 1, which switches the screen mode to a full
- STA HFX                \ mode 5 screen, therefore making the hyperspace rings
-                        \ multi-coloured and all zig-zaggy (see the IRQ1 routine
-                        \ for details)
-
- LDA #4                 \ Set the step size for the hyperspace rings to 4, so
-                        \ there are more sections in the rings and they are
-                        \ quite round (compared to the step size of 8 used in
-                        \ the much more polygonal launch rings)
-
- JSR HFS2               \ Call HFS2 to draw the hyperspace tunnel rings
-
- DEC HFX                \ Set HFX back to 0, so we switch back to the normal
-                        \ split-screen mode
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -9667,17 +9695,21 @@ ENDIF
 \
 \ ******************************************************************************
 
-.LAUN
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA #48                \ Call the NOISE routine with A = 48 to make the sound
- JSR NOISE              \ of the ship launching from the station
+\.LAUN
+\
+\ LDA #48               \ Call the NOISE routine with A = 48 to make the sound
+\ JSR NOISE             \ of the ship launching from the station
+\
+\ LDA #8                \ Set the step size for the launch tunnel rings to 8, so
+\                       \ there are fewer sections in the rings and they are
+\                       \ quite polygonal (compared to the step size of 4 used
+\                       \ in the much rounder hyperspace rings)
+\
+\                       \ Fall through into HFS2 to draw the launch tunnel rings
 
- LDA #8                 \ Set the step size for the launch tunnel rings to 8, so
-                        \ there are fewer sections in the rings and they are
-                        \ quite polygonal (compared to the step size of 4 used
-                        \ in the much rounder hyperspace rings)
-
-                        \ Fall through into HFS2 to draw the launch tunnel rings
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -9718,16 +9750,20 @@ ENDIF
 \
 \ ******************************************************************************
 
-.HFS2
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- STA STP                \ Store the step size in A
+\.HFS2
+\
+\ STA STP               \ Store the step size in A
+\
+\ JSR TTX66             \ Clear the screen and draw a white border
+\
+\ JSR HFS1              \ Call HFS1 below and then fall through into the same
+\                       \ routine, so this effectively runs HFS1 twice, and as
+\                       \ HFS1 draws 8 concentric rings, this means we draw 16
+\                       \ of them in all
 
- JSR TTX66              \ Clear the screen and draw a white border
-
- JSR HFS1               \ Call HFS1 below and then fall through into the same
-                        \ routine, so this effectively runs HFS1 twice, and as
-                        \ HFS1 draws 8 concentric rings, this means we draw 16
-                        \ of them in all
+                        \ --- End of removed code ----------------------------->
 
 .HFS1
 
@@ -9800,17 +9836,21 @@ ENDIF
 \
 \ ******************************************************************************
 
- EQUB &8C, &E7
- EQUB &8D, &ED
- EQUB &8A, &E6
- EQUB &C1, &C8
- EQUB &C8, &8B
- EQUB &E0, &8A
- EQUB &E6, &D6
- EQUB &C5, &C6
- EQUB &C1, &CA
- EQUB &95, &9D
- EQUB &9C, &97
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\ EQUB &8C, &E7
+\ EQUB &8D, &ED
+\ EQUB &8A, &E6
+\ EQUB &C1, &C8
+\ EQUB &C8, &8B
+\ EQUB &E0, &8A
+\ EQUB &E6, &D6
+\ EQUB &C5, &C6
+\ EQUB &C1, &CA
+\ EQUB &95, &9D
+\ EQUB &9C, &97
+
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -9828,16 +9868,20 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MU5
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- STA K                  \ Set K(3 2 1 0) to (A A A A)
- STA K+1
- STA K+2
- STA K+3
+\.MU5
+\
+\ STA K                 \ Set K(3 2 1 0) to (A A A A)
+\ STA K+1
+\ STA K+2
+\ STA K+3
+\
+\ CLC                   \ Clear the C flag
+\
+\ RTS                   \ Return from the subroutine
 
- CLC                    \ Clear the C flag
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -9859,18 +9903,22 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MLS2
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDX XX                 \ Set (S R) = XX(1 0), starting with the low bytes
- STX R
+\.MLS2
+\
+\ LDX XX                \ Set (S R) = XX(1 0), starting with the low bytes
+\ STX R
+\
+\ LDX XX+1              \ And then doing the high bytes
+\ STX S
+\
+\ LDX ALP1              \ This repeats the first two instructions of MLS1, which
+\ STX P                 \ is presumably unintentional (though it has no effect)
+\
+\                       \ Fall through into MLS1 to calculate (A P) = A * ALP1
 
- LDX XX+1               \ And then doing the high bytes
- STX S
-
- LDX ALP1               \ This repeats the first two instructions of MLS1, which
- STX P                  \ is presumably unintentional (though it has no effect)
-
-                        \ Fall through into MLS1 to calculate (A P) = A * ALP1
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -9956,14 +10004,18 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MLU1
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA SY,Y               \ Set Y1 the Y-th byte of SY
- STA Y1
+\.MLU1
+\
+\ LDA SY,Y              \ Set Y1 the Y-th byte of SY
+\ STA Y1
+\
+\                       \ Fall through into MLU2 to calculate:
+\                       \
+\                       \   (A P) = |A| * Q
 
-                        \ Fall through into MLU2 to calculate:
-                        \
-                        \   (A P) = |A| * Q
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -9981,15 +10033,19 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MLU2
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- AND #%01111111         \ Clear the sign bit in P, so P = |A|
- STA P
+\.MLU2
+\
+\ AND #%01111111        \ Clear the sign bit in P, so P = |A|
+\ STA P
+\
+\                       \ Fall through into MULTU to calculate:
+\                       \
+\                       \   (A P) = P * Q
+\                       \         = |A| * Q
 
-                        \ Fall through into MULTU to calculate:
-                        \
-                        \   (A P) = P * Q
-                        \         = |A| * Q
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10096,12 +10152,16 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MU6
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- STA P+1                \ Set P(1 0) = (A A)
- STA P
+\.MU6
+\
+\ STA P+1               \ Set P(1 0) = (A A)
+\ STA P
+\
+\ RTS                   \ Return from the subroutine
 
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10244,25 +10304,29 @@ ENDIF
 \
 \ ******************************************************************************
 
-{
- LDX Q
- BEQ MU1
- DEX
- STX T
- LDA #0
- LDX #8
- LSR P
+                        \ --- Mod: Code removed for Econet: ------------------->
 
-.MUL6
+\{
+\ LDX Q
+\ BEQ MU1
+\ DEX
+\ STX T
+\ LDA #0
+\ LDX #8
+\ LSR P
+\
+\.MUL6
+\
+\ BCC P%+4
+\ ADC T
+\ ROR A
+\ ROR P
+\ DEX
+\ BNE MUL6
+\ RTS
+\}
 
- BCC P%+4
- ADC T
- ROR A
- ROR P
- DEX
- BNE MUL6
- RTS
-}
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10309,55 +10373,59 @@ ENDIF
 \
 \ ******************************************************************************
 
- STX Q                  \ Store X in Q
+                        \ --- Mod: Code removed for Econet: ------------------->
 
-.MLTU2
+\ STX Q                 \ Store X in Q
+\
+\.MLTU2
+\
+\ EOR #%11111111        \ Flip the bits in A and rotate right, storing the
+\ LSR A                 \ result in P+1, so we now calculate (P+1 P) * Q
+\ STA P+1
+\
+\ LDA #0                \ Set A = 0 so we can start building the answer in A
+\
+\ LDX #16               \ Set up a counter in X to count the 16 bits in (P+1 P)
+\
+\ ROR P                 \ Set P = P >> 1 with bit 7 = bit 0 of A
+\                       \ and C flag = bit 0 of P
+\
+\.MUL7
+\
+\ BCS MU21              \ If C (i.e. the next bit from P) is set, do not do the
+\                       \ addition for this bit of P, and instead skip to MU21
+\                       \ to just do the shifts
+\
+\ ADC Q                 \ Do the addition for this bit of P:
+\                       \
+\                       \   A = A + Q + C
+\                       \     = A + Q
+\
+\ ROR A                 \ Rotate (A P+1 P) to the right, so we capture the next
+\ ROR P+1               \ digit of the result in P+1, and extract the next digit
+\ ROR P                 \ of (P+1 P) in the C flag
+\
+\ DEX                   \ Decrement the loop counter
+\
+\ BNE MUL7              \ Loop back for the next bit until P has been rotated
+\                       \ all the way
+\
+\ RTS                   \ Return from the subroutine
+\
+\.MU21
+\
+\ LSR A                 \ Shift (A P+1 P) to the right, so we capture the next
+\ ROR P+1               \ digit of the result in P+1, and extract the next digit
+\ ROR P                 \ of (P+1 P) in the C flag
+\
+\ DEX                   \ Decrement the loop counter
+\
+\ BNE MUL7              \ Loop back for the next bit until P has been rotated
+\                       \ all the way
+\
+\ RTS                   \ Return from the subroutine
 
- EOR #%11111111         \ Flip the bits in A and rotate right, storing the
- LSR A                  \ result in P+1, so we now calculate (P+1 P) * Q
- STA P+1
-
- LDA #0                 \ Set A = 0 so we can start building the answer in A
-
- LDX #16                \ Set up a counter in X to count the 16 bits in (P+1 P)
-
- ROR P                  \ Set P = P >> 1 with bit 7 = bit 0 of A
-                        \ and C flag = bit 0 of P
-
-.MUL7
-
- BCS MU21               \ If C (i.e. the next bit from P) is set, do not do the
-                        \ addition for this bit of P, and instead skip to MU21
-                        \ to just do the shifts
-
- ADC Q                  \ Do the addition for this bit of P:
-                        \
-                        \   A = A + Q + C
-                        \     = A + Q
-
- ROR A                  \ Rotate (A P+1 P) to the right, so we capture the next
- ROR P+1                \ digit of the result in P+1, and extract the next digit
- ROR P                  \ of (P+1 P) in the C flag
-
- DEX                    \ Decrement the loop counter
-
- BNE MUL7               \ Loop back for the next bit until P has been rotated
-                        \ all the way
-
- RTS                    \ Return from the subroutine
-
-.MU21
-
- LSR A                  \ Shift (A P+1 P) to the right, so we capture the next
- ROR P+1                \ digit of the result in P+1, and extract the next digit
- ROR P                  \ of (P+1 P) in the C flag
-
- DEX                    \ Decrement the loop counter
-
- BNE MUL7               \ Loop back for the next bit until P has been rotated
-                        \ all the way
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10373,15 +10441,19 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MUT3
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDX ALP1               \ Set P = ALP1, though this gets overwritten by the
- STX P                  \ following, so this has no effect
+\.MUT3
+\
+\ LDX ALP1              \ Set P = ALP1, though this gets overwritten by the
+\ STX P                 \ following, so this has no effect
+\
+\                       \ Fall through into MUT2 to do the following:
+\                       \
+\                       \   (S R) = XX(1 0)
+\                       \   (A P) = Q * A
 
-                        \ Fall through into MUT2 to do the following:
-                        \
-                        \   (S R) = XX(1 0)
-                        \   (A P) = Q * A
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10399,15 +10471,19 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MUT2
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDX XX+1               \ Set S = XX+1
- STX S
+\.MUT2
+\
+\ LDX XX+1              \ Set S = XX+1
+\ STX S
+\
+\                       \ Fall through into MUT1 to do the following:
+\                       \
+\                       \   R = XX
+\                       \   (A P) = Q * A
 
-                        \ Fall through into MUT1 to do the following:
-                        \
-                        \   R = XX
-                        \   (A P) = Q * A
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10425,14 +10501,18 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MUT1
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDX XX                 \ Set R = XX
- STX R
+\.MUT1
+\
+\ LDX XX                \ Set R = XX
+\ STX R
+\
+\                       \ Fall through into MULT1 to do the following:
+\                       \
+\                       \   (A P) = Q * A
 
-                        \ Fall through into MULT1 to do the following:
-                        \
-                        \   (A P) = Q * A
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10585,37 +10665,41 @@ ENDIF
 \
 \ ******************************************************************************
 
-.TAS3
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDX INWK,Y             \ Set Q = the Y-th byte of INWK, i.e. vect_x
- STX Q
+\.TAS3
+\
+\ LDX INWK,Y            \ Set Q = the Y-th byte of INWK, i.e. vect_x
+\ STX Q
+\
+\ LDA XX15              \ Set A = XX15
+\
+\ JSR MULT12            \ Set (S R) = Q * A
+\                       \           = vect_x * XX15
+\
+\ LDX INWK+2,Y          \ Set Q = the Y+2-th byte of INWK, i.e. vect_y
+\ STX Q
+\
+\ LDA XX15+1            \ Set A = XX15+1
+\
+\ JSR MAD               \ Set (A X) = Q * A + (S R)
+\                       \           = vect_y * XX15+1 + vect_x * XX15
+\
+\ STA S                 \ Set (S R) = (A X)
+\ STX R
+\
+\ LDX INWK+4,Y          \ Set Q = the Y+2-th byte of INWK, i.e. vect_z
+\ STX Q
+\
+\ LDA XX15+2            \ Set A = XX15+2
+\
+\                       \ Fall through into MAD to set:
+\                       \
+\                       \   (A X) = Q * A + (S R)
+\                       \           = vect_z * XX15+2 + vect_y * XX15+1 +
+\                       \             vect_x * XX15
 
- LDA XX15               \ Set A = XX15
-
- JSR MULT12             \ Set (S R) = Q * A
-                        \           = vect_x * XX15
-
- LDX INWK+2,Y           \ Set Q = the Y+2-th byte of INWK, i.e. vect_y
- STX Q
-
- LDA XX15+1             \ Set A = XX15+1
-
- JSR MAD                \ Set (A X) = Q * A + (S R)
-                        \           = vect_y * XX15+1 + vect_x * XX15
-
- STA S                  \ Set (S R) = (A X)
- STX R
-
- LDX INWK+4,Y           \ Set Q = the Y+2-th byte of INWK, i.e. vect_z
- STX Q
-
- LDA XX15+2             \ Set A = XX15+2
-
-                        \ Fall through into MAD to set:
-                        \
-                        \   (A X) = Q * A + (S R)
-                        \           = vect_z * XX15+2 + vect_y * XX15+1 +
-                        \             vect_x * XX15
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10877,14 +10961,18 @@ ENDIF
 \
 \ ******************************************************************************
 
-.DV42
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA SZ,Y               \ Fetch the Y-th dust particle's z_hi coordinate into A
+\.DV42
+\
+\ LDA SZ,Y              \ Fetch the Y-th dust particle's z_hi coordinate into A
+\
+\                       \ Fall through into DV41 to do:
+\                       \
+\                       \   (P R) = 256 * DELTA / A
+\                       \         = 256 * DELTA / Y-th stardust particle's z_hi
 
-                        \ Fall through into DV41 to do:
-                        \
-                        \   (P R) = 256 * DELTA / A
-                        \         = 256 * DELTA / Y-th stardust particle's z_hi
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10916,16 +11004,20 @@ ENDIF
 \
 \ ******************************************************************************
 
-.DV41
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- STA Q                  \ Store A in Q
+\.DV41
+\
+\ STA Q                 \ Store A in Q
+\
+\ LDA DELTA             \ Fetch the speed from DELTA into A
+\
+\                       \ Fall through into DVID4 to do:
+\                       \
+\                       \   (P R) = 256 * A / Q
+\                       \         = 256 * DELTA / A
 
- LDA DELTA              \ Fetch the speed from DELTA into A
-
-                        \ Fall through into DVID4 to do:
-                        \
-                        \   (P R) = 256 * A / Q
-                        \         = 256 * DELTA / A
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -11035,205 +11127,209 @@ ENDIF
 \
 \ ******************************************************************************
 
-.DVID3B2
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- STA P+2                \ Set P+2 = A
+\.DVID3B2
+\
+\ STA P+2               \ Set P+2 = A
+\
+\ LDA INWK+6            \ Set Q = z_lo
+\ STA Q
+\
+\ LDA INWK+7            \ Set R = z_hi
+\ STA R
+\
+\ LDA INWK+8            \ Set S = z_sign
+\ STA S
+\
+\.DVID3B
+\
+\                       \ Given the above assignments, we now want to calculate
+\                       \ the following to get the result we want:
+\                       \
+\                       \   K(3 2 1 0) = P(2 1 0) / (S R Q)
+\
+\ LDA P                 \ Make sure P(2 1 0) is at least 1
+\ ORA #1
+\ STA P
+\
+\ LDA P+2               \ Set T to the sign of P+2 * S (i.e. the sign of the
+\ EOR S                 \ result) and store it in T
+\ AND #%10000000
+\ STA T
+\
+\ LDY #0                \ Set Y = 0 to store the scale factor
+\
+\ LDA P+2               \ Clear the sign bit of P+2, so the division can be done
+\ AND #%01111111        \ with positive numbers and we'll set the correct sign
+\                       \ below, once all the maths is done
+\                       \
+\                       \ This also leaves A = P+2, which we use below
+\
+\.DVL9
+\
+\                       \ We now shift (A P+1 P) left until A >= 64, counting
+\                       \ the number of shifts in Y. This makes the top part of
+\                       \ the division as large as possible, thus retaining as
+\                       \ much accuracy as we can.  When we come to return the
+\                       \ final result, we shift the result by the number of
+\                       \ places in Y, and in the correct direction
+\
+\ CMP #64               \ If A >= 64, jump down to DV14
+\ BCS DV14
+\
+\ ASL P                 \ Shift (A P+1 P) to the left
+\ ROL P+1
+\ ROL A
+\
+\ INY                   \ Increment the scale factor in Y
+\
+\ BNE DVL9              \ Loop up to DVL9 (this BNE is effectively a JMP, as Y
+\                       \ will never be zero)
+\
+\.DV14
+\
+\                       \ If we get here, A >= 64 and contains the highest byte
+\                       \ of the numerator, scaled up by the number of left
+\                       \ shifts in Y
+\
+\ STA P+2               \ Store A in P+2, so we now have the scaled value of
+\                       \ the numerator in P(2 1 0)
+\
+\ LDA S                 \ Set A = |S|
+\ AND #%01111111
+\
+\ BMI DV9               \ If bit 7 of A is set, jump down to DV9 to skip the
+\                       \ left-shifting of the denominator (though this branch
+\                       \ instruction has no effect as bit 7 of the above AND
+\                       \ can never be set, which is why this instruction was
+\                       \ removed from later versions)
+\
+\.DVL6
+\
+\                       \ We now shift (S R Q) left until bit 7 of S is set,
+\                       \ reducing Y by the number of shifts. This makes the
+\                       \ bottom part of the division as large as possible, thus
+\                       \ retaining as much accuracy as we can. When we come to
+\                       \ return the final result, we shift the result by the
+\                       \ total number of places in Y, and in the correct
+\                       \ direction, to give us the correct result
+\                       \
+\                       \ We set A to |S| above, so the following actually
+\                       \ shifts (A R Q)
+\
+\ DEY                   \ Decrement the scale factor in Y
+\
+\ ASL Q                 \ Shift (A R Q) to the left
+\ ROL R
+\ ROL A
+\
+\ BPL DVL6              \ Loop up to DVL6 to do another shift, until bit 7 of A
+\                       \ is set and we can't shift left any further
+\
+\.DV9
+\
+\                       \ We have now shifted both the numerator and denominator
+\                       \ left as far as they will go, keeping a tally of the
+\                       \ overall scale factor of the various shifts in Y. We
+\                       \ can now divide just the two highest bytes to get our
+\                       \ result
+\
+\ STA Q                 \ Set Q = A, the highest byte of the denominator
+\
+\ LDA #254              \ Set R to have bits 1-7 set, so we can pass this to
+\ STA R                 \ LL31 to act as the bit counter in the division
+\
+\ LDA P+2               \ Set A to the highest byte of the numerator
+\
+\ JSR LL31              \ Call LL31 to calculate:
+\                       \
+\                       \   R = 256 * A / Q
+\                       \     = 256 * numerator / denominator
+\
+\                       \ The result of our division is now in R, so we just
+\                       \ need to shift it back by the scale factor in Y
+\
+\ LDA #0                \ Set K(3 2 1) = 0 to hold the result (we populate K
+\ STA K+1               \ next)
+\ STA K+2
+\ STA K+3
+\
+\ TYA                   \ If Y is positive, jump to DV12
+\ BPL DV12
+\
+\                       \ If we get here then Y is negative, so we need to shift
+\                       \ the result R to the left by Y places, and then set the
+\                       \ correct sign for the result
+\
+\ LDA R                 \ Set A = R
+\
+\.DVL8
+\
+\ ASL A                 \ Shift (K+3 K+2 K+1 A) left
+\ ROL K+1
+\ ROL K+2
+\ ROL K+3
+\
+\ INY                   \ Increment the scale factor in Y
+\
+\ BNE DVL8              \ Loop back to DVL8 until we have shifted left by Y
+\                       \ places
+\
+\ STA K                 \ Store A in K so the result is now in K(3 2 1 0)
+\
+\ LDA K+3               \ Set K+3 to the sign in T, which we set above to the
+\ ORA T                 \ correct sign for the result
+\ STA K+3
+\
+\ RTS                   \ Return from the subroutine
+\
+\.DV13
+\
+\                       \ If we get here then Y is zero, so we don't need to
+\                       \ shift the result R, we just need to set the correct
+\                       \ sign for the result
+\
+\ LDA R                 \ Store R in K so the result is now in K(3 2 1 0)
+\ STA K
+\
+\ LDA T                 \ Set K+3 to the sign in T, which we set above to the
+\ STA K+3               \ correct sign for the result
+\
+\ RTS                   \ Return from the subroutine
+\
+\.DV12
+\
+\ BEQ DV13              \ We jumped here having set A to the scale factor in Y,
+\                       \ so this jumps up to DV13 if Y = 0
+\
+\                       \ If we get here then Y is positive and non-zero, so we
+\                       \ need to shift the result R to the right by Y places
+\                       \ and then set the correct sign for the result. We also
+\                       \ know that K(3 2 1) will stay 0, as we are shifting the
+\                       \ lowest byte to the right, so no set bits will make
+\                       \ their way into the top three bytes
+\
+\ LDA R                 \ Set A = R
+\
+\.DVL10
+\
+\ LSR A                 \ Shift A right
+\
+\ DEY                   \ Decrement the scale factor in Y
+\
+\ BNE DVL10             \ Loop back to DVL10 until we have shifted right by Y
+\                       \ places
+\
+\ STA K                 \ Store the shifted A in K so the result is now in
+\                       \ K(3 2 1 0)
+\
+\ LDA T                 \ Set K+3 to the sign in T, which we set above to the
+\ STA K+3               \ correct sign for the result
+\
+\ RTS                   \ Return from the subroutine
 
- LDA INWK+6             \ Set Q = z_lo
- STA Q
-
- LDA INWK+7             \ Set R = z_hi
- STA R
-
- LDA INWK+8             \ Set S = z_sign
- STA S
-
-.DVID3B
-
-                        \ Given the above assignments, we now want to calculate
-                        \ the following to get the result we want:
-                        \
-                        \   K(3 2 1 0) = P(2 1 0) / (S R Q)
-
- LDA P                  \ Make sure P(2 1 0) is at least 1
- ORA #1
- STA P
-
- LDA P+2                \ Set T to the sign of P+2 * S (i.e. the sign of the
- EOR S                  \ result) and store it in T
- AND #%10000000
- STA T
-
- LDY #0                 \ Set Y = 0 to store the scale factor
-
- LDA P+2                \ Clear the sign bit of P+2, so the division can be done
- AND #%01111111         \ with positive numbers and we'll set the correct sign
-                        \ below, once all the maths is done
-                        \
-                        \ This also leaves A = P+2, which we use below
-
-.DVL9
-
-                        \ We now shift (A P+1 P) left until A >= 64, counting
-                        \ the number of shifts in Y. This makes the top part of
-                        \ the division as large as possible, thus retaining as
-                        \ much accuracy as we can.  When we come to return the
-                        \ final result, we shift the result by the number of
-                        \ places in Y, and in the correct direction
-
- CMP #64                \ If A >= 64, jump down to DV14
- BCS DV14
-
- ASL P                  \ Shift (A P+1 P) to the left
- ROL P+1
- ROL A
-
- INY                    \ Increment the scale factor in Y
-
- BNE DVL9               \ Loop up to DVL9 (this BNE is effectively a JMP, as Y
-                        \ will never be zero)
-
-.DV14
-
-                        \ If we get here, A >= 64 and contains the highest byte
-                        \ of the numerator, scaled up by the number of left
-                        \ shifts in Y
-
- STA P+2                \ Store A in P+2, so we now have the scaled value of
-                        \ the numerator in P(2 1 0)
-
- LDA S                  \ Set A = |S|
- AND #%01111111
-
- BMI DV9                \ If bit 7 of A is set, jump down to DV9 to skip the
-                        \ left-shifting of the denominator (though this branch
-                        \ instruction has no effect as bit 7 of the above AND
-                        \ can never be set, which is why this instruction was
-                        \ removed from later versions)
-
-.DVL6
-
-                        \ We now shift (S R Q) left until bit 7 of S is set,
-                        \ reducing Y by the number of shifts. This makes the
-                        \ bottom part of the division as large as possible, thus
-                        \ retaining as much accuracy as we can. When we come to
-                        \ return the final result, we shift the result by the
-                        \ total number of places in Y, and in the correct
-                        \ direction, to give us the correct result
-                        \
-                        \ We set A to |S| above, so the following actually
-                        \ shifts (A R Q)
-
- DEY                    \ Decrement the scale factor in Y
-
- ASL Q                  \ Shift (A R Q) to the left
- ROL R
- ROL A
-
- BPL DVL6               \ Loop up to DVL6 to do another shift, until bit 7 of A
-                        \ is set and we can't shift left any further
-
-.DV9
-
-                        \ We have now shifted both the numerator and denominator
-                        \ left as far as they will go, keeping a tally of the
-                        \ overall scale factor of the various shifts in Y. We
-                        \ can now divide just the two highest bytes to get our
-                        \ result
-
- STA Q                  \ Set Q = A, the highest byte of the denominator
-
- LDA #254               \ Set R to have bits 1-7 set, so we can pass this to
- STA R                  \ LL31 to act as the bit counter in the division
-
- LDA P+2                \ Set A to the highest byte of the numerator
-
- JSR LL31               \ Call LL31 to calculate:
-                        \
-                        \   R = 256 * A / Q
-                        \     = 256 * numerator / denominator
-
-                        \ The result of our division is now in R, so we just
-                        \ need to shift it back by the scale factor in Y
-
- LDA #0                 \ Set K(3 2 1) = 0 to hold the result (we populate K
- STA K+1                \ next)
- STA K+2
- STA K+3
-
- TYA                    \ If Y is positive, jump to DV12
- BPL DV12
-
-                        \ If we get here then Y is negative, so we need to shift
-                        \ the result R to the left by Y places, and then set the
-                        \ correct sign for the result
-
- LDA R                  \ Set A = R
-
-.DVL8
-
- ASL A                  \ Shift (K+3 K+2 K+1 A) left
- ROL K+1
- ROL K+2
- ROL K+3
-
- INY                    \ Increment the scale factor in Y
-
- BNE DVL8               \ Loop back to DVL8 until we have shifted left by Y
-                        \ places
-
- STA K                  \ Store A in K so the result is now in K(3 2 1 0)
-
- LDA K+3                \ Set K+3 to the sign in T, which we set above to the
- ORA T                  \ correct sign for the result
- STA K+3
-
- RTS                    \ Return from the subroutine
-
-.DV13
-
-                        \ If we get here then Y is zero, so we don't need to
-                        \ shift the result R, we just need to set the correct
-                        \ sign for the result
-
- LDA R                  \ Store R in K so the result is now in K(3 2 1 0)
- STA K
-
- LDA T                  \ Set K+3 to the sign in T, which we set above to the
- STA K+3                \ correct sign for the result
-
- RTS                    \ Return from the subroutine
-
-.DV12
-
- BEQ DV13               \ We jumped here having set A to the scale factor in Y,
-                        \ so this jumps up to DV13 if Y = 0
-
-                        \ If we get here then Y is positive and non-zero, so we
-                        \ need to shift the result R to the right by Y places
-                        \ and then set the correct sign for the result. We also
-                        \ know that K(3 2 1) will stay 0, as we are shifting the
-                        \ lowest byte to the right, so no set bits will make
-                        \ their way into the top three bytes
-
- LDA R                  \ Set A = R
-
-.DVL10
-
- LSR A                  \ Shift A right
-
- DEY                    \ Decrement the scale factor in Y
-
- BNE DVL10              \ Loop back to DVL10 until we have shifted right by Y
-                        \ places
-
- STA K                  \ Store the shifted A in K so the result is now in
-                        \ K(3 2 1 0)
-
- LDA T                  \ Set K+3 to the sign in T, which we set above to the
- STA K+3                \ correct sign for the result
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -11253,37 +11349,41 @@ ENDIF
 \
 \ ******************************************************************************
 
-.cntr
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA DAMP               \ If DAMP is non-zero, then keyboard damping is not
- BNE RE1                \ enabled, so jump to RE1 to return from the subroutine
+\.cntr
+\
+\ LDA DAMP              \ If DAMP is non-zero, then keyboard damping is not
+\ BNE RE1               \ enabled, so jump to RE1 to return from the subroutine
+\
+\ TXA                   \ If X < 128, then it's in the left-hand side of the
+\ BPL BUMP              \ dashboard slider, so jump to BUMP to bump it up by 1,
+\                       \ to move it closer to the centre
+\
+\ DEX                   \ Otherwise X >= 128, so it's in the right-hand side
+\ BMI RE1               \ of the dashboard slider, so decrement X by 1, and if
+\                       \ it's still >= 128, jump to RE1 to return from the
+\                       \ subroutine, otherwise fall through to BUMP to undo
+\                       \ the bump and then return
+\
+\.BUMP
+\
+\ INX                   \ Bump X up by 1, and if it hasn't overshot the end of
+\ BNE RE1               \ the dashboard slider, jump to RE1 to return from the
+\                       \ subroutine, otherwise fall through to REDU to drop
+\                       \ it down by 1 again
+\
+\.REDU
+\
+\ DEX                   \ Reduce X by 1, and if we have reached 0 jump up to
+\ BEQ BUMP              \ BUMP to add 1, because we need the value to be in the
+\                       \ range 1 to 255
+\
+\.RE1
+\
+\ RTS                   \ Return from the subroutine
 
- TXA                    \ If X < 128, then it's in the left-hand side of the
- BPL BUMP               \ dashboard slider, so jump to BUMP to bump it up by 1,
-                        \ to move it closer to the centre
-
- DEX                    \ Otherwise X >= 128, so it's in the right-hand side
- BMI RE1                \ of the dashboard slider, so decrement X by 1, and if
-                        \ it's still >= 128, jump to RE1 to return from the
-                        \ subroutine, otherwise fall through to BUMP to undo
-                        \ the bump and then return
-
-.BUMP
-
- INX                    \ Bump X up by 1, and if it hasn't overshot the end of
- BNE RE1                \ the dashboard slider, jump to RE1 to return from the
-                        \ subroutine, otherwise fall through to REDU to drop
-                        \ it down by 1 again
-
-.REDU
-
- DEX                    \ Reduce X by 1, and if we have reached 0 jump up to
- BEQ BUMP               \ BUMP to add 1, because we need the value to be in the
-                        \ range 1 to 255
-
-.RE1
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -11319,36 +11419,40 @@ ENDIF
 \
 \ ******************************************************************************
 
-.BUMP2
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- STA T                  \ Store argument A in T so we can restore it later
+\.BUMP2
+\
+\ STA T                 \ Store argument A in T so we can restore it later
+\
+\ TXA                   \ Copy argument X into A
+\
+\ CLC                   \ Clear the C flag so we can do addition without the
+\                       \ C flag affecting the result
+\
+\ ADC T                 \ Set X = A = argument X + argument A
+\ TAX
+\
+\ BCC RE2               \ If the C flag is clear, then we didn't overflow, so
+\                       \ jump to RE2 to auto-recentre and return the result
+\
+\ LDX #255              \ We have an overflow, so set X to the maximum possible
+\                       \ value of 255
+\
+\.RE2
+\
+\ BPL RE3+2             \ If X has bit 7 clear (i.e. the result < 128), then
+\                       \ jump to RE3+2 in routine REDU2 to do an auto-recentre,
+\                       \ if configured, because the result is on the left side
+\                       \ of the centre point of 128
+\
+\                       \ Jumps to RE2+2 end up here
+\
+\ LDA T                 \ Restore the original argument A from T into A
+\
+\ RTS                   \ Return from the subroutine
 
- TXA                    \ Copy argument X into A
-
- CLC                    \ Clear the C flag so we can do addition without the
-                        \ C flag affecting the result
-
- ADC T                  \ Set X = A = argument X + argument A
- TAX
-
- BCC RE2                \ If the C flag is clear, then we didn't overflow, so
-                        \ jump to RE2 to auto-recentre and return the result
-
- LDX #255               \ We have an overflow, so set X to the maximum possible
-                        \ value of 255
-
-.RE2
-
- BPL RE3+2              \ If X has bit 7 clear (i.e. the result < 128), then
-                        \ jump to RE3+2 in routine REDU2 to do an auto-recentre,
-                        \ if configured, because the result is on the left side
-                        \ of the centre point of 128
-
-                        \ Jumps to RE2+2 end up here
-
- LDA T                  \ Restore the original argument A from T into A
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -11385,44 +11489,48 @@ ENDIF
 \
 \ ******************************************************************************
 
-.REDU2
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- STA T                  \ Store argument A in T so we can restore it later
+\.REDU2
+\
+\ STA T                 \ Store argument A in T so we can restore it later
+\
+\ TXA                   \ Copy argument X into A
+\
+\ SEC                   \ Set the C flag so we can do subtraction without the
+\                       \ C flag affecting the result
+\
+\ SBC T                 \ Set X = A = argument X - argument A
+\ TAX
+\
+\ BCS RE3               \ If the C flag is set, then we didn't underflow, so
+\                       \ jump to RE3 to auto-recentre and return the result
+\
+\ LDX #1                \ We have an underflow, so set X to the minimum possible
+\                       \ value, 1
+\
+\.RE3
+\
+\ BPL RE2+2             \ If X has bit 7 clear (i.e. the result < 128), then
+\                       \ jump to RE2+2 above to return the result as is,
+\                       \ because the result is on the left side of the centre
+\                       \ point of 128, so we don't need to auto-centre
+\
+\                       \ Jumps to RE3+2 end up here
+\
+\                       \ If we get here, then we need to apply auto-recentre,
+\                       \ if it is configured
+\
+\ LDA DJD               \ If keyboard auto-recentre is disabled, then
+\ BNE RE2+2             \ jump to RE2+2 to restore A and return
+\
+\ LDX #128              \ If we get here then keyboard auto-recentre is enabled,
+\ BMI RE2+2             \ so set X to 128 (the middle of our range) and jump to
+\                       \ RE2+2 to restore A and return from the subroutine
+\                       \ (this BMI is effectively a JMP as bit 7 of X is always
+\                       \ set)
 
- TXA                    \ Copy argument X into A
-
- SEC                    \ Set the C flag so we can do subtraction without the
-                        \ C flag affecting the result
-
- SBC T                  \ Set X = A = argument X - argument A
- TAX
-
- BCS RE3                \ If the C flag is set, then we didn't underflow, so
-                        \ jump to RE3 to auto-recentre and return the result
-
- LDX #1                 \ We have an underflow, so set X to the minimum possible
-                        \ value, 1
-
-.RE3
-
- BPL RE2+2              \ If X has bit 7 clear (i.e. the result < 128), then
-                        \ jump to RE2+2 above to return the result as is,
-                        \ because the result is on the left side of the centre
-                        \ point of 128, so we don't need to auto-centre
-
-                        \ Jumps to RE3+2 end up here
-
-                        \ If we get here, then we need to apply auto-recentre,
-                        \ if it is configured
-
- LDA DJD                \ If keyboard auto-recentre is disabled, then
- BNE RE2+2              \ jump to RE2+2 to restore A and return
-
- LDX #128               \ If we get here then keyboard auto-recentre is enabled,
- BMI RE2+2              \ so set X to 128 (the middle of our range) and jump to
-                        \ RE2+2 to restore A and return from the subroutine
-                        \ (this BMI is effectively a JMP as bit 7 of X is always
-                        \ set)
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -12022,36 +12130,38 @@ ENDIF
 \
 \ ******************************************************************************
 
-.SIGHT
+\.SIGHT
+\
+\ LDY VIEW              \ Fetch the laser power for our new view
+\ LDA LASER,Y
+\
+\ BEQ BOL1-1            \ If it is zero (i.e. there is no laser fitted to this
+\                       \ view), jump to BOL1-1 to return from the subroutine
+\                       \ (as BOL1-1 contains &60, which is the opcode for an
+\                       \ RTS)
+\
+\ LDA #128              \ Set QQ19 to the x-coordinate of the centre of the
+\ STA QQ19              \ screen
+\
+\ LDA #Y-24             \ Set QQ19+1 to the y-coordinate of the centre of the
+\ STA QQ19+1            \ screen, minus 24 (because TT15 will add 24 to the
+\                       \ coordinate when it draws the crosshairs)
+\
+\ LDA #20               \ Set QQ19+2 to size 20 for the crosshairs size
+\ STA QQ19+2
+\
+\ JSR TT15              \ Call TT15 to draw crosshairs of size 20 just to the
+\                       \ left of the middle of the screen
+\
+\ LDA #10               \ Set QQ19+2 to size 10 for the crosshairs size
+\ STA QQ19+2
+\
+\ JMP TT15              \ Call TT15 to draw crosshairs of size 10 at the same
+\                       \ location, which will remove the centre part from the
+\                       \ laser crosshairs, leaving a gap in the middle, and
+\                       \ return from the subroutine using a tail call
 
- LDY VIEW               \ Fetch the laser power for our new view
- LDA LASER,Y
-
- BEQ BOL1-1             \ If it is zero (i.e. there is no laser fitted to this
-                        \ view), jump to BOL1-1 to return from the subroutine
-                        \ (as BOL1-1 contains &60, which is the opcode for an
-                        \ RTS)
-
- LDA #128               \ Set QQ19 to the x-coordinate of the centre of the
- STA QQ19               \ screen
-
- LDA #Y-24              \ Set QQ19+1 to the y-coordinate of the centre of the
- STA QQ19+1             \ screen, minus 24 (because TT15 will add 24 to the
-                        \ coordinate when it draws the crosshairs)
-
- LDA #20                \ Set QQ19+2 to size 20 for the crosshairs size
- STA QQ19+2
-
- JSR TT15               \ Call TT15 to draw crosshairs of size 20 just to the
-                        \ left of the middle of the screen
-
- LDA #10                \ Set QQ19+2 to size 10 for the crosshairs size
- STA QQ19+2
-
- JMP TT15               \ Call TT15 to draw crosshairs of size 10 at the same
-                        \ location, which will remove the centre part from the
-                        \ laser crosshairs, leaving a gap in the middle, and
-                        \ return from the subroutine using a tail call
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -12388,15 +12498,19 @@ ENDIF
 \
 \ ******************************************************************************
 
-.CPIX4
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- JSR CPIX2              \ Call CPIX2 to draw a single-height dash at (X1, Y1)
+\.CPIX4
+\
+\ JSR CPIX2             \ Call CPIX2 to draw a single-height dash at (X1, Y1)
+\
+\ DEC Y1                \ Decrement Y1
+\
+\                       \ Fall through into CPIX2 to draw a second single-height
+\                       \ dash on the pixel row above the first one, to create a
+\                       \ double-height dot
 
- DEC Y1                 \ Decrement Y1
-
-                        \ Fall through into CPIX2 to draw a second single-height
-                        \ dash on the pixel row above the first one, to create a
-                        \ double-height dot
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -12422,84 +12536,88 @@ ENDIF
 \
 \ ******************************************************************************
 
-.CPIX2
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA Y1                 \ Fetch the y-coordinate into A
+\.CPIX2
+\
+\ LDA Y1                \ Fetch the y-coordinate into A
+\
+\ TAY                   \ Store the y-coordinate in Y
+\
+\ LSR A                 \ Set A = A / 8, so A now contains the character row we
+\ LSR A                 \ need to draw in (as each character row contains 8
+\ LSR A                 \ pixel rows)
+\
+\ ORA #&60              \ Each character row in Elite's screen mode takes up one
+\                       \ page in memory (256 bytes), so we now OR with &60 to
+\                       \ get the page containing the dash (see the comments in
+\                       \ routine TT26 for more discussion about calculating
+\                       \ screen memory addresses)
+\
+\ STA SCH               \ Store the screen page in the high byte of SC(1 0)
+\
+\ LDA X1                \ Each character block contains 8 pixel rows, so to get
+\ AND #%11111000        \ the address of the first byte in the character block
+\                       \ that we need to draw into, as an offset from the start
+\                       \ of the row, we clear bits 0-2
+\
+\ STA SC                \ Store the address of the character block in the low
+\                       \ byte of SC(1 0), so now SC(1 0) points to the
+\                       \ character block we need to draw into
+\
+\ TYA                   \ Set Y to just bits 0-2 of the y-coordinate, which will
+\ AND #%00000111        \ be the number of the pixel row we need to draw into
+\ TAY                   \ within the character block
+\
+\ LDA X1                \ Copy bits 0-1 of X1 to bits 1-2 of X, and clear the C
+\ AND #%00000110        \ flag in the process (using the LSR). X will now be
+\ LSR A                 \ a value between 0 and 3, and will be the pixel number
+\ TAX                   \ in the character row for the left pixel in the dash.
+\                       \ This is because each character row is one byte that
+\                       \ contains 4 pixels, but covers 8 screen coordinates, so
+\                       \ this effectively does the division by 2 that we need
+\
+\ LDA CTWOS,X           \ Fetch a mode 5 1-pixel byte with the pixel position
+\ AND COL               \ at X, and AND with the colour byte so that pixel takes
+\                       \ on the colour we want to draw (i.e. A is acting as a
+\                       \ mask on the colour byte)
+\
+\ EOR (SC),Y            \ Draw the pixel on-screen using EOR logic, so we can
+\ STA (SC),Y            \ remove it later without ruining the background that's
+\                       \ already on-screen
+\
+\ LDA CTWOS+1,X         \ Fetch a mode 5 1-pixel byte with the pixel position
+\                       \ at X+1, so we can draw the right pixel of the dash
+\
+\ BPL CP1               \ The CTWOS table has an extra row at the end of it that
+\                       \ repeats the first value, %10001000, so if we have not
+\                       \ fetched that value, then the right pixel of the dash
+\                       \ is in the same character block as the left pixel, so
+\                       \ jump to CP1 to draw it
+\
+\ LDA SC                \ Otherwise the left pixel we drew was at the last
+\ ADC #8                \ position of four in this character block, so we add
+\ STA SC                \ 8 to the screen address to move onto the next block
+\                       \ along (as there are 8 bytes in a character block).
+\                       \ The C flag was cleared above, so this ADC is correct
+\
+\ LDA CTWOS+1,X         \ Re-fetch the mode 5 1-pixel byte, as we just overwrote
+\                       \ A (the byte will still be the fifth byte from the
+\                       \ table, which is correct as we want to draw the
+\                       \ leftmost pixel in the next character along as the
+\                       \ dash's right pixel)
+\
+\.CP1
+\
+\ AND COL               \ Apply the colour mask to the pixel byte, as above
+\
+\ EOR (SC),Y            \ Draw the dash's right pixel according to the mask in
+\ STA (SC),Y            \ A, with the colour in COL, using EOR logic, just as
+\                       \ above
+\
+\ RTS                   \ Return from the subroutine
 
- TAY                    \ Store the y-coordinate in Y
-
- LSR A                  \ Set A = A / 8, so A now contains the character row we
- LSR A                  \ need to draw in (as each character row contains 8
- LSR A                  \ pixel rows)
-
- ORA #&60               \ Each character row in Elite's screen mode takes up one
-                        \ page in memory (256 bytes), so we now OR with &60 to
-                        \ get the page containing the dash (see the comments in
-                        \ routine TT26 for more discussion about calculating
-                        \ screen memory addresses)
-
- STA SCH                \ Store the screen page in the high byte of SC(1 0)
-
- LDA X1                 \ Each character block contains 8 pixel rows, so to get
- AND #%11111000         \ the address of the first byte in the character block
-                        \ that we need to draw into, as an offset from the start
-                        \ of the row, we clear bits 0-2
-
- STA SC                 \ Store the address of the character block in the low
-                        \ byte of SC(1 0), so now SC(1 0) points to the
-                        \ character block we need to draw into
-
- TYA                    \ Set Y to just bits 0-2 of the y-coordinate, which will
- AND #%00000111         \ be the number of the pixel row we need to draw into
- TAY                    \ within the character block
-
- LDA X1                 \ Copy bits 0-1 of X1 to bits 1-2 of X, and clear the C
- AND #%00000110         \ flag in the process (using the LSR). X will now be
- LSR A                  \ a value between 0 and 3, and will be the pixel number
- TAX                    \ in the character row for the left pixel in the dash.
-                        \ This is because each character row is one byte that
-                        \ contains 4 pixels, but covers 8 screen coordinates, so
-                        \ this effectively does the division by 2 that we need
-
- LDA CTWOS,X            \ Fetch a mode 5 1-pixel byte with the pixel position
- AND COL                \ at X, and AND with the colour byte so that pixel takes
-                        \ on the colour we want to draw (i.e. A is acting as a
-                        \ mask on the colour byte)
-
- EOR (SC),Y             \ Draw the pixel on-screen using EOR logic, so we can
- STA (SC),Y             \ remove it later without ruining the background that's
-                        \ already on-screen
-
- LDA CTWOS+1,X          \ Fetch a mode 5 1-pixel byte with the pixel position
-                        \ at X+1, so we can draw the right pixel of the dash
-
- BPL CP1                \ The CTWOS table has an extra row at the end of it that
-                        \ repeats the first value, %10001000, so if we have not
-                        \ fetched that value, then the right pixel of the dash
-                        \ is in the same character block as the left pixel, so
-                        \ jump to CP1 to draw it
-
- LDA SC                 \ Otherwise the left pixel we drew was at the last
- ADC #8                 \ position of four in this character block, so we add
- STA SC                 \ 8 to the screen address to move onto the next block
-                        \ along (as there are 8 bytes in a character block).
-                        \ The C flag was cleared above, so this ADC is correct
-
- LDA CTWOS+1,X          \ Re-fetch the mode 5 1-pixel byte, as we just overwrote
-                        \ A (the byte will still be the fifth byte from the
-                        \ table, which is correct as we want to draw the
-                        \ leftmost pixel in the next character along as the
-                        \ dash's right pixel)
-
-.CP1
-
- AND COL                \ Apply the colour mask to the pixel byte, as above
-
- EOR (SC),Y             \ Draw the dash's right pixel according to the mask in
- STA (SC),Y             \ A, with the colour in COL, using EOR logic, just as
-                        \ above
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -14338,35 +14456,39 @@ ENDIF
 \
 \ ******************************************************************************
 
-.TT214
+                        \ --- Mod: Code removed for Econet: ------------------->
 
-.TT221
+\.TT214
+\
+\.TT221
+\
+\ JSR TT27              \ Print the text token in A
+\
+\ LDA #206              \ Print extended token 206 ("{all caps}(Y/N)?")
+\ JSR DETOK
+\
+\ JSR TT217             \ Scan the keyboard until a key is pressed, and return
+\                       \ the key's ASCII code in A and X
+\
+\ ORA #%00100000        \ Set bit 5 in the value of the key pressed, which
+\                       \ converts it to lower case
+\
+\ CMP #'y'              \ If "y" was pressed, jump to TT218
+\ BEQ TT218
+\
+\ LDA #'n'              \ Otherwise jump to TT26 to print "n" and return from
+\ JMP TT26              \ the subroutine using a tail call (so all other
+\                       \ responses apart from "y" indicate a no)
+\
+\.TT218
+\
+\ JSR TT26              \ Print the character in A, i.e. print "y"
+\
+\ SEC                   \ Set the C flag to indicate a "yes" response
+\
+\ RTS                   \ Return from the subroutine
 
- JSR TT27               \ Print the text token in A
-
- LDA #206               \ Print extended token 206 ("{all caps}(Y/N)?")
- JSR DETOK
-
- JSR TT217              \ Scan the keyboard until a key is pressed, and return
-                        \ the key's ASCII code in A and X
-
- ORA #%00100000         \ Set bit 5 in the value of the key pressed, which
-                        \ converts it to lower case
-
- CMP #'y'               \ If "y" was pressed, jump to TT218
- BEQ TT218
-
- LDA #'n'               \ Otherwise jump to TT26 to print "n" and return from
- JMP TT26               \ the subroutine using a tail call (so all other
-                        \ responses apart from "y" indicate a no)
-
-.TT218
-
- JSR TT26               \ Print the character in A, i.e. print "y"
-
- SEC                    \ Set the C flag to indicate a "yes" response
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -15205,76 +15327,80 @@ ENDIF
 \
 \ ******************************************************************************
 
-.hyp
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA QQ22+1             \ Fetch QQ22+1, which contains the number that's shown
-                        \ on-screen during hyperspace countdown
+\.hyp
+\
+\ LDA QQ22+1            \ Fetch QQ22+1, which contains the number that's shown
+\                       \ on-screen during hyperspace countdown
+\
+\ ORA QQ12              \ If we are docked (QQ12 = &FF) or there is already a
+\ BNE zZ+1              \ countdown in progress, then return from the subroutine
+\                       \ using a tail call (as zZ+1 contains an RTS), as we
+\                       \ can't hyperspace when docked, or there is already a
+\                       \ countdown in progress
+\
+\ JSR CTRL              \ Scan the keyboard to see if CTRL is currently pressed
+\
+\ BMI Ghy               \ If it is, then the galactic hyperdrive has been
+\                       \ activated, so jump to Ghy to process it
+\
+\ LDA QQ11              \ If the current view is 0 (i.e. the space view) then
+\ BEQ TTX110            \ jump to TTX110, which calls TT111 to set the current
+\                       \ system to the nearest system to (QQ9, QQ10), and jumps
+\                       \ back into this routine at TTX111 below
+\
+\ AND #%11000000        \ If neither bit 6 nor 7 of the view type is set - so
+\ BEQ zZ+1              \ this is neither the Short-range or Long-range Chart -
+\                       \ then return from the subroutine (as zZ+1 contains an
+\                       \ RTS)
+\
+\ JSR hm                \ This is a chart view, so call hm to redraw the chart
+\                       \ crosshairs
+\
+\.TTX111
+\
+\                       \ If we get here then the current view is either the
+\                       \ space view or a chart
+\
+\ LDA QQ8               \ If both bytes of the distance to the selected system
+\ ORA QQ8+1             \ in QQ8 are zero, return from the subroutine (as zZ+1
+\ BEQ zZ+1              \ contains an RTS), as the selected system is the
+\                       \ current system
+\
+\ LDA #7                \ Move the text cursor to column 7, row 22 (in the
+\ STA XC                \ middle of the bottom text row)
+\ LDA #22
+\ STA YC
+\
+\ LDA #0                \ Set QQ17 = 0 to switch to ALL CAPS
+\ STA QQ17
+\
+\ LDA #189              \ Print recursive token 29 ("HYPERSPACE ")
+\ JSR TT27
+\
+\ LDA QQ8+1             \ If the high byte of the distance to the selected
+\ BNE TT147             \ system in QQ8 is > 0, then it is definitely too far to
+\                       \ jump (as our maximum range is 7.0 light years, or a
+\                       \ value of 70 in QQ8(1 0)), so jump to TT147 to print
+\                       \ "RANGE?" and return from the subroutine using a tail
+\                       \ call
+\
+\ LDA QQ14              \ Fetch our current fuel level from Q114 into A
+\
+\ CMP QQ8               \ If our fuel reserves are less than the distance to the
+\ BCC TT147             \ selected system, then we don't have enough fuel for
+\                       \ this jump, so jump to TT147 to print "RANGE?" and
+\                       \ return from the subroutine using a tail call
+\
+\ LDA #'-'              \ Print a hyphen
+\ JSR TT27
+\
+\ JSR cpl               \ Call cpl to print the name of the selected system
+\
+\                       \ Fall through into wW to start the hyperspace countdown
 
- ORA QQ12               \ If we are docked (QQ12 = &FF) or there is already a
- BNE zZ+1               \ countdown in progress, then return from the subroutine
-                        \ using a tail call (as zZ+1 contains an RTS), as we
-                        \ can't hyperspace when docked, or there is already a
-                        \ countdown in progress
-
- JSR CTRL               \ Scan the keyboard to see if CTRL is currently pressed
-
- BMI Ghy                \ If it is, then the galactic hyperdrive has been
-                        \ activated, so jump to Ghy to process it
-
- LDA QQ11               \ If the current view is 0 (i.e. the space view) then
- BEQ TTX110             \ jump to TTX110, which calls TT111 to set the current
-                        \ system to the nearest system to (QQ9, QQ10), and jumps
-                        \ back into this routine at TTX111 below
-
- AND #%11000000         \ If neither bit 6 nor 7 of the view type is set - so
- BEQ zZ+1               \ this is neither the Short-range or Long-range Chart -
-                        \ then return from the subroutine (as zZ+1 contains an
-                        \ RTS)
-
- JSR hm                 \ This is a chart view, so call hm to redraw the chart
-                        \ crosshairs
-
-.TTX111
-
-                        \ If we get here then the current view is either the
-                        \ space view or a chart
-
- LDA QQ8                \ If both bytes of the distance to the selected system
- ORA QQ8+1              \ in QQ8 are zero, return from the subroutine (as zZ+1
- BEQ zZ+1               \ contains an RTS), as the selected system is the
-                        \ current system
-
- LDA #7                 \ Move the text cursor to column 7, row 22 (in the
- STA XC                 \ middle of the bottom text row)
- LDA #22
- STA YC
-
- LDA #0                 \ Set QQ17 = 0 to switch to ALL CAPS
- STA QQ17
-
- LDA #189               \ Print recursive token 29 ("HYPERSPACE ")
- JSR TT27
-
- LDA QQ8+1              \ If the high byte of the distance to the selected
- BNE TT147              \ system in QQ8 is > 0, then it is definitely too far to
-                        \ jump (as our maximum range is 7.0 light years, or a
-                        \ value of 70 in QQ8(1 0)), so jump to TT147 to print
-                        \ "RANGE?" and return from the subroutine using a tail
-                        \ call
-
- LDA QQ14               \ Fetch our current fuel level from Q114 into A
-
- CMP QQ8                \ If our fuel reserves are less than the distance to the
- BCC TT147              \ selected system, then we don't have enough fuel for
-                        \ this jump, so jump to TT147 to print "RANGE?" and
-                        \ return from the subroutine using a tail call
-
- LDA #'-'               \ Print a hyphen
- JSR TT27
-
- JSR cpl                \ Call cpl to print the name of the selected system
-
-                        \ Fall through into wW to start the hyperspace countdown
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -15290,25 +15416,29 @@ ENDIF
 \
 \ ******************************************************************************
 
-.wW
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA #15                \ The hyperspace countdown starts from 15, so set A to
-                        \ 15 so we can set the two hyperspace counters
+\.wW
+\
+\ LDA #15               \ The hyperspace countdown starts from 15, so set A to
+\                       \ 15 so we can set the two hyperspace counters
+\
+\ STA QQ22+1            \ Set the number in QQ22+1 to A, which is the number
+\                       \ that's shown on-screen during the hyperspace countdown
+\
+\ STA QQ22              \ Set the number in QQ22 to 15, which is the internal
+\                       \ counter that counts down by 1 each iteration of the
+\                       \ main game loop, and each time it reaches zero, the
+\                       \ on-screen counter gets decremented, and QQ22 gets set
+\                       \ to 5, so setting QQ22 to 15 here makes the first tick
+\                       \ of the hyperspace counter longer than subsequent ticks
+\
+\ TAX                   \ Print the 8-bit number in X (i.e. 15) at text location
+\ JMP ee3               \ (0, 1), padded to 5 digits, so it appears in the top
+\                       \ left corner of the screen, and return from the
+\                       \ subroutine using a tail call
 
- STA QQ22+1             \ Set the number in QQ22+1 to A, which is the number
-                        \ that's shown on-screen during the hyperspace countdown
-
- STA QQ22               \ Set the number in QQ22 to 15, which is the internal
-                        \ counter that counts down by 1 each iteration of the
-                        \ main game loop, and each time it reaches zero, the
-                        \ on-screen counter gets decremented, and QQ22 gets set
-                        \ to 5, so setting QQ22 to 15 here makes the first tick
-                        \ of the hyperspace counter longer than subsequent ticks
-
- TAX                    \ Print the 8-bit number in X (i.e. 15) at text location
- JMP ee3                \ (0, 1), padded to 5 digits, so it appears in the top
-                        \ left corner of the screen, and return from the
-                        \ subroutine using a tail call
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -15319,16 +15449,20 @@ ENDIF
 \
 \ ******************************************************************************
 
-.TTX110
+                        \ --- Mod: Code removed for Econet: ------------------->
 
-                        \ This routine is only called from the hyp routine, and
-                        \ it jumps back into hyp at label TTX111
+\.TTX110
+\
+\                       \ This routine is only called from the hyp routine, and
+\                       \ it jumps back into hyp at label TTX111
+\
+\ JSR TT111             \ Call TT111 to set the current system to the nearest
+\                       \ system to (QQ9, QQ10), and put the seeds of the
+\                       \ nearest system into QQ15 to QQ15+5
+\
+\ JMP TTX111            \ Return to TTX111 in the hyp routine
 
- JSR TT111              \ Call TT111 to set the current system to the nearest
-                        \ system to (QQ9, QQ10), and put the seeds of the
-                        \ nearest system into QQ15 to QQ15+5
-
- JMP TTX111             \ Return to TTX111 in the hyp routine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -15364,77 +15498,81 @@ ENDIF
 \
 \ ******************************************************************************
 
-.Ghy
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDX GHYP               \ Fetch GHYP, which tells us whether we own a galactic
- BEQ hy5                \ hyperdrive, and if it is zero, which means we don't,
-                        \ return from the subroutine (as hy5 contains an RTS)
+\.Ghy
+\
+\ LDX GHYP              \ Fetch GHYP, which tells us whether we own a galactic
+\ BEQ hy5               \ hyperdrive, and if it is zero, which means we don't,
+\                       \ return from the subroutine (as hy5 contains an RTS)
+\
+\ INX                   \ We own a galactic hyperdrive, so X is &FF, so this
+\                       \ instruction sets X = 0
+\
+\ STX GHYP              \ The galactic hyperdrive is a one-use item, so set GHYP
+\                       \ to 0 so we no longer have one fitted
+\
+\ STX FIST              \ Changing galaxy also clears our criminal record, so
+\                       \ set our legal status in FIST to 0 ("clean")
+\
+\ JSR wW                \ Call wW to start the hyperspace countdown
+\
+\ LDX #5                \ To move galaxy, we rotate the galaxy's seeds left, so
+\                       \ set a counter in X for the 6 seed bytes
+\
+\ INC GCNT              \ Increment the current galaxy number in GCNT
+\
+\ LDA GCNT              \ Set GCNT = GCNT mod 8, so we jump from galaxy 7 back
+\ AND #7                \ to galaxy 0 (shown in-game as going from galaxy 8 back
+\ STA GCNT              \ to the starting point in galaxy 1)
+\
+\.G1
+\
+\ LDA QQ21,X            \ Load the X-th seed byte into A
+\
+\ ASL A                 \ Set the C flag to bit 7 of the seed
+\
+\ ROL QQ21,X            \ Rotate the seed in memory, which will add bit 7 back
+\                       \ in as bit 0, so this rolls the seed around on itself
+\
+\ DEX                   \ Decrement the counter
+\
+\ BPL G1                \ Loop back for the next seed byte, until we have
+\                       \ rotated them all
+\
+\.zZ
+\
+\ LDA #96               \ Set (QQ9, QQ10) to (96, 96), which is where we always
+\ STA QQ9               \ arrive in a new galaxy (the selected system will be
+\ STA QQ10              \ set to the nearest actual system later on)
+\
+\ JSR TT110             \ Call TT110 to show the front space view
+\
+\ JSR TT111             \ Call TT111 to set the current system to the nearest
+\                       \ system to (QQ9, QQ10), and put the seeds of the
+\                       \ nearest system into QQ15 to QQ15+5
+\                       \
+\                       \ This call fixes a bug in the cassette version, where
+\                       \ the galactic hyperdrive will take us to coordinates
+\                       \ (96, 96) in the new galaxy, even if there isn't
+\                       \ actually a system there, so if we jump when we are
+\                       \ low on fuel, it is possible to get stuck in the
+\                       \ middle of nowhere when changing galaxy
+\                       \
+\                       \ This call sets the current system correctly, so we
+\                       \ always arrive at the nearest system to (96, 96)
+\
+\ LDX #0                \ Set the distance to the selected system in QQ8(1 0)
+\ STX QQ8               \ to 0
+\ STX QQ8+1
+\
+\ LDA #116              \ Print recursive token 116 (GALACTIC HYPERSPACE ")
+\ JSR MESS              \ as an in-flight message
+\
+\                       \ Fall through into jmp to set the system to the
+\                       \ current system and return from the subroutine there
 
- INX                    \ We own a galactic hyperdrive, so X is &FF, so this
-                        \ instruction sets X = 0
-
- STX GHYP               \ The galactic hyperdrive is a one-use item, so set GHYP
-                        \ to 0 so we no longer have one fitted
-
- STX FIST               \ Changing galaxy also clears our criminal record, so
-                        \ set our legal status in FIST to 0 ("clean")
-
- JSR wW                 \ Call wW to start the hyperspace countdown
-
- LDX #5                 \ To move galaxy, we rotate the galaxy's seeds left, so
-                        \ set a counter in X for the 6 seed bytes
-
- INC GCNT               \ Increment the current galaxy number in GCNT
-
- LDA GCNT               \ Set GCNT = GCNT mod 8, so we jump from galaxy 7 back
- AND #7                 \ to galaxy 0 (shown in-game as going from galaxy 8 back
- STA GCNT               \ to the starting point in galaxy 1)
-
-.G1
-
- LDA QQ21,X             \ Load the X-th seed byte into A
-
- ASL A                  \ Set the C flag to bit 7 of the seed
-
- ROL QQ21,X             \ Rotate the seed in memory, which will add bit 7 back
-                        \ in as bit 0, so this rolls the seed around on itself
-
- DEX                    \ Decrement the counter
-
- BPL G1                 \ Loop back for the next seed byte, until we have
-                        \ rotated them all
-
-.zZ
-
- LDA #96                \ Set (QQ9, QQ10) to (96, 96), which is where we always
- STA QQ9                \ arrive in a new galaxy (the selected system will be
- STA QQ10               \ set to the nearest actual system later on)
-
- JSR TT110              \ Call TT110 to show the front space view
-
- JSR TT111              \ Call TT111 to set the current system to the nearest
-                        \ system to (QQ9, QQ10), and put the seeds of the
-                        \ nearest system into QQ15 to QQ15+5
-                        \
-                        \ This call fixes a bug in the cassette version, where
-                        \ the galactic hyperdrive will take us to coordinates
-                        \ (96, 96) in the new galaxy, even if there isn't
-                        \ actually a system there, so if we jump when we are
-                        \ low on fuel, it is possible to get stuck in the
-                        \ middle of nowhere when changing galaxy
-                        \
-                        \ This call sets the current system correctly, so we
-                        \ always arrive at the nearest system to (96, 96)
-
- LDX #0                 \ Set the distance to the selected system in QQ8(1 0)
- STX QQ8                \ to 0
- STX QQ8+1
-
- LDA #116               \ Print recursive token 116 (GALACTIC HYPERSPACE ")
- JSR MESS               \ as an in-flight message
-
-                        \ Fall through into jmp to set the system to the
-                        \ current system and return from the subroutine there
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -15576,10 +15714,14 @@ ENDIF
 \
 \ ******************************************************************************
 
-.TT147
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA #202               \ Load A with token 42 ("RANGE") and fall through into
-                        \ prq to print it, followed by a question mark
+\.TT147
+\
+\ LDA #202              \ Load A with token 42 ("RANGE") and fall through into
+\                       \ prq to print it, followed by a question mark
+
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -18079,17 +18221,21 @@ ENDIF
 \
 \ ******************************************************************************
 
-.EX2
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA INWK+31            \ Set bits 5 and 7 of the ship's byte #31 to denote that
- ORA #%10100000         \ the ship is exploding and has been killed
- STA INWK+31
+\.EX2
+\
+\ LDA INWK+31           \ Set bits 5 and 7 of the ship's byte #31 to denote that
+\ ORA #%10100000        \ the ship is exploding and has been killed
+\ STA INWK+31
+\
+\ RTS                   \ Return from the subroutine
+\
+\.DOEXP
+\
+\ RTS                   \ Return from the subroutine
 
- RTS                    \ Return from the subroutine
-
-.DOEXP
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -18241,19 +18387,23 @@ ENDIF
 \
 \ ******************************************************************************
 
-.DET1
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA #6                 \ Set A to 6 so we can update 6845 register R6 below
+\.DET1
+\
+\ LDA #6                \ Set A to 6 so we can update 6845 register R6 below
+\
+\ SEI                   \ Disable interrupts so we can update the 6845
+\
+\ STA VIA+&00           \ Set 6845 register R6 to the value in X. Register R6
+\ STX VIA+&01           \ is the "vertical displayed" register, which sets the
+\                       \ number of rows shown on the screen
+\
+\ CLI                   \ Re-enable interrupts
+\
+\ RTS                   \ Return from the subroutine
 
- SEI                    \ Disable interrupts so we can update the 6845
-
- STA VIA+&00            \ Set 6845 register R6 to the value in X. Register R6
- STX VIA+&01            \ is the "vertical displayed" register, which sets the
-                        \ number of rows shown on the screen
-
- CLI                    \ Re-enable interrupts
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -18275,21 +18425,25 @@ ENDIF
 \
 \ ******************************************************************************
 
- DEX                    \ Increment the shield value so that it doesn't go past
-                        \ a maximum of 255
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- RTS                    \ Return from the subroutine
+\ DEX                   \ Increment the shield value so that it doesn't go past
+\                       \ a maximum of 255
+\
+\ RTS                   \ Return from the subroutine
+\
+\.SHD
+\
+\ INX                   \ Increment the shield value
+\
+\ BEQ SHD-2             \ If the shield value is 0 then this means it was 255
+\                       \ before, which is the maximum value, so jump to SHD-2
+\                       \ to bring it back down to 258 and return
+\
+\                       \ Otherwise fall through into DENGY to drain our energy
+\                       \ to pay for all this shield charging
 
-.SHD
-
- INX                    \ Increment the shield value
-
- BEQ SHD-2              \ If the shield value is 0 then this means it was 255
-                        \ before, which is the maximum value, so jump to SHD-2
-                        \ to bring it back down to 258 and return
-
-                        \ Otherwise fall through into DENGY to drain our energy
-                        \ to pay for all this shield charging
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -18306,22 +18460,26 @@ ENDIF
 \
 \ ******************************************************************************
 
-.DENGY
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- DEC ENERGY             \ Decrement the energy banks in ENERGY
+\.DENGY
+\
+\ DEC ENERGY            \ Decrement the energy banks in ENERGY
+\
+\ PHP                   \ Save the flags on the stack
+\
+\ BNE P%+5              \ If the energy levels are not yet zero, skip the
+\                       \ following instruction
+\
+\ INC ENERGY            \ The minimum allowed energy level is 1, and we just
+\                       \ reached 0, so increment ENERGY back to 1
+\
+\ PLP                   \ Restore the flags from the stack, so we return with
+\                       \ the Z flag from the DEC instruction above
+\
+\ RTS                   \ Return from the subroutine
 
- PHP                    \ Save the flags on the stack
-
- BNE P%+5               \ If the energy levels are not yet zero, skip the
-                        \ following instruction
-
- INC ENERGY             \ The minimum allowed energy level is 1, and we just
-                        \ reached 0, so increment ENERGY back to 1
-
- PLP                    \ Restore the flags from the stack, so we return with
-                        \ the Z flag from the DEC instruction above
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -18354,22 +18512,26 @@ ENDIF
 \
 \ ******************************************************************************
 
-.SPS3
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA K%+1,X             \ Copy x_hi into K3+X
- STA K3,X
+\.SPS3
+\
+\ LDA K%+1,X            \ Copy x_hi into K3+X
+\ STA K3,X
+\
+\ LDA K%+2,X            \ Set A = Y = x_sign
+\ TAY
+\
+\ AND #%01111111        \ Set K3+1 = |x_sign|
+\ STA K3+1,X
+\
+\ TYA                   \ Set K3+2 = the sign of x_sign
+\ AND #%10000000
+\ STA K3+2,X
+\
+\ RTS                   \ Return from the subroutine
 
- LDA K%+2,X             \ Set A = Y = x_sign
- TAY
-
- AND #%01111111         \ Set K3+1 = |x_sign|
- STA K3+1,X
-
- TYA                    \ Set K3+2 = the sign of x_sign
- AND #%10000000
- STA K3+2,X
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -18691,16 +18853,20 @@ ENDIF
 \
 \ ******************************************************************************
 
-.NwS1
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA INWK,X             \ Load the X-th byte of INWK into A and flip bit 7,
- EOR #%10000000         \ storing the result back in the X-th byte of INWK
- STA INWK,X
+\.NwS1
+\
+\ LDA INWK,X            \ Load the X-th byte of INWK into A and flip bit 7,
+\ EOR #%10000000        \ storing the result back in the X-th byte of INWK
+\ STA INWK,X
+\
+\ INX                   \ Add 2 to X
+\ INX
+\
+\ RTS                   \ Return from the subroutine
 
- INX                    \ Add 2 to X
- INX
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -18717,13 +18883,17 @@ ENDIF
 \
 \ ******************************************************************************
 
-.ABORT
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDX #&FF               \ Set X to &FF, which is the value of MSTG when we have
-                        \ no target lock for our missile
+\.ABORT
+\
+\ LDX #&FF              \ Set X to &FF, which is the value of MSTG when we have
+\                       \ no target lock for our missile
+\
+\                       \ Fall through into ABORT2 to set the missile lock to
+\                       \ the value in X, which effectively disarms the missile
 
-                        \ Fall through into ABORT2 to set the missile lock to
-                        \ the value in X, which effectively disarms the missile
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -18755,17 +18925,21 @@ ENDIF
 \
 \ ******************************************************************************
 
-.ABORT2
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- STX MSTG               \ Store the target of our missile lock in MSTG
+\.ABORT2
+\
+\ STX MSTG              \ Store the target of our missile lock in MSTG
+\
+\ LDX NOMSL             \ Call MSBAR to update the leftmost indicator in the
+\ JSR MSBAR             \ dashboard's missile bar, which returns with Y = 0
+\
+\ STY MSAR              \ Set MSAR = 0 to indicate that the leftmost missile
+\                       \ is no longer seeking a target lock
+\
+\ RTS                   \ Return from the subroutine
 
- LDX NOMSL              \ Call MSBAR to update the leftmost indicator in the
- JSR MSBAR              \ dashboard's missile bar, which returns with Y = 0
-
- STY MSAR               \ Set MSAR = 0 to indicate that the leftmost missile
-                        \ is no longer seeking a target lock
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -18776,17 +18950,21 @@ ENDIF
 \
 \ ******************************************************************************
 
-.SPBLB
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA #24*8              \ The space station bulb is in character block number 24
-                        \ with each character taking 8 bytes, so this sets the
-                        \ low byte of the screen address of the character block
-                        \ we want to draw to
+\.SPBLB
+\
+\ LDA #24*8             \ The space station bulb is in character block number 24
+\                       \ with each character taking 8 bytes, so this sets the
+\                       \ low byte of the screen address of the character block
+\                       \ we want to draw to
+\
+\ LDX #LO(SPBT)         \ Set (Y X) to point to the character definition in SPBT
+\ LDY #HI(SPBT)
+\
+\                       \ Fall through into BULB to draw the space station bulb
 
- LDX #LO(SPBT)          \ Set (Y X) to point to the character definition in SPBT
- LDY #HI(SPBT)
-
-                        \ Fall through into BULB to draw the space station bulb
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -18815,20 +18993,24 @@ ENDIF
 \
 \ ******************************************************************************
 
-.BULB
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- STA SC                 \ Store the low byte of the screen address in SC
+\.BULB
+\
+\ STA SC                \ Store the low byte of the screen address in SC
+\
+\ STX P+1               \ Set P(2 1) = (Y X)
+\ STY P+2
+\
+\ LDA #&7D              \ Set A to the high byte of the screen address, which is
+\                       \ &7D as the bulbs are both in the character row from
+\                       \ &7D00 to &7DFF
+\
+\ JMP RREN              \ Call RREN to print the character definition pointed to
+\                       \ by P(2 1) at the screen address pointed to by (A SC),
+\                       \ returning from the subroutine using a tail call
 
- STX P+1                \ Set P(2 1) = (Y X)
- STY P+2
-
- LDA #&7D               \ Set A to the high byte of the screen address, which is
-                        \ &7D as the bulbs are both in the character row from
-                        \ &7D00 to &7DFF
-
- JMP RREN               \ Call RREN to print the character definition pointed to
-                        \ by P(2 1) at the screen address pointed to by (A SC),
-                        \ returning from the subroutine using a tail call
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -18846,16 +19028,20 @@ ENDIF
 \
 \ ******************************************************************************
 
-.SPBT
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- EQUB %11100000         \ x x x .
- EQUB %11100000         \ x x x .
- EQUB %10000000         \ x . . .
- EQUB %11100000         \ x x x .
- EQUB %11100000         \ x x x .
- EQUB %00100000         \ . . x .
- EQUB %11100000         \ x x x .
- EQUB %11100000         \ x x x .
+\.SPBT
+\
+\ EQUB %11100000        \ x x x .
+\ EQUB %11100000        \ x x x .
+\ EQUB %10000000        \ x . . .
+\ EQUB %11100000        \ x x x .
+\ EQUB %11100000        \ x x x .
+\ EQUB %00100000        \ . . x .
+\ EQUB %11100000        \ x x x .
+\ EQUB %11100000        \ x x x .
+
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -19532,32 +19718,36 @@ ENDIF
 \
 \ ******************************************************************************
 
-.CIRCLE
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA #0                 \ Set LSX2 = 0 to indicate that the ball line heap is
- STA LSX2               \ not empty, as we are about to fill it
+\.CIRCLE
+\
+\ LDA #0                \ Set LSX2 = 0 to indicate that the ball line heap is
+\ STA LSX2              \ not empty, as we are about to fill it
+\
+\ LDX K                 \ Set X = K = radius
+\
+\ LDA #8                \ Set A = 8
+\
+\ CPX #8                \ If the radius < 8, skip to PL89
+\ BCC PL89
+\
+\ LSR A                 \ Halve A so A = 4
+\
+\ CPX #60               \ If the radius < 60, skip to PL89
+\ BCC PL89
+\
+\ LSR A                 \ Halve A so A = 2
+\
+\.PL89
+\
+\ STA STP               \ Set STP = A. STP is the step size for the circle, so
+\                       \ the above sets a smaller step size for bigger circles
+\
+\                       \ Fall through into CIRCLE2 to draw the circle with the
+\                       \ correct step size
 
- LDX K                  \ Set X = K = radius
-
- LDA #8                 \ Set A = 8
-
- CPX #8                 \ If the radius < 8, skip to PL89
- BCC PL89
-
- LSR A                  \ Halve A so A = 4
-
- CPX #60                \ If the radius < 60, skip to PL89
- BCC PL89
-
- LSR A                  \ Halve A so A = 2
-
-.PL89
-
- STA STP                \ Set STP = A. STP is the step size for the circle, so
-                        \ the above sets a smaller step size for bigger circles
-
-                        \ Fall through into CIRCLE2 to draw the circle with the
-                        \ correct step size
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -19709,15 +19899,19 @@ ENDIF
 \
 \ ******************************************************************************
 
-.WP1
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA #1                 \ Set LSP = 1 to reset the ball line heap pointer
- STA LSP
+\.WP1
+\
+\ LDA #1                \ Set LSP = 1 to reset the ball line heap pointer
+\ STA LSP
+\
+\ LDA #&FF              \ Set LSX2 = &FF to indicate the ball line heap is empty
+\ STA LSX2
+\
+\ RTS                   \ Return from the subroutine
 
- LDA #&FF               \ Set LSX2 = &FF to indicate the ball line heap is empty
- STA LSX2
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -19740,44 +19934,48 @@ ENDIF
 \
 \ ******************************************************************************
 
-.WPLS
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA LSX                \ If LSX < 0, the sun line heap is empty, so return from
- BMI PL44               \ the subroutine (as PL44 contains a CLC and RTS)
+\.WPLS
+\
+\ LDA LSX               \ If LSX < 0, the sun line heap is empty, so return from
+\ BMI PL44              \ the subroutine (as PL44 contains a CLC and RTS)
+\
+\ LDA SUNX              \ Set YY(1 0) = SUNX(1 0), the x-coordinate of the
+\ STA YY                \ vertical centre axis of the sun that's currently on
+\ LDA SUNX+1            \ screen
+\ STA YY+1
+\
+\ LDY #2*Y-1            \ #Y is the y-coordinate of the centre of the space
+\                       \ view, so this sets Y as a counter for the number of
+\                       \ lines in the space view (i.e. 191), which is also the
+\                       \ number of lines in the LSO block
+\
+\.WPL2
+\
+\ LDA LSO,Y             \ Fetch the Y-th point from the sun line heap, which
+\                       \ gives us the half-width of the sun's line on this line
+\                       \ of the screen
+\
+\ BEQ P%+5              \ If A = 0, skip the following call to HLOIN2 as there
+\                       \ is no sun line on this line of the screen
+\
+\ JSR HLOIN2            \ Call HLOIN2 to draw a horizontal line on pixel line Y,
+\                       \ with centre point YY(1 0) and half-width A, and remove
+\                       \ the line from the sun line heap once done
+\
+\ DEY                   \ Decrement the loop counter
+\
+\ BNE WPL2              \ Loop back for the next line in the line heap until
+\                       \ we have gone through the entire heap
+\
+\ DEY                   \ This sets Y to &FF, as we end the loop with Y = 0
+\
+\ STY LSX               \ Set LSX to &FF to indicate the sun line heap is empty
+\
+\ RTS                   \ Return from the subroutine
 
- LDA SUNX               \ Set YY(1 0) = SUNX(1 0), the x-coordinate of the
- STA YY                 \ vertical centre axis of the sun that's currently on
- LDA SUNX+1             \ screen
- STA YY+1
-
- LDY #2*Y-1             \ #Y is the y-coordinate of the centre of the space
-                        \ view, so this sets Y as a counter for the number of
-                        \ lines in the space view (i.e. 191), which is also the
-                        \ number of lines in the LSO block
-
-.WPL2
-
- LDA LSO,Y              \ Fetch the Y-th point from the sun line heap, which
-                        \ gives us the half-width of the sun's line on this line
-                        \ of the screen
-
- BEQ P%+5               \ If A = 0, skip the following call to HLOIN2 as there
-                        \ is no sun line on this line of the screen
-
- JSR HLOIN2             \ Call HLOIN2 to draw a horizontal line on pixel line Y,
-                        \ with centre point YY(1 0) and half-width A, and remove
-                        \ the line from the sun line heap once done
-
- DEY                    \ Decrement the loop counter
-
- BNE WPL2               \ Loop back for the next line in the line heap until
-                        \ we have gone through the entire heap
-
- DEY                    \ This sets Y to &FF, as we end the loop with Y = 0
-
- STY LSX                \ Set LSX to &FF to indicate the sun line heap is empty
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -20625,39 +20823,43 @@ ENDIF
 \
 \ ******************************************************************************
 
-.Ze
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- JSR ZINF               \ Call ZINF to reset the INWK ship workspace
+\.Ze
+\
+\ JSR ZINF              \ Call ZINF to reset the INWK ship workspace
+\
+\ JSR DORND             \ Set A and X to random numbers
+\
+\ STA T1                \ Store A in T1
+\
+\ AND #%10000000        \ Extract the sign of A and store in x_sign
+\ STA INWK+2
+\
+\ TXA                   \ Extract the sign of X and store in y_sign
+\ AND #%10000000
+\ STA INWK+5
+\
+\ LDA #25               \ Set x_hi = y_hi = z_hi = 25, a fair distance away
+\ STA INWK+1
+\ STA INWK+4
+\ STA INWK+7
+\
+\ TXA                   \ Set the C flag if X >= 245 (4% chance)
+\ CMP #245
+\
+\ ROL A                 \ Set bit 0 of A to the C flag (i.e. there's a 4%
+\                       \ chance of this ship having E.C.M.)
+\
+\ ORA #%11000000        \ Set bits 6 and 7 of A, so the ship is hostile (bit 6
+\                       \ and has AI (bit 7)
+\
+\ STA INWK+32           \ Store A in the AI flag of this ship
+\
+\                       \ Fall through into DORND2 to set A, X and the C flag
+\                       \ randomly
 
- JSR DORND              \ Set A and X to random numbers
-
- STA T1                 \ Store A in T1
-
- AND #%10000000         \ Extract the sign of A and store in x_sign
- STA INWK+2
-
- TXA                    \ Extract the sign of X and store in y_sign
- AND #%10000000
- STA INWK+5
-
- LDA #25                \ Set x_hi = y_hi = z_hi = 25, a fair distance away
- STA INWK+1
- STA INWK+4
- STA INWK+7
-
- TXA                    \ Set the C flag if X >= 245 (4% chance)
- CMP #245
-
- ROL A                  \ Set bit 0 of A to the C flag (i.e. there's a 4%
-                        \ chance of this ship having E.C.M.)
-
- ORA #%11000000         \ Set bits 6 and 7 of A, so the ship is hostile (bit 6
-                        \ and has AI (bit 7)
-
- STA INWK+32            \ Store A in the AI flag of this ship
-
-                        \ Fall through into DORND2 to set A, X and the C flag
-                        \ randomly
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -21160,19 +21362,23 @@ ENDIF
 \
 \ ******************************************************************************
 
-.BAD
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA QQ20+3             \ Set A to the number of tonnes of slaves in the hold
+\.BAD
+\
+\ LDA QQ20+3            \ Set A to the number of tonnes of slaves in the hold
+\
+\ CLC                   \ Clear the C flag so we can do addition without the
+\                       \ C flag affecting the result
+\
+\ ADC QQ20+6            \ Add the number of tonnes of narcotics in the hold
+\
+\ ASL A                 \ Double the result and add the number of tonnes of
+\ ADC QQ20+10           \ firearms in the hold
+\
+\ RTS                   \ Return from the subroutine
 
- CLC                    \ Clear the C flag so we can do addition without the
-                        \ C flag affecting the result
-
- ADC QQ20+6             \ Add the number of tonnes of narcotics in the hold
-
- ASL A                  \ Double the result and add the number of tonnes of
- ADC QQ20+10            \ firearms in the hold
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -22769,11 +22975,15 @@ ENDIF
 \
 \ ******************************************************************************
 
-.GTNMES
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- JSR GTNME              \ Fetch the name of a commander file to save or load
+\.GTNMES
+\
+\ JSR GTNME             \ Fetch the name of a commander file to save or load
+\
+\ RTS                   \ Return from the subroutine
 
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -22790,18 +23000,22 @@ ENDIF
 \
 \ ******************************************************************************
 
-.SPS1
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDX #0                 \ Copy the two high bytes of the planet's x-coordinate
- JSR SPS3               \ into K3(2 1 0), separating out the sign bit into K3+2
+\.SPS1
+\
+\ LDX #0                \ Copy the two high bytes of the planet's x-coordinate
+\ JSR SPS3              \ into K3(2 1 0), separating out the sign bit into K3+2
+\
+\ LDX #3                \ Copy the two high bytes of the planet's y-coordinate
+\ JSR SPS3              \ into K3(5 4 3), separating out the sign bit into K3+5
+\
+\ LDX #6                \ Copy the two high bytes of the planet's z-coordinate
+\ JSR SPS3              \ into K3(8 7 6), separating out the sign bit into K3+8
+\
+\                       \ Fall through into TAS2 to build XX15 from K3
 
- LDX #3                 \ Copy the two high bytes of the planet's y-coordinate
- JSR SPS3               \ into K3(5 4 3), separating out the sign bit into K3+5
-
- LDX #6                 \ Copy the two high bytes of the planet's z-coordinate
- JSR SPS3               \ into K3(8 7 6), separating out the sign bit into K3+8
-
-                        \ Fall through into TAS2 to build XX15 from K3
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -22859,65 +23073,69 @@ ENDIF
 \
 \ ******************************************************************************
 
-.TAS2
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA K3                 \ OR the three low bytes and 1 to get a byte that has
- ORA K3+3               \ a 1 wherever any of the three low bytes has a 1
- ORA K3+6               \ (as well as always having bit 0 set), and store in
- ORA #1                 \ K3+9
- STA K3+9
+\.TAS2
+\
+\ LDA K3                \ OR the three low bytes and 1 to get a byte that has
+\ ORA K3+3              \ a 1 wherever any of the three low bytes has a 1
+\ ORA K3+6              \ (as well as always having bit 0 set), and store in
+\ ORA #1                \ K3+9
+\ STA K3+9
+\
+\ LDA K3+1              \ OR the three high bytes to get a byte in A that has a
+\ ORA K3+4              \ 1 wherever any of the three high bytes has a 1
+\ ORA K3+7
+\
+\                       \ (A K3+9) now has a 1 wherever any of the 16-bit
+\                       \ values in K3 has a 1
+\.TAL2
+\
+\ ASL K3+9              \ Shift (A K3+9) to the left, so bit 7 of the high byte
+\ ROL A                 \ goes into the C flag
+\
+\ BCS TA2               \ If the left shift pushed a 1 out of the end, then we
+\                       \ know that at least one of the coordinates has a 1 in
+\                       \ this position, so jump to TA2 as we can't shift the
+\                       \ values in K3 any further to the left
+\
+\ ASL K3                \ Shift K3(1 0), the x-coordinate, to the left
+\ ROL K3+1
+\
+\ ASL K3+3              \ Shift K3(4 3), the y-coordinate, to the left
+\ ROL K3+4
+\
+\ ASL K3+6              \ Shift K3(6 7), the z-coordinate, to the left
+\ ROL K3+7
+\
+\ BCC TAL2              \ Jump back to TAL2 to do another shift left (this BCC
+\                       \ is effectively a JMP as we know bit 7 of K3+7 is not a
+\                       \ 1, as otherwise bit 7 of A would have been a 1 and we
+\                       \ would have taken the BCS above)
+\
+\.TA2
+\
+\ LDA K3+1              \ Fetch the high byte of the x-coordinate from our left-
+\ LSR A                 \ shifted K3, shift it right to clear bit 7, stick the
+\ ORA K3+2              \ sign bit in there from the x_sign part of K3, and
+\ STA XX15              \ store the resulting signed 8-bit x-coordinate in XX15
+\
+\ LDA K3+4              \ Fetch the high byte of the y-coordinate from our left-
+\ LSR A                 \ shifted K3, shift it right to clear bit 7, stick the
+\ ORA K3+5              \ sign bit in there from the y_sign part of K3, and
+\ STA XX15+1            \ store the resulting signed 8-bit y-coordinate in
+\                       \ XX15+1
+\
+\ LDA K3+7              \ Fetch the high byte of the z-coordinate from our left-
+\ LSR A                 \ shifted K3, shift it right to clear bit 7, stick the
+\ ORA K3+8              \ sign bit in there from the z_sign part of K3, and
+\ STA XX15+2            \ store the resulting signed 8-bit  z-coordinate in
+\                       \ XX15+2
+\
+\                       \ Now we have a signed 8-bit version of the vector K3 in
+\                       \ XX15, so fall through into NORM to normalise it
 
- LDA K3+1               \ OR the three high bytes to get a byte in A that has a
- ORA K3+4               \ 1 wherever any of the three high bytes has a 1
- ORA K3+7
-
-                        \ (A K3+9) now has a 1 wherever any of the 16-bit
-                        \ values in K3 has a 1
-.TAL2
-
- ASL K3+9               \ Shift (A K3+9) to the left, so bit 7 of the high byte
- ROL A                  \ goes into the C flag
-
- BCS TA2                \ If the left shift pushed a 1 out of the end, then we
-                        \ know that at least one of the coordinates has a 1 in
-                        \ this position, so jump to TA2 as we can't shift the
-                        \ values in K3 any further to the left
-
- ASL K3                 \ Shift K3(1 0), the x-coordinate, to the left
- ROL K3+1
-
- ASL K3+3               \ Shift K3(4 3), the y-coordinate, to the left
- ROL K3+4
-
- ASL K3+6               \ Shift K3(6 7), the z-coordinate, to the left
- ROL K3+7
-
- BCC TAL2               \ Jump back to TAL2 to do another shift left (this BCC
-                        \ is effectively a JMP as we know bit 7 of K3+7 is not a
-                        \ 1, as otherwise bit 7 of A would have been a 1 and we
-                        \ would have taken the BCS above)
-
-.TA2
-
- LDA K3+1               \ Fetch the high byte of the x-coordinate from our left-
- LSR A                  \ shifted K3, shift it right to clear bit 7, stick the
- ORA K3+2               \ sign bit in there from the x_sign part of K3, and
- STA XX15               \ store the resulting signed 8-bit x-coordinate in XX15
-
- LDA K3+4               \ Fetch the high byte of the y-coordinate from our left-
- LSR A                  \ shifted K3, shift it right to clear bit 7, stick the
- ORA K3+5               \ sign bit in there from the y_sign part of K3, and
- STA XX15+1             \ store the resulting signed 8-bit y-coordinate in
-                        \ XX15+1
-
- LDA K3+7               \ Fetch the high byte of the z-coordinate from our left-
- LSR A                  \ shifted K3, shift it right to clear bit 7, stick the
- ORA K3+8               \ sign bit in there from the z_sign part of K3, and
- STA XX15+2             \ store the resulting signed 8-bit  z-coordinate in
-                        \ XX15+2
-
-                        \ Now we have a signed 8-bit version of the vector K3 in
-                        \ XX15, so fall through into NORM to normalise it
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -23135,15 +23353,19 @@ ENDIF
 \
 \ ******************************************************************************
 
-.EXNO3
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA #16                \ Call the NOISE routine with A = 16 to make the first
- JSR NOISE              \ death sound
+\.EXNO3
+\
+\ LDA #16               \ Call the NOISE routine with A = 16 to make the first
+\ JSR NOISE             \ death sound
+\
+\ LDA #24               \ Call the NOISE routine with A = 24 to make the second
+\ BNE NOISE             \ death sound and return from the subroutine using a
+\                       \ tail call (this BNE is effectively a JMP as A will
+\                       \ never be zero)
 
- LDA #24                \ Call the NOISE routine with A = 24 to make the second
- BNE NOISE              \ death sound and return from the subroutine using a
-                        \ tail call (this BNE is effectively a JMP as A will
-                        \ never be zero)
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -23177,21 +23399,25 @@ ENDIF
 \
 \ ******************************************************************************
 
-.EXNO2
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- INC TALLY              \ Increment the low byte of the kill count in TALLY
+\.EXNO2
+\
+\ INC TALLY             \ Increment the low byte of the kill count in TALLY
+\
+\ BNE EXNO-2            \ If there is no carry, jump to the LDX #7 below (at
+\                       \ EXNO-2)
+\
+\ INC TALLY+1           \ Increment the high byte of the kill count in TALLY
+\
+\ LDA #101              \ The kill total is a multiple of 256, so it's time
+\ JSR MESS              \ for a pat on the back, so print recursive token 101
+\                       \ ("RIGHT ON COMMANDER!") as an in-flight message
+\
+\ LDX #7                \ Set X = 7 and fall through into EXNO to make the
+\                       \ sound of a ship exploding
 
- BNE EXNO-2             \ If there is no carry, jump to the LDX #7 below (at
-                        \ EXNO-2)
-
- INC TALLY+1            \ Increment the high byte of the kill count in TALLY
-
- LDA #101               \ The kill total is a multiple of 256, so it's time
- JSR MESS               \ for a pat on the back, so print recursive token 101
-                        \ ("RIGHT ON COMMANDER!") as an in-flight message
-
- LDX #7                 \ Set X = 7 and fall through into EXNO to make the
-                        \ sound of a ship exploding
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -23232,46 +23458,50 @@ ENDIF
 \
 \ ******************************************************************************
 
-.EXNO
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- STX T                  \ Store the distance in T
+\.EXNO
+\
+\ STX T                 \ Store the distance in T
+\
+\ LDA #24               \ Set A = 24 to denote the sound of us making a hit or
+\ JSR NOS1              \ kill (part 1 of the explosion), and call NOS1 to set
+\                       \ up the sound block in XX16
+\
+\ LDA INWK+7            \ Fetch z_hi, the distance of the ship being hit in
+\ LSR A                 \ terms of the z-axis (in and out of the screen), and
+\ LSR A                 \ divide by 4. If z_hi has either bit 6 or 7 set then
+\                       \ that ship is too far away to be shown on the scanner
+\                       \ (as per the SCAN routine), so we know the maximum
+\                       \ z_hi at this point is %00111111, and shifting z_hi
+\                       \ to the right twice gives us a maximum value of
+\                       \ %00001111
+\
+\ AND T                 \ This reduces A to a maximum of X; X can be either
+\                       \ 7 = %0111 or 15 = %1111, so AND'ing with 15 will
+\                       \ not affect A, while AND'ing with 7 will clear bit
+\                       \ 3, reducing the maximum value in A to 7
+\
+\ ORA #%11110001        \ The SOUND statement's amplitude ranges from 0 (for no
+\                       \ sound) to -15 (full volume), so we can set bits 0 and
+\                       \ 4-7 in A, and keep bits 1-3 from the above to get
+\                       \ a value between -15 (%11110001) and -1 (%11111111),
+\                       \ with lower values of z_hi and argument X leading
+\                       \ to a more negative, or quieter number (so the closer
+\                       \ the ship, i.e. the smaller the value of X, the louder
+\                       \ the sound)
+\
+\ STA XX16+2            \ The amplitude byte of the sound block in XX16 is in
+\                       \ byte #3 (where it's the low byte of the amplitude), so
+\                       \ this sets the amplitude to the value in A
+\
+\ JSR NO3               \ Make the sound from our updated sound block in XX16
+\
+\ LDA #16               \ Set A = 16 to denote we have made a hit or kill
+\                       \ (part 2 of the explosion), and fall through into NOISE
+\                       \ to make the sound
 
- LDA #24                \ Set A = 24 to denote the sound of us making a hit or
- JSR NOS1               \ kill (part 1 of the explosion), and call NOS1 to set
-                        \ up the sound block in XX16
-
- LDA INWK+7             \ Fetch z_hi, the distance of the ship being hit in
- LSR A                  \ terms of the z-axis (in and out of the screen), and
- LSR A                  \ divide by 4. If z_hi has either bit 6 or 7 set then
-                        \ that ship is too far away to be shown on the scanner
-                        \ (as per the SCAN routine), so we know the maximum
-                        \ z_hi at this point is %00111111, and shifting z_hi
-                        \ to the right twice gives us a maximum value of
-                        \ %00001111
-
- AND T                  \ This reduces A to a maximum of X; X can be either
-                        \ 7 = %0111 or 15 = %1111, so AND'ing with 15 will
-                        \ not affect A, while AND'ing with 7 will clear bit
-                        \ 3, reducing the maximum value in A to 7
-
- ORA #%11110001         \ The SOUND statement's amplitude ranges from 0 (for no
-                        \ sound) to -15 (full volume), so we can set bits 0 and
-                        \ 4-7 in A, and keep bits 1-3 from the above to get
-                        \ a value between -15 (%11110001) and -1 (%11111111),
-                        \ with lower values of z_hi and argument X leading
-                        \ to a more negative, or quieter number (so the closer
-                        \ the ship, i.e. the smaller the value of X, the louder
-                        \ the sound)
-
- STA XX16+2             \ The amplitude byte of the sound block in XX16 is in
-                        \ byte #3 (where it's the low byte of the amplitude), so
-                        \ this sets the amplitude to the value in A
-
- JSR NO3                \ Make the sound from our updated sound block in XX16
-
- LDA #16                \ Set A = 16 to denote we have made a hit or kill
-                        \ (part 2 of the explosion), and fall through into NOISE
-                        \ to make the sound
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -23632,36 +23862,40 @@ ENDIF
 \
 \ ******************************************************************************
 
-.DKJ1
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA VIA+&40            \ Read 6522 System VIA input register IRB (SHEILA &40)
+\.DKJ1
+\
+\ LDA VIA+&40           \ Read 6522 System VIA input register IRB (SHEILA &40)
+\
+\ TAX                   \ This instruction doesn't seem to have any effect, as
+\                       \ X is overwritten in a few instructions
+\
+\ AND #%00010000        \ Bit 4 of IRB (PB4) is clear if joystick 1's fire
+\                       \ button is pressed, otherwise it is set, so AND'ing
+\                       \ the value of IRB with %10000 extracts this bit
+\
+\ EOR #%00010000        \ Flip bit 4 so that it's set if the fire button has
+\ STA KY7               \ been pressed, and store the result in the keyboard
+\                       \ logger at location KY7, which is also where the A key
+\                       \ (fire lasers) key is logged
+\
+\ LDX #1                \ Call DKS2 to fetch the value of ADC channel 1 (the
+\ JSR DKS2              \ joystick X value) into (A X), and OR A with 1. This
+\ ORA #1                \ ensures that the high byte is at least 1, and then we
+\ STA JSTX              \ store the result in JSTX
+\
+\ LDX #2                \ Call DKS2 to fetch the value of ADC channel 2 (the
+\ JSR DKS2              \ joystick Y value) into (A X), and EOR A with JSTGY.
+\ EOR JSTGY             \ JSTGY will be &FF if the game is configured to
+\ STA JSTY              \ reverse the joystick Y channel, so this EOR does
+\                       \ exactly that, and then we store the result in JSTY
+\
+\ JMP DK4               \ We are done scanning the joystick flight controls,
+\                       \ so jump to DK4 to scan for other keys, using a tail
+\                       \ call so we can return from the subroutine there
 
- TAX                    \ This instruction doesn't seem to have any effect, as
-                        \ X is overwritten in a few instructions
-
- AND #%00010000         \ Bit 4 of IRB (PB4) is clear if joystick 1's fire
-                        \ button is pressed, otherwise it is set, so AND'ing
-                        \ the value of IRB with %10000 extracts this bit
-
- EOR #%00010000         \ Flip bit 4 so that it's set if the fire button has
- STA KY7                \ been pressed, and store the result in the keyboard
-                        \ logger at location KY7, which is also where the A key
-                        \ (fire lasers) key is logged
-
- LDX #1                 \ Call DKS2 to fetch the value of ADC channel 1 (the
- JSR DKS2               \ joystick X value) into (A X), and OR A with 1. This
- ORA #1                 \ ensures that the high byte is at least 1, and then we
- STA JSTX               \ store the result in JSTX
-
- LDX #2                 \ Call DKS2 to fetch the value of ADC channel 2 (the
- JSR DKS2               \ joystick Y value) into (A X), and EOR A with JSTGY.
- EOR JSTGY              \ JSTGY will be &FF if the game is configured to
- STA JSTY               \ reverse the joystick Y channel, so this EOR does
-                        \ exactly that, and then we store the result in JSTY
-
- JMP DK4                \ We are done scanning the joystick flight controls,
-                        \ so jump to DK4 to scan for other keys, using a tail
-                        \ call so we can return from the subroutine there
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -25176,9 +25410,20 @@ ENDMACRO
  AND #%11110111         \ byte #31 to denote that the ship is no longer being
  STA XX1+31             \ drawn on-screen
 
- JMP DOEXP              \ Jump to DOEXP to return from the subroutine using a
-                        \ tail call, as in the docked code DOEXP just contains
-                        \ an RTS
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\ JMP DOEXP             \ Jump to DOEXP to return from the subroutine using a
+\                       \ tail call, as in the docked code DOEXP just contains
+\                       \ an RTS
+
+                        \ --- And replaced by: -------------------------------->
+
+ JMP TT48               \ Jump to TT48 to return from the subroutine using a
+                        \ tail call, as TT48 just contains an RTS (it replaces
+                        \ a call to DOEXP in the flight code, which we don't
+                        \ need to do here as we are docked)
+
+                        \ --- End of replacement ------------------------------>
 
 .EE51
 
@@ -26856,8 +27101,19 @@ ENDMACRO
  ORA #%00001000         \ #31 to denote that we are drawing something on-screen
  STA XX1+31             \ for this ship
 
- JMP DOEXP              \ Jump to DOEXP to display the explosion cloud,
-                        \ returning from the subroutine using a tail call
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\ JMP DOEXP             \ Jump to DOEXP to display the explosion cloud,
+\                       \ returning from the subroutine using a tail call
+
+                        \ --- And replaced by: -------------------------------->
+
+ JMP TT48               \ Jump to TT48 to return from the subroutine using a
+                        \ tail call, as TT48 just contains an RTS (it replaces
+                        \ a call to DOEXP in the flight code, which we don't
+                        \ need to do here as we are docked)
+
+                        \ --- End of replacement ------------------------------>
 
 .EE31
 
@@ -33820,7 +34076,15 @@ ENDMACRO
  FACE        0,        0,     -160,         31    \ Face 8
  FACE        0,      -27,        0,         31    \ Face 9
 
- SKIP 171               \ These bytes appear to be unused
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\SKIP 171               \ These bytes appear to be unused
+
+                        \ --- And replaced by: -------------------------------->
+
+ SKIPTO &6000
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
