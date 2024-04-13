@@ -2102,6 +2102,7 @@ ELIF _SRAM_DISC
                         \ of ship blueprints and jump into the main game loop
 
 ENDIF
+
 \ ******************************************************************************
 \
 \       Name: SCANCOL
