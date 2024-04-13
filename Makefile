@@ -27,7 +27,7 @@ endif
 
 variant-number=3
 folder=/sideways-ram
-suffix=-sideways-ram
+suffix=-econet
 boot=-opt 3
 
 .PHONY:all
