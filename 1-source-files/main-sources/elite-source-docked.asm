@@ -213,11 +213,25 @@
  SKIP 4                 \ Four 8-bit seeds for the random number generation
                         \ system implemented in the DORND routine
 
-.TRTB%
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- SKIP 2                 \ Contains the address of the keyboard translation
-                        \ table, which is used to translate internal key
-                        \ numbers to ASCII
+\.TRTB%
+\
+\SKIP 2                 \ Contains the address of the keyboard translation
+\                       \ table, which is used to translate internal key
+\                       \ numbers to ASCII
+
+                        \ --- And replaced by: -------------------------------->
+
+.XX4
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+.XX20
+
+ SKIP 1                 \ Temporary storage, used in a number of places
+
+                        \ --- End of replacement ------------------------------>
 
 .T1
 
@@ -578,21 +592,25 @@
 
  SKIP 1                 \ Temporary storage, used in a number of places
 
-.XSAV
+                        \ --- Mod: Code moved for Econet: --------------------->
 
- SKIP 1                 \ Temporary storage for saving the value of the X
-                        \ register, used in a number of places
+\.XSAV
+\
+\SKIP 1                 \ Temporary storage for saving the value of the X
+\                       \ register, used in a number of places
+\
+\.YSAV
+\
+\SKIP 1                 \ Temporary storage for saving the value of the Y
+\                       \ register, used in a number of places
+\
+\.XX17
+\
+\SKIP 1                 \ Temporary storage, used in BPRNT to store the number
+\                       \ of characters to print, and as the edge counter in the
+\                       \ main ship-drawing routine
 
-.YSAV
-
- SKIP 1                 \ Temporary storage for saving the value of the Y
-                        \ register, used in a number of places
-
-.XX17
-
- SKIP 1                 \ Temporary storage, used in BPRNT to store the number
-                        \ of characters to print, and as the edge counter in the
-                        \ main ship-drawing routine
+                        \ --- End of moved code ------------------------------->
 
 .QQ11
 
@@ -679,6 +697,95 @@
                         \ for counters when drawing explosion clouds and partial
                         \ circles
 
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\.SWAP
+\
+\SKIP 1                 \ Temporary storage, used to store a flag that records
+\                       \ whether or not we had to swap a line's start and end
+\                       \ coordinates around when clipping the line in routine
+\                       \ LL145 (the flag is used in places like BLINE to swap
+\                       \ them back)
+\
+\.COL
+\
+\SKIP 1                 \ Temporary storage, used to store colour information
+\                       \ when drawing pixels in the dashboard
+\
+\.FLAG
+\
+\SKIP 1                 \ A flag that's used to define whether this is the first
+\                       \ call to the ball line routine in BLINE, so it knows
+\                       \ whether to wait for the second call before storing
+\                       \ segment data in the ball line heap
+
+                        \ --- End of removed code ----------------------------->
+
+.CNT
+
+ SKIP 1                 \ Temporary storage, typically used for storing the
+                        \ number of iterations required when looping
+
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\.CNT2
+\
+\SKIP 1                 \ Temporary storage, used in the planet-drawing routine
+\                       \ to store the segment number where the arc of a partial
+\                       \ circle should start
+\
+\.STP
+\
+\SKIP 1                 \ The step size for drawing circles
+\                       \
+\                       \ Circles in Elite are split up into 64 points, and the
+\                       \ step size determines how many points to skip with each
+\                       \ straight-line segment, so the smaller the step size,
+\                       \ the smoother the circle. The values used are:
+\                       \
+\                       \   * 2 for big planets and the circles on the charts
+\                       \   * 4 for medium planets and the launch tunnel
+\                       \   * 8 for small planets and the hyperspace tunnel
+\                       \
+\                       \ As the step size increases we move from smoother
+\                       \ circles at the top to more polygonal at the bottom.
+\                       \ See the CIRCLE2 routine for more details
+\
+\.XX4
+\
+\SKIP 1                 \ Temporary storage, used in a number of places
+\
+\.XX20
+\
+\SKIP 1                 \ Temporary storage, used in a number of places
+\
+\.XX14
+\
+\SKIP 1                 \ This byte appears to be unused
+\
+\
+\.RAT
+\
+\SKIP 1                 \ Used to store different signs depending on the current
+\                       \ space view, for use in calculating stardust movement
+\
+\.RAT2
+\
+\SKIP 1                 \ Temporary storage, used to store the pitch and roll
+\                       \ signs when moving objects and stardust
+\
+\.K2
+\
+\SKIP 4                 \ Temporary storage, used in a number of places
+
+                        \ --- And replaced by: -------------------------------->
+
+.CNT2
+
+ SKIP 1                 \ Temporary storage, used in the planet-drawing routine
+                        \ to store the segment number where the arc of a partial
+                        \ circle should start
+
 .SWAP
 
  SKIP 1                 \ Temporary storage, used to store a flag that records
@@ -687,28 +794,51 @@
                         \ LL145 (the flag is used in places like BLINE to swap
                         \ them back)
 
-.COL
+                        \ --- End of replacement ------------------------------>
 
- SKIP 1                 \ Temporary storage, used to store colour information
-                        \ when drawing pixels in the dashboard
+                        \ --- Mod: Code added for Econet: --------------------->
 
-.FLAG
+ SKIP 16                \ &90-9F is reserved for Econet
 
- SKIP 1                 \ A flag that's used to define whether this is the first
-                        \ call to the ball line routine in BLINE, so it knows
-                        \ whether to wait for the second call before storing
-                        \ segment data in the ball line heap
+                        \ --- End of added code ------------------------------->
 
-.CNT
+ ORG &00D1
 
- SKIP 1                 \ Temporary storage, typically used for storing the
-                        \ number of iterations required when looping
+.T
 
-.CNT2
+ SKIP 1                 \ Temporary storage, used in a number of places
 
- SKIP 1                 \ Temporary storage, used in the planet-drawing routine
-                        \ to store the segment number where the arc of a partial
-                        \ circle should start
+.K3
+
+ SKIP 0                 \ Temporary storage, used in a number of places
+
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\.XX2
+\
+\SKIP 14                \ Temporary storage, used to store the visibility of the
+\                       \ ship's faces during the ship-drawing routine at LL9
+
+                        \ --- And replaced by: -------------------------------->
+
+.XX2
+
+ SKIP 5                 \ Temporary storage, used to store the visibility of the
+                        \ ship's faces during the ship-drawing routine at LL9
+
+.K2
+
+ SKIP 4                 \ Temporary storage, used in a number of places
+
+.RAT
+
+ SKIP 1                 \ Used to store different signs depending on the current
+                        \ space view, for use in calculating stardust movement
+
+.RAT2
+
+ SKIP 1                 \ Temporary storage, used to store the pitch and roll
+                        \ signs when moving objects and stardust
 
 .STP
 
@@ -727,46 +857,19 @@
                         \ circles at the top to more polygonal at the bottom.
                         \ See the CIRCLE2 routine for more details
 
-.XX4
+.COL
 
- SKIP 1                 \ Temporary storage, used in a number of places
+ SKIP 1                 \ Temporary storage, used to store colour information
+                        \ when drawing pixels in the dashboard
 
-.XX20
+.FLAG
 
- SKIP 1                 \ Temporary storage, used in a number of places
+ SKIP 1                 \ A flag that's used to define whether this is the first
+                        \ call to the ball line routine in BLINE, so it knows
+                        \ whether to wait for the second call before storing
+                        \ segment data in the ball line heap
 
-.XX14
-
- SKIP 1                 \ This byte appears to be unused
-
-.RAT
-
- SKIP 1                 \ Used to store different signs depending on the current
-                        \ space view, for use in calculating stardust movement
-
-.RAT2
-
- SKIP 1                 \ Temporary storage, used to store the pitch and roll
-                        \ signs when moving objects and stardust
-
-.K2
-
- SKIP 4                 \ Temporary storage, used in a number of places
-
- ORG &00D1
-
-.T
-
- SKIP 1                 \ Temporary storage, used in a number of places
-
-.K3
-
- SKIP 0                 \ Temporary storage, used in a number of places
-
-.XX2
-
- SKIP 14                \ Temporary storage, used to store the visibility of the
-                        \ ship's faces during the ship-drawing routine at LL9
+                        \ --- End of replacement ------------------------------>
 
 .K4
 
@@ -1984,6 +2087,26 @@
  SKIP 1                 \ A counter used when spawning pirates, to work our way
                         \ through the list of pirate ship blueprints until we
                         \ find one that has been loaded
+
+                        \ --- Mod: Code moved for Econet: --------------------->
+
+.XSAV
+
+ SKIP 1                 \ Temporary storage for saving the value of the X
+                        \ register, used in a number of places
+
+.YSAV
+
+ SKIP 1                 \ Temporary storage for saving the value of the Y
+                        \ register, used in a number of places
+
+.XX17
+
+ SKIP 1                 \ Temporary storage, used in BPRNT to store the number
+                        \ of characters to print, and as the edge counter in the
+                        \ main ship-drawing routine
+
+                        \ --- End of moved code ------------------------------->
 
  PRINT "WP workspace from  ", ~WP," to ", ~P%
 
@@ -16261,7 +16384,11 @@ ENDIF
  BPL eny1               \ Loop back to copy the next byte until we have copied
                         \ the whole table
 
- JSR CATD               \ Call CATD to reload the disc catalogue
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\JSR CATD               \ Call CATD to reload the disc catalogue
+
+                        \ --- End of removed code ----------------------------->
 
  LDX #LO(RDLI)          \ Set (Y X) to point to RDLI ("R.D.CODE")
  LDY #HI(RDLI)
@@ -24132,10 +24259,21 @@ ENDIF
  TAY                    \ Copy A to Y, so Y contains the internal key number
                         \ of the key pressed
 
- LDA (TRTB%),Y          \ The address in TRTB% points to the MOS key
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\LDA (TRTB%),Y          \ The address in TRTB% points to the MOS key
                         \ translation table, which is used to translate
                         \ internal key numbers to ASCII, so this fetches the
                         \ key's ASCII code into A
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDA &F02B,Y            \ The address &F02B points to the OS 1.20 MOS key
+                        \ translation table, which is used to translate
+                        \ internal key numbers to ASCII, so this fetches the
+                        \ key's ASCII code into A
+
+                        \ --- End of replacement ------------------------------>
 
  LDY YSAV               \ Restore the original value of Y we stored above
 

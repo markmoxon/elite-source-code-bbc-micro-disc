@@ -1,33 +1,9 @@
 BEEBASM?=beebasm
 PYTHON?=python
 
-# A make command with no arguments will build the Stairway to Hell variant
-# with encrypted binaries, checksums enabled, the standard commander and
-# crc32 verification of the game binaries
-#
-# Optional arguments for the make command are:
-#
-#   variant=<release>   Build the specified variant:
-#
-#                         sth (default)
-#                         ib-disc
-#                         sideways-ram
-#
-#   commander=max       Start with a maxed-out commander
-#
-#   encrypt=no          Disable encryption and checksum routines
-#
-#   match=no            Do not attempt to match the original game binaries
-#                       (i.e. omit workspace noise)
-#
-#   verify=no           Disable crc32 verification of the game binaries
-#
-# So, for example:
-#
-#   make variant=ib-disc commander=max encrypt=no match=no verify=no
-#
-# will build an unencrypted Ian Bell disc variant with a maxed-out commander,
-# no workspace noise and no crc32 verification
+# Only the Sideways RAM variant is suited to Econet, as we need the
+# space vacated by the blueprint files to cope with Econet's extra
+# memory requirements
 
 ifeq ($(commander), max)
   max-commander=TRUE
@@ -49,22 +25,10 @@ else
   match-original-binaries=TRUE
 endif
 
-ifeq ($(variant), ib-disc)
-  variant-number=1
-  folder=/ib-disc
-  suffix=-ib-disc
-  boot=-boot ELITE2
-else ifeq ($(variant), sideways-ram)
-  variant-number=3
-  folder=/sideways-ram
-  suffix=-sideways-ram
-  boot=-opt 3
-else
-  variant-number=2
-  folder=/sth
-  suffix=-sth
-  boot=-boot ELITE2
-endif
+variant-number=3
+folder=/sideways-ram
+suffix=-sideways-ram
+boot=-opt 3
 
 .PHONY:all
 all:

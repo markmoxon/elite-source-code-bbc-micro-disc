@@ -155,7 +155,15 @@ ENDIF
 
  SKIP 2                 \ Used in the copy protection code
 
- ORG &008B
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\ORG &008B
+
+                        \ --- And replaced by: -------------------------------->
+
+ ORG &0088
+
+                        \ --- End of replacement ------------------------------>
 
 .DL
 
