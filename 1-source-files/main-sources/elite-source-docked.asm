@@ -1939,6 +1939,26 @@
                         \ of the catalogue, between the two lists of filenames,
                         \ so it can be dropped without affecting the layout)
 
+                        \ --- Mod: Code moved for Econet: --------------------->
+
+.XSAV
+
+ SKIP 1                 \ Temporary storage for saving the value of the X
+                        \ register, used in a number of places
+
+.YSAV
+
+ SKIP 1                 \ Temporary storage for saving the value of the Y
+                        \ register, used in a number of places
+
+.XX17
+
+ SKIP 1                 \ Temporary storage, used in BPRNT to store the number
+                        \ of characters to print, and as the edge counter in the
+                        \ main ship-drawing routine
+
+                        \ --- End of moved code ------------------------------->
+
 \ ******************************************************************************
 \
 \       Name: K%
@@ -2087,26 +2107,6 @@
  SKIP 1                 \ A counter used when spawning pirates, to work our way
                         \ through the list of pirate ship blueprints until we
                         \ find one that has been loaded
-
-                        \ --- Mod: Code moved for Econet: --------------------->
-
-.XSAV
-
- SKIP 1                 \ Temporary storage for saving the value of the X
-                        \ register, used in a number of places
-
-.YSAV
-
- SKIP 1                 \ Temporary storage for saving the value of the Y
-                        \ register, used in a number of places
-
-.XX17
-
- SKIP 1                 \ Temporary storage, used in BPRNT to store the number
-                        \ of characters to print, and as the edge counter in the
-                        \ main ship-drawing routine
-
-                        \ --- End of moved code ------------------------------->
 
  PRINT "WP workspace from  ", ~WP," to ", ~P%
 
