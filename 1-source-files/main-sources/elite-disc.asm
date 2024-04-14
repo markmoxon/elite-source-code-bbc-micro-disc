@@ -45,6 +45,7 @@ ELIF _SRAM_DISC
  PUTFILE "1-source-files/boot-files/$.!BOOT.bin", "!BOOT", &FFFFFF, &FFFFFF
  PUTFILE "1-source-files/boot-files/$.MENU.bin", "MENU", &FF1900, &FF8023
  PUTFILE "1-source-files/boot-files/$.SCREEN.bin", "SCREEN", &007800, &007BE8
+ PUTFILE "1-source-files/boot-files/$.ELTROM.bin", "ELTROM", &003400, &003400
  PUTFILE "3-assembled-output/MNUCODE.bin", "MNUCODE", &007400, &00743B
  PUTFILE "3-assembled-output/ELITE4.bin", "INTRO", &001900, &00197B
 
