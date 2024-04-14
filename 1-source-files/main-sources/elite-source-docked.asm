@@ -291,10 +291,14 @@
  SKIP 2                 \ Temporary storage, typically used for storing a 16-bit
                         \ y-coordinate
 
-.SUNX
+                        \ --- Mod: Code moved for Econet: --------------------->
 
- SKIP 2                 \ The 16-bit x-coordinate of the vertical centre axis
-                        \ of the sun (which might be off-screen)
+\.SUNX
+\
+\SKIP 2                 \ The 16-bit x-coordinate of the vertical centre axis
+\                       \ of the sun (which might be off-screen)
+
+                        \ --- End of moved code ------------------------------->
 
 .BETA
 
@@ -1956,6 +1960,11 @@
  SKIP 1                 \ Temporary storage, used in BPRNT to store the number
                         \ of characters to print, and as the edge counter in the
                         \ main ship-drawing routine
+
+.SUNX
+
+ SKIP 2                 \ The 16-bit x-coordinate of the vertical centre axis
+                        \ of the sun (which might be off-screen)
 
                         \ --- End of moved code ------------------------------->
 

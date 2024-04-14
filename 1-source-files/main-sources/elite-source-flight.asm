@@ -280,10 +280,14 @@
  SKIP 2                 \ Temporary storage, typically used for storing a 16-bit
                         \ y-coordinate
 
-.SUNX
+                        \ --- Mod: Code moved for Econet: --------------------->
 
- SKIP 2                 \ The 16-bit x-coordinate of the vertical centre axis
-                        \ of the sun (which might be off-screen)
+\.SUNX
+\
+\SKIP 2                 \ The 16-bit x-coordinate of the vertical centre axis
+\                       \ of the sun (which might be off-screen)
+
+                        \ --- End of moved code ------------------------------->
 
 .BETA
 
@@ -1947,6 +1951,11 @@
  SKIP 1                 \ Temporary storage, used in BPRNT to store the number
                         \ of characters to print, and as the edge counter in the
                         \ main ship-drawing routine
+
+.SUNX
+
+ SKIP 2                 \ The 16-bit x-coordinate of the vertical centre axis
+                        \ of the sun (which might be off-screen)
 
                         \ --- End of moved code ------------------------------->
 
@@ -12833,15 +12842,17 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MUT3
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDX ALP1               \ Set P = ALP1, though this gets overwritten by the
- STX P                  \ following, so this has no effect
+\LDX ALP1               \ Set P = ALP1, though this gets overwritten by the
+\STX P                  \ following, so this has no effect
 
                         \ Fall through into MUT2 to do the following:
                         \
                         \   (S R) = XX(1 0)
                         \   (A P) = Q * A
+
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -14148,17 +14159,21 @@ ENDIF
 \
 \ ******************************************************************************
 
- EQUB &8C, &E7
- EQUB &8D, &ED
- EQUB &8A, &E6
- EQUB &C1, &C8
- EQUB &C8, &8B
- EQUB &E0, &8A
- EQUB &E6, &D6
- EQUB &C5, &C6
- EQUB &C1, &CA
- EQUB &95, &9D
- EQUB &9C, &97
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\EQUB &8C, &E7
+\EQUB &8D, &ED
+\EQUB &8A, &E6
+\EQUB &C1, &C8
+\EQUB &C8, &8B
+\EQUB &E0, &8A
+\EQUB &E6, &D6
+\EQUB &C5, &C6
+\EQUB &C1, &CA
+\EQUB &95, &9D
+\EQUB &9C, &97
+
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
