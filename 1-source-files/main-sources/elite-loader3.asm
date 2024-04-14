@@ -77,8 +77,17 @@
  ESCP = &0386           \ The flag that determines whether we have an escape pod
                         \ fitted, matching the address in the main game code
 
- S% = &11E3             \ The address of the main entry point workspace in the
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\S% = &11E3             \ The address of the main entry point workspace in the
+\                       \ main game code
+
+                        \ --- And replaced by: -------------------------------->
+
+ S% = &12E3             \ The address of the main entry point workspace in the
                         \ main game code
+
+                        \ --- End of replacement ------------------------------>
 
  VIA = &FE00            \ Memory-mapped space for accessing internal hardware,
                         \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
@@ -480,9 +489,25 @@ ENDIF
 
  JSR PROT3              \ Call PROT3 to do more checks on the CHKSM checksum
 
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\LDA #&00               \ Set the following:
+\STA ZP                 \
+\LDA #&11               \   ZP(1 0) = &1100
+\STA ZP+1               \   P(1 0) = TVT1code
+\LDA #LO(TVT1code)
+\STA P
+\LDA #HI(TVT1code)
+\STA P+1
+\
+\JSR MVPG               \ Call MVPG to move and decrypt a page of memory from
+\                       \ TVT1code to &1100-&11FF
+
+                        \ --- And replaced by: -------------------------------->
+
  LDA #&00               \ Set the following:
  STA ZP                 \
- LDA #&11               \   ZP(1 0) = &1100
+ LDA #&12               \   ZP(1 0) = &1200
  STA ZP+1               \   P(1 0) = TVT1code
  LDA #LO(TVT1code)
  STA P
@@ -490,7 +515,9 @@ ENDIF
  STA P+1
 
  JSR MVPG               \ Call MVPG to move and decrypt a page of memory from
-                        \ TVT1code to &1100-&11FF
+                        \ TVT1code to &1200-&12FF
+
+                        \ --- End of replacement ------------------------------>
 
  LDA #&00               \ Set the following:
  STA ZP                 \
@@ -630,8 +657,18 @@ ENDIF
  LDX #LO(MESS1)         \ Set (Y X) to point to MESS1 ("DIR E")
  LDY #HI(MESS1)
 
- JSR OSCLI              \ Call OSCLI to run the OS command in MESS1, which
-                        \ changes the disc directory to E
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\JSR OSCLI              \ Call OSCLI to run the OS command in MESS1, which
+\                       \ changes the disc directory to E
+
+                        \ --- And replaced by: -------------------------------->
+
+ NOP                    \ We set the directory in the docked code
+ NOP
+ NOP
+
+                        \ --- End of replacement ------------------------------>
 
  LDA #LO(LOAD)          \ Set the following:
  STA ZP                 \
@@ -655,7 +692,15 @@ IF _STH_DISC OR _IB_DISC
 
 ELIF _SRAM_DISC
 
- EOR CHKSM              \ Decrypt it by EOR'ing with the checksum value
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\EOR CHKSM              \ Decrypt it by EOR'ing with the checksum value
+
+                        \ --- And replaced by: -------------------------------->
+
+ EOR #&18               \ Decrypt it by EOR'ing with &18
+
+                        \ --- End of replacement ------------------------------>
 
 ENDIF
 
@@ -763,11 +808,23 @@ ENDIF
  STY ZP                 \ Set the low byte of ZP(1 0) to 0, so ZP(1 0) always
                         \ points to the start of a page
 
- LDX #&11               \ Set X = &11, so ZP(1 0) will point to &1100 when we
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\LDX #&11               \ Set X = &11, so ZP(1 0) will point to &1100 when we
+\                       \ stick X in ZP+1 below
+\
+\TXA                    \ Set A = &11 = 17, to set the initial value of the
+\                       \ checksum to 18 (17 plus carry)
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDX #&12               \ Set X = &12, so ZP(1 0) will point to &1200 when we
                         \ stick X in ZP+1 below
 
- TXA                    \ Set A = &11 = 17, to set the initial value of the
-                        \ checksum to 18 (17 plus carry)
+ TXA                    \ Set A = &12 = 18, to set the initial value of the
+                        \ checksum to 19 (18 plus carry)
+
+                        \ --- End of replacement ------------------------------>
 
 .l1
 
@@ -1928,7 +1985,15 @@ ENDIF
 
 .TVT1code
 
- ORG &1100
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\ORG &1100
+
+                        \ --- And replaced by: -------------------------------->
+
+ ORG &1200
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \

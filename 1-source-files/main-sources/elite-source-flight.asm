@@ -30,7 +30,11 @@
  _STH_DISC              = (_VARIANT = 2)
  _SRAM_DISC             = (_VARIANT = 3)
 
- GUARD &5600            \ Guard against assembling over the ship blueprint file
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\GUARD &5600            \ Guard against assembling over the ship blueprint file
+
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -38,9 +42,19 @@
 \
 \ ******************************************************************************
 
- CODE% = &11E3          \ The address where the code will be run
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LOAD% = &11E3          \ The address where the code will be loaded
+\CODE% = &11E3          \ The address where the code will be run
+
+\LOAD% = &11E3          \ The address where the code will be loaded
+
+                        \ --- And replaced by: -------------------------------->
+
+ CODE% = &12E3          \ The address where the code will be run
+
+ LOAD% = &12E3          \ The address where the code will be loaded
+
+                        \ --- End of replacement ------------------------------>
 
  NOST = 18              \ The number of stardust particles in normal space (this
                         \ goes down to 3 in witchspace)
@@ -157,18 +171,37 @@
  CATD = &0D7A           \ The address of the CATD routine that is put in place
                         \ by the third loader, as set in elite-loader3.asm
 
- IRQ1 = &114B           \ The address of the IRQ1 routine that implements the
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\IRQ1 = &114B           \ The address of the IRQ1 routine that implements the
+\                       \ split screen interrupt handler, as set in
+\                       \ elite-loader3.asm
+\
+\BRBR1 = &11D5          \ The address of the main break handler, which BRKV
+\                       \ points to as set in elite-loader3.asm
+\
+\XX21 = &5600           \ The address of the ship blueprints lookup table, where
+\                       \ the chosen ship blueprints file is loaded
+\
+\E% = &563E             \ The address of the default NEWB ship bytes within the
+\                       \ loaded ship blueprints file
+
+                        \ --- And replaced by: -------------------------------->
+
+ IRQ1 = &124B           \ The address of the IRQ1 routine that implements the
                         \ split screen interrupt handler, as set in
                         \ elite-loader3.asm
 
- BRBR1 = &11D5          \ The address of the main break handler, which BRKV
+ BRBR1 = &12D5          \ The address of the main break handler, which BRKV
                         \ points to as set in elite-loader3.asm
 
- XX21 = &5600           \ The address of the ship blueprints lookup table, where
+ XX21 = &5700           \ The address of the ship blueprints lookup table, where
                         \ the chosen ship blueprints file is loaded
 
- E% = &563E             \ The address of the default NEWB ship bytes within the
+ E% = &573E             \ The address of the default NEWB ship bytes within the
                         \ loaded ship blueprints file
+
+                        \ --- End of replacement ------------------------------>
 
  VIA = &FE00            \ Memory-mapped space for accessing internal hardware,
                         \ such as the video ULA, 6845 CRTC and 6522 VIAs (also

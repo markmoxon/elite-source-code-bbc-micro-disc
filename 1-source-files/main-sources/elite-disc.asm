@@ -51,8 +51,8 @@ ELIF _SRAM_DISC
 
 ENDIF
 
- PUTFILE "3-assembled-output/D.CODE.bin", "D.CODE", &0011E3, &0011E3
- PUTFILE "3-assembled-output/T.CODE.bin", "T.CODE", &0011E3, &0011E3
+ PUTFILE "3-assembled-output/D.CODE.bin", "D.CODE", &0012E3, &0012E3
+ PUTFILE "3-assembled-output/T.CODE.bin", "T.CODE", &0012E3, &0012E3
 
  PUTFILE "3-assembled-output/D.MOA.bin", "D.MOA", &005600, &005600
  PUTFILE "3-assembled-output/D.MOB.bin", "D.MOB", &005600, &005600

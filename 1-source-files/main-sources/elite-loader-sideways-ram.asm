@@ -57,11 +57,23 @@
 
  XIND1V = &0DE7         \ The extended IND1 vector
 
- XX21 = &5600           \ The address of the ship blueprints lookup table in the
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\XX21 = &5600           \ The address of the ship blueprints lookup table in the
+\                       \ current blueprints file
+\
+\E% = &563E             \ The address of the default NEWB flags in the current
+\                       \ blueprints file
+
+                        \ --- And replaced by: -------------------------------->
+
+ XX21 = &5700           \ The address of the ship blueprints lookup table in the
                         \ current blueprints file
 
- E% = &563E             \ The address of the default NEWB flags in the current
+ E% = &573E             \ The address of the default NEWB flags in the current
                         \ blueprints file
+
+                        \ --- End of replacement ------------------------------>
 
  ROM_XX21 = &8100       \ The address of the ship blueprints lookup table in the
                         \ sideways RAM image that we build

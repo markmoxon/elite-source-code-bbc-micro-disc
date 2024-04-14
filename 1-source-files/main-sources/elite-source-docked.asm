@@ -38,9 +38,19 @@
 \
 \ ******************************************************************************
 
- CODE% = &11E3          \ The address where the code will be run
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LOAD% = &11E3          \ The address where the code will be loaded
+\CODE% = &11E3          \ The address where the code will be run
+
+\LOAD% = &11E3          \ The address where the code will be loaded
+
+                        \ --- And replaced by: -------------------------------->
+
+ CODE% = &12E3          \ The address where the code will be run
+
+ LOAD% = &12E3          \ The address where the code will be loaded
+
+                        \ --- End of replacement ------------------------------>
 
  NOST = 18              \ The number of stardust particles in normal space (this
                         \ goes down to 3 in witchspace)
@@ -158,21 +168,43 @@
  CATD = &0D7A           \ The address of the CATD routine that is put in place
                         \ by the third loader, as set in elite-loader3.asm
 
- IRQ1 = &114B           \ The address of the IRQ1 routine that implements the
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\IRQ1 = &114B           \ The address of the IRQ1 routine that implements the
+\                       \ split screen interrupt handler, as set in
+\                       \ elite-loader3.asm
+\
+\BRBR1 = &11D5          \ The address of the main break handler, which BRKV
+\                       \ points to as set in elite-loader3.asm
+\
+\NA% = &1181            \ The address of the data block for the last saved
+\                       \ commander, as set in elite-loader3.asm
+\
+\CHK2 = &11D3           \ The address of the second checksum byte for the saved
+\                       \ commander data file, as set in elite-loader3.asm
+\
+\CHK = &11D4            \ The address of the first checksum byte for the saved
+\                       \ commander data file, as set in elite-loader3.asm
+
+                        \ --- And replaced by: -------------------------------->
+
+ IRQ1 = &124B           \ The address of the IRQ1 routine that implements the
                         \ split screen interrupt handler, as set in
                         \ elite-loader3.asm
 
- BRBR1 = &11D5          \ The address of the main break handler, which BRKV
+ BRBR1 = &12D5          \ The address of the main break handler, which BRKV
                         \ points to as set in elite-loader3.asm
 
- NA% = &1181            \ The address of the data block for the last saved
+ NA% = &1281            \ The address of the data block for the last saved
                         \ commander, as set in elite-loader3.asm
 
- CHK2 = &11D3           \ The address of the second checksum byte for the saved
+ CHK2 = &12D3           \ The address of the second checksum byte for the saved
                         \ commander data file, as set in elite-loader3.asm
 
- CHK = &11D4            \ The address of the first checksum byte for the saved
+ CHK = &12D4            \ The address of the first checksum byte for the saved
                         \ commander data file, as set in elite-loader3.asm
+
+                        \ --- End of replacement ------------------------------>
 
  SHIP_MISSILE = &7F00   \ The address of the missile ship blueprint, as set in
                         \ elite-loader3.asm

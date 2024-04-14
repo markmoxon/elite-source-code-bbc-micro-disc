@@ -86,9 +86,9 @@ elif release == 3:
 
 # Commander file checksum
 tvt1_code = 0x2962          # TVT1code
-tvt1 = 0x1100               # TVT1
-na_per_cent = 0x1181        # NA%
-chk2 = 0x11D3               # CHK2
+tvt1 = 0x1200               # TVT1
+na_per_cent = 0x1281        # NA%
+chk2 = 0x12D3               # CHK2
 
 # Load assembled code file for ELITE4
 
@@ -148,9 +148,9 @@ print("3-assembled-output/ELITE4.bin file saved")
 
 # Configuration variables for D.CODE
 
-load_address = 0x11E3
-scramble_from = 0x1300
-scramble_to = 0x5600
+load_address = 0x12E3
+scramble_from = 0x1400
+scramble_to = 0x5700
 scramble_eor = 0x33
 
 # Load assembled code file for D.CODE
@@ -177,9 +177,9 @@ print("3-assembled-output/D.CODE.bin file saved")
 
 # Configuration variables for T.CODE
 
-load_address = 0x11E3
-scramble_from = 0x1300
-scramble_to = 0x6000
+load_address = 0x12E3
+scramble_from = 0x1400
+scramble_to = 0x6100
 scramble_eor = 0x33
 
 # Load assembled code file for T.CODE
@@ -202,12 +202,12 @@ if Scramble:
 checksum_address = 0x55FF
 block_to_checksum = block_1100 + data_block
 
-d_checksum = 0x11
+d_checksum = 0x12
 carry = 1
-for x in range(0x11, 0x54):
+for x in range(0x12, 0x55):
     for y in [0] + list(range(255, 0, -1)):
         i = x * 256 + y
-        d_checksum += block_to_checksum[i - 0x1100] + carry
+        d_checksum += block_to_checksum[i - 0x1200] + carry
         if d_checksum > 255:
             carry = 1
         else:
