@@ -45,7 +45,7 @@ ELIF _SRAM_DISC
  PUTFILE "1-source-files/boot-files/$.!BOOT.bin", "!BOOT", &FFFFFF, &FFFFFF
  PUTFILE "1-source-files/boot-files/$.MENUEC.bin", "MENU", &FF1900, &FF8023
  PUTFILE "1-source-files/boot-files/$.SCREEN.bin", "SCREEN", &007800, &007BE8
- PUTFILE "1-source-files/boot-files/$.ELTROM.bin", "ELTROM", &003400, &003400
+ PUTFILE "1-source-files/boot-files/$.ELTROMEC.bin", "ELTROM", &003400, &003400
  PUTFILE "3-assembled-output/MNUCODE.bin", "MNUCODE", &007400, &00743B
  PUTFILE "3-assembled-output/ELITE4.bin", "INTRO", &001900, &00197B
 
@@ -54,21 +54,21 @@ ENDIF
  PUTFILE "3-assembled-output/D.CODE.bin", "D.CODE", &0012E3, &0012E3
  PUTFILE "3-assembled-output/T.CODE.bin", "T.CODE", &0012E3, &0012E3
 
- PUTFILE "3-assembled-output/D.MOA.bin", "D.MOA", &005600, &005600
- PUTFILE "3-assembled-output/D.MOB.bin", "D.MOB", &005600, &005600
- PUTFILE "3-assembled-output/D.MOC.bin", "D.MOC", &005600, &005600
- PUTFILE "3-assembled-output/D.MOD.bin", "D.MOD", &005600, &005600
- PUTFILE "3-assembled-output/D.MOE.bin", "D.MOE", &005600, &005600
- PUTFILE "3-assembled-output/D.MOF.bin", "D.MOF", &005600, &005600
- PUTFILE "3-assembled-output/D.MOG.bin", "D.MOG", &005600, &005600
- PUTFILE "3-assembled-output/D.MOH.bin", "D.MOH", &005600, &005600
- PUTFILE "3-assembled-output/D.MOI.bin", "D.MOI", &005600, &005600
- PUTFILE "3-assembled-output/D.MOJ.bin", "D.MOJ", &005600, &005600
- PUTFILE "3-assembled-output/D.MOK.bin", "D.MOK", &005600, &005600
- PUTFILE "3-assembled-output/D.MOL.bin", "D.MOL", &005600, &005600
- PUTFILE "3-assembled-output/D.MOM.bin", "D.MOM", &005600, &005600
- PUTFILE "3-assembled-output/D.MON.bin", "D.MON", &005600, &005600
- PUTFILE "3-assembled-output/D.MOO.bin", "D.MOO", &005600, &005600
- PUTFILE "3-assembled-output/D.MOP.bin", "D.MOP", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOA.bin", "D.MOA", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOB.bin", "D.MOB", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOC.bin", "D.MOC", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOD.bin", "D.MOD", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOE.bin", "D.MOE", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOF.bin", "D.MOF", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOG.bin", "D.MOG", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOH.bin", "D.MOH", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOI.bin", "D.MOI", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOJ.bin", "D.MOJ", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOK.bin", "D.MOK", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOL.bin", "D.MOL", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOM.bin", "D.MOM", &005600, &005600
+\PUTFILE "3-assembled-output/D.MON.bin", "D.MON", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOO.bin", "D.MOO", &005600, &005600
+\PUTFILE "3-assembled-output/D.MOP.bin", "D.MOP", &005600, &005600
 
  PUTFILE "3-assembled-output/README.txt", "README", &FFFFFF, &FFFFFF

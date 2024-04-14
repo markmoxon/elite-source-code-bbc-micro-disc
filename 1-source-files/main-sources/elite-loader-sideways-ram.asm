@@ -335,6 +335,12 @@
  LDA &8000+6            \ the type of the copied ROM, which is in byte #6 of the
  STA ROMTYPE,X          \ ROM header
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ JMP SetFileHandler     \ Set the file handler
+
+                        \ --- End of added code ------------------------------->
+
  PLA                    \ Switch back to the ROM bank number that we saved on
  STA &F4                \ the stack at the start of the routine
  STA VIA+&30
@@ -396,6 +402,12 @@
 
  JSR LoadShipFiles      \ Load all the ship blueprint files into the sideways
                         \ RAM image to the location in ZP(1 0)
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+.SetFileHandler
+
+                        \ --- End of added code ------------------------------->
 
                         \ Now that we have created our sideways RAM image, we
                         \ intercept calls to OSFILE so they call our custom file
