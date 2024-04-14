@@ -24269,19 +24269,36 @@ ENDIF
 
  BEQ t2                 \ Keep looping up to t2 until a key is pressed
 
- TAY                    \ Copy A to Y, so Y contains the internal key number
-                        \ of the key pressed
-
                         \ --- Mod: Code removed for Econet: ------------------->
 
+\TAY                    \ Copy A to Y, so Y contains the internal key number
+\                       \ of the key pressed
+\
 \LDA (TRTB%),Y          \ The address in TRTB% points to the MOS key
-                        \ translation table, which is used to translate
-                        \ internal key numbers to ASCII, so this fetches the
-                        \ key's ASCII code into A
+\                       \ translation table, which is used to translate
+\                       \ internal key numbers to ASCII, so this fetches the
+\                       \ key's ASCII code into A
 
                         \ --- And replaced by: -------------------------------->
 
- LDA &F02B,Y            \ The address &F02B points to the OS 1.20 MOS key
+ PHA                    \ Store the key pressed in A on the stack
+
+ LDA #172               \ Call OSBYTE 172 to read the address of the MOS
+ LDX #0                 \ keyboard translation table into (Y X)
+ LDY #&FF
+ JSR OSBYTE
+
+ STX trtb+1             \ Store the address of the keyboard translation table in
+ STY trtb+2             \ the LDA &FFFF,Y instruction below
+
+ PLA                    \ Retrieve A from the stack
+
+ TAY                    \ Copy A to Y, so Y contains the internal key number
+                        \ of the key pressed
+
+.trtb
+
+ LDA &FFFF,Y            \ This is modified by the above to point to the MOS key
                         \ translation table, which is used to translate
                         \ internal key numbers to ASCII, so this fetches the
                         \ key's ASCII code into A
