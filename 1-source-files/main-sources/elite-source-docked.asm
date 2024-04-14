@@ -2248,34 +2248,91 @@ IF _STH_DISC OR _IB_DISC
 
 ELIF _SRAM_DISC
 
- NOP                    \ The sideways RAM variant is not encrypted, so the
- NOP                    \ decryption code is disabled and is replaced by NOPs
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
- NOP
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\NOP                    \ The sideways RAM variant is not encrypted, so the
+\NOP                    \ decryption code is disabled and is replaced by NOPs
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+\NOP
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDX #LO(MESS1)         \ Set (Y X) to point to MESS1 ("DIR")
+ LDY #HI(MESS1)
+
+ JSR OSCLI              \ Call OSCLI to run the OS command in MESS1, which
+                        \ changes the directory to the user's main directory
+
+ LDX #LO(MESS2)         \ Set (Y X) to point to MESS2 ("DIR ELITE")
+ LDY #HI(MESS2)
+
+ JSR OSCLI              \ Call OSCLI to run the OS command in MESS2, which
+                        \ changes the directory to ELITE
+
+                        \ --- End of replacement ------------------------------>
 
  JMP BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
                         \ and return from the subroutine using a tail call
 
 ENDIF
+
+\ ******************************************************************************
+\
+\       Name: MESS1
+\       Type: Variable
+\   Category: Loader
+\    Summary: The OS command string for changing the directory to the user's
+\             main directory
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+.MESS1
+
+ EQUS "DIR"             \ Change to the user's main directory on the network
+ EQUB 13
+
+                        \ --- End of added code ------------------------------->
+
+\ ******************************************************************************
+\
+\       Name: MESS2
+\       Type: Variable
+\   Category: Loader
+\    Summary: The OS command string for changing the disc directory to ELITE
+\
+\ ******************************************************************************
+
+.MESS2
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+\EQUS "DIR ELITE"       \ Change to the ELITE folder in the user's main
+ EQUS "DIR E    "       \ Change to the ELITE folder in the user's main
+ EQUB 13                \ directory on the network
+
+                        \ --- End of added code ------------------------------->
+
 \ ******************************************************************************
 \
 \       Name: DOENTRY
@@ -7779,9 +7836,19 @@ ENDIF
  LDY QQ17               \ Load the QQ17 flag, which contains the text printing
                         \ flags
 
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\INY                    \ If QQ17 = 255 then printing is disabled, so jump to
+\BEQ RR4                \ RR4, which doesn't print anything, it just restores
+\                       \ the registers and returns from the subroutine
+
+                        \ --- And replaced by: -------------------------------->
+
  INY                    \ If QQ17 = 255 then printing is disabled, so jump to
- BEQ RR4                \ RR4, which doesn't print anything, it just restores
+ BEQ RR4S               \ RR4, which doesn't print anything, it just restores
                         \ the registers and returns from the subroutine
+
+                        \ --- End of replacement ------------------------------>
 
  TAY                    \ Set Y = the character to be printed
 
@@ -7793,9 +7860,21 @@ ENDIF
                         \ RR4 to restore the registers and return from the
                         \ subroutine
 
- CMP #7                 \ If this is a beep character (A = 7), jump to R5,
- BEQ R5                 \ which will emit the beep, restore the registers and
-                        \ return from the subroutine
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\CMP #7                 \ If this is a beep character (A = 7), jump to R5,
+\BEQ R5                 \ which will emit the beep, restore the registers and
+\                       \ return from the subroutine
+
+                        \ --- And replaced by: -------------------------------->
+
+\CMP #7                 \ If this is not control code 7 (beep), skip the next
+\BNE P%+5               \ instruction
+\
+\JMP R5                 \ This is control code 7 (beep), so jump to R5 to make
+                        \ a beep and return from the subroutine via RR4
+
+                        \ --- End of replacement ------------------------------>
 
  CMP #32                \ If this is an ASCII character (A >= 32), jump to RR1
  BCS RR1                \ below, which will print the character, restore the
@@ -7823,9 +7902,20 @@ ENDIF
                         \ number (y-coordinate) of the text cursor, which is
                         \ stored in YC
 
- BNE RR4                \ Jump to RR4 to restore the registers and return from
-                        \ the subroutine (this BNE is effectively a JMP as Y
-                        \ will never be zero)
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\BNE RR4                \ Jump to RR4 to restore the registers and return from
+\                       \ the subroutine (this BNE is effectively a JMP as Y
+\                       \ will never be zero)
+
+                        \ --- And replaced by: -------------------------------->
+
+.RR4S
+
+ JMP RR4                \ Jump to RR4 to restore the registers and return from
+                        \ the subroutine using a tail call
+
+                        \ --- End of replacement ------------------------------>
 
 .RR1
 
@@ -7926,23 +8016,43 @@ ENDIF
  LDX CATF               \ If CATF = 0, jump to RR5, otherwise we are printing a
  BEQ RR5                \ disc catalogue
 
- CPY #' '               \ If the character we want to print in Y is a space,
- BNE RR5                \ jump to RR5
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\CPY #' '               \ If the character we want to print in Y is a space,
+\BNE RR5                \ jump to RR5
+\
+\                       \ If we get here, then CATF is non-zero, so we are
+\                       \ printing a disc catalogue and we are not printing a
+\                       \ space, so we drop column 17 from the output so the
+\                       \ catalogue will fit on-screen (column 17 is a blank
+\                       \ column in the middle of the catalogue, between the
+\                       \ two lists of filenames, so it can be dropped without
+\                       \ affecting the layout). Without this, the catalogue
+\                       \ would be one character too wide for the square screen
+\                       \ mode (it's 34 characters wide, while the screen mode
+\                       \ is only 33 characters across)
+\
+\CMP #17                \ If A = 17, i.e. the text cursor is in column 17, jump
+\BEQ RR4                \ to RR4 to restore the registers and return from the
+\                       \ subroutine, thus omitting this column
+
+                        \ --- And replaced by: -------------------------------->
+
+ CMP #21                \ If A < 21, i.e. the text cursor is in column 0-20,
+ BCC RR5                \ jump to RR5 to skip the following
 
                         \ If we get here, then CATF is non-zero, so we are
-                        \ printing a disc catalogue and we are not printing a
-                        \ space, so we drop column 17 from the output so the
-                        \ catalogue will fit on-screen (column 17 is a blank
-                        \ column in the middle of the catalogue, between the
-                        \ two lists of filenames, so it can be dropped without
-                        \ affecting the layout). Without this, the catalogue
-                        \ would be one character too wide for the square screen
-                        \ mode (it's 34 characters wide, while the screen mode
-                        \ is only 33 characters across)
+                        \ printing a disc catalogue and we have reached column
+                        \ 21, so we move to the start of the next line so the
+                        \ catalogue line-wraps to fit within the bounds of the
+                        \ screen
 
- CMP #17                \ If A = 17, i.e. the text cursor is in column 17, jump
- BEQ RR4                \ to RR4 to restore the registers and return from the
-                        \ subroutine, thus omitting this column
+ INC YC                 \ More the text cursor down a line
+
+ LDA #1                 \ Move the text cursor to column 1
+ STA XC
+
+                        \ --- End of replacement ------------------------------>
 
 .RR5
 
@@ -8023,6 +8133,25 @@ ENDIF
                         \ character
 
  PHA                    \ Store A on the stack so we can retrieve it below
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ LDA CATF               \ If CATF = 0, skip the next few instructions, as we are
+ BEQ skipReturn         \ not printing a disc catalogue
+
+ LDX #&49               \ Set C to the internal key number for RETURN
+
+.checkReturn
+
+ JSR DKS4               \ Call DKS4 to check whether the key in X is being
+                        \ pressed, and if it is, set bit 7 of A
+
+ TAX                    \ We have just printed the disc catalogue, so wait until
+ BPL checkReturn        \ RETURN is pressed, looping indefinitely until it gets
+                        \ tapped
+
+.skipReturn
+                        \ --- End of added code ------------------------------->
 
  JSR TTX66              \ Otherwise we are off the bottom of the screen, so
                         \ clear the screen and draw a white border
@@ -22446,8 +22575,17 @@ ENDIF
 
 .CTLI
 
- EQUS ".0"              \ The "0" part of the string is overwritten with the
- EQUB 13                \ actual drive number by the CATS routine
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\EQUS ".0"              \ The "0" part of the string is overwritten with the
+\EQUB 13                \ actual drive number by the CATS routine
+
+                        \ --- And replaced by: -------------------------------->
+
+ EQUS "."               \ The "0" part of the string has been removed
+ EQUB 13                \
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
@@ -22460,8 +22598,17 @@ ENDIF
 
 .DELI
 
- EQUS "DE.:0.E.1234567" \ Short for "*DELETE :0.E.1234567"
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\EQUS "DE.:0.E.1234567" \ Short for "*DELETE :0.E.1234567"
+\EQUB 13
+
+                        \ --- And replaced by: -------------------------------->
+
+ EQUS "DE.   E.1234567"
  EQUB 13
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
@@ -22562,14 +22709,18 @@ ENDIF
                         \ name on the Master Compact) and catalogue that disc
                         \ or directory
 
- BCS SVE                \ If the C flag is set then an invalid drive number was
-                        \ entered as part of the catalogue process, so jump to
-                        \ SVE to display the disc access menu
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA CTLI+1             \ The call to CATS above put the drive number into
- STA DELI+4             \ CTLI+1, so copy the drive number into DELI+4 so that
-                        \ the drive number in the "DE.:0.E.1234567" string
-                        \ gets updated (i.e. the number after the colon)
+\BCS SVE                \ If the C flag is set then an invalid drive number was
+\                       \ entered as part of the catalogue process, so jump to
+\                       \ SVE to display the disc access menu
+\
+\LDA CTLI+1             \ The call to CATS above put the drive number into
+\STA DELI+7             \ CTLI+1, so copy the drive number into DELI+7 so that
+\                       \ the drive number in the "DELETE:0.E.1234567" string
+\                       \ gets updated (i.e. the number after the colon)
+
+                        \ --- End of removed code ----------------------------->
 
  LDA #9                 \ Print extended token 9 ("{clear bottom of screen}FILE
  JSR DETOK              \ TO DELETE?")
@@ -22917,24 +23068,36 @@ ENDIF
 
 .QUS1
 
- PHA                    \ Store A on the stack so we can restore it after the
-                        \ call to GTDRV
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- JSR GTDRV              \ Get an ASCII disc drive number from the keyboard in A,
-                        \ setting the C flag if an invalid drive number was
-                        \ entered
+\PHA                    \ Store A on the stack so we can restore it after the
+\                       \ call to GTDRV
+\
+\JSR GTDRV              \ Get an ASCII disc drive number from the keyboard in A,
+\                       \ setting the C flag if an invalid drive number was
+\                       \ entered
+\
+\STA INWK+1             \ Store the ASCII drive number in INWK+1, which is the
+\                       \ drive character of the filename string ":0.E."
+\
+\PLA                    \ Restore A from the stack
+\
+\BCS QUR                \ If the C flag is set, then an invalid drive number was
+\                       \ entered, so jump to QUR to return from the subroutine
 
- STA INWK+1             \ Store the ASCII drive number in INWK+1, which is the
-                        \ drive character of the filename string ":0.E."
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- PLA                    \ Restore A from the stack
+\LDX #INWK              \ Store a pointer to INWK at the start of the block at
+\STX &0C00              \ &0C00, storing #INWK in the low byte because INWK is
+\                       \ in zero page
 
- BCS QUR                \ If the C flag is set, then an invalid drive number was
-                        \ entered, so jump to QUR to return from the subroutine
+                        \ --- And replaced by: -------------------------------->
 
- LDX #INWK              \ Store a pointer to INWK at the start of the block at
+ LDX #INWK+5            \ Store a pointer to INWK at the start of the block at
  STX &0C00              \ &0C00, storing #INWK in the low byte because INWK is
                         \ in zero page
+
+                        \ --- End of replacement ------------------------------>
 
  LDX #0                 \ Set (Y X) = &0C00
  LDY #&C
@@ -29240,7 +29403,15 @@ ENDMACRO
  ETOK 200
  EQUB VE
 
- EJMP 21                \ Token 9:      "{clear bottom of screen}
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\EJMP 21                \ Token 9:      "{clear bottom of screen}
+
+                        \ --- And replaced by: -------------------------------->
+
+ EJMP 19                \ Token 9:      "{single cap}
+
+                        \ --- End of replacement ------------------------------>
  ECHR 'F'               \                FILE TO DELETE?"
  ECHR 'I'               \
  ETWO 'L', 'E'          \ Encoded as:   "{21}FI<229>[201]DEL<221>E?"
