@@ -22488,22 +22488,26 @@ ENDIF
 
 .CATS
 
- JSR GTDRV              \ Get an ASCII disc drive number from the keyboard in A,
-                        \ setting the C flag if an invalid drive number was
-                        \ entered
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- BCS DELT-1             \ If the C flag is set, then an invalid drive number was
-                        \ entered, so return from the subroutine (as DELT-1
-                        \ contains an RTS)
+\JSR GTDRV              \ Get an ASCII disc drive number from the keyboard in A,
+\                       \ setting the C flag if an invalid drive number was
+\                       \ entered
+\
+\BCS DELT-1             \ If the C flag is set, then an invalid drive number was
+\                       \ entered, so return from the subroutine (as DELT-1
+\                       \ contains an RTS)
+\
+\STA CTLI+1             \ Store the drive number in the second byte of the
+\                       \ command string at CTLI, so it overwrites the "0" in
+\                       \ ".0" with the drive number to catalogue
+\
+\STA DTW7               \ Store the drive number in DTW7, so printing extended
+\                       \ token 4 will show the correct drive number (as token 4
+\                       \ contains the {drive number} jump code, which calls
+\                       \ MT16 to print the character in DTW7)
 
- STA CTLI+1             \ Store the drive number in the second byte of the
-                        \ command string at CTLI, so it overwrites the "0" in
-                        \ ".0" with the drive number to catalogue
-
- STA DTW7               \ Store the drive number in DTW7, so printing extended
-                        \ token 4 will show the correct drive number (as token 4
-                        \ contains the {drive number} jump code, which calls
-                        \ MT16 to print the character in DTW7)
+                        \ --- End of removed code ----------------------------->
 
  LDA #4                 \ Print extended token 4, which clears the screen and
  JSR DETOK              \ prints the boxed-out title "DRIVE {drive number}
@@ -29144,14 +29148,29 @@ ENDMACRO
  ECHR ':'
  EQUB VE
 
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\ETOK 150               \ Token 4:      "{clear screen}
+\ETOK 151               \                {draw box around title}
+\ECHR ' '               \                {all caps}
+\EJMP 16                \                {tab 6}DRIVE {drive number} CATALOGUE
+\ETOK 152               \                {crlf}
+\ETWO '-', '-'          \               "
+\EQUB VE                \
+\                       \ Encoded as:   "[150][151] {16}[152]<215>"
+
+                        \ --- And replaced by: -------------------------------->
+
  ETOK 150               \ Token 4:      "{clear screen}
- ETOK 151               \                {draw box around title}
+ ECHR ' '               \                {draw box around title}
  ECHR ' '               \                {all caps}
- EJMP 16                \                {tab 6}DRIVE {drive number} CATALOGUE
+ ECHR ' '               \                {tab 6}   CATALOGUE
  ETOK 152               \                {crlf}
  ETWO '-', '-'          \               "
  EQUB VE                \
-                        \ Encoded as:   "[150][151] {16}[152]<215>"
+                        \ Encoded as:   "[150]   [152]<215>"
+
+                        \ --- End of replacement ------------------------------>
 
  ETOK 176               \ Token 5:      "{lower case}
  ERND 18                \                {justify}
