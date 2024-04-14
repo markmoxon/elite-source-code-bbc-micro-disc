@@ -590,8 +590,25 @@ ENDIF
 
 .loop2
 
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\LDA CATDcode,X         \ Copy the X-th byte of CATDcode to the X-th byte of
+\STA CATD,X             \ CATD
+\
+\DEX                    \ Decrement the loop counter
+\
+\BPL loop2              \ Loop back to copy the next byte until they are all
+\                       \ done
+\
+\LDA &76                \ Set the drive number in the CATD routine to the
+\STA CATBLOCK           \ contents of &76, which gets set in ELITE3
+
+                        \ --- And replaced by: -------------------------------->
+
  LDA CATDcode,X         \ Copy the X-th byte of CATDcode to the X-th byte of
- STA CATD,X             \ CATD
+ NOP                    \ CATD
+ NOP
+ NOP
 
  DEX                    \ Decrement the loop counter
 
@@ -599,7 +616,11 @@ ENDIF
                         \ done
 
  LDA &76                \ Set the drive number in the CATD routine to the
- STA CATBLOCK           \ contents of &76, which gets set in ELITE3
+ NOP                    \ contents of &76, which gets set in ELITE3
+ NOP
+ NOP
+
+                        \ --- End of replacement ------------------------------>
 
  FNE 0                  \ Set up sound envelopes 0-3 using the FNE macro
  FNE 1
