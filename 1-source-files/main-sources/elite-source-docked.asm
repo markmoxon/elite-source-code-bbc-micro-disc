@@ -16729,8 +16729,18 @@ ENDIF
 
 .RDLI
 
- EQUS "R.D.CODE"        \ This is short for "*RUN D.CODE"
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\EQUS "R.D.CODE"        \ This is short for "*RUN D.CODE"
+\EQUB 13
+
+                        \ --- And replaced by: -------------------------------->
+
+ EQUS "R.ELTDC "        \ This is short for "*RUN ELTDC"
  EQUB 13
+
+                        \ --- End of replacement ------------------------------>
+
 
 \ ******************************************************************************
 \

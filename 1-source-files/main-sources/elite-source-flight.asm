@@ -2203,8 +2203,17 @@
 
 .LTLI
 
- EQUS "L.T.CODE"        \ This is short for "*LOAD T.CODE"
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\EQUS "L.T.CODE"        \ This is short for "*LOAD T.CODE"
+\EQUB 13
+
+                        \ --- And replaced by: -------------------------------->
+
+ EQUS "R.ELTTC "        \ This is short for "*RUN ELTTC"
  EQUB 13
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
@@ -2345,8 +2354,12 @@ ENDIF
 
 .DOENTRY
 
- LDA #'R'               \ Modify the command in LTLI from "L.T.CODE" to
- STA LTLI               \ "R.T.CODE" so it *RUNs the code rather than loading it
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\LDA #'R'               \ Modify the command in LTLI from "L.T.CODE" to
+\STA LTLI               \ "R.T.CODE" so it *RUNs the code rather than loading it
+
+                        \ --- End of removed code ----------------------------->
 
                         \ Fall into DEATH2 to reset most variables and *RUN the
                         \ docked code

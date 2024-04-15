@@ -872,8 +872,17 @@ ENDIF
 
 .LTLI
 
- EQUS "L.T.CODE"        \ This is short for "*LOAD T.CODE"
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\EQUS "L.T.CODE"        \ This is short for "*LOAD T.CODE"
+\EQUB 13
+
+                        \ --- And replaced by: -------------------------------->
+
+ EQUS "L.ELTTC "        \ This is short for "*LOAD ELTTC"
  EQUB 13
+
+                        \ --- End of replacement ------------------------------>
 
  EQUS "Does your mother know you do this?"
 
