@@ -2042,7 +2042,15 @@
 \
 \ ******************************************************************************
 
- ORG &0E00
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\ORG &0E00
+
+                        \ --- And replaced by: -------------------------------->
+
+ ORG &5400
+
+                        \ --- End of replacement ------------------------------>
 
 .WP
 
@@ -2359,7 +2367,7 @@ ENDIF
 
                         \ --- Mod: Code added for Econet: --------------------->
 
- EQUS "DIR ELITE"       \ Change to the ELITE folder in the user's main
+ EQUS "DIR E    "       \ Change to the ELITE folder in the user's main
  EQUB 13                \ directory on the network
 
                         \ --- End of added code ------------------------------->
