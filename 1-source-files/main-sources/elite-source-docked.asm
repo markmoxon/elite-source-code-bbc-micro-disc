@@ -16744,7 +16744,7 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
- EQUS "R.ELTDC "        \ This is short for "*RUN ELTDC"
+ EQUS "EliteB D"        \ This is short for "*RUN EliteB D"
  EQUB 13
 
                         \ --- End of replacement ------------------------------>

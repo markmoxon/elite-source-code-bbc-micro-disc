@@ -6427,7 +6427,7 @@ WP workspace from  &5E00  to &5FD3
      12F3   A0 12      LDY #&12
      12F5   20 F7 FF   JSR &FFF7
 .LTLI
-     12F8   52 2E 45 ...
+     12F8   45 6C 69 ...
      1300   0D
 .DEEOR
      1301   4C 27 43   JMP &4327
@@ -20213,7 +20213,7 @@ S.ELTC &1F82  &242C  &12E3  &1F82
      2C5E   A6 1B      LDX &1B
      2C60   60         RTS
 .RDLI
-     2C61   52 2E 45 ...
+     2C61   45 6C 69 ...
      2C69   0D
 .bay
      2C6A   4C 4E 35   JMP &354E

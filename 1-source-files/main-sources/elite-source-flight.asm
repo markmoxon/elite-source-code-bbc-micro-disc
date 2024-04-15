@@ -2218,7 +2218,7 @@
 
                         \ --- And replaced by: -------------------------------->
 
- EQUS "R.ELTTC "        \ This is short for "*RUN ELTTC"
+ EQUS "EliteB T"        \ This is short for "*RUN EliteB T"
  EQUB 13
 
                         \ --- End of replacement ------------------------------>
