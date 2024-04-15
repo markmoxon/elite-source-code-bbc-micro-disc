@@ -34,7 +34,7 @@
  _STH_DISC              = (_VARIANT = 2)
  _SRAM_DISC             = (_VARIANT = 3)
 
- PUTFILE "1-source-files/boot-files/$.MENUEC.bin", "ELTDI", &FF1900, &FF8023
+ PUTFILE "1-source-files/boot-files/$.MENUEC.bin", "ELTBB", &FF1900, &FF8023
  PUTFILE "1-source-files/boot-files/$.SCREEN.bin", "ELTSC", &007800, &007BE8
  PUTFILE "1-source-files/boot-files/$.ELTROMEC.bin", "ELTRM", &003400, &003400
  PUTFILE "3-assembled-output/MNUCODE.bin", "ELTMN", &007400, &00743B
