@@ -32,7 +32,7 @@
 
                         \ --- Mod: Code removed for Econet: ------------------->
 
-\GUARD &5600            \ Guard against assembling over the ship blueprint file
+ GUARD &5700            \ Guard against assembling over the ship blueprint file
 
                         \ --- End of removed code ----------------------------->
 
@@ -2282,10 +2282,64 @@ IF _STH_DISC OR _IB_DISC
 
 ELIF _SRAM_DISC
 
+                        \ --- And replaced by: -------------------------------->
+
+ LDX #LO(MESS1)         \ Set (Y X) to point to MESS1 ("DIR")
+ LDY #HI(MESS1)
+
+ JSR OSCLI              \ Call OSCLI to run the OS command in MESS1, which
+                        \ changes the directory to the user's main directory
+
+ LDX #LO(MESS2)         \ Set (Y X) to point to MESS2 ("DIR ELITE")
+ LDY #HI(MESS2)
+
+ JSR OSCLI              \ Call OSCLI to run the OS command in MESS2, which
+                        \ changes the directory to ELITE
+
+                        \ --- End of replacement ------------------------------>
+
  JMP RSHIPS             \ Call RSHIPS to launch from the station, load a new set
                         \ of ship blueprints and jump into the main game loop
 
 ENDIF
+
+\ ******************************************************************************
+\
+\       Name: MESS1
+\       Type: Variable
+\   Category: Loader
+\    Summary: The OS command string for changing the directory to the user's
+\             main directory
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+.MESS1
+
+ EQUS "DIR"             \ Change to the user's main directory on the network
+ EQUB 13
+
+                        \ --- End of added code ------------------------------->
+
+\ ******************************************************************************
+\
+\       Name: MESS2
+\       Type: Variable
+\   Category: Loader
+\    Summary: The OS command string for changing the disc directory to ELITE
+\
+\ ******************************************************************************
+
+.MESS2
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ EQUS "DIR ELITE"       \ Change to the ELITE folder in the user's main
+ EQUB 13                \ directory on the network
+
+                        \ --- End of added code ------------------------------->
+
 \ ******************************************************************************
 \
 \       Name: SCANCOL
@@ -5115,12 +5169,16 @@ ENDIF
 \
 \ ******************************************************************************
 
-.FLKB
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- LDA #15                \ Call OSBYTE with A = 15 and Y <> 0 to flush the input
- TAX                    \ buffers (i.e. flush the operating system's keyboard
- JMP OSBYTE             \ buffer) and return from the subroutine using a tail
+\.FLKB
+\
+\LDA #15                \ Call OSBYTE with A = 15 and Y <> 0 to flush the input
+\TAX                    \ buffers (i.e. flush the operating system's keyboard
+\JMP OSBYTE             \ buffer) and return from the subroutine using a tail
                         \ call
+
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -6447,9 +6505,13 @@ ENDIF
  STA SZ,Y               \ z_hi so the new particle starts in the far distance
  STA ZZ
 
- LDA Y1                 \ Set A to the new value of y_hi. This has no effect as
-                        \ STC1 starts with a jump to PIXEL2, which starts with a
-                        \ LDA instruction
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\LDA Y1                 \ Set A to the new value of y_hi. This has no effect as
+\                       \ STC1 starts with a jump to PIXEL2, which starts with a
+\                       \ LDA instruction
+
+                        \ --- End of removed code ----------------------------->
 
  JMP STC1               \ Jump up to STC1 to draw this new particle
 
@@ -13638,11 +13700,15 @@ ENDIF
  LDA S                  \ Set A = |S|
  AND #%01111111
 
- BMI DV9                \ If bit 7 of A is set, jump down to DV9 to skip the
-                        \ left-shifting of the denominator (though this branch
-                        \ instruction has no effect as bit 7 of the above AND
-                        \ can never be set, which is why this instruction was
-                        \ removed from later versions)
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\BMI DV9                \ If bit 7 of A is set, jump down to DV9 to skip the
+\                       \ left-shifting of the denominator (though this branch
+\                       \ instruction has no effect as bit 7 of the above AND
+\                       \ can never be set, which is why this instruction was
+\                       \ removed from later versions)
+
+                        \ --- End of removed code ----------------------------->
 
 .DVL6
 
@@ -33285,15 +33351,27 @@ ENDMACRO
                         \ add them together to get the result we're after, and
                         \ then set the sign afterwards
 
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\LDA K                  \ We now do the following sum:
+\CLC                    \
+\ADC K2                 \   (A y_hi y_lo -) = K(3 2 1 0) + K2(3 2 1 0)
+\                       \
+\                       \ starting with the low bytes (which we don't keep)
+\                       \
+\                       \ The CLC has no effect because MULT3 clears the C
+\                       \ flag, so this instruction could be removed (as it is
+\                       \ in the cassette version, for example)
+
+                        \ --- And replaced by: -------------------------------->
+
  LDA K                  \ We now do the following sum:
- CLC                    \
- ADC K2                 \   (A y_hi y_lo -) = K(3 2 1 0) + K2(3 2 1 0)
+ ADC K2                 \
+                        \   (A y_hi y_lo -) = K(3 2 1 0) + K2(3 2 1 0)
                         \
                         \ starting with the low bytes (which we don't keep)
-                        \
-                        \ The CLC has no effect because MULT3 clears the C
-                        \ flag, so this instruction could be removed (as it is
-                        \ in the cassette version, for example)
+
+                        \ --- End of replacement ------------------------------>
 
  LDA K+1                \ We then do the middle bytes, which go into y_lo
  ADC K2+1
