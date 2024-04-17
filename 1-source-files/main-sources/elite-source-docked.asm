@@ -2010,16 +2010,6 @@
 
                         \ --- End of moved code ------------------------------->
 
-                        \ --- Mod: Code added for Scoreboard: ----------------->
-
-.netTally
-
- SKIP 2                 \ Stores a one-point-per-kill combat score for the
-                        \ scoreboard (so all platforms have the same point
-                        \ system)
-
-                        \ --- End of added code ------------------------------->
-
 \ ******************************************************************************
 \
 \       Name: K%
@@ -2068,7 +2058,7 @@
 
                         \ --- And replaced by: -------------------------------->
 
- ORG &5400
+ ORG &5E00
 
                         \ --- End of replacement ------------------------------>
 
@@ -33419,14 +33409,7 @@ PRINT "Free space for Econet = ", ~(&55FF - P%)
 \
 \ENDIF
 
-                        \ --- And replaced by: -------------------------------->
-
- ORG &55FF
-
- EQUB &E6               \ This checksum is at location &55FF, and is checked in
-                        \ the LOAD routine in elite-loader3.asm
-
-                        \ --- End of replacement ------------------------------>
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -34565,11 +34548,7 @@ ENDMACRO
 
 \SKIP 171               \ These bytes appear to be unused
 
-                        \ --- And replaced by: -------------------------------->
-
- SKIPTO &6000
-
-                        \ --- End of replacement ------------------------------>
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -34598,24 +34577,6 @@ ENDMACRO
 
 \ ******************************************************************************
 \
-\ Scoreboard
-\
-\ ******************************************************************************
-
-                        \ --- Mod: Code added for Econet: --------------------->
-
-oswordBlock = &0C00
-
-CODE_SCORE% = &A000
-
-LOAD_SCORE% = &A000
-
-ORG CODE_SCORE%
-
-                        \ --- End of added code ------------------------------->
-
-\ ******************************************************************************
-\
 \       Name: Econet variables
 \       Type: Workspace
 \   Category: Econet
@@ -34624,6 +34585,8 @@ ORG CODE_SCORE%
 \ ******************************************************************************
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
+
+ ORG &5FD3
 
 .scorePort
 
@@ -34640,6 +34603,16 @@ ORG CODE_SCORE%
 .scoreNetwork
 
  SKIP 1                 \ The Econet network number of the scoreboard machine
+
+.netTally
+
+ SKIP 2                 \ Stores a one-point-per-kill combat score for the
+                        \ scoreboard (so all platforms have the same point
+                        \ system)
+
+.oswordBlock
+
+ SKIP 12                \ The OSWORD block to use for network calls
 
 .transmitBuffer
 
@@ -34666,6 +34639,22 @@ ORG CODE_SCORE%
                         \ (unlike the way that credits are stored in the game)
 
 .endBuffer
+
+                        \ --- End of added code ------------------------------->
+
+\ ******************************************************************************
+\
+\ Scoreboard
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+CODE_SCORE% = &A000
+
+LOAD_SCORE% = &A000
+
+ORG CODE_SCORE%
 
                         \ --- End of added code ------------------------------->
 
@@ -35161,6 +35150,6 @@ ORG CODE_SCORE%
 \
 \ ******************************************************************************
 
- PRINT "S.M128Elt ", ~CODE_SCORE%, " ", ~P%, " ", ~LOAD_SCORE%, " ", ~LOAD_SCORE%
+ PRINT "S.Scoreboard ", ~CODE_SCORE%, " ", ~P%, " ", ~LOAD_SCORE%, " ", ~LOAD_SCORE%
  SAVE "3-assembled-output/Scoreboard.bin", CODE_SCORE%, P%, LOAD_SCORE%
 

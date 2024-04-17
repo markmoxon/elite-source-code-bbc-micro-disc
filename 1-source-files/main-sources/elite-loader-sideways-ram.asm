@@ -91,10 +91,10 @@
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
- TransmitCmdrData = &A01F   \ The address of the TransmitCmdrData routine in the
+ TransmitCmdrData = &A008   \ The address of the TransmitCmdrData routine in the
                             \ Elite ROM
 
- GetNetworkDetails = &A0BC  \ The address of the GetNetworkDetails routine in
+ GetNetworkDetails = &A0A5  \ The address of the GetNetworkDetails routine in
                             \ the Elite ROM
 
                         \ --- End of added code ------------------------------->

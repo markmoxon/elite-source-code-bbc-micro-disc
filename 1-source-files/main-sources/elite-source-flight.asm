@@ -153,13 +153,6 @@
  RE = &23               \ The obfuscation byte used to hide the recursive tokens
                         \ table from crackers viewing the binary code
 
-                        \ --- Mod: Code added for Scoreboard: ----------------->
-
- netTally = &03D5       \ The address of the combat score to show on the
-                        \ scoreboard
-
-                        \ --- End of added code ------------------------------->
-
  QQ18 = &0400           \ The address of the text token table, as set in
                         \ elite-loader3.asm
 
@@ -2165,6 +2158,73 @@
                         \ find one that has been loaded
 
  PRINT "WP workspace from  ", ~WP," to ", ~P%
+
+\ ******************************************************************************
+\
+\       Name: Econet variables
+\       Type: Workspace
+\   Category: Econet
+\    Summary: Variables used in Elite over Econet
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+.scorePort
+
+ SKIP 1                 \ The Econet port on which to talk to the scoreboard
+                        \ machine
+                        \
+                        \ If this is zero, the network is disabled and no
+                        \ commander data is transmitted
+
+.scoreStation
+
+ SKIP 1                 \ The Econet station number of the scoreboard machine
+
+.scoreNetwork
+
+ SKIP 1                 \ The Econet network number of the scoreboard machine
+
+.netTally
+
+ SKIP 2                 \ Stores a one-point-per-kill combat score for the
+                        \ scoreboard (so all platforms have the same point
+                        \ system)
+
+.oswordBlock
+
+ SKIP 12                \ The OSWORD block to use for network calls
+
+.transmitBuffer
+
+ SKIP 20                \ A buffer to hold the data we want to transmit to the
+                        \ scoreboard machine in the format:
+                        \
+                        \   * Bytes #0-7 = commander's name, terminated by a
+                        \                  carriage return
+                        \
+                        \   * Byte #8 = commander's legal status
+                        \
+                        \   * Byte #9 = commander's status condition
+                        \               0 = docked, 1 = green
+                        \               2 = yellow, 3 = red
+                        \
+                        \   * Bytes #10-11 = commander's score
+                        \
+                        \   * Bytes #12-15 = commander's credits
+                        \
+                        \   * Byte #16 = machine type
+                        \                1 = Master, 2 = 6502SP, 3 = BBC Micro
+                        \
+                        \ Score and credits are stored with the low byte first
+                        \ (unlike the way that credits are stored in the game)
+
+.endBuffer
+
+ SKIP 0
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
