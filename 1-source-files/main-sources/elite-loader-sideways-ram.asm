@@ -61,6 +61,8 @@
 
  XIND2V = &0DEA         \ The extended IND2 vector
 
+ XIND3V = &0DED         \ The extended IND3 vector
+
                         \ --- End of added code ------------------------------->
 
                         \ --- Mod: Code removed for Econet: ------------------->
@@ -91,6 +93,9 @@
 
  TransmitCmdrData = &A01F   \ The address of the TransmitCmdrData routine in the
                             \ Elite ROM
+
+ GetNetworkDetails = &A0BC  \ The address of the GetNetworkDetails routine in
+                            \ the Elite ROM
 
                         \ --- End of added code ------------------------------->
 
@@ -461,6 +466,13 @@
  STA XIND2V+1               \ JSR OSXIND2 instruction
  LDA &F4
  STA XIND2V+2
+
+ LDA #LO(GetNetworkDetails) \ Set the extended vector XIND3V to point to the
+ STA XIND3V                 \ GetNetworkDetails routine in the sideways RAM bank
+ LDA #HI(GetNetworkDetails) \ that we are building, so we can call it using a
+ STA XIND3V+1               \ JSR OSXIND3 instruction
+ LDA &F4
+ STA XIND3V+2
 
                         \ --- End of added code ------------------------------->
 

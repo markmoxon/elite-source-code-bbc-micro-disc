@@ -218,6 +218,9 @@
  OSXIND2 = &FF4B        \ The extended IND2 vector, which points to the
                         \ TransmitCmdrData routine in sideways RAM
 
+ OSXIND3 = &FF4E        \ The extended IND3 vector, which points to the
+                        \ GetNetworkDetails routine in sideways RAM
+
                         \ --- End of added code ------------------------------->
 
  OSBYTE = &FFF4         \ The address for the OSBYTE routine
@@ -24384,9 +24387,9 @@ ENDIF
  CPX #&55               \ If "N" is not being pressed, skip to skipNetwork
  BNE skipNetwork
 
- JMP GetNetworkDetails  \ Get the network and station numbers for the scoreboard
-                        \ server, returning from the subroutine using a tail
-                        \ call
+ JMP OSXIND3            \ Transmit commander data to the scoreboard machine, if
+                        \ configured (this calls GetNetworkDetails after
+                        \ switching in the correct ROM bank)
 
 .skipNetwork
 
