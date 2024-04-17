@@ -153,6 +153,13 @@
  RE = &23               \ The obfuscation byte used to hide the recursive tokens
                         \ table from crackers viewing the binary code
 
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+ netTally = &03D5       \ The address of the combat score to show on the
+                        \ scoreboard
+
+                        \ --- End of added code ------------------------------->
+
  QQ18 = &0400           \ The address of the text token table, as set in
                         \ elite-loader3.asm
 
@@ -206,6 +213,14 @@
  VIA = &FE00            \ Memory-mapped space for accessing internal hardware,
                         \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
                         \ known as SHEILA)
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+ OSXIND2 = &FF4B        \ The extended IND2 vector, which points to the
+                        \ TransmitCmdrData routine in sideways RAM
+
+                        \ --- End of added code ------------------------------->
+
 
  OSBYTE = &FFF4         \ The address for the OSBYTE routine
 
@@ -2396,12 +2411,16 @@ IF _SRAM_DISC
 
  RTS                    \ Return from the subroutine
 
- NOP                    \ This code is never run, and just pads out the DEEOR
- NOP                    \ routine in the sideways RAM variant to be the same
- NOP                    \ size as in the original version (the sideways RAM
- NOP                    \ variant is not encrypted, so the decryption routine
- NOP                    \ is disabled and is replaced by NOPs and the SCANCOL
- JMP RSHIPS             \ routine)
+                        \ --- Mod: Code removed for Scoreboard: --------------->
+
+\NOP                    \ This code is never run, and just pads out the DEEOR
+\NOP                    \ routine in the sideways RAM variant to be the same
+\NOP                    \ size as in the original version (the sideways RAM
+\NOP                    \ variant is not encrypted, so the decryption routine
+\NOP                    \ is disabled and is replaced by NOPs and the SCANCOL
+\JMP RSHIPS             \ routine)
+
+                        \ --- End of removed code ----------------------------->
 
 ENDIF
 
@@ -17807,7 +17826,14 @@ ENDIF
 
 .TT113
 
- RTS                    \ Return from the subroutine
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+ JMP OSXIND2            \ Transmit commander data to the scoreboard machine, if
+                        \ configured (this calls TransmitCmdrData after
+                        \ switching in the correct ROM bank), returning from the
+                        \ subroutiune using a tail call
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -17824,9 +17850,13 @@ ENDIF
 \
 \ ******************************************************************************
 
-.GCASH
+                        \ --- Mod: Code removed for Scoreboard: --------------->
 
- JSR MULTU              \ Call MULTU to calculate (A P) = P * Q
+\.GCASH
+\
+\JSR MULTU              \ Call MULTU to calculate (A P) = P * Q
+
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -24700,6 +24730,14 @@ ENDIF
                         \ time it will either be an asteroid (98.5% chance) or,
                         \ very rarely, a cargo canister (1.5% chance)
 
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+ JSR OSXIND2            \ Transmit commander data to the scoreboard machine, if
+                        \ configured (this calls TransmitCmdrData after
+                        \ switching in the correct ROM bank)
+
+                        \ --- End of added code ------------------------------->
+
  LDA MJ                 \ If we are in witchspace following a mis-jump, skip the
  BNE ytq                \ following by jumping down to MLOOP (via ytq above)
 
@@ -26556,6 +26594,20 @@ ENDIF
  LDA #101               \ The kill total is a multiple of 256, so it's time
  JSR MESS               \ for a pat on the back, so print recursive token 101
                         \ ("RIGHT ON COMMANDER!") as an in-flight message
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+ INC netTally           \ Increment the kill count in netTally
+ BNE taly1
+ INC netTally+1
+
+.taly1
+
+ JSR OSXIND2            \ Transmit commander data to the scoreboard machine, if
+                        \ configured (this calls TransmitCmdrData after
+                        \ switching in the correct ROM bank)
+
+                        \ --- End of added code ------------------------------->
 
  LDX #7                 \ Set X = 7 and fall through into EXNO to make the
                         \ sound of a ship exploding

@@ -57,6 +57,12 @@
 
  XIND1V = &0DE7         \ The extended IND1 vector
 
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+ XIND2V = &0DEA         \ The extended IND2 vector
+
+                        \ --- End of added code ------------------------------->
+
                         \ --- Mod: Code removed for Econet: ------------------->
 
 \XX21 = &5600           \ The address of the ship blueprints lookup table in the
@@ -80,6 +86,14 @@
 
  ROM_E% = &813E         \ The address of the default NEWB flags in the sideways
                         \ RAM image that we build
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+ TransmitCmdrData = &A01F   \ The address of the TransmitCmdrData routine in the
+                            \ Elite ROM
+
+                        \ --- End of added code ------------------------------->
+
 
  VIA = &FE00            \ Memory-mapped space for accessing internal hardware,
                         \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
@@ -438,6 +452,17 @@
  STA IND1V              \ can pass any calls to XFILEV down the chain by calling
  LDA #HI(OSXIND1)       \ JMP (IND1V) from our custom file handler in the
  STA IND1V+1            \ FileHandler routine
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+ LDA #LO(TransmitCmdrData)  \ Set the extended vector XIND2V to point to the
+ STA XIND2V                 \ TransmitCmdrData routine in the sideways RAM bank
+ LDA #HI(TransmitCmdrData)  \ that we are building, so we can call it using a
+ STA XIND2V+1               \ JSR OSXIND2 instruction
+ LDA &F4
+ STA XIND2V+2
+
+                        \ --- End of added code ------------------------------->
 
  PLA                    \ Switch back to the ROM bank number that we saved on
  STA &F4                \ the stack at the start of the routine
