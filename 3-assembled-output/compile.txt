@@ -37007,7 +37007,7 @@ Saving file '3-assembled-output/T.CODE.unprot.bin'
      A057   8D F1 5F   STA &5FF1
      A05A   AD 64 03   LDA &0364
      A05D   8D F0 5F   STA &5FF0
-     A060   A9 02      LDA #&02
+     A060   A9 03      LDA #&03
      A062   8D F4 5F   STA &5FF4
 .TransmitData
      A065   A9 80      LDA #&80

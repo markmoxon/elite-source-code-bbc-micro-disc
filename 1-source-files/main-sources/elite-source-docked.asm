@@ -34773,7 +34773,7 @@ ORG CODE_SCORE%
  LDA CASH+3
  STA transmitBuffer+12
 
- LDA #2                 \ Set machine type to 1 (6502SP)
+ LDA #3                 \ Set machine type to 3 (Disc)
  STA transmitBuffer+16
 
                         \ Fall through into TransmitData to transmit the data
