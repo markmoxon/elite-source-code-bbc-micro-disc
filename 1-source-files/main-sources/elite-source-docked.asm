@@ -34722,13 +34722,27 @@ ORG CODE_SCORE%
 
  BPL trcm1              \ Loop back until we have copied all eight bytes
 
- LDA FIST               \ Copy the commander's legal status from FIST to
- STA transmitBuffer+8   \ transmitBuffer+8
+ LDA FIST               \ Fetch the commander's legal status from FIST
+
+ BEQ trcm2              \ If A = 0 then we are clean, so jump to trcm2 to
+                        \ store this value
+
+ CMP #50                \ Set the C flag if A >= 50, so C is set if we have
+                        \ a legal status of 50+ (i.e. we are a fugitive)
+
+ ADC #1                 \ Add 1 + C to A, so if C is not set (i.e. we have a
+                        \ legal status between 1 and 49) then A is set to 1,
+                        \ and if C is set (i.e. we have a legal status of 50+)
+                        \ then A is set to 2
+
+.trcm2
+
+ STA transmitBuffer+8   \ Store the commander's legal status in transmitBuffer+8
 
  LDX #0                 \ Set X to condition docked (0)
 
  LDY QQ12               \ Fetch the docked status from QQ12, and if we are
- BNE trcm2              \ docked, jump to wearedocked
+ BNE trcm3              \ docked, jump to wearedocked
 
  INX                    \ Set X to condition green (1)
 
@@ -34742,20 +34756,20 @@ ORG CODE_SCORE%
                         \ empty (i.e. is non-zero), then that means the number
                         \ of non-asteroids in the vicinity is at least 1
 
- BEQ trcm2              \ So if X = 0, there are no ships in the vicinity, so
-                        \ jump to trcm2 to set the ship's condition to green
+ BEQ trcm3              \ So if X = 0, there are no ships in the vicinity, so
+                        \ jump to trcm3 to set the ship's condition to green
 
  INX                    \ Set X to condition yellow (2)
 
  LDY ENERGY             \ Otherwise we have ships in the vicinity, so we load
                         \ our energy levels into Y
 
- CPY #128               \ If energy levels >= 128, jump to trcm2
- BCS trcm2
+ CPY #128               \ If energy levels >= 128, jump to trcm3
+ BCS trcm3
 
  INX                    \ Set X to condition red (3)
 
-.trcm2
+.trcm3
 
  STX transmitBuffer+9   \ Store the commander's condition in transmitBuffer+9
 

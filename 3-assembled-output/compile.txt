@@ -36980,307 +36980,311 @@ Saving file '3-assembled-output/T.CODE.unprot.bin'
      A018   CA         DEX
      A019   10 F7      BPL &A012
      A01B   AD 8C 03   LDA &038C
-     A01E   8D EC 5F   STA &5FEC
-     A021   A2 00      LDX #&00
-     A023   A4 89      LDY &89
-     A025   D0 12      BNE &A039
-     A027   E8         INX
-     A028   AC 3E 03   LDY &033E
-     A02B   B9 13 03   LDA &0313,Y
-     A02E   F0 09      BEQ &A039
-     A030   E8         INX
-     A031   AC A7 03   LDY &03A7
-     A034   C0 80      CPY #&80
-     A036   B0 01      BCS &A039
-     A038   E8         INX
+     A01E   F0 04      BEQ &A024
+     A020   C9 32      CMP #&32
+     A022   69 01      ADC #&01
 .trcm2
-     A039   8E ED 5F   STX &5FED
-     A03C   AD D6 5F   LDA &5FD6
-     A03F   8D EE 5F   STA &5FEE
-     A042   AD D7 5F   LDA &5FD7
-     A045   8D EF 5F   STA &5FEF
-     A048   AD 61 03   LDA &0361
-     A04B   8D F3 5F   STA &5FF3
-     A04E   AD 62 03   LDA &0362
-     A051   8D F2 5F   STA &5FF2
-     A054   AD 63 03   LDA &0363
-     A057   8D F1 5F   STA &5FF1
-     A05A   AD 64 03   LDA &0364
-     A05D   8D F0 5F   STA &5FF0
-     A060   A9 00      LDA #&00
-     A062   8D F4 5F   STA &5FF4
+     A024   8D EC 5F   STA &5FEC
+     A027   A2 00      LDX #&00
+     A029   A4 89      LDY &89
+     A02B   D0 12      BNE &A03F
+     A02D   E8         INX
+     A02E   AC 3E 03   LDY &033E
+     A031   B9 13 03   LDA &0313,Y
+     A034   F0 09      BEQ &A03F
+     A036   E8         INX
+     A037   AC A7 03   LDY &03A7
+     A03A   C0 80      CPY #&80
+     A03C   B0 01      BCS &A03F
+     A03E   E8         INX
+.trcm3
+     A03F   8E ED 5F   STX &5FED
+     A042   AD D6 5F   LDA &5FD6
+     A045   8D EE 5F   STA &5FEE
+     A048   AD D7 5F   LDA &5FD7
+     A04B   8D EF 5F   STA &5FEF
+     A04E   AD 61 03   LDA &0361
+     A051   8D F3 5F   STA &5FF3
+     A054   AD 62 03   LDA &0362
+     A057   8D F2 5F   STA &5FF2
+     A05A   AD 63 03   LDA &0363
+     A05D   8D F1 5F   STA &5FF1
+     A060   AD 64 03   LDA &0364
+     A063   8D F0 5F   STA &5FF0
+     A066   A9 00      LDA #&00
+     A068   8D F4 5F   STA &5FF4
 .TransmitData
-     A065   A9 80      LDA #&80
-     A067   8D D8 5F   STA &5FD8
-     A06A   AD D3 5F   LDA &5FD3
-     A06D   8D D9 5F   STA &5FD9
-     A070   AD D4 5F   LDA &5FD4
-     A073   8D DA 5F   STA &5FDA
-     A076   AD D5 5F   LDA &5FD5
-     A079   8D DB 5F   STA &5FDB
-     A07C   A9 E4      LDA #&E4
-     A07E   8D DC 5F   STA &5FDC
-     A081   A9 5F      LDA #&5F
-     A083   8D DD 5F   STA &5FDD
-     A086   A9 00      LDA #&00
-     A088   8D DE 5F   STA &5FDE
-     A08B   8D DF 5F   STA &5FDF
-     A08E   8D E2 5F   STA &5FE2
-     A091   8D E3 5F   STA &5FE3
-     A094   A9 F8      LDA #&F8
-     A096   8D E0 5F   STA &5FE0
-     A099   A9 5F      LDA #&5F
-     A09B   8D E1 5F   STA &5FE1
-     A09E   A9 10      LDA #&10
-     A0A0   20 00 A0   JSR &A000
-     A0A3   28         PLP
-     A0A4   60         RTS
+     A06B   A9 80      LDA #&80
+     A06D   8D D8 5F   STA &5FD8
+     A070   AD D3 5F   LDA &5FD3
+     A073   8D D9 5F   STA &5FD9
+     A076   AD D4 5F   LDA &5FD4
+     A079   8D DA 5F   STA &5FDA
+     A07C   AD D5 5F   LDA &5FD5
+     A07F   8D DB 5F   STA &5FDB
+     A082   A9 E4      LDA #&E4
+     A084   8D DC 5F   STA &5FDC
+     A087   A9 5F      LDA #&5F
+     A089   8D DD 5F   STA &5FDD
+     A08C   A9 00      LDA #&00
+     A08E   8D DE 5F   STA &5FDE
+     A091   8D DF 5F   STA &5FDF
+     A094   8D E2 5F   STA &5FE2
+     A097   8D E3 5F   STA &5FE3
+     A09A   A9 F8      LDA #&F8
+     A09C   8D E0 5F   STA &5FE0
+     A09F   A9 5F      LDA #&5F
+     A0A1   8D E1 5F   STA &5FE1
+     A0A4   A9 10      LDA #&10
+     A0A6   20 00 A0   JSR &A000
+     A0A9   28         PLP
+     A0AA   60         RTS
 .GetNetworkDetails
-     A0A5   A9 08      LDA #&08
-     A0A7   20 8F 23   JSR &238F
-     A0AA   A9 0A      LDA #&0A
-     A0AC   85 2A      STA &2A
-     A0AE   A9 05      LDA #&05
-     A0B0   20 97 A1   JSR &A197
-     A0B3   A9 04      LDA #&04
-     A0B5   20 97 A1   JSR &A197
-     A0B8   20 1B 19   JSR &191B
-     A0BB   A0 FF      LDY #&FF
-     A0BD   8C AB 03   STY &03AB
-     A0C0   A9 60      LDA #&60
-     A0C2   8D C7 27   STA &27C7
-     A0C5   A9 05      LDA #&05
-     A0C7   20 97 A1   JSR &A197
-     A0CA   A9 03      LDA #&03
-     A0CC   20 97 A1   JSR &A197
-     A0CF   AE D5 5F   LDX &5FD5
-     A0D2   18         CLC
-     A0D3   20 9E 1B   JSR &1B9E
-     A0D6   A9 07      LDA #&07
-     A0D8   20 97 A1   JSR &A197
-     A0DB   20 0D 2B   JSR &2B0D
-     A0DE   20 8B 2B   JSR &2B8B
-     A0E1   20 CC 27   JSR &27CC
-     A0E4   A6 06      LDX &06
-     A0E6   E0 0C      CPX #&0C
-     A0E8   F0 03      BEQ &A0ED
-     A0EA   8D D5 5F   STA &5FD5
+     A0AB   A9 08      LDA #&08
+     A0AD   20 8F 23   JSR &238F
+     A0B0   A9 0A      LDA #&0A
+     A0B2   85 2A      STA &2A
+     A0B4   A9 05      LDA #&05
+     A0B6   20 9D A1   JSR &A19D
+     A0B9   A9 04      LDA #&04
+     A0BB   20 9D A1   JSR &A19D
+     A0BE   20 1B 19   JSR &191B
+     A0C1   A0 FF      LDY #&FF
+     A0C3   8C AB 03   STY &03AB
+     A0C6   A9 60      LDA #&60
+     A0C8   8D C7 27   STA &27C7
+     A0CB   A9 05      LDA #&05
+     A0CD   20 9D A1   JSR &A19D
+     A0D0   A9 03      LDA #&03
+     A0D2   20 9D A1   JSR &A19D
+     A0D5   AE D5 5F   LDX &5FD5
+     A0D8   18         CLC
+     A0D9   20 9E 1B   JSR &1B9E
+     A0DC   A9 07      LDA #&07
+     A0DE   20 9D A1   JSR &A19D
+     A0E1   20 0D 2B   JSR &2B0D
+     A0E4   20 8B 2B   JSR &2B8B
+     A0E7   20 CC 27   JSR &27CC
+     A0EA   A6 06      LDX &06
+     A0EC   E0 0C      CPX #&0C
+     A0EE   F0 03      BEQ &A0F3
+     A0F0   8D D5 5F   STA &5FD5
 .gnet1
-     A0ED   20 9E 24   JSR &249E
-     A0F0   20 9E 24   JSR &249E
-     A0F3   A9 01      LDA #&01
-     A0F5   20 97 A1   JSR &A197
-     A0F8   A9 03      LDA #&03
-     A0FA   20 97 A1   JSR &A197
-     A0FD   AE D4 5F   LDX &5FD4
-     A100   18         CLC
-     A101   20 9E 1B   JSR &1B9E
-     A104   A9 07      LDA #&07
-     A106   20 97 A1   JSR &A197
-     A109   20 0D 2B   JSR &2B0D
-     A10C   20 8B 2B   JSR &2B8B
-     A10F   20 CC 27   JSR &27CC
-     A112   A6 06      LDX &06
-     A114   E0 0C      CPX #&0C
-     A116   F0 03      BEQ &A11B
-     A118   8D D4 5F   STA &5FD4
+     A0F3   20 9E 24   JSR &249E
+     A0F6   20 9E 24   JSR &249E
+     A0F9   A9 01      LDA #&01
+     A0FB   20 9D A1   JSR &A19D
+     A0FE   A9 03      LDA #&03
+     A100   20 9D A1   JSR &A19D
+     A103   AE D4 5F   LDX &5FD4
+     A106   18         CLC
+     A107   20 9E 1B   JSR &1B9E
+     A10A   A9 07      LDA #&07
+     A10C   20 9D A1   JSR &A19D
+     A10F   20 0D 2B   JSR &2B0D
+     A112   20 8B 2B   JSR &2B8B
+     A115   20 CC 27   JSR &27CC
+     A118   A6 06      LDX &06
+     A11A   E0 0C      CPX #&0C
+     A11C   F0 03      BEQ &A121
+     A11E   8D D4 5F   STA &5FD4
 .gnet2
-     A11B   20 9E 24   JSR &249E
-     A11E   20 9E 24   JSR &249E
-     A121   A9 02      LDA #&02
-     A123   20 97 A1   JSR &A197
-     A126   A9 03      LDA #&03
-     A128   20 97 A1   JSR &A197
-     A12B   A9 07      LDA #&07
-     A12D   20 97 A1   JSR &A197
-     A130   AE D3 5F   LDX &5FD3
-     A133   18         CLC
-     A134   20 9E 1B   JSR &1B9E
-     A137   A9 07      LDA #&07
-     A139   20 97 A1   JSR &A197
-     A13C   20 0D 2B   JSR &2B0D
-     A13F   20 8B 2B   JSR &2B8B
-     A142   20 CC 27   JSR &27CC
-     A145   A6 06      LDX &06
-     A147   E0 0C      CPX #&0C
-     A149   F0 03      BEQ &A14E
-     A14B   8D D3 5F   STA &5FD3
+     A121   20 9E 24   JSR &249E
+     A124   20 9E 24   JSR &249E
+     A127   A9 02      LDA #&02
+     A129   20 9D A1   JSR &A19D
+     A12C   A9 03      LDA #&03
+     A12E   20 9D A1   JSR &A19D
+     A131   A9 07      LDA #&07
+     A133   20 9D A1   JSR &A19D
+     A136   AE D3 5F   LDX &5FD3
+     A139   18         CLC
+     A13A   20 9E 1B   JSR &1B9E
+     A13D   A9 07      LDA #&07
+     A13F   20 9D A1   JSR &A19D
+     A142   20 0D 2B   JSR &2B0D
+     A145   20 8B 2B   JSR &2B8B
+     A148   20 CC 27   JSR &27CC
+     A14B   A6 06      LDX &06
+     A14D   E0 0C      CPX #&0C
+     A14F   F0 03      BEQ &A154
+     A151   8D D3 5F   STA &5FD3
 .gnet3
-     A14E   20 9E 24   JSR &249E
-     A151   20 9E 24   JSR &249E
-     A154   A9 08      LDA #&08
-     A156   20 97 A1   JSR &A197
-     A159   AE D6 5F   LDX &5FD6
-     A15C   AC D7 5F   LDY &5FD7
-     A15F   A9 09      LDA #&09
-     A161   18         CLC
-     A162   20 A2 1B   JSR &1BA2
-     A165   A9 07      LDA #&07
-     A167   20 97 A1   JSR &A197
-     A16A   20 F8 28   JSR &28F8
-     A16D   90 08      BCC &A177
-     A16F   A9 00      LDA #&00
-     A171   8D D6 5F   STA &5FD6
-     A174   8D D7 5F   STA &5FD7
+     A154   20 9E 24   JSR &249E
+     A157   20 9E 24   JSR &249E
+     A15A   A9 08      LDA #&08
+     A15C   20 9D A1   JSR &A19D
+     A15F   AE D6 5F   LDX &5FD6
+     A162   AC D7 5F   LDY &5FD7
+     A165   A9 09      LDA #&09
+     A167   18         CLC
+     A168   20 A2 1B   JSR &1BA2
+     A16B   A9 07      LDA #&07
+     A16D   20 9D A1   JSR &A19D
+     A170   20 F8 28   JSR &28F8
+     A173   90 08      BCC &A17D
+     A175   A9 00      LDA #&00
+     A177   8D D6 5F   STA &5FD6
+     A17A   8D D7 5F   STA &5FD7
 .gnet4
-     A177   A9 A9      LDA #&A9
-     A179   8D C7 27   STA &27C7
-     A17C   20 08 A0   JSR &A008
-     A17F   20 9E 24   JSR &249E
-     A182   20 9E 24   JSR &249E
-     A185   A9 06      LDA #&06
-     A187   20 97 A1   JSR &A197
-     A18A   A0 64      LDY #&64
-     A18C   20 F4 23   JSR &23F4
-     A18F   A2 FF      LDX #&FF
-     A191   9A         TXS
-     A192   A9 76      LDA #&76
-     A194   4C 76 34   JMP &3476
+     A17D   A9 A9      LDA #&A9
+     A17F   8D C7 27   STA &27C7
+     A182   20 08 A0   JSR &A008
+     A185   20 9E 24   JSR &249E
+     A188   20 9E 24   JSR &249E
+     A18B   A9 06      LDA #&06
+     A18D   20 9D A1   JSR &A19D
+     A190   A0 64      LDY #&64
+     A192   20 F4 23   JSR &23F4
+     A195   A2 FF      LDX #&FF
+     A197   9A         TXS
+     A198   A9 76      LDA #&76
+     A19A   4C 76 34   JMP &3476
 .PrintToken
-     A197   48         PHA
-     A198   AA         TAX
-     A199   98         TYA
-     A19A   48         PHA
-     A19B   A5 22      LDA &22
      A19D   48         PHA
-     A19E   A5 23      LDA &23
+     A19E   AA         TAX
+     A19F   98         TYA
      A1A0   48         PHA
-     A1A1   20 31 15   JSR &1531
-     A1A4   A9 AD      LDA #&AD
-     A1A6   85 22      STA &22
-     A1A8   A9 A1      LDA #&A1
-     A1AA   4C E6 13   JMP &13E6
+     A1A1   A5 22      LDA &22
+     A1A3   48         PHA
+     A1A4   A5 23      LDA &23
+     A1A6   48         PHA
+     A1A7   20 31 15   JSR &1531
+     A1AA   A9 B3      LDA #&B3
+     A1AC   85 22      STA &22
+     A1AE   A9 A1      LDA #&A1
+     A1B0   4C E6 13   JMP &13E6
 .EconetToken
-     A1AD   57
+     A1B3   57
 Macro ETWO:
-     A1AE   89
+     A1B4   89
 End macro ETWO
 Macro ETWO:
-     A1AF   A2
+     A1B5   A2
 End macro ETWO
 Macro ECHR:
-     A1B0   1E
+     A1B6   1E
 End macro ECHR
 Macro ETWO:
-     A1B1   88
+     A1B7   88
 End macro ETWO
-     A1B2   57
+     A1B8   57
 Macro ECHR:
-     A1B3   07
+     A1B9   07
 End macro ECHR
 Macro ETWO:
-     A1B4   AA
+     A1BA   AA
 End macro ETWO
 Macro ECHR:
-     A1B5   03
+     A1BB   03
 End macro ECHR
-     A1B6   57
-Macro ECHR:
-     A1B7   77
-End macro ECHR
-Macro ETWO:
-     A1B8   B6
-End macro ETWO
-Macro ECHR:
-     A1B9   1A
-End macro ECHR
-Macro ECHR:
-     A1BA   15
-End macro ECHR
-Macro ETWO:
-     A1BB   A3
-End macro ETWO
-Macro ECHR:
-     A1BC   77
-End macro ECHR
+     A1BC   57
 Macro ECHR:
      A1BD   77
 End macro ECHR
-Macro ECHR:
-     A1BE   77
-End macro ECHR
-     A1BF   57
-Macro ECHR:
-     A1C0   77
-End macro ECHR
-Macro ECHR:
-     A1C1   1A
-End macro ECHR
-Macro ECHR:
-     A1C2   12
-End macro ECHR
 Macro ETWO:
-     A1C3   B6
-End macro ETWO
-Macro ETWO:
-     A1C4   80
-End macro ETWO
-Macro ETWO:
-     A1C5   80
-End macro ETWO
-     A1C6   57
-Macro ECHR:
-     A1C7   19
-End macro ECHR
-Macro ETWO:
-     A1C8   8A
+     A1BE   B6
 End macro ETWO
 Macro ECHR:
-     A1C9   00
+     A1BF   1A
+End macro ECHR
+Macro ECHR:
+     A1C0   15
 End macro ECHR
 Macro ETWO:
-     A1CA   AA
+     A1C1   A3
 End macro ETWO
 Macro ECHR:
-     A1CB   1C
+     A1C2   77
 End macro ECHR
+Macro ECHR:
+     A1C3   77
+End macro ECHR
+Macro ECHR:
+     A1C4   77
+End macro ECHR
+     A1C5   57
+Macro ECHR:
+     A1C6   77
+End macro ECHR
+Macro ECHR:
+     A1C7   1A
+End macro ECHR
+Macro ECHR:
+     A1C8   12
+End macro ECHR
+Macro ETWO:
+     A1C9   B6
+End macro ETWO
+Macro ETWO:
+     A1CA   80
+End macro ETWO
+Macro ETWO:
+     A1CB   80
+End macro ETWO
      A1CC   57
+Macro ECHR:
+     A1CD   19
+End macro ECHR
+Macro ETWO:
+     A1CE   8A
+End macro ETWO
+Macro ECHR:
+     A1CF   00
+End macro ECHR
+Macro ETWO:
+     A1D0   AA
+End macro ETWO
+Macro ECHR:
+     A1D1   1C
+End macro ECHR
+     A1D2   57
 Macro EJMP:
-     A1CD   56
+     A1D3   56
 End macro EJMP
 Macro ECHR:
-     A1CE   18
+     A1D4   18
 End macro ECHR
 Macro ECHR:
-     A1CF   1C
+     A1D5   1C
 End macro ECHR
-     A1D0   57
+     A1D6   57
 Macro ECHR:
-     A1D1   77
-End macro ECHR
-Macro ECHR:
-     A1D2   77
-End macro ECHR
-Macro ECHR:
-     A1D3   77
-End macro ECHR
-     A1D4   57
-Macro ETWO:
-     A1D5   A5
-End macro ETWO
-Macro ETWO:
-     A1D6   8D
-End macro ETWO
-Macro ECHR:
-     A1D7   03
+     A1D7   77
 End macro ECHR
 Macro ECHR:
      A1D8   77
 End macro ECHR
 Macro ECHR:
-     A1D9   04
+     A1D9   77
 End macro ECHR
-Macro ECHR:
-     A1DA   14
-End macro ECHR
+     A1DA   57
 Macro ETWO:
-     A1DB   AA
+     A1DB   A5
+End macro ETWO
+Macro ETWO:
+     A1DC   8D
 End macro ETWO
 Macro ECHR:
-     A1DC   12
+     A1DD   03
 End macro ECHR
-     A1DD   57
-S.Scoreboard &A000  &A1DE  &A000  &A000 
+Macro ECHR:
+     A1DE   77
+End macro ECHR
+Macro ECHR:
+     A1DF   04
+End macro ECHR
+Macro ECHR:
+     A1E0   14
+End macro ECHR
+Macro ETWO:
+     A1E1   AA
+End macro ETWO
+Macro ECHR:
+     A1E2   12
+End macro ECHR
+     A1E3   57
+S.Scoreboard &A000  &A1E4  &A000  &A000 
 Saving file '3-assembled-output/Scoreboard.bin'
 .XX21
      5600   00 7F
