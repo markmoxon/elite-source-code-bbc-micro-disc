@@ -26644,17 +26644,6 @@ ENDIF
 
 .EXNO2
 
- INC TALLY              \ Increment the low byte of the kill count in TALLY
-
- BNE EXNO-2             \ If there is no carry, jump to the LDX #7 below (at
-                        \ EXNO-2)
-
- INC TALLY+1            \ Increment the high byte of the kill count in TALLY
-
- LDA #101               \ The kill total is a multiple of 256, so it's time
- JSR MESS               \ for a pat on the back, so print recursive token 101
-                        \ ("RIGHT ON COMMANDER!") as an in-flight message
-
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
  INC netTally           \ Increment the kill count in netTally
@@ -26668,6 +26657,17 @@ ENDIF
                         \ switching in the correct ROM bank)
 
                         \ --- End of added code ------------------------------->
+
+ INC TALLY              \ Increment the low byte of the kill count in TALLY
+
+ BNE EXNO-2             \ If there is no carry, jump to the LDX #7 below (at
+                        \ EXNO-2)
+
+ INC TALLY+1            \ Increment the high byte of the kill count in TALLY
+
+ LDA #101               \ The kill total is a multiple of 256, so it's time
+ JSR MESS               \ for a pat on the back, so print recursive token 101
+                        \ ("RIGHT ON COMMANDER!") as an in-flight message
 
  LDX #7                 \ Set X = 7 and fall through into EXNO to make the
                         \ sound of a ship exploding

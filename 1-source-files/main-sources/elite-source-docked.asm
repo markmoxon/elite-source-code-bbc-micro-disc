@@ -22694,7 +22694,7 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
- EQUS "DE.   E.1234567"
+ EQUS "DEL.  E.1234567"
  EQUB 13
 
                         \ --- End of replacement ------------------------------>

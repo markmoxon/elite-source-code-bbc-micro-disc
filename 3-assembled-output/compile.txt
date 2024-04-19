@@ -13504,16 +13504,16 @@ S.ELTE &33E8  &3F7C  &12E3  &33E8
      44B6   A9 30      LDA #&30
      44B8   D0 30      BNE &44EA
 .EXNO2
-     44BA   EE 9F 03   INC &039F
-     44BD   D0 13      BNE &44D2
-     44BF   EE A0 03   INC &03A0
-     44C2   A9 65      LDA #&65
-     44C4   20 BD 46   JSR &46BD
-     44C7   EE D6 5F   INC &5FD6
-     44CA   D0 03      BNE &44CF
-     44CC   EE D7 5F   INC &5FD7
+     44BA   EE D6 5F   INC &5FD6
+     44BD   D0 03      BNE &44C2
+     44BF   EE D7 5F   INC &5FD7
 .taly1
-     44CF   20 4B FF   JSR &FF4B
+     44C2   20 4B FF   JSR &FF4B
+     44C5   EE 9F 03   INC &039F
+     44C8   D0 08      BNE &44D2
+     44CA   EE A0 03   INC &03A0
+     44CD   A9 65      LDA #&65
+     44CF   20 BD 46   JSR &46BD
      44D2   A2 07      LDX #&07
 .EXNO
      44D4   86 D1      STX &D1
@@ -21775,7 +21775,7 @@ S.ELTE &2EA7  &334E  &12E3  &2EA7
      36D4   2E 
      36D5   0D
 .DELI
-     36D6   44 45 2E ...
+     36D6   44 45 4C ...
      36E5   0D
 .CATS
      36E6   A9 04      LDA #&04
