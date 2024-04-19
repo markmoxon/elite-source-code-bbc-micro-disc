@@ -5662,7 +5662,7 @@ CHK2 = &12D3
      74CD   8D EB 0D   STA &0DEB
      74D0   A5 F4      LDA &F4
      74D2   8D EC 0D   STA &0DEC
-     74D5   A9 A5      LDA #&A5
+     74D5   A9 AD      LDA #&AD
      74D7   8D ED 0D   STA &0DED
      74DA   A9 A0      LDA #&A0
      74DC   8D EE 0D   STA &0DEE
