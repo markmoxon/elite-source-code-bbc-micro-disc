@@ -34730,8 +34730,8 @@ ORG CODE_SCORE%
  CMP #50                \ Set the C flag if A >= 50, so C is set if we have
                         \ a legal status of 50+ (i.e. we are a fugitive)
 
- ADC #1                 \ Add 1 + C to A, so if C is not set (i.e. we have a
-                        \ legal status between 1 and 49) then A is set to 1,
+ LDA #0                 \ Set A = 1 + C, so if C is not set (i.e. we have a
+ ADC #1                 \ legal status between 1 and 49) then A is set to 1,
                         \ and if C is set (i.e. we have a legal status of 50+)
                         \ then A is set to 2
 
