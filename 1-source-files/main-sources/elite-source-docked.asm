@@ -34989,13 +34989,13 @@ ORG CODE_SCORE%
  JSR TT67               \ Print two newlines
  JSR TT67
 
- LDA #8                 \ Print extended token 8 ("RESET SCORE")
+ LDA #8                 \ Print extended token 8 ("RESET SCORES")
  JSR PrintToken
 
  LDX netTally           \ Get the current combat score from scorePort
  LDY netTally+1
 
- LDA #9                 \ Print the 16-bit number in (Y X) to 9 digits, without
+ LDA #8                 \ Print the 16-bit number in (Y X) to 8 digits, without
  CLC                    \ a decimal point
  JSR TT11
 
@@ -35009,6 +35009,13 @@ ORG CODE_SCORE%
  LDA #0                 \ The answer was yes, so reset the combat score
  STA netTally
  STA netTally+1
+
+ STA CASH               \ And set the credit level to 100 Cr
+ STA CASH+1
+ LDA #&03
+ STA CASH+2
+ LDA #&E8
+ STA CASH+3
 
 .gnet4
 
@@ -35157,14 +35164,14 @@ ORG CODE_SCORE%
  ECHR ' '
  EQUB VE
 
- ETWO 'R', 'E'          \ Token 8:    "RESET SCORE"
+ ETWO 'R', 'E'          \ Token 8:    "RESET SCORES"
  ETWO 'S', 'E'
  ECHR 'T'
  ECHR ' '
  ECHR 'S'
  ECHR 'C'
  ETWO 'O', 'R'
- ECHR 'E'
+ ETWO 'E', 'S'
  EQUB VE
 
                         \ --- End of added code ------------------------------->
