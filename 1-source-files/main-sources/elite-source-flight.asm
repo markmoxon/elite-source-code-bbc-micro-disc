@@ -2269,35 +2269,51 @@
 
 .INBAY
 
- LDX #LO(LTLI)          \ Set (Y X) to point to LTLI ("L.T.CODE", which gets
- LDY #HI(LTLI)          \ modified to "R.T.CODE" in the DOENTRY routine)
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- JSR OSCLI              \ Call OSCLI to run the OS command in LTLI, which *RUNs
-                        \ the main docked code in T.CODE
-                        \
-                        \ Note that this is a JSR rather than a JMP, so if LTLI
-                        \ is still set to "L.T.CODE" (rather than "R.T.CODE"),
-                        \ then once the command has been run and the docked code
-                        \ has loaded, execution will continue from the next
-                        \ instruction
-                        \
-                        \ By this point the T.CODE binary has loaded over the
-                        \ top of this one, so we don't fall through into the
-                        \ LTLI variable (as that's in the flight code), but
-                        \ instead we fall through into the DOBEGIN routine in
-                        \ the docked code)
-                        \
-                        \ This means that if the LTLI command is unchanged, then
-                        \ we load the docked code and fall through into DOBEGIN
-                        \ to restart the game from the title screen, so by
-                        \ default, loading the docked code will restart the game
-                        \
-                        \ However if we call DOENTRY in the flight code first,
-                        \ then the command in LTLI is changed to the "R.T.CODE"
-                        \ version, which *RUNs the docked code and starts
-                        \ execution from the start of the docked binary at S%,
-                        \ which contains a JMP DOENTRY instruction that docks at
-                        \ the station instead
+\LDX #LO(LTLI)          \ Set (Y X) to point to LTLI ("L.T.CODE", which gets
+\LDY #HI(LTLI)          \ modified to "R.T.CODE" in the DOENTRY routine)
+\
+\JSR OSCLI              \ Call OSCLI to run the OS command in LTLI, which *RUNs
+\                       \ the main docked code in T.CODE
+\                       \
+\                       \ Note that this is a JSR rather than a JMP, so if LTLI
+\                       \ is still set to "L.T.CODE" (rather than "R.T.CODE"),
+\                       \ then once the command has been run and the docked code
+\                       \ has loaded, execution will continue from the next
+\                       \ instruction
+\                       \
+\                       \ By this point the T.CODE binary has loaded over the
+\                       \ top of this one, so we don't fall through into the
+\                       \ LTLI variable (as that's in the flight code), but
+\                       \ instead we fall through into the DOBEGIN routine in
+\                       \ the docked code)
+\                       \
+\                       \ This means that if the LTLI command is unchanged, then
+\                       \ we load the docked code and fall through into DOBEGIN
+\                       \ to restart the game from the title screen, so by
+\                       \ default, loading the docked code will restart the game
+\                       \
+\                       \ However if we call DOENTRY in the flight code first,
+\                       \ then the command in LTLI is changed to the "R.T.CODE"
+\                       \ version, which *RUNs the docked code and starts
+\                       \ execution from the start of the docked binary at S%,
+\                       \ which contains a JMP DOENTRY instruction that docks at
+\                       \ the station instead
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDX #LO(LTLI)          \ Set (Y X) to point to LTLI ("EliteB T", which gets
+ LDY #HI(LTLI)          \ modified to "EliteB R" in the DOENTRY routine)
+
+
+ JMP OSCLI              \ Call OSCLI to run the OS command in LTLI, which *RUNs
+                        \ the main disc loader with *Elite, passing the correct
+                        \ parameter for a game restart (*EliteB R) or docking
+                        \ (*EliteB T), returning from the subroutine using a
+                        \ tail call
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
@@ -2468,45 +2484,45 @@ ENDIF
 \
 \ ******************************************************************************
 
-IF _SRAM_DISC
+                        \ --- Mod: Code removed for Econet: ------------------->
 
-.SCANCOL
-
- LDX #&F0               \ Set X to the default scanner colour of yellow/white
-                        \ (a 4-pixel mode 5 byte in colour 2)
-
- CMP #MSL               \ If the ship type in A is that of a missile, then jump
- BEQ scol1              \ to scol1 to return from the subroutine with the colour
-                        \ set to yellow/white
-
- LDX #&FF               \ Set X to the default scanner colour of green/cyan
-                        \ (a 4-pixel mode 5 byte in colour 3)
-
- CMP #SHU               \ If the ship type in A is that of a Shuttle or greater,
- BCS scol1              \ then it is a ship, so jump to scol1 to return from the
-                        \ subroutine with the colour set to green/cyan
-
- LDX #&0F               \ Otherwise set X to the default scanner colour of red
-                        \ (a 4-pixel mode 5 byte in colour 1), to use as the
-                        \ scanner colour for the space station, asteroids,
-                        \ escape pods and cargo
-
-.scol1
-
- RTS                    \ Return from the subroutine
-
-                        \ --- Mod: Code removed for Scoreboard: --------------->
-
+\IF _SRAM_DISC
+\
+\.SCANCOL
+\
+\LDX #&F0               \ Set X to the default scanner colour of yellow/white
+\                       \ (a 4-pixel mode 5 byte in colour 2)
+\
+\CMP #MSL               \ If the ship type in A is that of a missile, then jump
+\BEQ scol1              \ to scol1 to return from the subroutine with the colour
+\                       \ set to yellow/white
+\
+\LDX #&FF               \ Set X to the default scanner colour of green/cyan
+\                       \ (a 4-pixel mode 5 byte in colour 3)
+\
+\CMP #SHU               \ If the ship type in A is that of a Shuttle or greater,
+\BCS scol1              \ then it is a ship, so jump to scol1 to return from the
+\                       \ subroutine with the colour set to green/cyan
+\
+\LDX #&0F               \ Otherwise set X to the default scanner colour of red
+\                       \ (a 4-pixel mode 5 byte in colour 1), to use as the
+\                       \ scanner colour for the space station, asteroids,
+\                       \ escape pods and cargo
+\
+\.scol1
+\
+\RTS                    \ Return from the subroutine
+\
 \NOP                    \ This code is never run, and just pads out the DEEOR
 \NOP                    \ routine in the sideways RAM variant to be the same
 \NOP                    \ size as in the original version (the sideways RAM
 \NOP                    \ variant is not encrypted, so the decryption routine
 \NOP                    \ is disabled and is replaced by NOPs and the SCANCOL
 \JMP RSHIPS             \ routine)
+\
+\ENDIF
 
                         \ --- End of removed code ----------------------------->
-
-ENDIF
 
 \ ******************************************************************************
 \
@@ -2532,7 +2548,13 @@ ENDIF
 \                       \ jumps to the docked DOENTRY routine to dock with the
 \                       \ space station
 
-                        \ --- End of removed code ----------------------------->
+                        \ --- And replaced by: -------------------------------->
+
+ LDA #'R'               \ Modify the command in LTLI from "EliteB T" to
+ STA LTLI+7             \ "EliteB R" so it docks with the station rather than
+                        \ restarting the game
+
+                        \ --- End of replacement ------------------------------>
 
                         \ Fall into DEATH2 to reset most variables and *RUN the
                         \ docked code
@@ -24878,13 +24900,17 @@ ENDIF
 
 IF _STH_DISC OR _SRAM_DISC
 
- NOP                    \ In the first version of disc Elite, asteroids never
- NOP                    \ appeared. It turned out that the authors had put in a
- NOP                    \ jump to force traders to spawn, so they could test
-                        \ that part of the code, but had forgotten to remove it,
-                        \ so this was fixed in later versions by replacing the
-                        \ JMP instruction with NOPs... and this is where that
-                        \ was done
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\NOP                    \ In the first version of disc Elite, asteroids never
+\NOP                    \ appeared. It turned out that the authors had put in a
+\NOP                    \ jump to force traders to spawn, so they could test
+\                       \ that part of the code, but had forgotten to remove it,
+\                       \ so this was fixed in later versions by replacing the
+\                       \ JMP instruction with NOPs... and this is where that
+\                       \ was done
+
+                        \ --- End of removed code ----------------------------->
 
 ELIF _IB_DISC
 
@@ -34267,14 +34293,41 @@ IF _STH_DISC OR _IB_DISC
 
 ELIF _SRAM_DISC
 
- JSR SCANCOL            \ Call SCANCOL to set the correct colour on the scanner
-                        \ for the current ship type
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- NOP                    \ Pad out the code so it takes up the same amount of
- NOP                    \ space as in the original version
- NOP
- NOP
- NOP
+\JSR SCANCOL            \ Call SCANCOL to set the correct colour on the scanner
+\                       \ for the current ship type
+\
+\NOP                    \ Pad out the code so it takes up the same amount of
+\NOP                    \ space as in the original version
+\NOP
+\NOP
+\NOP
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDX #&F0               \ Set X to the default scanner colour of yellow/white
+                        \ (a 4-pixel mode 5 byte in colour 2)
+
+ CMP #MSL               \ If the ship type in A is that of a missile, then jump
+ BEQ scol1              \ to scol1 to return from the subroutine with the colour
+                        \ set to yellow/white
+
+ LDX #&FF               \ Set X to the default scanner colour of green/cyan
+                        \ (a 4-pixel mode 5 byte in colour 3)
+
+ CMP #SHU               \ If the ship type in A is that of a Shuttle or greater,
+ BCS scol1              \ then it is a ship, so jump to scol1 to return from the
+                        \ subroutine with the colour set to green/cyan
+
+ LDX #&0F               \ Otherwise set X to the default scanner colour of red
+                        \ (a 4-pixel mode 5 byte in colour 1), to use as the
+                        \ scanner colour for the space station, asteroids,
+                        \ escape pods and cargo
+
+.scol1
+
+                        \ --- End of replacement ------------------------------>
 
 ENDIF
 
