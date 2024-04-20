@@ -2035,10 +2035,21 @@
 
 .INBAY
 
- LDX #0                 \ This code is never run, and seems to have no effect
- LDY #0
- JSR &8888
- JMP SCRAM
+ LDX #0                 \ This code is never run, but it takes up the same
+ LDY #0                 \ number of bytes as the INBAY routine in the flight
+ JSR &8888              \ code, so if the flight code *LOADs the docked code in
+ JMP SCRAM              \ its own version of the INBAY routine, then execution
+                        \ will fall through into the DOBEGIN routine below once
+                        \ the docked binary has loaded
+                        \
+                        \ This enables the docked code to choose whether to load
+                        \ the docked code and jump to DOBEGIN to restart the
+                        \ game (in which case the flight code simply *LOADs the
+                        \ docked code), or whether to dock with the space
+                        \ station and continue the game (in which case the
+                        \ flight code *RUNs the docked code, which has an
+                        \ execution address of S% at the start of the docked
+                        \ code, which contains a JMP DOENTRY instruction)
 
 \ ******************************************************************************
 \
