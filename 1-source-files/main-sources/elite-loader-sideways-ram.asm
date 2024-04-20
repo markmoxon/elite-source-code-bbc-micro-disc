@@ -306,6 +306,12 @@
 \    Summary: Copy a pre-generated ship blueprints ROM image from address &3400
 \             into sideways RAM
 \
+\ ------------------------------------------------------------------------------
+\
+\ Arguments:
+\
+\   X                   The bank number of sideways RAM to use for Elite
+\
 \ ******************************************************************************
 
 .LoadRom
@@ -1314,6 +1320,7 @@
 
  EQUS "D.MOA"
  EQUB 13
+
 \ ******************************************************************************
 \
 \       Name: eliteRomHeader
