@@ -2194,35 +2194,50 @@
 
 .INBAY
 
- LDX #LO(LTLI)          \ Set (Y X) to point to LTLI ("L.T.CODE", which gets
- LDY #HI(LTLI)          \ modified to "R.T.CODE" in the DOENTRY routine)
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\LDX #LO(LTLI)          \ Set (Y X) to point to LTLI ("L.T.CODE", which gets
+\LDY #HI(LTLI)          \ modified to "R.T.CODE" in the DOENTRY routine)
+\
+\JSR OSCLI              \ Call OSCLI to run the OS command in LTLI, which *RUNs
+\                       \ the main docked code in T.CODE
+\                       \
+\                       \ Note that this is a JSR rather than a JMP, so if LTLI
+\                       \ is still set to "L.T.CODE" (rather than "R.T.CODE"),
+\                       \ then once the command has been run and the docked code
+\                       \ has loaded, execution will continue from the next
+\                       \ instruction
+\                       \
+\                       \ By this point the T.CODE binary has loaded over the
+\                       \ top of this one, so we don't fall through into the
+\                       \ LTLI variable (as that's in the flight code), but
+\                       \ instead we fall through into the DOBEGIN routine in
+\                       \ the docked code)
+\                       \
+\                       \ This means that if the LTLI command is unchanged, then
+\                       \ we load the docked code and fall through into DOBEGIN
+\                       \ to restart the game from the title screen, so by
+\                       \ default, loading the docked code will restart the game
+\                       \
+\                       \ However if we call DOENTRY in the flight code first,
+\                       \ then the command in LTLI is changed to the "R.T.CODE"
+\                       \ version, which *RUNs the docked code and starts
+\                       \ execution from the start of the docked binary at S%,
+\                       \ which contains a JMP DOENTRY instruction that docks at
+\                       \ the station instead
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDX #LO(LTLI)          \ Set (Y X) to point to LTLI ("EliteB T", which gets
+ LDY #HI(LTLI)          \ modified to "EliteB R" in the DOENTRY routine)
+
 
  JSR OSCLI              \ Call OSCLI to run the OS command in LTLI, which *RUNs
-                        \ the main docked code in T.CODE
-                        \
-                        \ Note that this is a JSR rather than a JMP, so if LTLI
-                        \ is still set to "L.T.CODE" (rather than "R.T.CODE"),
-                        \ then once the command has been run and the docked code
-                        \ has loaded, execution will continue from the next
-                        \ instruction
-                        \
-                        \ By this point the T.CODE binary has loaded over the
-                        \ top of this one, so we don't fall through into the
-                        \ LTLI variable (as that's in the flight code), but
-                        \ instead we fall through into the DOBEGIN routine in
-                        \ the docked code)
-                        \
-                        \ This means that if the LTLI command is unchanged, then
-                        \ we load the docked code and fall through into DOBEGIN
-                        \ to restart the game from the title screen, so by
-                        \ default, loading the docked code will restart the game
-                        \
-                        \ However if we call DOENTRY in the flight code first,
-                        \ then the command in LTLI is changed to the "R.T.CODE"
-                        \ version, which *RUNs the docked code and starts
-                        \ execution from the start of the docked binary at S%,
-                        \ which contains a JMP DOENTRY instruction that docks at
-                        \ the station instead
+                        \ the main disc loader with *Elite, passing the correct
+                        \ parameter for a game restart (*EliteB R) or docking
+                        \ (*EliteB T)
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
@@ -2452,6 +2467,12 @@ ENDIF
 \                       \ jump to the start of the docked code at S%, which
 \                       \ jumps to the docked DOENTRY routine to dock with the
 \                       \ space station
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDA #'R'               \ Modify the command in LTLI from "EliteB T" to
+ STA LTLI+7             \ "EliteB R" so it docks with the station rather than
+                        \ restarting the game
 
                         \ --- End of removed code ----------------------------->
 
