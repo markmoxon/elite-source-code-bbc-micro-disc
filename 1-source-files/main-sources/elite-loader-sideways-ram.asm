@@ -29,7 +29,7 @@
  INCLUDE "1-source-files/main-sources/elite-build-options.asm"
 
  CPU 1                  \ Switch to 65SC12 assembly, as this code contains a
-                        \ BBC Master DEC A instruction
+                        \ 6502 Second Processor DEC A instruction
 
  _IB_DISC               = (_VARIANT = 1)
  _STH_DISC              = (_VARIANT = 2)
