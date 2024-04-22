@@ -2380,7 +2380,8 @@ ENDIF
 \       Name: MESS2
 \       Type: Variable
 \   Category: Loader
-\    Summary: The OS command string for changing the disc directory to ELITE
+\    Summary: The OS command string for changing the disc directory to
+\             EliteCmdrs
 \
 \ ******************************************************************************
 
@@ -2388,7 +2389,7 @@ ENDIF
 
                         \ --- Mod: Code added for Econet: --------------------->
 
- EQUS "DIR ELITE"       \ Change to the ELITE folder in the user's main
+ EQUS "DIR EliteCmdrs"  \ Change to the EliteCmdrs folder in the user's main
  EQUB 13                \ directory on the network
 
                         \ --- End of added code ------------------------------->
