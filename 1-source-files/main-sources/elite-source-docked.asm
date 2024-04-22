@@ -16801,7 +16801,6 @@ ENDIF
 
                         \ --- End of replacement ------------------------------>
 
-
 \ ******************************************************************************
 \
 \       Name: EQSHP
@@ -33361,14 +33360,6 @@ ENDMACRO
  EQUB 115               \ Token 35: a random extended token between 115 and 119
  EQUB 120               \ Token 36: a random extended token between 120 and 124
  EQUB 125               \ Token 37: a random extended token between 125 and 129
-
-                        \ --- Mod: Code added for Econet: --------------------->
-
-\ INSERT ECONET CODE HERE
-
-PRINT "Free space for Econet = ", ~(&55FF - P%)
-
-                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \

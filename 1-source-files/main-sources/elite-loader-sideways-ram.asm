@@ -99,7 +99,6 @@
 
                         \ --- End of added code ------------------------------->
 
-
  VIA = &FE00            \ Memory-mapped space for accessing internal hardware,
                         \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
                         \ known as SHEILA)

@@ -214,7 +214,6 @@
 
                         \ --- End of added code ------------------------------->
 
-
  OSBYTE = &FFF4         \ The address for the OSBYTE routine
 
  OSWORD = &FFF1         \ The address for the OSWORD routine
@@ -2306,7 +2305,6 @@
  LDX #LO(LTLI)          \ Set (Y X) to point to LTLI ("EliteB T", which gets
  LDY #HI(LTLI)          \ modified to "EliteB R" in the DOENTRY routine)
 
-
  JMP OSCLI              \ Call OSCLI to run the OS command in LTLI, which *RUNs
                         \ the main disc loader with *Elite, passing the correct
                         \ parameter for a game restart (*EliteB R) or docking
@@ -2453,7 +2451,6 @@ ENDIF
 
  EQUS "DIR EliteCmdrs"  \ Change to the EliteCmdrs folder in the user's main
  EQUB 13                \ directory on the network
-
 
                         \ --- End of added code ------------------------------->
 
@@ -17942,7 +17939,11 @@ ENDIF
 
 .TT113
 
-                        \ --- Mod: Code added for Scoreboard: ----------------->
+                        \ --- Mod: Code removed for Scoreboard: --------------->
+
+\RTS                    \ Return from the subroutine
+
+                        \ --- And replaced by: -------------------------------->
 
  JMP OSXIND2            \ Transmit commander data to the scoreboard machine, if
                         \ configured (this calls TransmitCmdrData after
