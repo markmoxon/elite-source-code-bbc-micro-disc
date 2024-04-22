@@ -32,6 +32,10 @@
 
                         \ --- Mod: Code removed for Econet: ------------------->
 
+\GUARD &5600            \ Guard against assembling over the ship blueprint file
+
+                        \ --- And replaced by: -------------------------------->
+
  GUARD &5700            \ Guard against assembling over the ship blueprint file
 
                         \ --- End of removed code ----------------------------->
