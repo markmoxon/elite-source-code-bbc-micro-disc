@@ -35,11 +35,11 @@
  _SRAM_DISC             = (_VARIANT = 3)
 
  PUTFILE "1-source-files/boot-files/$.MENUEC.bin", "MENU", &FF1900, &FF8023
- PUTFILE "1-source-files/boot-files/$.SCREEN.bin", "ELTSC", &007800, &007BE8
- PUTFILE "3-assembled-output/ELTRM.bin", "ELTRM", &003400, &003400
- PUTFILE "3-assembled-output/MNUCODE.bin", "ELTMN", &007400, &00743B
- PUTFILE "3-assembled-output/ELITE4.bin", "ELTIN", &001900, &00197B
- PUTFILE "3-assembled-output/D.CODE.bin", "ELTDC", &0012E3, &0012E3
- PUTFILE "3-assembled-output/T.CODE.bin", "ELTTC", &0012E3, &0012E3
+ PUTFILE "1-source-files/boot-files/$.SCREEN.bin", "ELTBS", &007800, &007BE8
+ PUTFILE "3-assembled-output/ELTROM.bin", "ELTBR", &003400, &003400
+ PUTFILE "3-assembled-output/MNUCODE.bin", "ELTBM", &007400, &00743B
+ PUTFILE "3-assembled-output/ELITE4.bin", "ELTBI", &001900, &00197B
+ PUTFILE "3-assembled-output/D.CODE.bin", "ELTBD", &0012E3, &0012E3
+ PUTFILE "3-assembled-output/T.CODE.bin", "ELTBT", &0012E3, &0012E3
 
  PUTFILE "3-assembled-output/README.txt", "README", &FFFFFF, &FFFFFF

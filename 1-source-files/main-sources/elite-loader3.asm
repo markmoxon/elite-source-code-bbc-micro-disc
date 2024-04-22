@@ -879,7 +879,7 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
- EQUS "L.ELTTC "        \ This is short for "*LOAD ELTTC"
+ EQUS "L.ELTBT "        \ This is short for "*LOAD ELTBT"
  EQUB 13
 
                         \ --- End of replacement ------------------------------>
