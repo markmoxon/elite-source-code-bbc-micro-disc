@@ -21299,7 +21299,6 @@ IF _SRAM_DISC
  RTS                    \ The planet doesn't fit on-screen, so return from the
                         \ subroutine
 
-
 .PL25
 
  LDA TYPE               \ If the planet type is 128 then it has an equator and

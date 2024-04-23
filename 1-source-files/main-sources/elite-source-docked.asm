@@ -16737,7 +16737,6 @@ IF _SRAM_DISC
 
 ENDIF
 
-
                         \ --- End of added code ------------------------------->
 
  RTS                    \ Return from the subroutine
