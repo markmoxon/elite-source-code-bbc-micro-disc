@@ -2262,55 +2262,55 @@
 
 .DEEOR
 
-IF _STH_DISC OR _IB_DISC
-
- LDY #0                 \ We're going to work our way through a large number of
-                        \ encrypted bytes, so we set Y to 0 to be the index of
-                        \ the current byte within its page in memory
-
- STY SC                 \ Set the low byte of SC(1 0) to 0
-
- LDX #&13               \ Set X to &13 to be the page number of the current
-                        \ byte, so we start the decryption with the first byte
-                        \ of page &13
-
-.DEEORL
-
- STX SCH                \ Set the high byte of SC(1 0) to X, so SC(1 0) now
-                        \ points to the first byte of page X
-
- TYA                    \ Set A to Y, so A now contains the index of the current
-                        \ byte within its page
-
- EOR (SC),Y             \ EOR the current byte with its index within the page
-
- EOR #&33               \ EOR the current byte with &33
-
- STA (SC),Y             \ Update the current byte
-
-                        \ The current byte is in page X at offset Y, and SC(1 0)
-                        \ points to the first byte of page X, so we just did
-                        \  this:
-                        \
-                        \   (X Y) = (X Y) EOR Y EOR &33
-
- DEY                    \ Decrement the index in Y to point to the next byte
-
- BNE DEEORL             \ Loop back to DEEORL to decrypt the next byte until we
-                        \ have done the whole page
-
- INX                    \ Increment X to point to the next page in memory
-
- CPX #&60               \ Loop back to DEEORL to decrypt the next page until we
- BNE DEEORL             \ reach the start of page &60
-
- JMP BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
-                        \ and return from the subroutine using a tail call
-
-ELIF _SRAM_DISC
-
                         \ --- Mod: Code removed for Econet: ------------------->
 
+\IF _STH_DISC OR _IB_DISC
+\
+\LDY #0                 \ We're going to work our way through a large number of
+\                       \ encrypted bytes, so we set Y to 0 to be the index of
+\                       \ the current byte within its page in memory
+\
+\STY SC                 \ Set the low byte of SC(1 0) to 0
+\
+\LDX #&13               \ Set X to &13 to be the page number of the current
+\                       \ byte, so we start the decryption with the first byte
+\                       \ of page &13
+\
+\.DEEORL
+\
+\STX SCH                \ Set the high byte of SC(1 0) to X, so SC(1 0) now
+\                       \ points to the first byte of page X
+\
+\TYA                    \ Set A to Y, so A now contains the index of the current
+\                       \ byte within its page
+\
+\EOR (SC),Y             \ EOR the current byte with its index within the page
+\
+\EOR #&33               \ EOR the current byte with &33
+\
+\STA (SC),Y             \ Update the current byte
+\
+\                       \ The current byte is in page X at offset Y, and SC(1 0)
+\                       \ points to the first byte of page X, so we just did
+\                       \  this:
+\                       \
+\                       \   (X Y) = (X Y) EOR Y EOR &33
+\
+\DEY                    \ Decrement the index in Y to point to the next byte
+\
+\BNE DEEORL             \ Loop back to DEEORL to decrypt the next byte until we
+\                       \ have done the whole page
+\
+\INX                    \ Increment X to point to the next page in memory
+\
+\CPX #&60               \ Loop back to DEEORL to decrypt the next page until we
+\BNE DEEORL             \ reach the start of page &60
+\
+\JMP BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
+\                       \ and return from the subroutine using a tail call
+\
+\ELIF _SRAM_DISC
+\
 \NOP                    \ The sideways RAM variant is not encrypted, so the
 \NOP                    \ decryption code is disabled and is replaced by NOPs
 \NOP
@@ -2334,7 +2334,11 @@ ELIF _SRAM_DISC
 \NOP
 \NOP
 \NOP
-
+\
+\JMP BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
+\                       \ and return from the subroutine using a tail call
+\
+\ENDIF
                         \ --- And replaced by: -------------------------------->
 
  LDX #LO(MESS1)         \ Set (Y X) to point to MESS1 ("DIR")
@@ -2343,18 +2347,16 @@ ELIF _SRAM_DISC
  JSR OSCLI              \ Call OSCLI to run the OS command in MESS1, which
                         \ changes the directory to the user's main directory
 
- LDX #LO(MESS2)         \ Set (Y X) to point to MESS2 ("DIR ELITE")
+ LDX #LO(MESS2)         \ Set (Y X) to point to MESS2 ("DIR EliteCmdrs")
  LDY #HI(MESS2)
 
  JSR OSCLI              \ Call OSCLI to run the OS command in MESS2, which
-                        \ changes the directory to ELITE
-
-                        \ --- End of replacement ------------------------------>
+                        \ changes the directory to EliteCmdrs
 
  JMP BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
                         \ and return from the subroutine using a tail call
 
-ENDIF
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
@@ -2412,10 +2414,13 @@ ENDIF
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
+IF _SRAM_DISC
+
  JSR OSXIND2            \ Transmit commander data to the scoreboard machine, if
                         \ configured (this calls TransmitCmdrData after
                         \ switching in the correct ROM bank)
 
+ENDIF
                         \ --- End of added code ------------------------------->
 
  JSR RES2               \ Reset a number of flight variables and workspaces
@@ -16706,6 +16711,8 @@ ENDIF
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
+IF _SRAM_DISC
+
                         \ If we get here then either the transaction was an
                         \ MCASH and the C flag is clear, or it was a successful
                         \ LCASH and the C flag is set
@@ -16727,6 +16734,9 @@ ENDIF
  PLP                    \ Restore the flags
 
 .cash2
+
+ENDIF
+
 
                         \ --- End of added code ------------------------------->
 
@@ -16796,8 +16806,17 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
+IF _SRAM_DISC
+
  EQUS "EliteB D"        \ This is short for "*RUN EliteB D"
  EQUB 13
+
+ELIF _STH_DISC OR _IB_DISC
+
+ EQUS "EliteB F"        \ This is short for "*RUN EliteB F"
+ EQUB 13
+
+ENDIF
 
                         \ --- End of replacement ------------------------------>
 
@@ -24385,6 +24404,8 @@ ENDIF
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
+IF _SRAM_DISC
+
  CPX #&55               \ If "N" is not being pressed, skip to skipNetwork
  BNE skipNetwork
 
@@ -24393,6 +24414,8 @@ ENDIF
                         \ switching in the correct ROM bank)
 
 .skipNetwork
+
+ENDIF
 
                         \ --- End of added code ------------------------------->
 
@@ -34589,6 +34612,8 @@ ENDMACRO
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
+IF _SRAM_DISC
+
  ORG &5FD3
 
 .scorePort
@@ -34643,6 +34668,8 @@ ENDMACRO
 
 .endBuffer
 
+ENDIF
+
                         \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
@@ -34651,13 +34678,17 @@ ENDMACRO
 \
 \ ******************************************************************************
 
-                        \ --- Mod: Code added for Econet: --------------------->
+                        \ --- Mod: Code added for Scoreboard: ----------------->
 
-CODE_SCORE% = &A000
+IF _SRAM_DISC
 
-LOAD_SCORE% = &A000
+ CODE_SCORE% = &A000
 
-ORG CODE_SCORE%
+ LOAD_SCORE% = &A000
+
+ ORG CODE_SCORE%
+
+ENDIF
 
                         \ --- End of added code ------------------------------->
 
@@ -34672,6 +34703,8 @@ ORG CODE_SCORE%
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
+IF _SRAM_DISC
+
 .SendOverEconet
 
  LDX #LO(oswordBlock)   \ Set (Y X) to the address of the OSWORD parameter block
@@ -34680,6 +34713,8 @@ ORG CODE_SCORE%
  JSR OSWORD             \ Call OSWORD with the command number from the stack
 
  RTS                    \ Return from the subroutine
+
+ENDIF
 
                         \ --- End of added code ------------------------------->
 
@@ -34694,6 +34729,8 @@ ORG CODE_SCORE%
 \ ******************************************************************************
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
+
+IF _SRAM_DISC
 
 .TransmitCmdrData
 
@@ -34795,6 +34832,8 @@ ORG CODE_SCORE%
 
                         \ Fall through into TransmitData to transmit the data
 
+ENDIF
+
                         \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
@@ -34807,6 +34846,8 @@ ORG CODE_SCORE%
 \ ******************************************************************************
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
+
+IF _SRAM_DISC
 
 .TransmitData
 
@@ -34844,6 +34885,8 @@ ORG CODE_SCORE%
 
  RTS                    \ Return from the subroutine
 
+ENDIF
+
                         \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
@@ -34857,6 +34900,8 @@ ORG CODE_SCORE%
 \ ******************************************************************************
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
+
+IF _SRAM_DISC
 
 .GetNetworkDetails
 
@@ -35035,6 +35080,8 @@ ORG CODE_SCORE%
  JMP FRCE               \ "pressed" to red key f8 (so we show the Status Mode
                         \ screen)
 
+ENDIF
+
                         \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
@@ -35064,6 +35111,8 @@ ORG CODE_SCORE%
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
+IF _SRAM_DISC
+
 .PrintToken
 
  PHA                    \ Store A on the stack, so we can retrieve it later
@@ -35091,6 +35140,8 @@ ORG CODE_SCORE%
                         \ V(1 0) from the stack, returning from the subroutine
                         \ using a tail call
 
+ENDIF
+
                         \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
@@ -35103,6 +35154,8 @@ ORG CODE_SCORE%
 \ ******************************************************************************
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
+
+IF _SRAM_DISC
 
 .EconetToken
 
@@ -35166,6 +35219,8 @@ ORG CODE_SCORE%
  ETWO 'E', 'S'
  EQUB VE
 
+ENDIF
+
                         \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
@@ -35174,6 +35229,9 @@ ORG CODE_SCORE%
 \
 \ ******************************************************************************
 
+IF _SRAM_DISC
+
  PRINT "S.Scoreboard ", ~CODE_SCORE%, " ", ~P%, " ", ~LOAD_SCORE%, " ", ~LOAD_SCORE%
  SAVE "3-assembled-output/Scoreboard.bin", CODE_SCORE%, P%, LOAD_SCORE%
 
+ENDIF

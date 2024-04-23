@@ -4,6 +4,9 @@ PYTHON?=python
 # Only the Sideways RAM variant is suited to Econet, as we need the
 # space vacated by the blueprint files to cope with Econet's extra
 # memory requirements
+#
+# The STH variant is a cut-down version of Elite to squeeze into the
+# space left when Econet is active
 
 ifeq ($(commander), max)
   max-commander=TRUE
@@ -25,10 +28,22 @@ else
   match-original-binaries=TRUE
 endif
 
-variant-number=3
-folder=/sideways-ram
-suffix=-econet
-boot=
+ifeq ($(variant), ib-disc)
+  variant-number=1
+  folder=/ib-disc
+  suffix=-ib-disc
+  boot=-boot ELITE2
+else ifeq ($(variant), sideways-ram)
+  variant-number=3
+  folder=/sideways-ram
+  suffix=-econet-sideways-ram
+  boot=
+else
+  variant-number=2
+  folder=/sth
+  suffix=-econet-sth
+  boot=
+endif
 
 .PHONY:all
 all:

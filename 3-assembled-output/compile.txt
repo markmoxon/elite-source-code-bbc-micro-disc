@@ -33632,7 +33632,6 @@ End macro ECHR
      5219   73
      521A   78
      521B   7D
-Free space for Econet = &3E3 
 ELITE H
 Assembled at &4451 
 Ends at &521C 

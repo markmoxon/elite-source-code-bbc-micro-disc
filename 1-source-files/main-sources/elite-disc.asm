@@ -34,6 +34,8 @@
  _STH_DISC              = (_VARIANT = 2)
  _SRAM_DISC             = (_VARIANT = 3)
 
+IF _SRAM_DISC
+
  PUTFILE "1-source-files/boot-files/$.MENUEC.bin", "MENU", &FF1900, &FF8023
  PUTFILE "1-source-files/boot-files/$.SCREEN.bin", "ELTBS", &007800, &007BE8
  PUTFILE "3-assembled-output/ELTROM.bin", "ELTBR", &003400, &003400
@@ -41,5 +43,14 @@
  PUTFILE "3-assembled-output/ELITE4.bin", "ELTBI", &001900, &00197B
  PUTFILE "3-assembled-output/D.CODE.bin", "ELTBD", &0012E3, &0012E3
  PUTFILE "3-assembled-output/T.CODE.bin", "ELTBT", &0012E3, &0012E3
+
+ELIF _STH_DISC OR _IB_DISC
+
+ PUTFILE "3-assembled-output/ELITE4.bin", "ELTAI", &001900, &00197B
+ PUTFILE "3-assembled-output/D.CODE.bin", "ELTAD", &0012E3, &0012E3
+ PUTFILE "3-assembled-output/T.CODE.bin", "ELTAT", &0012E3, &0012E3
+
+ENDIF
+
 
  PUTFILE "3-assembled-output/README.txt", "README", &FFFFFF, &FFFFFF

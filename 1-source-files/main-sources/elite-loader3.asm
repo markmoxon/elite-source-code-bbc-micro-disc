@@ -846,26 +846,35 @@ ENDIF
                         \ in the docked file we just loaded, in the byte before
                         \ the ship hangar blueprints at XX21
 
-IF _REMOVE_CHECKSUMS
+                        \ --- Mod: Code removed for Econet: ------------------->
 
- NOP                    \ If we have disabled checksums, then ignore the result
- NOP                    \ of the checksum comparison
+\IF _REMOVE_CHECKSUMS
+\
+\NOP                    \ If we have disabled checksums, then ignore the result
+\NOP                    \ of the checksum comparison
+\
+\ELSE
+\
+\IF _STH_DISC OR _IB_DISC
+\
+\BNE P%                 \ If the checksums don't match then enter an infinite
+\                       \ loop, which hangs the computer
+\
+\ELIF _SRAM_DISC
+\
+\NOP                    \ The sideways RAM variant ignores the result of the
+\NOP                    \ checksum comparison
+\
+\ENDIF
+\
+\ENDIF
 
-ELSE
+                        \ --- And replaced by: -------------------------------->
 
-IF _STH_DISC OR _IB_DISC
+ NOP                    \ The Econet versions ignore the result of the checksum
+ NOP                    \ comparison
 
- BNE P%                 \ If the checksums don't match then enter an infinite
-                        \ loop, which hangs the computer
-
-ELIF _SRAM_DISC
-
- NOP                    \ The sideways RAM variant ignores the result of the
- NOP                    \ checksum comparison
-
-ENDIF
-
-ENDIF
+                        \ --- End of replacement ------------------------------>
 
  JMP S%+3               \ Jump to the second entry in the main docked code's S%
                         \ workspace to start a new game
@@ -879,8 +888,17 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
+IF _SRAM_DISC
+
  EQUS "L.ELTBT "        \ This is short for "*LOAD ELTBT"
  EQUB 13
+
+ELIF _STH_DISC OR _IB_DISC
+
+ EQUS "L.ELTAT "        \ This is short for "*LOAD ELTAT"
+ EQUB 13
+
+ENDIF
 
                         \ --- End of replacement ------------------------------>
 

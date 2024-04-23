@@ -36,7 +36,15 @@
 
                         \ --- And replaced by: -------------------------------->
 
+IF _SRAM_DISC
+
  GUARD &5700            \ Guard against assembling over the ship blueprint file
+
+ELIF _STH_DISC OR _IB_DISC
+
+ GUARD &5600            \ Guard against assembling over the ship blueprint file
+
+ENDIF
 
                         \ --- End of removed code ----------------------------->
 
@@ -2173,6 +2181,8 @@
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
+IF _SRAM_DISC
+
 .scorePort
 
  SKIP 1                 \ The Econet port on which to talk to the scoreboard
@@ -2226,6 +2236,8 @@
 .endBuffer
 
  SKIP 0
+
+ENDIF
 
                         \ --- End of added code ------------------------------->
 
@@ -2306,8 +2318,17 @@
 
                         \ --- And replaced by: -------------------------------->
 
+IF _SRAM_DISC
+
  LDX #LO(LTLI)          \ Set (Y X) to point to LTLI ("EliteB T", which gets
  LDY #HI(LTLI)          \ modified to "EliteB R" in the DOENTRY routine)
+
+ELIF _STH_DISC OR _IB_DISC
+
+ LDX #LO(LTLI)          \ Set (Y X) to point to LTLI ("EliteB S", which gets
+ LDY #HI(LTLI)          \ modified to "EliteB Q" in the DOENTRY routine)
+
+ENDIF
 
  JMP OSCLI              \ Call OSCLI to run the OS command in LTLI, which *RUNs
                         \ the main disc loader with *Elite, passing the correct
@@ -2335,8 +2356,17 @@
 
                         \ --- And replaced by: -------------------------------->
 
+IF _SRAM_DISC
+
  EQUS "EliteB T"        \ This is short for "*RUN EliteB T"
  EQUB 13
+
+ELIF _STH_DISC OR _IB_DISC
+
+ EQUS "EliteB S"        \ This is short for "*RUN EliteB S"
+ EQUB 13
+
+ENDIF
 
                         \ --- End of replacement ------------------------------>
 
@@ -2407,11 +2437,11 @@ ELIF _SRAM_DISC
  JSR OSCLI              \ Call OSCLI to run the OS command in MESS1, which
                         \ changes the directory to the user's main directory
 
- LDX #LO(MESS2)         \ Set (Y X) to point to MESS2 ("DIR ELITE")
+ LDX #LO(MESS2)         \ Set (Y X) to point to MESS2 ("DIR EliteCmdrs")
  LDY #HI(MESS2)
 
  JSR OSCLI              \ Call OSCLI to run the OS command in MESS2, which
-                        \ changes the directory to ELITE
+                        \ changes the directory to EliteCmdrs
 
                         \ --- End of replacement ------------------------------>
 
@@ -2553,9 +2583,19 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
+IF _SRAM_DISC
+
  LDA #'R'               \ Modify the command in LTLI from "EliteB T" to
  STA LTLI+7             \ "EliteB R" so it docks with the station rather than
                         \ restarting the game
+
+ELIF _STH_DISC OR _IB_DISC
+
+ LDA #'Q'               \ Modify the command in LTLI from "EliteB S" to
+ STA LTLI+7             \ "EliteB Q" so it docks with the station rather than
+                        \ restarting the game
+
+ENDIF
 
                         \ --- End of replacement ------------------------------>
 
@@ -2974,12 +3014,45 @@ ENDIF
 
 .MA64
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
+
  LDA KY19               \ If "C" is being pressed, and we have a docking
  AND DKCMP              \ computer fitted, keep going, otherwise jump down to
  BEQ MA68               \ MA68 to skip the following
 
  STA auto               \ Set auto to the non-zero value of A, so the docking
                         \ computer is activated
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ELIF _STH_DISC OR _IB_DISC
+
+ LDA KY19               \ If "C" is being pressed, and we have a docking
+ AND DKCMP              \ computer fitted, and we are inside the space station's
+ AND SSPR               \ safe zone, keep going, otherwise jump down to MA68 to
+ BEQ MA68               \ skip the following
+
+ LDA K%+NI%+32          \ Fetch the AI counter (byte #32) of the second ship
+ BMI MA68               \ from the ship data workspace at K%, which is reserved
+                        \ for the sun or the space station (in this case it's
+                        \ the latter as we are in the safe zone). If byte #32 is
+                        \ negative, meaning the station is hostile, then jump
+                        \ down to MA68 to skip the following (so we can't use
+                        \ the docking computer to dock at a station that has
+                        \ turned against us)
+
+ JMP GOIN               \ The Docking Computer button has been pressed and
+                        \ we are allowed to dock at the station, so jump to
+                        \ GOIN to dock (or "go in"), and exit the main flight
+                        \ loop using a tail call
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
 .MA68
 
@@ -9841,12 +9914,24 @@ ENDIF
  BCS TN3                \ and jump to TN3 if it is set (i.e. if this ship is
                         \ hostile)
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
+
  LSR A                  \ The ship is not hostile, so extract bit 4 of the
  LSR A                  \ ship's NEWB flags into the C flag, and jump to GOPL if
  BCC GOPL               \ it is clear (i.e. if this ship is not docking)
 
  JMP DOCKIT             \ The ship is not hostile and is docking, so jump to
                         \ DOCKIT to apply the docking algorithm to this ship
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
 .GOPL
 
@@ -10426,6 +10511,12 @@ ENDIF
 \
 \ ******************************************************************************
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
+
 .DOCKIT
 
  LDA #6                 \ Set RAT2 = 6, which is the threshold below which we
@@ -10742,6 +10833,12 @@ ENDIF
 .TNRTS
 
  RTS                    \ Return from the subroutine
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -17949,10 +18046,18 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
+IF _SRAM_DISC
+
  JMP OSXIND2            \ Transmit commander data to the scoreboard machine, if
                         \ configured (this calls TransmitCmdrData after
                         \ switching in the correct ROM bank), returning from the
                         \ subroutiune using a tail call
+
+ELIF _STH_DISC OR _IB_DISC
+
+ RTS                    \ Return from the subroutine
+
+ENDIF
 
                         \ --- End of added code ------------------------------->
 
@@ -17971,7 +18076,7 @@ ENDIF
 \
 \ ******************************************************************************
 
-                        \ --- Mod: Code removed for Scoreboard: --------------->
+                        \ --- Mod: Code removed for Econet: ------------------->
 
 \.GCASH
 \
@@ -24853,9 +24958,13 @@ ENDIF
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
+IF _SRAM_DISC
+
  JSR OSXIND2            \ Transmit commander data to the scoreboard machine, if
                         \ configured (this calls TransmitCmdrData after
                         \ switching in the correct ROM bank)
+
+ENDIF
 
                         \ --- End of added code ------------------------------->
 
@@ -26740,6 +26849,8 @@ ENDIF
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
+IF _SRAM_DISC
+
  INC netTally           \ Increment the kill count in netTally
  BNE taly1
  INC netTally+1
@@ -26749,6 +26860,8 @@ ENDIF
  JSR OSXIND2            \ Transmit commander data to the scoreboard machine, if
                         \ configured (this calls TransmitCmdrData after
                         \ switching in the correct ROM bank)
+
+ENDIF
 
                         \ --- End of added code ------------------------------->
 
@@ -27305,9 +27418,21 @@ ENDIF
 
 .DKJ1
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
+
  LDA auto               \ If auto is non-zero, then the docking computer is
  BNE auton              \ currently activated, so jump to auton in DOKEY so the
                         \ docking computer can "press" the flight keys for us
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
  LDY #1                 \ Update the key logger for key 1 in the KYTB table, so
  JSR DKS1               \ KY1 will be &FF if "?" (slow down) is being pressed
@@ -27446,6 +27571,12 @@ ENDIF
 
  BNE DKL2               \ Loop back for the next key, working our way from A at
                         \ KYTB+7 down to ? at KYTB+1
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
 
  LDA auto               \ If auto is 0, then the docking computer is not
  BEQ DK15               \ currently activated, so jump to DK15 to skip the
@@ -27594,6 +27725,12 @@ ENDIF
 .DK13
 
  STA JSTY               \ Store A in JSTY to update the current pitch rate
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
 .DK15
 
