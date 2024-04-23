@@ -2232,6 +2232,14 @@ ENDIF
 \                       \ of ship blueprints and jump into the main game loop
 \
 \ELIF _SRAM_DISC
+\
+\JMP RSHIPS             \ Call RSHIPS to launch from the station, load a new set
+\                       \ of ship blueprints and jump into the main game loop
+\
+\ENDIF
+
+                        \ --- Mod: Code removed for Econet: ------------------->
+
 
                         \ --- And replaced by: -------------------------------->
 
@@ -2247,16 +2255,10 @@ ENDIF
  JSR OSCLI              \ Call OSCLI to run the OS command in MESS2, which
                         \ changes the directory to EliteCmdrs
 
-                        \ --- End of replacement ------------------------------>
-
  JMP RSHIPS             \ Call RSHIPS to launch from the station, load a new set
                         \ of ship blueprints and jump into the main game loop
 
-                        \ --- Mod: Code removed for Econet: ------------------->
-
-\ENDIF
-
-                        \ --- End of removed code ----------------------------->
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
