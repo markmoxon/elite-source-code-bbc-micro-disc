@@ -3,7 +3,9 @@
 Acornsoft Elite
 
 Version: BBC Micro disc
-Variant: BBC Micro Sideways RAM version
+Variant: Stairway to Hell archive
+Product: Acornsoft SNG38
+         Acornsoft SNG47
 
 See www.bbcelite.com for details
 ---------------------------------------

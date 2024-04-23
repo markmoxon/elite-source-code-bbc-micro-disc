@@ -27,7 +27,7 @@ import sys
 argv = sys.argv
 argc = len(argv)
 Encrypt = True
-Scramble = True
+Scramble = False
 release = 1
 
 for arg in argv[1:]:
@@ -38,7 +38,6 @@ for arg in argv[1:]:
     if arg == "-rel2":
         release = 2
     if arg == "-rel3":
-        Scramble = False
         release = 3
 
 print("Disc Elite Checksum")
@@ -94,9 +93,14 @@ chk2 = 0x12D3               # CHK2
 
 data_block = bytearray()
 
-elite_file = open("3-assembled-output/ELITE4.unprot.bin", "rb")
-data_block.extend(elite_file.read())
-elite_file.close()
+if release == 3:
+    elite_file = open("3-assembled-output/sELITE4.unprot.bin", "rb")
+    data_block.extend(elite_file.read())
+    elite_file.close()
+else:
+    elite_file = open("3-assembled-output/ELITE4.unprot.bin", "rb")
+    data_block.extend(elite_file.read())
+    elite_file.close()
 
 # Commander data checksum
 
@@ -140,9 +144,14 @@ for n in range(scramble4_from, scramble4_to):
 
 # Write output file for ELITE4
 
-output_file = open("3-assembled-output/ELITE4.bin", "wb")
-output_file.write(data_block)
-output_file.close()
+if release == 3:
+    output_file = open("3-assembled-output/sELITE4.bin", "wb")
+    output_file.write(data_block)
+    output_file.close()
+else:
+    output_file = open("3-assembled-output/ELITE4.bin", "wb")
+    output_file.write(data_block)
+    output_file.close()
 
 print("3-assembled-output/ELITE4.bin file saved")
 
@@ -157,9 +166,14 @@ scramble_eor = 0x33
 
 data_block = bytearray()
 
-elite_file = open("3-assembled-output/D.CODE.unprot.bin", "rb")
-data_block.extend(elite_file.read())
-elite_file.close()
+if release == 3:
+    elite_file = open("3-assembled-output/sD.CODE.unprot.bin", "rb")
+    data_block.extend(elite_file.read())
+    elite_file.close()
+else:
+    elite_file = open("3-assembled-output/D.CODE.unprot.bin", "rb")
+    data_block.extend(elite_file.read())
+    elite_file.close()
 
 # SC routine, which EORs bytes between &1300 and &55FF
 
@@ -169,9 +183,14 @@ if Scramble:
 
 # Write output file for D.CODE
 
-output_file = open("3-assembled-output/D.CODE.bin", "wb")
-output_file.write(data_block)
-output_file.close()
+if release == 3:
+    output_file = open("3-assembled-output/sD.CODE.bin", "wb")
+    output_file.write(data_block)
+    output_file.close()
+else:
+    output_file = open("3-assembled-output/D.CODE.bin", "wb")
+    output_file.write(data_block)
+    output_file.close()
 
 print("3-assembled-output/D.CODE.bin file saved")
 
@@ -186,9 +205,14 @@ scramble_eor = 0x33
 
 data_block = bytearray()
 
-elite_file = open("3-assembled-output/T.CODE.unprot.bin", "rb")
-data_block.extend(elite_file.read())
-elite_file.close()
+if release == 3:
+    elite_file = open("3-assembled-output/sT.CODE.unprot.bin", "rb")
+    data_block.extend(elite_file.read())
+    elite_file.close()
+else:
+    elite_file = open("3-assembled-output/T.CODE.unprot.bin", "rb")
+    data_block.extend(elite_file.read())
+    elite_file.close()
 
 # SC routine, which EORs bytes between &1300 and &9FFF
 
@@ -229,8 +253,13 @@ print("&55FF docked code checksum = ", hex(d_checksum))
 
 # Write output file for T.CODE
 
-output_file = open("3-assembled-output/T.CODE.bin", "wb")
-output_file.write(data_block)
-output_file.close()
+if release == 3:
+    output_file = open("3-assembled-output/sT.CODE.bin", "wb")
+    output_file.write(data_block)
+    output_file.close()
+else:
+    output_file = open("3-assembled-output/T.CODE.bin", "wb")
+    output_file.write(data_block)
+    output_file.close()
 
 print("3-assembled-output/T.CODE.bin file saved")

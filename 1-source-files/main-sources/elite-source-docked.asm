@@ -34597,8 +34597,17 @@ ENDMACRO
 \
 \ ******************************************************************************
 
+IF _SRAM_DISC
+
+ PRINT "S.T.CODE ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
+ SAVE "3-assembled-output/sT.CODE.unprot.bin", CODE%, P%
+
+ELIF _STH_DISC OR _IB_DISC
+
  PRINT "S.T.CODE ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
  SAVE "3-assembled-output/T.CODE.unprot.bin", CODE%, P%
+
+ENDIF
 
 \ ******************************************************************************
 \

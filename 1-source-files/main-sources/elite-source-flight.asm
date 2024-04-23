@@ -34789,8 +34789,17 @@ ENDIF
 \
 \ ******************************************************************************
 
+IF _SRAM_DISC
+
+ PRINT "S.D.CODE ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
+ SAVE "3-assembled-output/sD.CODE.unprot.bin", CODE%, P%
+
+ELIF _STH_DISC OR _IB_DISC
+
  PRINT "S.D.CODE ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
  SAVE "3-assembled-output/D.CODE.unprot.bin", CODE%, P%
+
+ENDIF
 
 \ ******************************************************************************
 \

@@ -2669,8 +2669,17 @@ ENDIF
 \
 \ ******************************************************************************
 
+IF _SRAM_DISC
+
+ PRINT "S.ELITE4 ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
+ SAVE "3-assembled-output/sELITE4.unprot.bin", CODE%, P%, LOAD%
+
+ELIF _STH_DISC OR _IB_DISC
+
  PRINT "S.ELITE4 ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
  SAVE "3-assembled-output/ELITE4.unprot.bin", CODE%, P%, LOAD%
+
+ENDIF
 
  PRINT "Addresses for the scramble routines in elite-checksum.py"
  PRINT "Load address = ", ~CODE%
