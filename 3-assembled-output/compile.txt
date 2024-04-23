@@ -6393,55 +6393,6 @@ Zero page variables from &0  to &E2
      03D3
 .K%
      0900
-.WP
-     5E00
-.LSX
-     5E00
-.LSO
-     5E00
-.BUF
-     5E01
-.LSX2
-     5EC0
-.LSY2
-     5F0E
-.SX
-     5F5C
-.SXL
-     5F6F
-.SY
-     5F82
-.SYL
-     5F95
-.SZ
-     5FA8
-.SZL
-     5FBB
-.LASX
-     5FCE
-.LASY
-     5FCF
-.XX24
-     5FD0
-.ALTIT
-     5FD1
-.CPIR
-     5FD2
-WP workspace from  &5E00  to &5FD3 
-.scorePort
-     5FD3
-.scoreStation
-     5FD4
-.scoreNetwork
-     5FD5
-.netTally
-     5FD6
-.oswordBlock
-     5FD8
-.transmitBuffer
-     5FE4
-.endBuffer
-     5FF8
 .S%
      12E3   4C 01 13   JMP &1301
      12E6   4C 01 13   JMP &1301
@@ -16176,6 +16127,55 @@ Reload at &5197
 S.ELTH &5197  &56FE  &12E3  &5197 
 S.D.CODE &12E3  &56FE  &12E3  &12E3 
 Saving file '3-assembled-output/D.CODE.unprot.bin'
+.WP
+     5E00
+.LSX
+     5E00
+.LSO
+     5E00
+.BUF
+     5E01
+.LSX2
+     5EC0
+.LSY2
+     5F0E
+.SX
+     5F5C
+.SXL
+     5F6F
+.SY
+     5F82
+.SYL
+     5F95
+.SZ
+     5FA8
+.SZL
+     5FBB
+.LASX
+     5FCE
+.LASY
+     5FCF
+.XX24
+     5FD0
+.ALTIT
+     5FD1
+.CPIR
+     5FD2
+WP workspace from  &5E00  to &5FD3 
+.scorePort
+     5FD3
+.scoreStation
+     5FD4
+.scoreNetwork
+     5FD5
+.netTally
+     5FD6
+.oswordBlock
+     5FD8
+.transmitBuffer
+     5FE4
+.endBuffer
+     5FF8
 .ZP
      0000
 .RAND

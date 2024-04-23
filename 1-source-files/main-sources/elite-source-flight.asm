@@ -2045,204 +2045,6 @@ ENDIF
 
 \ ******************************************************************************
 \
-\       Name: WP
-\       Type: Workspace
-\    Address: &0E00 to &0FD2
-\   Category: Workspaces
-\    Summary: Variables
-\
-\ ******************************************************************************
-
-                        \ --- Mod: Code removed for Econet: ------------------->
-
-\ORG &0E00
-
-                        \ --- And replaced by: -------------------------------->
-
- ORG &5E00
-
-                        \ --- End of replacement ------------------------------>
-
-.WP
-
- SKIP 0                 \ The start of the WP workspace
-
-.LSX
-
- SKIP 0                 \ LSX is an alias that points to the first byte of the
-                        \ sun line heap at LSO
-                        \
-                        \   * &FF indicates the sun line heap is empty
-                        \
-                        \   * Otherwise the LSO heap contains the line data for
-                        \     the sun
-
-.LSO
-
- SKIP 1                 \ The ship line heap for the space station (see NWSPS)
-                        \ and the sun line heap (see SUN)
-                        \
-                        \ The spaces can be shared as our local bubble of
-                        \ universe can support either the sun or a space
-                        \ station, but not both
-
-.BUF
-
- SKIP 191               \ The line buffer used by DASC to print justified text
-                        \
-                        \ This buffer shares space with the LSO buffer, which
-                        \ works because neither the sun or space station are
-                        \ shown at the same time as printing justified text
-
-.LSX2
-
- SKIP 78                \ The ball line heap for storing x-coordinates (see the
-                        \ deep dive on "The ball line heap" for details)
-
-.LSY2
-
- SKIP 78                \ The ball line heap for storing y-coordinates (see the
-                        \ deep dive on "The ball line heap" for details)
-
-.SX
-
- SKIP NOST + 1          \ This is where we store the x_hi coordinates for all
-                        \ the stardust particles
-
-.SXL
-
- SKIP NOST + 1          \ This is where we store the x_lo coordinates for all
-                        \ the stardust particles
-
-.SY
-
- SKIP NOST + 1          \ This is where we store the y_hi coordinates for all
-                        \ the stardust particles
-
-.SYL
-
- SKIP NOST + 1          \ This is where we store the y_lo coordinates for all
-                        \ the stardust particles
-
-.SZ
-
- SKIP NOST + 1          \ This is where we store the z_hi coordinates for all
-                        \ the stardust particles
-
-.SZL
-
- SKIP NOST + 1          \ This is where we store the z_lo coordinates for all
-                        \ the stardust particles
-
-.LASX
-
- SKIP 1                 \ The x-coordinate of the tip of the laser line
-
-.LASY
-
- SKIP 1                 \ The y-coordinate of the tip of the laser line
-
-.XX24
-
- SKIP 1                 \ This byte appears to be unused
-
-.ALTIT
-
- SKIP 1                 \ Our altitude above the surface of the planet or sun
-                        \
-                        \   * 255 = we are a long way above the surface
-                        \
-                        \   * 1-254 = our altitude as the square root of:
-                        \
-                        \       x_hi^2 + y_hi^2 + z_hi^2 - 6^2
-                        \
-                        \     where our ship is at the origin, the centre of the
-                        \     planet/sun is at (x_hi, y_hi, z_hi), and the
-                        \     radius of the planet/sun is 6
-                        \
-                        \   * 0 = we have crashed into the surface
-
-.CPIR
-
- SKIP 1                 \ A counter used when spawning pirates, to work our way
-                        \ through the list of pirate ship blueprints until we
-                        \ find one that has been loaded
-
- PRINT "WP workspace from  ", ~WP," to ", ~P%
-
-\ ******************************************************************************
-\
-\       Name: Econet variables
-\       Type: Workspace
-\   Category: Econet
-\    Summary: Variables used in Elite over Econet
-\
-\ ******************************************************************************
-
-                        \ --- Mod: Code added for Scoreboard: ----------------->
-
-IF _SRAM_DISC
-
-.scorePort
-
- SKIP 1                 \ The Econet port on which to talk to the scoreboard
-                        \ machine
-                        \
-                        \ If this is zero, the network is disabled and no
-                        \ commander data is transmitted
-
-.scoreStation
-
- SKIP 1                 \ The Econet station number of the scoreboard machine
-
-.scoreNetwork
-
- SKIP 1                 \ The Econet network number of the scoreboard machine
-
-.netTally
-
- SKIP 2                 \ Stores a one-point-per-kill combat score for the
-                        \ scoreboard (so all platforms have the same point
-                        \ system)
-
-.oswordBlock
-
- SKIP 12                \ The OSWORD block to use for network calls
-
-.transmitBuffer
-
- SKIP 20                \ A buffer to hold the data we want to transmit to the
-                        \ scoreboard machine in the format:
-                        \
-                        \   * Bytes #0-7 = commander's name, terminated by a
-                        \                  carriage return
-                        \
-                        \   * Byte #8 = commander's legal status
-                        \
-                        \   * Byte #9 = commander's status condition
-                        \               0 = docked, 1 = green
-                        \               2 = yellow, 3 = red
-                        \
-                        \   * Bytes #10-11 = commander's score
-                        \
-                        \   * Bytes #12-15 = commander's credits
-                        \
-                        \   * Byte #16 = machine type
-                        \                1 = Master, 2 = 6502SP, 3 = BBC Micro
-                        \
-                        \ Score and credits are stored with the low byte first
-                        \ (unlike the way that credits are stored in the game)
-
-.endBuffer
-
- SKIP 0
-
-ENDIF
-
-                        \ --- End of added code ------------------------------->
-
-\ ******************************************************************************
-\
 \ ELITE A FILE
 \
 \ ******************************************************************************
@@ -10864,6 +10666,12 @@ ENDIF
 \
 \ ******************************************************************************
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
+
 .VCSU1
 
  LDA #LO(K%+NI%)        \ Set the low byte of V(1 0) to point to the coordinates
@@ -10882,6 +10690,12 @@ ENDIF
                         \
                         \   K3(8 7 6) = (z_sign z_hi z_lo) - z-coordinate of sun
                         \               or space station
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -11042,6 +10856,12 @@ ENDIF
 \
 \ ******************************************************************************
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
+
 .TAS4
 
  LDX K%+NI%,Y           \ Set Q = the Y-th byte of K%+NI%, i.e. vect_x from the
@@ -11075,6 +10895,12 @@ ENDIF
                         \             vect_x * XX15
                         \
                         \ and return from the subroutine using a tail call
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -11154,6 +10980,12 @@ ENDIF
 \                       station)
 \
 \ ******************************************************************************
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
 
 .DCS1
 
@@ -11256,6 +11088,12 @@ ENDIF
  STA K3+2,X
 
  JMP TS72               \ Jump to TS72 to return from the subroutine
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -14288,6 +14126,12 @@ ENDIF
 \
 \ ******************************************************************************
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
+
 .ARCTAN
 
  LDA P                  \ Set T1 = P EOR Q, which will have the sign of P * Q
@@ -14399,6 +14243,12 @@ ENDIF
                         \     = arctan(A / Q)
 
  RTS                    \ Return from the subroutine
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -21428,6 +21278,12 @@ ENDIF
 
  JSR WPLS2              \ Call WPLS2 to remove the planet from the screen
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
+
  JSR CIRCLE             \ Call CIRCLE to draw the planet's new circle
 
  BCS PL20               \ If the call to CIRCLE returned with the C flag set,
@@ -21443,6 +21299,7 @@ ENDIF
  RTS                    \ The planet doesn't fit on-screen, so return from the
                         \ subroutine
 
+
 .PL25
 
  LDA TYPE               \ If the planet type is 128 then it has an equator and
@@ -21453,6 +21310,17 @@ ENDIF
                         \ Otherwise this is a planet with an equator and
                         \ meridian, so fall through into the following to draw
                         \ them
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ELIF _STH_DISC OR _IB_DISC
+
+ JMP CIRCLE             \ Call CIRCLE to draw the planet's new circle and return
+                        \ from the subroutine using a tail call
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -21479,6 +21347,12 @@ ENDIF
 \   INWK                The planet's ship data block
 \
 \ ******************************************************************************
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
 
  LDA K                  \ If the planet's radius is less than 6, the planet is
  CMP #6                 \ too small to show a meridian, so jump to PL20 to
@@ -21548,6 +21422,12 @@ ENDIF
  JMP PLS2               \ Jump to PLS2 to draw the second meridian, returning
                         \ from the subroutine using a tail call
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
+
 \ ******************************************************************************
 \
 \       Name: PL9 (Part 3 of 3)
@@ -21573,6 +21453,12 @@ ENDIF
 \   INWK                The planet's ship data block
 \
 \ ******************************************************************************
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
 
 .PL26
 
@@ -21679,6 +21565,12 @@ ENDIF
                         \ subroutine using a tail call (this BEQ is effectively
                         \ a JMP as A is always zero)
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
+
 \ ******************************************************************************
 \
 \       Name: PLS1
@@ -21728,6 +21620,12 @@ ENDIF
 \
 \ ******************************************************************************
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
+
 .PLS1
 
  LDA INWK,X             \ Set P = nosev_x_lo
@@ -21762,6 +21660,12 @@ ENDIF
 
  RTS                    \ Return from the subroutine
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
+
 \ ******************************************************************************
 \
 \       Name: PLS2
@@ -21777,12 +21681,24 @@ ENDIF
 \
 \ ******************************************************************************
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
+
 .PLS2
 
  LDA #31                \ Set TGT = 31, so we only draw half an ellipse
  STA TGT
 
                         \ Fall through into PLS22 to draw the half-ellipse
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -21855,6 +21771,12 @@ ENDIF
 \   CNT2                The starting segment for drawing the half-ellipse
 \
 \ ******************************************************************************
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
 
 .PLS22
 
@@ -22134,6 +22056,12 @@ ENDIF
 .PL40
 
  RTS                    \ Return from the subroutine
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -23383,6 +23311,12 @@ ENDIF
 \
 \ ******************************************************************************
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
+
 .PLS3
 
  JSR PLS1               \ Call PLS1 to calculate the following:
@@ -23424,6 +23358,12 @@ ENDIF
 
  RTS                    \ Return from the subroutine
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
+
 \ ******************************************************************************
 \
 \       Name: PLS4
@@ -23455,6 +23395,12 @@ ENDIF
 \ z-axis.
 \
 \ ******************************************************************************
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
 
 .PLS4
 
@@ -23492,6 +23438,12 @@ ENDIF
 
  RTS                    \ Return from the subroutine
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
+
 \ ******************************************************************************
 \
 \       Name: PLS5
@@ -23523,6 +23475,12 @@ ENDIF
 \
 \ ******************************************************************************
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
+
 .PLS5
 
  JSR PLS1               \ Call PLS1 to calculate the following:
@@ -23544,6 +23502,12 @@ ENDIF
                         \ and increment X to point to roofv_z for the next call
 
  RTS                    \ Return from the subroutine
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -34828,3 +34792,206 @@ ENDIF
 
  PRINT "S.D.CODE ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
  SAVE "3-assembled-output/D.CODE.unprot.bin", CODE%, P%
+
+\ ******************************************************************************
+\
+\       Name: WP
+\       Type: Workspace
+\    Address: &0E00 to &0FD2
+\   Category: Workspaces
+\    Summary: Variables
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\ORG &0E00
+
+                        \ --- And replaced by: -------------------------------->
+
+IF _SRAM_DISC
+
+ ORG &5E00
+
+ENDIF
+
+                        \ --- End of replacement ------------------------------>
+
+.WP
+
+ SKIP 0                 \ The start of the WP workspace
+
+.LSX
+
+ SKIP 0                 \ LSX is an alias that points to the first byte of the
+                        \ sun line heap at LSO
+                        \
+                        \   * &FF indicates the sun line heap is empty
+                        \
+                        \   * Otherwise the LSO heap contains the line data for
+                        \     the sun
+
+.LSO
+
+ SKIP 1                 \ The ship line heap for the space station (see NWSPS)
+                        \ and the sun line heap (see SUN)
+                        \
+                        \ The spaces can be shared as our local bubble of
+                        \ universe can support either the sun or a space
+                        \ station, but not both
+
+.BUF
+
+ SKIP 191               \ The line buffer used by DASC to print justified text
+                        \
+                        \ This buffer shares space with the LSO buffer, which
+                        \ works because neither the sun or space station are
+                        \ shown at the same time as printing justified text
+
+.LSX2
+
+ SKIP 78                \ The ball line heap for storing x-coordinates (see the
+                        \ deep dive on "The ball line heap" for details)
+
+.LSY2
+
+ SKIP 78                \ The ball line heap for storing y-coordinates (see the
+                        \ deep dive on "The ball line heap" for details)
+
+.SX
+
+ SKIP NOST + 1          \ This is where we store the x_hi coordinates for all
+                        \ the stardust particles
+
+.SXL
+
+ SKIP NOST + 1          \ This is where we store the x_lo coordinates for all
+                        \ the stardust particles
+
+.SY
+
+ SKIP NOST + 1          \ This is where we store the y_hi coordinates for all
+                        \ the stardust particles
+
+.SYL
+
+ SKIP NOST + 1          \ This is where we store the y_lo coordinates for all
+                        \ the stardust particles
+
+.SZ
+
+ SKIP NOST + 1          \ This is where we store the z_hi coordinates for all
+                        \ the stardust particles
+
+.SZL
+
+ SKIP NOST + 1          \ This is where we store the z_lo coordinates for all
+                        \ the stardust particles
+
+.LASX
+
+ SKIP 1                 \ The x-coordinate of the tip of the laser line
+
+.LASY
+
+ SKIP 1                 \ The y-coordinate of the tip of the laser line
+
+.XX24
+
+ SKIP 1                 \ This byte appears to be unused
+
+.ALTIT
+
+ SKIP 1                 \ Our altitude above the surface of the planet or sun
+                        \
+                        \   * 255 = we are a long way above the surface
+                        \
+                        \   * 1-254 = our altitude as the square root of:
+                        \
+                        \       x_hi^2 + y_hi^2 + z_hi^2 - 6^2
+                        \
+                        \     where our ship is at the origin, the centre of the
+                        \     planet/sun is at (x_hi, y_hi, z_hi), and the
+                        \     radius of the planet/sun is 6
+                        \
+                        \   * 0 = we have crashed into the surface
+
+.CPIR
+
+ SKIP 1                 \ A counter used when spawning pirates, to work our way
+                        \ through the list of pirate ship blueprints until we
+                        \ find one that has been loaded
+
+ PRINT "WP workspace from  ", ~WP," to ", ~P%
+
+\ ******************************************************************************
+\
+\       Name: Econet variables
+\       Type: Workspace
+\   Category: Econet
+\    Summary: Variables used in Elite over Econet
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+IF _SRAM_DISC
+
+.scorePort
+
+ SKIP 1                 \ The Econet port on which to talk to the scoreboard
+                        \ machine
+                        \
+                        \ If this is zero, the network is disabled and no
+                        \ commander data is transmitted
+
+.scoreStation
+
+ SKIP 1                 \ The Econet station number of the scoreboard machine
+
+.scoreNetwork
+
+ SKIP 1                 \ The Econet network number of the scoreboard machine
+
+.netTally
+
+ SKIP 2                 \ Stores a one-point-per-kill combat score for the
+                        \ scoreboard (so all platforms have the same point
+                        \ system)
+
+.oswordBlock
+
+ SKIP 12                \ The OSWORD block to use for network calls
+
+.transmitBuffer
+
+ SKIP 20                \ A buffer to hold the data we want to transmit to the
+                        \ scoreboard machine in the format:
+                        \
+                        \   * Bytes #0-7 = commander's name, terminated by a
+                        \                  carriage return
+                        \
+                        \   * Byte #8 = commander's legal status
+                        \
+                        \   * Byte #9 = commander's status condition
+                        \               0 = docked, 1 = green
+                        \               2 = yellow, 3 = red
+                        \
+                        \   * Bytes #10-11 = commander's score
+                        \
+                        \   * Bytes #12-15 = commander's credits
+                        \
+                        \   * Byte #16 = machine type
+                        \                1 = Master, 2 = 6502SP, 3 = BBC Micro
+                        \
+                        \ Score and credits are stored with the low byte first
+                        \ (unlike the way that credits are stored in the game)
+
+.endBuffer
+
+ SKIP 0
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
+
