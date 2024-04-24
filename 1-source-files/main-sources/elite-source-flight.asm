@@ -2796,6 +2796,13 @@ ENDIF
 
 .MA76
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
+
+
  LDA KY20               \ If "P" is being pressed, keep going, otherwise skip
  BEQ MA78               \ the next two instructions
 
@@ -2803,6 +2810,12 @@ ENDIF
  STA auto               \ so turn it off by setting auto to 0
 
 .MA78
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
  LDA KY13               \ If ESCAPE is being pressed and we have an escape pod
  AND ESCP               \ fitted, keep going, otherwise jump to noescp to skip
@@ -2863,14 +2876,14 @@ ELIF _STH_DISC OR _IB_DISC
  AND SSPR               \ safe zone, keep going, otherwise jump down to MA68 to
  BEQ MA68               \ skip the following
 
- LDA K%+NI%+32          \ Fetch the AI counter (byte #32) of the second ship
- BMI MA68               \ from the ship data workspace at K%, which is reserved
-                        \ for the sun or the space station (in this case it's
-                        \ the latter as we are in the safe zone). If byte #32 is
-                        \ negative, meaning the station is hostile, then jump
-                        \ down to MA68 to skip the following (so we can't use
-                        \ the docking computer to dock at a station that has
-                        \ turned against us)
+ LDA K%+NI%+36          \ Fetch the NEWB flags (byte #36) of the second ship
+ AND #%00000100         \ from the ship data workspace at K%, which is reserved
+ BNE MA68               \ for the sun or the space station (in this case it's
+                        \ the latter as we are in the safe zone). If bit 2 is
+                        \ set, meaning the station is hostile, jump down to MA62
+                        \ to skip the following (so we can't use the docking
+                        \ computer to dock at a station that has turned against
+                        \ us)
 
  JMP GOIN               \ The Docking Computer button has been pressed and
                         \ we are allowed to dock at the station, so jump to
@@ -4050,6 +4063,12 @@ ENDIF
 
 .MA29
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+                        \ --- End of added code ------------------------------->
+
  CMP #15                \ If this is the 15th iteration in this block of 32,
  BNE MA33               \ do the following, otherwise jump to MA33 to skip the
                         \ docking computer manoeuvring
@@ -4060,6 +4079,18 @@ ENDIF
 
  LDA #123               \ Set A = 123 and jump down to MA34 to print token 123
  BNE MA34               \ ("DOCKING COMPUTERS ON") as an in-flight message
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ELIF _STH_DISC OR _IB_DISC
+
+ CMP #20                \ If this is the 20th iteration in this block of 32,
+ BNE MA23               \ do the following, otherwise jump to MA23 to skip the
+                        \ sun altitude check
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
 
 .MA33
 
