@@ -26104,16 +26104,34 @@ ENDIF
  CLC                    \ Convert A from 0-15 to 'A' to 'P'
  ADC #'A'
 
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\STA SHIPI+6            \ Store the letter of the ship blueprints file we want
+\                       \ in the seventh byte of the command string at SHIPI, so
+\                       \ it overwrites the "0" in "D.MO0" with the file letter
+\                       \ to load, from D.MOA to D.MOP
+\
+\JSR CATD               \ Call CATD to reload the disc catalogue
+
+                        \ --- And replaced by: -------------------------------->
+
+IF _SRAM_DISC
+
  STA SHIPI+6            \ Store the letter of the ship blueprints file we want
                         \ in the seventh byte of the command string at SHIPI, so
                         \ it overwrites the "0" in "D.MO0" with the file letter
                         \ to load, from D.MOA to D.MOP
 
-                        \ --- Mod: Code removed for Econet: ------------------->
+ELIF _STH_DISC OR _IB_DISC
 
-\JSR CATD               \ Call CATD to reload the disc catalogue
+ STA SHIPI+7            \ Store the letter of the ship blueprints file we want
+                        \ in the seventh byte of the command string at SHIPI, so
+                        \ it overwrites the "0" in "EliteB 0" with the file
+                        \ letter to load, from A to P
 
-                        \ --- End of removed code ----------------------------->
+ENDIF
+
+                        \ --- End of replacement ------------------------------>
 
  LDX #LO(SHIPI)         \ Set (Y X) to point to the OS command at SHIPI, which
  LDY #HI(SHIPI)         \ loads the relevant ship blueprints file
@@ -26133,8 +26151,26 @@ ENDIF
 
 .SHIPI
 
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\EQUS "L.D.MO0"         \ This is short for "*LOAD D.MO0"
+\EQUB 13
+
+                        \ --- And replaced by: -------------------------------->
+
+IF _SRAM_DISC
+
  EQUS "L.D.MO0"         \ This is short for "*LOAD D.MO0"
  EQUB 13
+
+ELIF _STH_DISC OR _IB_DISC
+
+ EQUS "EliteB 0"        \ This is short for "*RUN EliteB 0"
+ EQUB 13
+
+ENDIF
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
