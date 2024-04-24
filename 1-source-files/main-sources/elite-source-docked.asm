@@ -16807,12 +16807,12 @@ ENDIF
 
 IF _SRAM_DISC
 
- EQUS "EliteB D"        \ This is short for "*RUN EliteB D"
+ EQUS "EliteB U"        \ This is short for "*RUN EliteB U"
  EQUB 13
 
 ELIF _STH_DISC OR _IB_DISC
 
- EQUS "EliteB F"        \ This is short for "*RUN EliteB F"
+ EQUS "EliteB V"        \ This is short for "*RUN EliteB V"
  EQUB 13
 
 ENDIF
