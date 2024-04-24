@@ -207,11 +207,22 @@ ENDIF
  BRBR1 = &12D5          \ The address of the main break handler, which BRKV
                         \ points to as set in elite-loader3.asm
 
+IF _SRAM_DISC
+
  XX21 = &5700           \ The address of the ship blueprints lookup table, where
                         \ the chosen ship blueprints file is loaded
 
  E% = &573E             \ The address of the default NEWB ship bytes within the
+
+ELIF _STH_DISC OR _IB_DISC
+
+ XX21 = &5600           \ The address of the ship blueprints lookup table, where
+                        \ the chosen ship blueprints file is loaded
+
+ E% = &563E             \ The address of the default NEWB ship bytes within the
                         \ loaded ship blueprints file
+
+ENDIF
 
                         \ --- End of replacement ------------------------------>
 
@@ -2243,7 +2254,11 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
+IF _STH_DISC OR _IB_DISC
+
  JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
+
+ENDIF
 
  LDX #LO(MESS1)         \ Set (Y X) to point to MESS1 ("DIR")
  LDY #HI(MESS1)
@@ -25986,7 +26001,15 @@ ENDIF
 
 \JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
 
-                        \ --- End of removed code ----------------------------->
+                        \ --- And replaced by: -------------------------------->
+
+IF _SRAM_DISC
+
+ JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
+
+ENDIF
+
+                        \ --- End of replacement ------------------------------>
 
  JSR RESET              \ Call RESET to reset most variables
 

@@ -6619,9 +6619,9 @@ Zero page variables from &0  to &E2
      14A4   30 23      BMI &14C9
      14A6   0A         ASL A
      14A7   A8         TAY
-     14A8   B9 FE 56   LDA &56FE,Y
+     14A8   B9 FE 55   LDA &55FE,Y
      14AB   85 1E      STA &1E
-     14AD   B9 FF 56   LDA &56FF,Y
+     14AD   B9 FF 55   LDA &55FF,Y
      14B0   85 1F      STA &1F
      14B2   AD 82 03   LDA &0382
      14B5   10 12      BPL &14C9
@@ -8713,7 +8713,7 @@ S.ELTB &17AA  &2219  &12E3  &17AA
      236B   C9 E6      CMP #&E6
      236D   90 0E      BCC &237D
      236F   A6 87      LDX &87
-     2371   BD 3D 57   LDA &573D,X
+     2371   BD 3D 56   LDA &563D,X
      2374   10 07      BPL &237D
      2376   A9 00      LDA #&00
      2378   85 64      STA &64
@@ -11492,10 +11492,10 @@ S.ELTD &2A46  &3263  &12E3  &2A46
      36D8   30 52      BMI &372C
      36DA   0A         ASL A
      36DB   A8         TAY
-     36DC   B9 FF 56   LDA &56FF,Y
+     36DC   B9 FF 55   LDA &55FF,Y
      36DF   F0 F0      BEQ &36D1
      36E1   85 1F      STA &1F
-     36E3   B9 FE 56   LDA &56FE,Y
+     36E3   B9 FE 55   LDA &55FE,Y
      36E6   85 1E      STA &1E
      36E8   C0 04      CPY #&04
      36EA   F0 30      BEQ &371C
@@ -11546,7 +11546,7 @@ S.ELTD &2A46  &3263  &12E3  &2A46
      373D   FE 1E 03   INC &031E,X
 .NW8
      3740   A4 D1      LDY &D1
-     3742   B9 3D 57   LDA &573D,Y
+     3742   B9 3D 56   LDA &563D,Y
      3745   29 6F      AND #&6F
      3747   05 68      ORA &68
      3749   85 68      STA &68
@@ -12215,9 +12215,9 @@ S.ELTD &2A46  &3263  &12E3  &2A46
      3BD4   4C 4D 3B   JMP &3B4D
      3BD7   0A         ASL A
      3BD8   A8         TAY
-     3BD9   B9 FE 56   LDA &56FE,Y
+     3BD9   B9 FE 55   LDA &55FE,Y
      3BDC   85 07      STA &07
-     3BDE   B9 FF 56   LDA &56FF,Y
+     3BDE   B9 FF 55   LDA &55FF,Y
      3BE1   85 08      STA &08
      3BE3   A0 05      LDY #&05
      3BE5   B1 07      LDA (&07),Y
@@ -12764,7 +12764,7 @@ S.ELTE &3263  &3C3C  &12E3  &3263
      3FB9   29 87      AND #&87
      3FBB   85 62      STA &62
      3FBD   A2 05      LDX #&05
-     3FBF   AD 07 57   LDA &5707
+     3FBF   AD 07 56   LDA &5607
      3FC2   F0 03      BEQ &3FC7
      3FC4   90 01      BCC &3FC7
      3FC6   CA         DEX
