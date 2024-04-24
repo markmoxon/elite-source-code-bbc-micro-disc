@@ -2243,6 +2243,8 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
+ JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
+
  LDX #LO(MESS1)         \ Set (Y X) to point to MESS1 ("DIR")
  LDY #HI(MESS1)
 
@@ -2255,8 +2257,8 @@ ENDIF
  JSR OSCLI              \ Call OSCLI to run the OS command in MESS2, which
                         \ changes the directory to EliteCmdrs
 
- JMP RSHIPS             \ Call RSHIPS to launch from the station, load a new set
-                        \ of ship blueprints and jump into the main game loop
+ JMP RSHIPS             \ Call RSHIPS to launch from the station and jump into
+                        \ the main game loop
 
                         \ --- End of replacement ------------------------------>
 
@@ -25980,7 +25982,11 @@ ENDIF
 
 .RSHIPS
 
- JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
+
+                        \ --- End of removed code ----------------------------->
 
  JSR RESET              \ Call RESET to reset most variables
 
