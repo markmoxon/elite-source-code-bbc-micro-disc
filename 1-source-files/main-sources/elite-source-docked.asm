@@ -2420,6 +2420,11 @@ IF _SRAM_DISC
                         \ configured (this calls TransmitCmdrData after
                         \ switching in the correct ROM bank)
 
+ELIF _STH_DISC OR _IB_DISC
+
+ JSR TransmitCmdrData   \ Transmit commander data to the scoreboard machine, if
+                        \ configured
+
 ENDIF
                         \ --- End of added code ------------------------------->
 
@@ -16735,6 +16740,28 @@ IF _SRAM_DISC
 
 .cash2
 
+ELIF _STH_DISC OR _IB_DISC
+
+                        \ MCASH and the C flag is clear, or it was a successful
+                        \ LCASH and the C flag is set
+
+ TXA                    \ If both X and Y are zero, jump to cash2 to skip the
+ BNE cash1              \ transmission of data, as our credit balance will not
+ TYA                    \ have changed
+ BEQ cash2
+
+.cash1
+
+ PHP                    \ Store the flags on the stack so we can return them
+                        \ from the subroutine
+
+ JSR TransmitCmdrData   \ Transmit commander data to the scoreboard machine, if
+                        \ configured
+
+ PLP                    \ Restore the flags
+
+.cash2
+
 ENDIF
 
                         \ --- End of added code ------------------------------->
@@ -24408,9 +24435,21 @@ IF _SRAM_DISC
  CPX #&55               \ If "N" is not being pressed, skip to skipNetwork
  BNE skipNetwork
 
- JMP OSXIND3            \ Transmit commander data to the scoreboard machine, if
-                        \ configured (this calls GetNetworkDetails after
-                        \ switching in the correct ROM bank)
+ JMP OSXIND3            \ Get the network and station numbers for the scoreboard
+                        \ server, returning from the subroutine using a tail
+                        \ call (this calls GetNetworkDetails after switching in
+                        \ the correct ROM bank)
+
+.skipNetwork
+
+ELIF _STH_DISC OR _IB_DISC
+
+ CPX #&55               \ If "N" is not being pressed, skip to skipNetwork
+ BNE skipNetwork
+
+ JMP GetNetworkDetails  \ Get the network and station numbers for the scoreboard
+                        \ server, returning from the subroutine using a tail
+                        \ call
 
 .skipNetwork
 
@@ -33323,6 +33362,78 @@ ENDMACRO
 
 \ ******************************************************************************
 \
+\       Name: Econet variables
+\       Type: Workspace
+\   Category: Econet
+\    Summary: Variables used in Elite over Econet
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+IF _STH_DISC OR _IB_DISC
+
+ ORG &521C              \ The first four variables have to be at the same
+                        \ address in both the docked and flight code
+
+.scorePort
+
+ SKIP 1                 \ The Econet port on which to talk to the scoreboard
+                        \ machine
+                        \
+                        \ If this is zero, the network is disabled and no
+                        \ commander data is transmitted
+
+.scoreStation
+
+ SKIP 1                 \ The Econet station number of the scoreboard machine
+
+.scoreNetwork
+
+ SKIP 1                 \ The Econet network number of the scoreboard machine
+
+.netTally
+
+ SKIP 2                 \ Stores a one-point-per-kill combat score for the
+                        \ scoreboard (so all platforms have the same point
+                        \ system)
+
+.oswordBlock
+
+ SKIP 12                \ The OSWORD block to use for network calls
+
+.transmitBuffer
+
+ SKIP 20                \ A buffer to hold the data we want to transmit to the
+                        \ scoreboard machine in the format:
+                        \
+                        \   * Bytes #0-7 = commander's name, terminated by a
+                        \                  carriage return
+                        \
+                        \   * Byte #8 = commander's legal status
+                        \
+                        \   * Byte #9 = commander's status condition
+                        \               0 = docked, 1 = green
+                        \               2 = yellow, 3 = red
+                        \
+                        \   * Bytes #10-11 = commander's score
+                        \
+                        \   * Bytes #12-15 = commander's credits
+                        \
+                        \   * Byte #16 = machine type
+                        \                0 = BBC Micro,1 = Master, 2 = 6502SP
+                        \
+                        \ Score and credits are stored with the low byte first
+                        \ (unlike the way that credits are stored in the game)
+
+.endBuffer
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
+
+\ ******************************************************************************
+\
 \       Name: MTIN
 \       Type: Variable
 \   Category: Text
@@ -34581,6 +34692,8 @@ ENDMACRO
 \
 \ ******************************************************************************
 
+IF _SRAM_DISC
+
  PRINT "SHIPS"
  PRINT "Assembled at ", ~CODE_SHIPS%
  PRINT "Ends at ", ~P%
@@ -34590,6 +34703,8 @@ ENDMACRO
 
  PRINT "S.SHIPS ", ~CODE_B%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_SHIPS%
 \SAVE "3-assembled-output/SHIPS.bin", CODE_SHIPS%, P%, LOAD%
+
+ENDIF
 
 \ ******************************************************************************
 \
@@ -34602,83 +34717,7 @@ IF _SRAM_DISC
  PRINT "S.T.CODE ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
  SAVE "3-assembled-output/sT.CODE.unprot.bin", CODE%, P%
 
-ELIF _STH_DISC OR _IB_DISC
-
- PRINT "S.T.CODE ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
- SAVE "3-assembled-output/T.CODE.unprot.bin", CODE%, P%
-
 ENDIF
-
-\ ******************************************************************************
-\
-\       Name: Econet variables
-\       Type: Workspace
-\   Category: Econet
-\    Summary: Variables used in Elite over Econet
-\
-\ ******************************************************************************
-
-                        \ --- Mod: Code added for Scoreboard: ----------------->
-
-IF _SRAM_DISC
-
- ORG &5FD3
-
-.scorePort
-
- SKIP 1                 \ The Econet port on which to talk to the scoreboard
-                        \ machine
-                        \
-                        \ If this is zero, the network is disabled and no
-                        \ commander data is transmitted
-
-.scoreStation
-
- SKIP 1                 \ The Econet station number of the scoreboard machine
-
-.scoreNetwork
-
- SKIP 1                 \ The Econet network number of the scoreboard machine
-
-.netTally
-
- SKIP 2                 \ Stores a one-point-per-kill combat score for the
-                        \ scoreboard (so all platforms have the same point
-                        \ system)
-
-.oswordBlock
-
- SKIP 12                \ The OSWORD block to use for network calls
-
-.transmitBuffer
-
- SKIP 20                \ A buffer to hold the data we want to transmit to the
-                        \ scoreboard machine in the format:
-                        \
-                        \   * Bytes #0-7 = commander's name, terminated by a
-                        \                  carriage return
-                        \
-                        \   * Byte #8 = commander's legal status
-                        \
-                        \   * Byte #9 = commander's status condition
-                        \               0 = docked, 1 = green
-                        \               2 = yellow, 3 = red
-                        \
-                        \   * Bytes #10-11 = commander's score
-                        \
-                        \   * Bytes #12-15 = commander's credits
-                        \
-                        \   * Byte #16 = machine type
-                        \                0 = BBC Micro,1 = Master, 2 = 6502SP
-                        \
-                        \ Score and credits are stored with the low byte first
-                        \ (unlike the way that credits are stored in the game)
-
-.endBuffer
-
-ENDIF
-
-                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -34711,8 +34750,6 @@ ENDIF
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
-IF _SRAM_DISC
-
 .SendOverEconet
 
  LDX #LO(oswordBlock)   \ Set (Y X) to the address of the OSWORD parameter block
@@ -34721,8 +34758,6 @@ IF _SRAM_DISC
  JSR OSWORD             \ Call OSWORD with the command number from the stack
 
  RTS                    \ Return from the subroutine
-
-ENDIF
 
                         \ --- End of added code ------------------------------->
 
@@ -34737,8 +34772,6 @@ ENDIF
 \ ******************************************************************************
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
-
-IF _SRAM_DISC
 
 .TransmitCmdrData
 
@@ -34840,8 +34873,6 @@ IF _SRAM_DISC
 
                         \ Fall through into TransmitData to transmit the data
 
-ENDIF
-
                         \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
@@ -34854,8 +34885,6 @@ ENDIF
 \ ******************************************************************************
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
-
-IF _SRAM_DISC
 
 .TransmitData
 
@@ -34893,8 +34922,6 @@ IF _SRAM_DISC
 
  RTS                    \ Return from the subroutine
 
-ENDIF
-
                         \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
@@ -34908,8 +34935,6 @@ ENDIF
 \ ******************************************************************************
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
-
-IF _SRAM_DISC
 
 .GetNetworkDetails
 
@@ -35088,8 +35113,6 @@ IF _SRAM_DISC
  JMP FRCE               \ "pressed" to red key f8 (so we show the Status Mode
                         \ screen)
 
-ENDIF
-
                         \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
@@ -35119,8 +35142,6 @@ ENDIF
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
-IF _SRAM_DISC
-
 .PrintToken
 
  PHA                    \ Store A on the stack, so we can retrieve it later
@@ -35148,8 +35169,6 @@ IF _SRAM_DISC
                         \ V(1 0) from the stack, returning from the subroutine
                         \ using a tail call
 
-ENDIF
-
                         \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
@@ -35162,8 +35181,6 @@ ENDIF
 \ ******************************************************************************
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
-
-IF _SRAM_DISC
 
 .EconetToken
 
@@ -35227,8 +35244,6 @@ IF _SRAM_DISC
  ETWO 'E', 'S'
  EQUB VE
 
-ENDIF
-
                         \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
@@ -35243,3 +35258,107 @@ IF _SRAM_DISC
  SAVE "3-assembled-output/Scoreboard.bin", CODE_SCORE%, P%, LOAD_SCORE%
 
 ENDIF
+
+\ ******************************************************************************
+\
+\ Save SHIPS.bin
+\
+\ ******************************************************************************
+
+IF _STH_DISC OR _IB_DISC
+
+ PRINT "SHIPS"
+ PRINT "Assembled at ", ~CODE_SHIPS%
+ PRINT "Ends at ", ~P%
+ PRINT "Code size is ", ~(P% - CODE_SHIPS%)
+ PRINT "Execute at ", ~LOAD%
+ PRINT "Reload at ", ~LOAD_SHIPS%
+
+ PRINT "S.SHIPS ", ~CODE_B%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD_SHIPS%
+\SAVE "3-assembled-output/SHIPS.bin", CODE_SHIPS%, P%, LOAD%
+
+ENDIF
+
+\ ******************************************************************************
+\
+\ Save T.CODE.unprot.bin
+\
+\ ******************************************************************************
+
+IF _STH_DISC OR _IB_DISC
+
+ PRINT "S.T.CODE ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
+ SAVE "3-assembled-output/T.CODE.unprot.bin", CODE%, P%
+
+ENDIF
+
+\ ******************************************************************************
+\
+\       Name: Econet variables
+\       Type: Workspace
+\   Category: Econet
+\    Summary: Variables used in Elite over Econet
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+IF _SRAM_DISC
+
+ ORG &5FD3
+
+.scorePort
+
+ SKIP 1                 \ The Econet port on which to talk to the scoreboard
+                        \ machine
+                        \
+                        \ If this is zero, the network is disabled and no
+                        \ commander data is transmitted
+
+.scoreStation
+
+ SKIP 1                 \ The Econet station number of the scoreboard machine
+
+.scoreNetwork
+
+ SKIP 1                 \ The Econet network number of the scoreboard machine
+
+.netTally
+
+ SKIP 2                 \ Stores a one-point-per-kill combat score for the
+                        \ scoreboard (so all platforms have the same point
+                        \ system)
+
+.oswordBlock
+
+ SKIP 12                \ The OSWORD block to use for network calls
+
+.transmitBuffer
+
+ SKIP 20                \ A buffer to hold the data we want to transmit to the
+                        \ scoreboard machine in the format:
+                        \
+                        \   * Bytes #0-7 = commander's name, terminated by a
+                        \                  carriage return
+                        \
+                        \   * Byte #8 = commander's legal status
+                        \
+                        \   * Byte #9 = commander's status condition
+                        \               0 = docked, 1 = green
+                        \               2 = yellow, 3 = red
+                        \
+                        \   * Bytes #10-11 = commander's score
+                        \
+                        \   * Bytes #12-15 = commander's credits
+                        \
+                        \   * Byte #16 = machine type
+                        \                0 = BBC Micro,1 = Master, 2 = 6502SP
+                        \
+                        \ Score and credits are stored with the low byte first
+                        \ (unlike the way that credits are stored in the game)
+
+.endBuffer
+
+ENDIF
+                        \ --- End of added code ------------------------------->
+

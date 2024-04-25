@@ -204,6 +204,9 @@ ENDIF
                         \ split screen interrupt handler, as set in
                         \ elite-loader3.asm
 
+ NA% = &1281            \ The address of the data block for the last saved
+                        \ commander, as set in elite-loader3.asm
+
  BRBR1 = &12D5          \ The address of the main break handler, which BRKV
                         \ points to as set in elite-loader3.asm
 
@@ -17961,7 +17964,9 @@ IF _SRAM_DISC
 
 ELIF _STH_DISC OR _IB_DISC
 
- RTS                    \ Return from the subroutine
+ JMP TransmitCmdrData   \ Transmit commander data to the scoreboard machine, if
+                        \ configured, returning from the subroutiune using a
+                        \ tail call
 
 ENDIF
 
@@ -24983,6 +24988,11 @@ IF _SRAM_DISC
                         \ configured (this calls TransmitCmdrData after
                         \ switching in the correct ROM bank)
 
+ELIF _STH_DISC OR _IB_DISC
+
+ JSR TransmitCmdrData   \ Transmit commander data to the scoreboard machine, if
+                        \ configured
+
 ENDIF
 
                         \ --- End of added code ------------------------------->
@@ -26927,6 +26937,18 @@ IF _SRAM_DISC
  JSR OSXIND2            \ Transmit commander data to the scoreboard machine, if
                         \ configured (this calls TransmitCmdrData after
                         \ switching in the correct ROM bank)
+
+
+ELIF _STH_DISC OR _IB_DISC
+
+ INC netTally           \ Increment the kill count in netTally
+ BNE taly1
+ INC netTally+1
+
+.taly1
+
+ JSR TransmitCmdrData   \ Transmit commander data to the scoreboard machine, if
+                        \ configured
 
 ENDIF
 
@@ -34144,6 +34166,80 @@ ENDMACRO
 
 \ ******************************************************************************
 \
+\       Name: Econet variables
+\       Type: Workspace
+\   Category: Econet
+\    Summary: Variables used in Elite over Econet
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+IF _STH_DISC OR _IB_DISC
+
+ ORG &521C              \ The first four variables have to be at the same
+                        \ address in both the docked and flight code
+
+.scorePort
+
+ SKIP 1                 \ The Econet port on which to talk to the scoreboard
+                        \ machine
+                        \
+                        \ If this is zero, the network is disabled and no
+                        \ commander data is transmitted
+
+.scoreStation
+
+ SKIP 1                 \ The Econet station number of the scoreboard machine
+
+.scoreNetwork
+
+ SKIP 1                 \ The Econet network number of the scoreboard machine
+
+.netTally
+
+ SKIP 2                 \ Stores a one-point-per-kill combat score for the
+                        \ scoreboard (so all platforms have the same point
+                        \ system)
+
+.oswordBlock
+
+ SKIP 12                \ The OSWORD block to use for network calls
+
+.transmitBuffer
+
+ SKIP 20                \ A buffer to hold the data we want to transmit to the
+                        \ scoreboard machine in the format:
+                        \
+                        \   * Bytes #0-7 = commander's name, terminated by a
+                        \                  carriage return
+                        \
+                        \   * Byte #8 = commander's legal status
+                        \
+                        \   * Byte #9 = commander's status condition
+                        \               0 = docked, 1 = green
+                        \               2 = yellow, 3 = red
+                        \
+                        \   * Bytes #10-11 = commander's score
+                        \
+                        \   * Bytes #12-15 = commander's credits
+                        \
+                        \   * Byte #16 = machine type
+                        \                1 = Master, 2 = 6502SP, 3 = BBC Micro
+                        \
+                        \ Score and credits are stored with the low byte first
+                        \ (unlike the way that credits are stored in the game)
+
+.endBuffer
+
+ SKIP 0
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
+
+\ ******************************************************************************
+\
 \       Name: TT66
 \       Type: Subroutine
 \   Category: Drawing the screen
@@ -34873,6 +34969,203 @@ ENDIF
 
 \ ******************************************************************************
 \
+\       Name: SendOverEconet
+\       Type: Subroutine
+\   Category: Econet
+\    Summary: Send data over the Econet
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+IF _STH_DISC OR _IB_DISC
+
+.SendOverEconet
+
+ LDX #LO(oswordBlock)   \ Set (Y X) to the address of the OSWORD parameter block
+ LDY #HI(oswordBlock)
+
+ JSR OSWORD             \ Call OSWORD with the command number from the stack
+
+ RTS                    \ Return from the subroutine
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
+
+\ ******************************************************************************
+\
+\       Name: TransmitCmdrData
+\       Type: Subroutine
+\   Category: Econet
+\    Summary: Fill the transmit buffer with the commander data that we want to
+\             transmit to the scoreboard machine, and then transmit it
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+IF _STH_DISC OR _IB_DISC
+
+.TransmitCmdrData
+
+ PHP                    \ Store the flags on the stack
+
+ LDA scorePort          \ If the network is configured then the port will be
+ BNE tran1              \ non-zero, so skip the following to move on to the
+                        \ data transmission
+
+ PLP                    \ Retrieve the flags from the stack
+
+ RTS                    \ Return from the subroutine
+
+.tran1
+                        \ Copy the commander's name from NA% to transmitBuffer+0
+                        \ to transmitBuffer+7
+
+ LDX #7                 \ The commander's name can contain a maximum of 7
+                        \ characters, and is terminated by a carriage return,
+                        \ so set up a counter in X to copy 8 characters from
+                        \ NA% to dataToTransmit
+
+.trcm1
+
+ LDA NA%,X              \ Copy the X-th byte of NA% to the X-th byte of
+ STA transmitBuffer,X   \ transmitBuffer
+
+ DEX                    \ Decrement the loop counter
+
+ BPL trcm1              \ Loop back until we have copied all eight bytes
+
+ LDA FIST               \ Fetch the commander's legal status from FIST
+
+ BEQ trcm2              \ If A = 0 then we are clean, so jump to trcm2 to
+                        \ store this value
+
+ CMP #50                \ Set the C flag if A >= 50, so C is set if we have
+                        \ a legal status of 50+ (i.e. we are a fugitive)
+
+ LDA #0                 \ Set A = 1 + C, so if C is not set (i.e. we have a
+ ADC #1                 \ legal status between 1 and 49) then A is set to 1,
+                        \ and if C is set (i.e. we have a legal status of 50+)
+                        \ then A is set to 2
+
+.trcm2
+
+ STA transmitBuffer+8   \ Store the commander's legal status in transmitBuffer+8
+
+ LDX #0                 \ Set X to condition docked (0)
+
+ LDY QQ12               \ Fetch the docked status from QQ12, and if we are
+ BNE trcm3              \ docked, jump to wearedocked
+
+ INX                    \ Set X to condition green (1)
+
+ LDY JUNK               \ Set Y to the number of junk items in our local bubble
+                        \ of universe (where junk is asteroids, canisters,
+                        \ escape pods and so on)
+
+ LDA FRIN+2,Y           \ The ship slots at FRIN are ordered with the first two
+                        \ slots reserved for the planet and sun/space station,
+                        \ and then any ships, so if the slot at FRIN+2+Y is not
+                        \ empty (i.e. is non-zero), then that means the number
+                        \ of non-asteroids in the vicinity is at least 1
+
+ BEQ trcm3              \ So if X = 0, there are no ships in the vicinity, so
+                        \ jump to trcm3 to set the ship's condition to green
+
+ INX                    \ Set X to condition yellow (2)
+
+ LDY ENERGY             \ Otherwise we have ships in the vicinity, so we load
+                        \ our energy levels into Y
+
+ CPY #128               \ If energy levels >= 128, jump to trcm3
+ BCS trcm3
+
+ INX                    \ Set X to condition red (3)
+
+.trcm3
+
+ STX transmitBuffer+9   \ Store the commander's condition in transmitBuffer+9
+
+ LDA netTally           \ Copy the commander's combat score from netTally(1 0)
+ STA transmitBuffer+10  \ to transmitBuffer(11 10)
+ LDA netTally+1
+ STA transmitBuffer+11
+
+ LDA CASH               \ Copy the cash levels from CASH(0 1 2 3) to
+ STA transmitBuffer+15  \ transmitBuffer(15 14 13 12)
+ LDA CASH+1
+ STA transmitBuffer+14
+ LDA CASH+2
+ STA transmitBuffer+13
+ LDA CASH+3
+ STA transmitBuffer+12
+
+ LDA #0                 \ Set machine type to 0 (BBC Micro)
+ STA transmitBuffer+16
+
+                        \ Fall through into TransmitData to transmit the data
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
+
+\ ******************************************************************************
+\
+\       Name: TransmitData
+\       Type: Subroutine
+\   Category: Econet
+\    Summary: Send the commander data to the scoreboard machine
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+IF _STH_DISC OR _IB_DISC
+
+.TransmitData
+
+ LDA #&80               \ Set the control byte in byte #0 of the parameter block
+ STA oswordBlock
+
+ LDA scorePort          \ Set the port number in byte #1 of the parameter block
+ STA oswordBlock+1
+
+ LDA scoreStation       \ Copy the scoreboard machine's Econet station number
+ STA oswordBlock+2      \ from scoreStation to byte #2 of the parameter block
+
+ LDA scoreNetwork       \ Copy the scoreboard machine's Econet network number
+ STA oswordBlock+3      \ from scoreNetwork to byte #3 of the parameter block
+
+ LDA #LO(transmitBuffer)    \ Put the address of the transmit buffer into bytes
+ STA oswordBlock+4          \ #4-7 of the parameter block
+ LDA #HI(transmitBuffer)
+ STA oswordBlock+5
+ LDA #0
+ STA oswordBlock+6
+ STA oswordBlock+7
+
+ STA oswordBlock+10     \ Put the end address of the transmit buffer into bytes
+ STA oswordBlock+11     \ #8-11 of the parameter block
+ LDA #LO(endBuffer)
+ STA oswordBlock+8
+ LDA #HI(endBuffer)
+ STA oswordBlock+9
+
+ LDA #16                \ Call OSWORD with A = 16 to transmit the contents of
+ JSR SendOverEconet     \ the transmit buffer to the scoreboard machine
+
+ PLP                    \ Retrieve the flags from the stack
+
+ RTS                    \ Return from the subroutine
+
+                        \ --- End of added code ------------------------------->
+
+ENDIF
+
+\ ******************************************************************************
+\
 \ Save ELTH.bin
 \
 \ ******************************************************************************
@@ -35106,4 +35399,3 @@ IF _SRAM_DISC
 ENDIF
 
                         \ --- End of added code ------------------------------->
-
