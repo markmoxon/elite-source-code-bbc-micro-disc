@@ -2000,6 +2000,36 @@ ENDIF
                         \ of the catalogue, between the two lists of filenames,
                         \ so it can be dropped without affecting the layout)
 
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+IF _STH_DISC OR _IB_DISC
+
+.scorePort
+
+ SKIP 1                 \ The Econet port on which to talk to the scoreboard
+                        \ machine
+                        \
+                        \ If this is zero, the network is disabled and no
+                        \ commander data is transmitted
+
+.scoreStation
+
+ SKIP 1                 \ The Econet station number of the scoreboard machine
+
+.scoreNetwork
+
+ SKIP 1                 \ The Econet network number of the scoreboard machine
+
+.netTally
+
+ SKIP 2                 \ Stores a one-point-per-kill combat score for the
+                        \ scoreboard (so all platforms have the same point
+                        \ system)
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
+
                         \ --- Mod: Code moved for Econet: --------------------->
 
 .XSAV
@@ -34176,31 +34206,6 @@ ENDMACRO
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
 IF _STH_DISC OR _IB_DISC
-
- ORG &521C              \ The first four variables have to be at the same
-                        \ address in both the docked and flight code
-
-.scorePort
-
- SKIP 1                 \ The Econet port on which to talk to the scoreboard
-                        \ machine
-                        \
-                        \ If this is zero, the network is disabled and no
-                        \ commander data is transmitted
-
-.scoreStation
-
- SKIP 1                 \ The Econet station number of the scoreboard machine
-
-.scoreNetwork
-
- SKIP 1                 \ The Econet network number of the scoreboard machine
-
-.netTally
-
- SKIP 2                 \ Stores a one-point-per-kill combat score for the
-                        \ scoreboard (so all platforms have the same point
-                        \ system)
 
 .oswordBlock
 

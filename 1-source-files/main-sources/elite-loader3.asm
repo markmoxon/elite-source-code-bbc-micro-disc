@@ -84,6 +84,14 @@
 
                         \ --- And replaced by: -------------------------------->
 
+ scorePort = &03D0      \ The address of the scoreboard port
+
+ scoreStation = &03D1   \ The address of the scoreboard station
+
+ scoreNetwork = &03D2   \ The address of the scoreboard network
+
+ netTally = &03D3       \ The address of the scoreboard tally
+
  S% = &12E3             \ The address of the main entry point workspace in the
                         \ main game code
 
@@ -632,6 +640,17 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
+IF _STH_DISC OR _IB_DISC
+
+ LDA #0                 \ Zero scorePort to netTally (17 bytes)
+ STA scorePort
+ STA scoreStation
+ STA scoreNetwork
+ STA netTally
+ STA netTally+1
+
+ELIF _SRAM_DISC
+
  LDA CATDcode,X         \ Copy the X-th byte of CATDcode to the X-th byte of
  NOP                    \ CATD
  NOP
@@ -646,6 +665,8 @@ ENDIF
  NOP                    \ contents of &76, which gets set in ELITE3
  NOP
  NOP
+
+ENDIF
 
                         \ --- End of replacement ------------------------------>
 
@@ -664,9 +685,13 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
+IF _SRAM_DISC
+
  NOP                    \ We set the directory in the docked code
  NOP
  NOP
+
+ENDIF
 
                         \ --- End of replacement ------------------------------>
 
