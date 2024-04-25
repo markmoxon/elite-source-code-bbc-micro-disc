@@ -3313,8 +3313,12 @@ ENDIF
                         \ tonne of this cargo (A is set to 1 by this call, and
                         \ the C flag contains the result)
 
- LDY #78                \ This instruction has no effect, so presumably it used
-                        \ to do something, but didn't get removed
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\LDY #78                \ This instruction has no effect, so presumably it used
+\                       \ to do something, but didn't get removed
+
+                        \ --- End of removed code ----------------------------->
 
  BCS MA59               \ If the C flag is set then we have no room in the hold
                         \ for the scooped item, so jump down to MA59 make a
@@ -15876,8 +15880,12 @@ ENDIF
  LDA QQ19+4             \ Store the updated y-coordinate in QQ10 (the current
  STA QQ10               \ y-coordinate of the crosshairs)
 
- STA QQ19+1             \ This instruction has no effect, as QQ19+1 is
-                        \ overwritten below, both in TT103 and TT105
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\STA QQ19+1             \ This instruction has no effect, as QQ19+1 is
+\                       \ overwritten below, both in TT103 and TT105
+
+                        \ --- End of removed code ----------------------------->
 
  PLA                    \ Store the x-delta in QQ19+3 and fetch the current
  STA QQ19+3             \ x-coordinate of the crosshairs from QQ10 into A, ready
@@ -15890,8 +15898,12 @@ ENDIF
  LDA QQ19+4             \ Store the updated x-coordinate in QQ9 (the current
  STA QQ9                \ x-coordinate of the crosshairs)
 
- STA QQ19               \ This instruction has no effect, as QQ19 is overwritten
-                        \ below, both in TT103 and TT105
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\STA QQ19               \ This instruction has no effect, as QQ19 is overwritten
+\                       \ below, both in TT103 and TT105
+
+                        \ --- End of removed code ----------------------------->
 
                         \ Now we've updated the coordinates of the crosshairs,
                         \ fall through into TT103 to redraw them at their new
@@ -26692,6 +26704,30 @@ ENDIF
 
 .WARP
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+IF _SRAM_DISC
+
+ LDA auto               \ If the docking computer is engaged (auto is non-zero)
+ AND SSPR               \ and we are inside the space station safe zone (SSPR
+ BEQ warp1              \ is non-zero), then this sets A to be non-zero, so if
+                        \ this is not the case, jump to warp1 to skip the
+                        \ following
+
+                        \ If we get here then the docking computer is engaged
+                        \ and we are in the space station safe zone, in which
+                        \ case the fast-forward button docks us instantly
+
+ JMP GOIN               \ Go to the docking bay (i.e. show the ship hangar
+                        \ screen) and return from the subroutine with a tail
+                        \ call
+
+.warp1
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
+
  LDX JUNK               \ Set X to the total number of junk items in the
                         \ vicinity (e.g. asteroids, escape pods, cargo
                         \ canisters, Shuttles, Transporters and so on)
@@ -33519,8 +33555,12 @@ ENDMACRO
                         \
                         \ nosev_y = nosev_y - alpha * nosev_x_hi
 
- STX P                  \ This instruction has no effect as MAD overwrites P,
-                        \ but it sets P = nosev_y_lo
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\STX P                  \ This instruction has no effect as MAD overwrites P,
+\                       \ but it sets P = nosev_y_lo
+
+                        \ --- End of removed code ----------------------------->
 
  LDX INWK,Y             \ Set (S R) = nosev_x
  STX R
@@ -33536,8 +33576,12 @@ ENDMACRO
                         \
                         \ nosev_x = nosev_x + alpha * nosev_y_hi
 
- STX P                  \ This instruction has no effect as MAD overwrites P,
-                        \ but it sets P = nosev_x_lo
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\STX P                  \ This instruction has no effect as MAD overwrites P,
+\                       \ but it sets P = nosev_x_lo
+
+                        \ --- End of removed code ----------------------------->
 
  LDA BETA               \ Set Q = beta (the pitch angle to rotate through)
  STA Q
@@ -33548,8 +33592,12 @@ ENDMACRO
  STX S
  LDX INWK+4,Y
 
- STX P                  \ This instruction has no effect as MAD overwrites P,
-                        \ but it sets P = nosev_y
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\STX P                  \ This instruction has no effect as MAD overwrites P,
+\                       \ but it sets P = nosev_y
+
+                        \ --- End of removed code ----------------------------->
 
  LDA INWK+5,Y           \ Set A = -nosev_z_hi
  EOR #%10000000
@@ -33561,8 +33609,12 @@ ENDMACRO
                         \
                         \ nosev_y = nosev_y - beta * nosev_z_hi
 
- STX P                  \ This instruction has no effect as MAD overwrites P,
-                        \ but it sets P = nosev_y_lo
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\STX P                  \ This instruction has no effect as MAD overwrites P,
+\                       \ but it sets P = nosev_y_lo
+
+                        \ --- End of removed code ----------------------------->
 
  LDX INWK+4,Y           \ Set (S R) = nosev_z
  STX R
