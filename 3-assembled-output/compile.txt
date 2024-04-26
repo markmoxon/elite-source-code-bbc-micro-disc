@@ -15657,7 +15657,7 @@ S.ELTG &44A6  &4DDC  &12E3  &44A6
      53B4   8D 16 52   STA &5216
      53B7   AD 64 03   LDA &0364
      53BA   8D 15 52   STA &5215
-     53BD   A9 00      LDA #&00
+     53BD   A9 03      LDA #&03
      53BF   8D 19 52   STA &5219
 .TransmitData
      53C2   A9 80      LDA #&80
@@ -36546,7 +36546,7 @@ End macro FACE
      5BF0   8D 0F 52   STA &520F
      5BF3   AD 64 03   LDA &0364
      5BF6   8D 0E 52   STA &520E
-     5BF9   A9 00      LDA #&00
+     5BF9   A9 03      LDA #&03
      5BFB   8D 12 52   STA &5212
 .TransmitData
      5BFE   A9 80      LDA #&80

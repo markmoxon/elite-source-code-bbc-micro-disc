@@ -34282,7 +34282,8 @@ IF _STH_DISC OR _IB_DISC
                         \   * Bytes #12-15 = commander's credits
                         \
                         \   * Byte #16 = machine type
-                        \                1 = Master, 2 = 6502SP, 3 = BBC Micro
+                        \                0 = BBC Micro SRAM, 1 = Master,
+                        \                2 = 6502SP, 3 = BBC Micro standard
                         \
                         \ Score and credits are stored with the low byte first
                         \ (unlike the way that credits are stored in the game)
@@ -35159,7 +35160,7 @@ IF _STH_DISC OR _IB_DISC
  LDA CASH+3
  STA transmitBuffer+12
 
- LDA #0                 \ Set machine type to 0 (BBC Micro)
+ LDA #3                 \ Set machine type to 0 (BBC Micro standard)
  STA transmitBuffer+16
 
                         \ Fall through into TransmitData to transmit the data
@@ -35444,7 +35445,8 @@ IF _SRAM_DISC
                         \   * Bytes #12-15 = commander's credits
                         \
                         \   * Byte #16 = machine type
-                        \                1 = Master, 2 = 6502SP, 3 = BBC Micro
+                        \                0 = BBC Micro SRAM, 1 = Master,
+                        \                2 = 6502SP, 3 = BBC Micro standard
                         \
                         \ Score and credits are stored with the low byte first
                         \ (unlike the way that credits are stored in the game)
