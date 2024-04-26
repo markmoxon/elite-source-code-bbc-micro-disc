@@ -2022,9 +2022,13 @@ IF _STH_DISC OR _IB_DISC
 
 .netTally
 
- SKIP 2                 \ Stores a one-point-per-kill combat score for the
+ SKIP 1                 \ Stores a one-point-per-kill combat score for the
                         \ scoreboard (so all platforms have the same point
                         \ system)
+
+.netDeaths
+
+ SKIP 1                 \ Counts the number of deaths
 
 ENDIF
 
@@ -2487,6 +2491,12 @@ ENDIF
 \JSR CATD               \ Call CATD to reload the disc catalogue
 
                         \ --- End of removed code ----------------------------->
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+ INC netDeaths          \ Increment the death count
+
+                        \ --- End of added code ------------------------------->
 
  BNE INBAY              \ Jump to INBAY to load the docked code (this BNE is
                         \ effectively a JMP)
@@ -18012,7 +18022,7 @@ ELIF _STH_DISC OR _IB_DISC
 
 ENDIF
 
-                        \ --- End of added code ------------------------------->
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
@@ -26994,9 +27004,9 @@ ENDIF
 
 IF _SRAM_DISC
 
- INC netTally           \ Increment the kill count in netTally
- BNE taly1
- INC netTally+1
+ INC netTally           \ Increment the kill count in netTally, up to a maximum
+ BNE taly1              \ of 256
+ DEC netTally
 
 .taly1
 
@@ -27007,9 +27017,9 @@ IF _SRAM_DISC
 
 ELIF _STH_DISC OR _IB_DISC
 
- INC netTally           \ Increment the kill count in netTally
- BNE taly1
- INC netTally+1
+ INC netTally           \ Increment the kill count in netTally, up to a maximum
+ BNE taly1              \ of 256
+ DEC netTally
 
 .taly1
 
@@ -35146,10 +35156,11 @@ IF _STH_DISC OR _IB_DISC
 
  STX transmitBuffer+9   \ Store the commander's condition in transmitBuffer+9
 
- LDA netTally           \ Copy the commander's combat score from netTally(1 0)
- STA transmitBuffer+10  \ to transmitBuffer(11 10)
- LDA netTally+1
- STA transmitBuffer+11
+ LDA netTally           \ Copy the commander's combat score from netTally to
+ STA transmitBuffer+10  \ transmitBuffer+10
+
+ LDA netDeaths          \ Copy the commander's death count from netDeaths to
+ STA transmitBuffer+11  \ transmitBuffer+11
 
  LDA CASH               \ Copy the cash levels from CASH(0 1 2 3) to
  STA transmitBuffer+15  \ transmitBuffer(15 14 13 12)
@@ -35418,9 +35429,13 @@ IF _SRAM_DISC
 
 .netTally
 
- SKIP 2                 \ Stores a one-point-per-kill combat score for the
+ SKIP 1                 \ Stores a one-point-per-kill combat score for the
                         \ scoreboard (so all platforms have the same point
                         \ system)
+
+.netDeaths
+
+ SKIP 1                 \ Counts the number of deaths
 
 .oswordBlock
 

@@ -2009,9 +2009,13 @@ IF _STH_DISC OR _IB_DISC
 
 .netTally
 
- SKIP 2                 \ Stores a one-point-per-kill combat score for the
+ SKIP 1                 \ Stores a one-point-per-kill combat score for the
                         \ scoreboard (so all platforms have the same point
                         \ system)
+
+.netDeaths
+
+ SKIP 1                 \ Counts the number of deaths
 
 ENDIF
 
@@ -2456,6 +2460,7 @@ ELIF _STH_DISC OR _IB_DISC
                         \ configured
 
 ENDIF
+
                         \ --- End of added code ------------------------------->
 
  JSR RES2               \ Reset a number of flight variables and workspaces
@@ -21965,6 +21970,27 @@ ENDIF
 
 .BR1
 
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+ JSR RESET              \ Reset the environment, so we transmit the correct
+                        \ condition in the following (RESET is called again in
+                        \ TITLE anyway)
+
+IF _SRAM_DISC
+
+ JSR OSXIND2            \ Transmit commander data to the scoreboard machine, if
+                        \ configured (this calls TransmitCmdrData after
+                        \ switching in the correct ROM bank)
+
+ELIF _STH_DISC OR _IB_DISC
+
+ JSR TransmitCmdrData   \ Transmit commander data to the scoreboard machine, if
+                        \ configured
+
+ENDIF
+
+                        \ --- End of added code ------------------------------->
+
  LDX #3                 \ Set XC = 3 (set text cursor to column 3)
  STX XC
 
@@ -23392,6 +23418,15 @@ ENDIF
 
  BPL LOL1               \ Loop back until we have copied all NT% bytes
 
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+ LDA #0                 \ Zero scorePort, netTally and netDeaths to reset the
+ STA scorePort          \ scores and stop transmissions to the scoreboard
+ STA netTally
+ STA netDeaths
+
+                        \ --- End of added code ------------------------------->
+
 .LOR
 
  SEC                    \ Set the C flag
@@ -24523,8 +24558,19 @@ ENDIF
 
 .DK7
 
- CPX #&70               \ If ESCAPE is not being pressed, skip over the next
- BNE P%+5               \ instruction
+                        \ --- Mod: Code removed for Scoreboard: --------------->
+
+\CPX #&70               \ If ESCAPE is not being pressed, skip over the next
+\BNE P%+5               \ instruction
+
+                        \ --- And replaced by: -------------------------------->
+
+ CPX #&70               \ If ESCAPE is not being pressed, skip over the next two
+ BNE P%+8               \ instructions
+
+ INC netDeaths          \ Increment the death count
+
+                        \ --- End of replacement ------------------------------>
 
  JMP BR1                \ ESCAPE is being pressed, so jump to BR1 to end the
                         \ game
@@ -34860,10 +34906,11 @@ ENDIF
 
  STX transmitBuffer+9   \ Store the commander's condition in transmitBuffer+9
 
- LDA netTally           \ Copy the commander's combat score from netTally(1 0)
- STA transmitBuffer+10  \ to transmitBuffer(11 10)
- LDA netTally+1
- STA transmitBuffer+11
+ LDA netTally           \ Copy the commander's combat score from netTally to
+ STA transmitBuffer+10  \ transmitBuffer+10
+
+ LDA netDeaths          \ Copy the commander's death count from netDeaths to
+ STA transmitBuffer+11  \ transmitBuffer+11
 
  LDA CASH               \ Copy the cash levels from CASH(0 1 2 3) to
  STA transmitBuffer+15  \ transmitBuffer(15 14 13 12)
@@ -35074,26 +35121,33 @@ ENDIF
  JSR TT67               \ Print two newlines
  JSR TT67
 
- LDA #8                 \ Print extended token 8 ("RESET SCORES")
+ LDA #8                 \ Print extended token 8 ("RESET SCORES ")
  JSR PrintToken
 
- LDX netTally           \ Get the current combat score from scorePort
- LDY netTally+1
+ LDX netTally           \ Get the current combat score from netTally
 
- LDA #8                 \ Print the 16-bit number in (Y X) to 8 digits, without
- CLC                    \ a decimal point
- JSR TT11
+ CLC                    \ Call pr2 to print the score level as a 3-digit
+ JSR pr2                \ number without a decimal point (by clearing the C
+                        \ flag)
+
+ JSR TT162              \ Print a space
+
+ LDX netDeaths          \ Get the current death count from netDeaths
+
+ CLC                    \ Call pr2 to print the death count as a 3-digit
+ JSR pr2                \ number without a decimal point (by clearing the C
+                        \ flag)
 
  LDA #7                 \ Print extended token 7 ("   ")
  JSR PrintToken
 
- JSR TT214              \ Ask a question with a "Y/N?" prompt
+ JSR TT214+3            \ Print a "Y/N?" prompt (without a leading question)
 
  BCC gnet4              \ If the answer was not "yes", jump to gnet4
 
- LDA #0                 \ The answer was yes, so reset the combat score
- STA netTally
- STA netTally+1
+ LDA #0                 \ The answer was yes, so reset the combat score and
+ STA netTally           \ death count
+ STA netDeaths
 
  STA CASH               \ And set the credit level to 100 Cr
  STA CASH+1
@@ -35249,7 +35303,7 @@ ENDIF
  ECHR ' '
  EQUB VE
 
- ETWO 'R', 'E'          \ Token 8:    "RESET SCORES"
+ ETWO 'R', 'E'          \ Token 8:    "RESET SCORES "
  ETWO 'S', 'E'
  ECHR 'T'
  ECHR ' '
@@ -35257,6 +35311,7 @@ ENDIF
  ECHR 'C'
  ETWO 'O', 'R'
  ETWO 'E', 'S'
+ ECHR ' '
  EQUB VE
 
                         \ --- End of added code ------------------------------->
@@ -35340,9 +35395,13 @@ IF _SRAM_DISC
 
 .netTally
 
- SKIP 2                 \ Stores a one-point-per-kill combat score for the
+ SKIP 1                 \ Stores a one-point-per-kill combat score for the
                         \ scoreboard (so all platforms have the same point
                         \ system)
+
+.netDeaths
+
+ SKIP 1                 \ Counts the number of deaths
 
 .oswordBlock
 

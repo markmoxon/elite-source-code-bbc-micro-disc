@@ -92,6 +92,8 @@
 
  netTally = &03D3       \ The address of the scoreboard tally
 
+ netDeaths = &03D4      \ The address of the scoreboard death count
+
  S% = &12E3             \ The address of the main entry point workspace in the
                         \ main game code
 
@@ -619,14 +621,14 @@ ENDIF
  JSR MVBL               \ Call MVBL to move and decrypt 4 pages of memory from
                         \ WORDS to &0400-&07FF
 
- LDX #35                \ We now want to copy the disc catalogue routine from
-                        \ CATDcode to CATD, so set a counter in X for the 36
-                        \ bytes to copy
-
-.loop2
-
                         \ --- Mod: Code removed for Econet: ------------------->
 
+\LDX #35                \ We now want to copy the disc catalogue routine from
+\                       \ CATDcode to CATD, so set a counter in X for the 36
+\                       \ bytes to copy
+\
+\.loop2
+\
 \LDA CATDcode,X         \ Copy the X-th byte of CATDcode to the X-th byte of
 \STA CATD,X             \ CATD
 \
@@ -640,33 +642,14 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
-IF _STH_DISC OR _IB_DISC
-
- LDA #0                 \ Zero scorePort to netTally (17 bytes)
+ LDA #0                 \ Zero scorePort to netDeaths
  STA scorePort
  STA scoreStation
  STA scoreNetwork
  STA netTally
- STA netTally+1
-
-ELIF _SRAM_DISC
-
- LDA CATDcode,X         \ Copy the X-th byte of CATDcode to the X-th byte of
- NOP                    \ CATD
+ STA netDeaths
  NOP
  NOP
-
- DEX                    \ Decrement the loop counter
-
- BPL loop2              \ Loop back to copy the next byte until they are all
-                        \ done
-
- LDA &76                \ Set the drive number in the CATD routine to the
- NOP                    \ contents of &76, which gets set in ELITE3
- NOP
- NOP
-
-ENDIF
 
                         \ --- End of replacement ------------------------------>
 
@@ -683,17 +666,7 @@ ENDIF
 \JSR OSCLI              \ Call OSCLI to run the OS command in MESS1, which
 \                       \ changes the disc directory to E
 
-                        \ --- And replaced by: -------------------------------->
-
-IF _SRAM_DISC
-
- NOP                    \ We set the directory in the docked code
- NOP
- NOP
-
-ENDIF
-
-                        \ --- End of replacement ------------------------------>
+                        \ --- End of removed code ----------------------------->
 
  LDA #LO(LOAD)          \ Set the following:
  STA ZP                 \
