@@ -1013,8 +1013,8 @@
  CMP &8000,Y            \ If the character from bank X does not match the same
  BNE tbbc4              \ character from the copyright message in copyMatch,
                         \ then bank X is not a valid ROM, so jump to tbbc4 to
-                        \ the top four bits of the first byte in ROM bank X and
-                        \ move on to the next test
+                        \ set the top four bits of the first byte in ROM bank X
+                        \ and move on to the next test
 
  INY                    \ Increment the character pointer into the copyright
                         \ message in bank X
@@ -1533,5 +1533,5 @@
 \
 \ ******************************************************************************
 
- PRINT "T.MNUCODE ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
+ PRINT "S.MNUCODE ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
  SAVE "3-assembled-output/MNUCODE.bin", CODE%, P%, LOAD%
