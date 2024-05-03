@@ -6031,7 +6031,7 @@ CHK2 = &12D3
      807A   0D
 .coriolisStation
      807B
-T.MNUCODE &7400  &7794  &7400  &7400 
+S.MNUCODE &7400  &7794  &7400  &7400 
 Saving file '3-assembled-output/MNUCODE.bin'
 .ZP
      0000

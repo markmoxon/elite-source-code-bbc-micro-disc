@@ -2648,6 +2648,46 @@ IF _SRAM_DISC
 
 .PROT4
 
+                        \ We start by restoring various vectors that are changed
+                        \ by boards like the IntegraB, which would otherwise
+                        \ point into the space used for the QQ18 text tokens
+                        \ during flight
+
+ SEI                    \ Disable all interrupts
+
+ LDA &FFB7              \ Set ZP(1 0) to the location stored in &FFB7-&FFB8,
+ STA ZP                 \ which contains the address of the default vector table
+ LDA &FFB8
+ STA ZP+1
+
+ LDY #&A                \ Set Y to &A so we reset vectors &020A to &0211 (BYTEV,
+                        \ WORDV and WRCHV)
+
+.prlp1
+
+ LDA (ZP),Y             \ Copy the Y-th byte from the default vector table into
+ STA &0200,Y            \ the vector table in &0200
+
+ INY                    \ Increment the loop counter
+
+ CPY #&12               \ Loop back for the next vector until we have done them
+ BNE prlp1              \ all
+
+ LDY #&2A               \ Set Y to &2A so we reset vectors &022A to &022F (INSV,
+                        \ REMV and CNPV)
+
+.prlp2
+
+ LDA (ZP),Y             \ Copy the Y-th byte from the default vector table into
+ STA &0200,Y            \ the vector table in &0200
+
+ INY                    \ Increment the loop counter
+
+ CPY #&30               \ Loop back for the next vector until we have done them
+ BNE prlp2              \ all
+
+ CLI                    \ Re-enable interrupts
+
  LDA #172               \ Call OSBYTE 172 to read the address of the MOS
  LDX #0                 \ keyboard translation table into (Y X)
  LDY #255
