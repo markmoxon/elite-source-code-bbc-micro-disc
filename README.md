@@ -30,6 +30,8 @@ See the [introduction](#introduction) for more information, or jump straight int
 
 * [Elite Compendium](#elite-compendium)
 
+* [Elite over Econet](#elite-over-econet)
+
 * [Building Elite from the source](#building-elite-from-the-source)
 
   * [Requirements](#requirements)
@@ -167,6 +169,14 @@ This repository also includes a version of BBC Micro disc Elite for the Elite Co
 The annotated source files in the `elite-compendium` branch contain both the original Acornsoft code and all of the modifications for the Elite Compendium, so you can look through the source to see exactly what's changed. Any code that I've removed from the original version is commented out in the source files, so when they are assembled they produce the Compendium binaries, while still containing details of all the modifications. You can find all the diffs by searching the sources for `Mod:`.
 
 For more information on the Elite Compendium, see the [hacks section of the accompanying website](https://www.bbcelite.com/hacks/elite_compendium.html).
+
+## Elite over Econet
+
+This repository also includes a version of BBC Micro disc Elite that loads over Econet and supports multiplayer scoreboards. The Elite over Econet version is in a separate branch called `econet`, which is included in the [Elite over Econet](https://github.com/markmoxon/elite-over-econet) repository as a submodule.
+
+The annotated source files in the `econet` branch contain both the original Acornsoft code and all of the modifications for Elite over Econet, so you can look through the source to see exactly what's changed. Any code that I've removed from the original version is commented out in the source files, so when they are assembled they produce the Elite over Econet binaries, while still containing details of all the modifications. You can find all the diffs by searching the sources for `Mod:`.
+
+For more information on Elite over Econet, see the [hacks section of the accompanying website](https://www.bbcelite.com/hacks/elite_over_econet.html).
 
 ## Building Elite from the source
 
