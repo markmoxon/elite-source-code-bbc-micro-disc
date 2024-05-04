@@ -34288,7 +34288,7 @@ IF _STH_DISC OR _IB_DISC
                         \               0 = docked, 1 = green
                         \               2 = yellow, 3 = red
                         \
-                        \   * Byte #10 = commander's score
+                        \   * Byte #10 = commander's kill count
                         \
                         \   * Byte #11 = commander's death count
                         \
@@ -35459,7 +35459,7 @@ IF _SRAM_DISC
                         \               0 = docked, 1 = green
                         \               2 = yellow, 3 = red
                         \
-                        \   * Byte #10 = commander's score
+                        \   * Byte #10 = commander's kill count
                         \
                         \   * Byte #11 = commander's death count
                         \
