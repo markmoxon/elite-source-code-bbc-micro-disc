@@ -563,7 +563,7 @@
  EQUS '"'
  EQUS ";~PAGE''"
  EQUS '"'
- EQUS "You can run Elite on this computer"
+ EQUS "You can run *Elite on this computer"
  EQUS '"'
  EQUS "'|M"
  EQUB 13

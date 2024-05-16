@@ -92423,7 +92423,7 @@ Saving file '3-assembled-output/README.txt'
 .ZP
      0070
 .CheckPage
-     7400   A9 EA      LDA #&EA
+     7400   A9 EB      LDA #&EB
      7402   85 70      STA &70
      7404   A9 75      LDA #&75
      7406   85 71      STA &71
@@ -92442,14 +92442,14 @@ Saving file '3-assembled-output/README.txt'
      7422   F0 02      BEQ &7426
      7424   D0 0C      BNE &7432
 .chek1
-     7426   A9 82      LDA #&82
+     7426   A9 83      LDA #&83
      7428   85 70      STA &70
      742A   A9 76      LDA #&76
      742C   85 71      STA &71
      742E   20 20 75   JSR &7520
      7431   60         RTS
 .DisableROMs
-     7432   A9 F6      LDA #&F6
+     7432   A9 F7      LDA #&F7
      7434   85 70      STA &70
      7436   A9 75      LDA #&75
      7438   85 71      STA &71
@@ -92555,7 +92555,7 @@ Saving file '3-assembled-output/README.txt'
      74F4   A2 53      LDX #&53
      74F6   A0 75      LDY #&75
      74F8   20 F7 FF   JSR &FFF7
-     74FB   A9 62      LDA #&62
+     74FB   A9 63      LDA #&63
      74FD   85 70      STA &70
      74FF   A9 76      LDA #&76
      7501   85 71      STA &71
@@ -92611,52 +92611,52 @@ Saving file '3-assembled-output/README.txt'
      75BA   3B 7E 50 ...
      75C2   22
      75C3   59 6F 75 ...
-     75E5   22
-     75E6   27 7C 4D 
-     75E9   0D
+     75E6   22
+     75E7   27 7C 4D 
+     75EA   0D
 .pageIs
-     75EA   0A
-     75EB   0D
-     75EC   50 41 47 ...
-     75F5   00
+     75EB   0A
+     75EC   0D
+     75ED   50 41 47 ...
+     75F6   00
 .romList
-     75F6   0A
-     75F7   0D
-     75F8   0A
-     75F9   0D
-     75FA   54 68 69 ...
-     7620   0A
-     7621   0D
-     7622   0A
-     7623   0D
-     7624   44 69 73 ...
-     764B   0A
-     764C   0D
-     764D   0A
-     764E   0D
-     764F   35 34 33 ...
-     765F   0A
-     7660   0D
-     7661   00
+     75F7   0A
+     75F8   0D
+     75F9   0A
+     75FA   0D
+     75FB   54 68 69 ...
+     7621   0A
+     7622   0D
+     7623   0A
+     7624   0D
+     7625   44 69 73 ...
+     764C   0A
+     764D   0D
+     764E   0A
+     764F   0D
+     7650   35 34 33 ...
+     7660   0A
+     7661   0D
+     7662   00
 .pressBreak
-     7662   0A
-     7663   0D
-     7664   50 72 65 ...
-     767D   0A
-     767E   0D
-     767F   0A
-     7680   0D
-     7681   00
+     7663   0A
+     7664   0D
+     7665   50 72 65 ...
+     767E   0A
+     767F   0D
+     7680   0A
+     7681   0D
+     7682   00
 .pageIsOK
-     7682   0A
-     7683   0D
-     7684   0A
-     7685   0D
-     7686   59 6F 75 ...
-     76A8   0A
-     76A9   0D
-     76AA   0A
-     76AB   0D
-     76AC   00
-S.FixPAGE &7400  &76AD  &7400  &7400 
+     7683   0A
+     7684   0D
+     7685   0A
+     7686   0D
+     7687   59 6F 75 ...
+     76A9   0A
+     76AA   0D
+     76AB   0A
+     76AC   0D
+     76AD   00
+S.FixPAGE &7400  &76AE  &7400  &7400 
 Saving file '3-assembled-output/FixPAGE.bin'
