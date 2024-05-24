@@ -553,19 +553,24 @@
 
 .breakKey
 
- EQUS "KEY10IF PAGE>&1200 THEN CLS:PRINT''"
+ EQUS "KEY10CLS:PRINT''"
  EQUS '"'
- EQUS "PAGE is still too high at &"
+ EQUS "User memory now starts at address &"
  EQUS '"'
- EQUS ";~PAGE' ELSE CLS:PRINT''"
+ EQUS ";~PAGE"
+ EQUS ":IFPAGE>&1200THENPRINT"
  EQUS '"'
- EQUS "PAGE is now &"
+ EQUS "but this is still too high for Elite"
  EQUS '"'
- EQUS ";~PAGE''"
+ EQUS " ELSE PRINT"
  EQUS '"'
- EQUS "You can run *Elite on this computer"
+ EQUS "so there is enough memory to run Elite"
  EQUS '"'
- EQUS "'|M"
+ EQUS "''"
+ EQUS '"'
+ EQUS "Press any key to load Elite over Econet"
+ EQUS '"'
+ EQUS "':A=GET:*Elite|M"
  EQUB 13
 
 \ ******************************************************************************
@@ -580,17 +585,24 @@
 .pageIs
 
  EQUB 10, 13
- EQUS "PAGE is &"
+ EQUB 10, 13
+ EQUS "User memory starts at address &"
  EQUB 0
 
 .romList
 
  EQUB 10, 13
  EQUB 10, 13
- EQUS "This is too high for Elite over Econet"
+ EQUS "This means there is not enough free"
+ EQUB 10, 13
+ EQUS "memory right now to run Elite over"
+ EQUB 10, 13
+ EQUS "Econet"
  EQUB 10, 13
  EQUB 10, 13
- EQUS "Disabling all ROMs except NFS and BASIC"
+ EQUS "I will try to free up more memory by"
+ EQUB 10, 13
+ EQUS "disabling all ROMs except NFS and BASIC"
  EQUB 10, 13
  EQUB 10, 13
  EQUS "5432109876543210"
@@ -600,7 +612,9 @@
 .pressBreak
 
  EQUB 10, 13
- EQUS "Press BREAK to reset PAGE"
+ EQUS "Press BREAK to free up as much memory"
+ EQUB 10, 13
+ EQUS "as possible so we can try again"
  EQUB 10, 13
  EQUB 10, 13
  EQUB 0
