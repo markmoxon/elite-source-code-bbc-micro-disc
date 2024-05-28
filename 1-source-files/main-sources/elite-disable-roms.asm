@@ -360,11 +360,6 @@
 
 .drom15
 
- LDA #10                \ Print a carriage return and line feed
- JSR OSWRCH
- LDA #13
- JSR OSWRCH
-
  PLA                    \ Switch back to the ROM bank number that we saved on
  STA &F4                \ the stack at the start of the routine
  STA VIA+&30
@@ -381,7 +376,9 @@
  STA ZP+1
  JSR PrintString
 
- RTS                    \ Return from the subroutine
+.drom16
+
+ JMP drom16             \ Wait for the user to press BREAK
 
 \ ******************************************************************************
 \
@@ -611,6 +608,7 @@
 
 .pressBreak
 
+ EQUB 10, 13
  EQUB 10, 13
  EQUS "Press BREAK to free up as much memory"
  EQUB 10, 13

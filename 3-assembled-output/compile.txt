@@ -92423,17 +92423,17 @@ Saving file '3-assembled-output/README.txt'
 .ZP
      0070
 .CheckPage
-     7400   A9 39      LDA #&39
+     7400   A9 31      LDA #&31
      7402   85 70      STA &70
      7404   A9 76      LDA #&76
      7406   85 71      STA &71
-     7408   20 20 75   JSR &7520
+     7408   20 18 75   JSR &7518
      740B   A9 83      LDA #&83
      740D   20 F4 FF   JSR &FFF4
      7410   98         TYA
-     7411   20 07 75   JSR &7507
+     7411   20 FF 74   JSR &74FF
      7414   8A         TXA
-     7415   20 07 75   JSR &7507
+     7415   20 FF 74   JSR &74FF
      7418   C0 13      CPY #&13
      741A   B0 16      BCS &7432
      741C   C0 12      CPY #&12
@@ -92442,18 +92442,18 @@ Saving file '3-assembled-output/README.txt'
      7422   F0 02      BEQ &7426
      7424   D0 0C      BNE &7432
 .chek1
-     7426   A9 65      LDA #&65
+     7426   A9 5F      LDA #&5F
      7428   85 70      STA &70
      742A   A9 77      LDA #&77
      742C   85 71      STA &71
-     742E   20 20 75   JSR &7520
+     742E   20 18 75   JSR &7518
      7431   60         RTS
 .DisableROMs
-     7432   A9 5D      LDA #&5D
+     7432   A9 55      LDA #&55
      7434   85 70      STA &70
      7436   A9 76      LDA #&76
      7438   85 71      STA &71
-     743A   20 20 75   JSR &7520
+     743A   20 18 75   JSR &7518
      743D   A5 F4      LDA &F4
      743F   48         PHA
      7440   A2 0F      LDX #&0F
@@ -92462,7 +92462,7 @@ Saving file '3-assembled-output/README.txt'
      7444   8E 30 FE   STX &FE30
      7447   A0 F6      LDY #&F6
 .drom2
-     7449   B9 37 74   LDA &7437,Y
+     7449   B9 2F 74   LDA &742F,Y
      744C   D9 13 7F   CMP &7F13,Y
      744F   D0 0B      BNE &745C
      7451   C8         INY
@@ -92473,7 +92473,7 @@ Saving file '3-assembled-output/README.txt'
 .drom3
      745C   A0 F9      LDY #&F9
 .drom4
-     745E   B9 3E 74   LDA &743E,Y
+     745E   B9 36 74   LDA &7436,Y
      7461   D9 10 7F   CMP &7F10,Y
      7464   D0 1A      BNE &7480
      7466   C8         INY
@@ -92492,7 +92492,7 @@ Saving file '3-assembled-output/README.txt'
 .drom5
      7480   A0 FD      LDY #&FD
 .drom6
-     7482   B9 41 74   LDA &7441,Y
+     7482   B9 39 74   LDA &7439,Y
      7485   D9 0C 7F   CMP &7F0C,Y
      7488   D0 06      BNE &7490
      748A   C8         INY
@@ -92501,7 +92501,7 @@ Saving file '3-assembled-output/README.txt'
 .drom7
      7490   A0 FD      LDY #&FD
 .drom10
-     7492   B9 4E 74   LDA &744E,Y
+     7492   B9 46 74   LDA &7446,Y
      7495   D9 0C 7F   CMP &7F0C,Y
      7498   D0 0B      BNE &74A5
      749A   C8         INY
@@ -92512,7 +92512,7 @@ Saving file '3-assembled-output/README.txt'
 .drom11
      74A5   A0 FB      LDY #&FB
 .drom12
-     74A7   B9 53 74   LDA &7453,Y
+     74A7   B9 4B 74   LDA &744B,Y
      74AA   D9 0E 7F   CMP &7F0E,Y
      74AD   D0 0B      BNE &74BA
      74AF   C8         INY
@@ -92545,137 +92545,136 @@ Saving file '3-assembled-output/README.txt'
      74DF   30 03      BMI &74E4
      74E1   4C 42 74   JMP &7442
 .drom15
-     74E4   A9 0A      LDA #&0A
-     74E6   20 EE FF   JSR &FFEE
-     74E9   A9 0D      LDA #&0D
-     74EB   20 EE FF   JSR &FFEE
-     74EE   68         PLA
-     74EF   85 F4      STA &F4
-     74F1   8D 30 FE   STA &FE30
-     74F4   A2 53      LDX #&53
-     74F6   A0 75      LDY #&75
-     74F8   20 F7 FF   JSR &FFF7
-     74FB   A9 18      LDA #&18
-     74FD   85 70      STA &70
-     74FF   A9 77      LDA #&77
-     7501   85 71      STA &71
-     7503   20 20 75   JSR &7520
-     7506   60         RTS
+     74E4   68         PLA
+     74E5   85 F4      STA &F4
+     74E7   8D 30 FE   STA &FE30
+     74EA   A2 4B      LDX #&4B
+     74EC   A0 75      LDY #&75
+     74EE   20 F7 FF   JSR &FFF7
+     74F1   A9 10      LDA #&10
+     74F3   85 70      STA &70
+     74F5   A9 77      LDA #&77
+     74F7   85 71      STA &71
+     74F9   20 18 75   JSR &7518
+.drom16
+     74FC   4C FC 74   JMP &74FC
 .PrintHexNumber
-     7507   48         PHA
-     7508   4A         LSR A
-     7509   4A         LSR A
-     750A   4A         LSR A
-     750B   4A         LSR A
-     750C   20 12 75   JSR &7512
-     750F   68         PLA
-     7510   29 0F      AND #&0F
+     74FF   48         PHA
+     7500   4A         LSR A
+     7501   4A         LSR A
+     7502   4A         LSR A
+     7503   4A         LSR A
+     7504   20 0A 75   JSR &750A
+     7507   68         PLA
+     7508   29 0F      AND #&0F
 .hexn1
-     7512   C9 0A      CMP #&0A
-     7514   B0 05      BCS &751B
-     7516   69 30      ADC #&30
-     7518   4C EE FF   JMP &FFEE
-     751B   69 36      ADC #&36
-     751D   4C EE FF   JMP &FFEE
+     750A   C9 0A      CMP #&0A
+     750C   B0 05      BCS &7513
+     750E   69 30      ADC #&30
+     7510   4C EE FF   JMP &FFEE
+     7513   69 36      ADC #&36
+     7515   4C EE FF   JMP &FFEE
 .PrintString
-     7520   A0 00      LDY #&00
+     7518   A0 00      LDY #&00
 .pstr1
-     7522   B1 70      LDA (&70),Y
-     7524   F0 06      BEQ &752C
-     7526   20 EE FF   JSR &FFEE
-     7529   C8         INY
-     752A   D0 F6      BNE &7522
+     751A   B1 70      LDA (&70),Y
+     751C   F0 06      BEQ &7524
+     751E   20 EE FF   JSR &FFEE
+     7521   C8         INY
+     7522   D0 F6      BNE &751A
 .pstr2
-     752C   60         RTS
+     7524   60         RTS
 .eliteMatch
-     752D   53 52 41 ...
+     7525   53 52 41 ...
 .dnfsMatch
-     7537   44 46 53 ...
+     752F   44 46 53 ...
 .dfsMatch
-     753E   44 46 53 
+     7536   44 46 53 
 .anfsMatch
-     7541   41 63 6F ...
+     7539   41 63 6F ...
 .nfsMatch
-     754B   4E 45 54 
+     7543   4E 45 54 
 .basicMatch
-     754E   42 41 53 ...
+     7546   42 41 53 ...
 .breakKey
-     7553   4B 45 59 ...
-     7563   22
-     7564   55 73 65 ...
-     7587   22
-     7588   3B 7E 50 ...
-     758E   3A 49 46 ...
-     75A4   22
-     75A5   62 75 74 ...
-     75C9   22
-     75CA   20 45 4C ...
-     75D5   22
-     75D6   73 6F 20 ...
-     75FC   22
-     75FD   27 27 
-     75FF   22
-     7600   50 72 65 ...
-     7627   22
-     7628   27 3A 41 ...
-     7638   0D
+     754B   4B 45 59 ...
+     755B   22
+     755C   55 73 65 ...
+     757F   22
+     7580   3B 7E 50 ...
+     7586   3A 49 46 ...
+     759C   22
+     759D   62 75 74 ...
+     75C1   22
+     75C2   20 45 4C ...
+     75CD   22
+     75CE   73 6F 20 ...
+     75F4   22
+     75F5   27 27 
+     75F7   22
+     75F8   50 72 65 ...
+     761F   22
+     7620   27 3A 41 ...
+     7630   0D
 .pageIs
-     7639   0A
-     763A   0D
-     763B   0A
-     763C   0D
-     763D   55 73 65 ...
-     765C   00
+     7631   0A
+     7632   0D
+     7633   0A
+     7634   0D
+     7635   55 73 65 ...
+     7654   00
 .romList
-     765D   0A
-     765E   0D
-     765F   0A
-     7660   0D
-     7661   54 68 69 ...
-     7684   0A
-     7685   0D
-     7686   6D 65 6D ...
+     7655   0A
+     7656   0D
+     7657   0A
+     7658   0D
+     7659   54 68 69 ...
+     767C   0A
+     767D   0D
+     767E   6D 65 6D ...
+     76A0   0A
+     76A1   0D
+     76A2   45 63 6F ...
      76A8   0A
      76A9   0D
-     76AA   45 63 6F ...
-     76B0   0A
-     76B1   0D
-     76B2   0A
-     76B3   0D
-     76B4   49 20 77 ...
-     76D8   0A
-     76D9   0D
-     76DA   64 69 73 ...
-     7701   0A
-     7702   0D
-     7703   0A
-     7704   0D
-     7705   35 34 33 ...
-     7715   0A
-     7716   0D
-     7717   00
+     76AA   0A
+     76AB   0D
+     76AC   49 20 77 ...
+     76D0   0A
+     76D1   0D
+     76D2   64 69 73 ...
+     76F9   0A
+     76FA   0D
+     76FB   0A
+     76FC   0D
+     76FD   35 34 33 ...
+     770D   0A
+     770E   0D
+     770F   00
 .pressBreak
-     7718   0A
-     7719   0D
-     771A   50 72 65 ...
-     773F   0A
-     7740   0D
-     7741   61 73 20 ...
-     7760   0A
-     7761   0D
-     7762   0A
-     7763   0D
-     7764   00
+     7710   0A
+     7711   0D
+     7712   0A
+     7713   0D
+     7714   50 72 65 ...
+     7739   0A
+     773A   0D
+     773B   61 73 20 ...
+     775A   0A
+     775B   0D
+     775C   0A
+     775D   0D
+     775E   00
 .pageIsOK
-     7765   0A
-     7766   0D
-     7767   0A
-     7768   0D
-     7769   59 6F 75 ...
-     778B   0A
-     778C   0D
-     778D   0A
-     778E   0D
-     778F   00
-S.FixPAGE &7400  &7790  &7400  &7400 
+     775F   0A
+     7760   0D
+     7761   0A
+     7762   0D
+     7763   59 6F 75 ...
+     7785   0A
+     7786   0D
+     7787   0A
+     7788   0D
+     7789   00
+S.FixPAGE &7400  &778A  &7400  &7400 
 Saving file '3-assembled-output/FixPAGE.bin'
