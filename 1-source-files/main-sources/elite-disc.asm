@@ -69,5 +69,6 @@ ELIF _STH_DISC OR _IB_DISC
 ENDIF
 
  PUTFILE "3-assembled-output/FixPAGE.bin", "FixPAGE", &007400, &007400
+ PUTFILE "3-assembled-output/Integra.bin", "Integra", &004000, &004000
 
  PUTFILE "3-assembled-output/README.txt", "README", &FFFFFF, &FFFFFF

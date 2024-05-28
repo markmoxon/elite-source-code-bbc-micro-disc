@@ -92678,3 +92678,26 @@ Saving file '3-assembled-output/README.txt'
      7789   00
 S.FixPAGE &7400  &778A  &7400  &7400 
 Saving file '3-assembled-output/FixPAGE.bin'
+.IntegraFix
+     4000   78         SEI
+     4001   AD B7 FF   LDA &FFB7
+     4004   85 70      STA &70
+     4006   AD B8 FF   LDA &FFB8
+     4009   85 71      STA &71
+     400B   A0 0A      LDY #&0A
+.prlp1
+     400D   B1 70      LDA (&70),Y
+     400F   99 00 02   STA &0200,Y
+     4012   C8         INY
+     4013   C0 12      CPY #&12
+     4015   D0 F6      BNE &400D
+     4017   A0 2A      LDY #&2A
+.prlp2
+     4019   B1 70      LDA (&70),Y
+     401B   99 00 02   STA &0200,Y
+     401E   C8         INY
+     401F   C0 30      CPY #&30
+     4021   D0 F6      BNE &4019
+     4023   58         CLI
+     4024   60         RTS
+Saving file '3-assembled-output/Integra.bin'
