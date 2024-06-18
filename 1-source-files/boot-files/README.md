@@ -2,7 +2,7 @@
 
 This folder contains the boot and menu files from the disc containing the sideways RAM variant of Elite on Ian Bell's personal website.
 
-* [$.!BOOT.bin]($.!BOOT.bin) is the boot file from the sideways RAM disc, updatef for the musical version
+* [$.!BOOT.bin]($.!BOOT.bin) is the boot file from the sideways RAM disc, updated for the musical version
 
 * [$.MENU.bin]($.MENU.bin) is the menu file from the sideways RAM disc
 
