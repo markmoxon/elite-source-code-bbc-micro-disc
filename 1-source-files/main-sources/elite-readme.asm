@@ -11,10 +11,10 @@
 \ in the documentation are entirely my fault
 \
 \ The terminology and notations used in this commentary are explained at
-\ https://www.bbcelite.com/terminology
+\ https://elite.bbcelite.com/terminology
 \
 \ The deep dive articles referred to in this commentary can be found at
-\ https://www.bbcelite.com/deep_dives
+\ https://elite.bbcelite.com/deep_dives
 \
 \ ------------------------------------------------------------------------------
 \
@@ -28,6 +28,7 @@
 
  _IB_DISC               = (_VARIANT = 1)
  _STH_DISC              = (_VARIANT = 2)
+ _SRAM_DISC             = (_VARIANT = 3)
 
 .readme
 
@@ -56,6 +57,11 @@ ELIF _STH_DISC
  EQUS "Product: Acornsoft SNG38"
  EQUB 10, 13
  EQUS "         Acornsoft SNG47"
+ EQUB 10, 13
+
+ELIF _SRAM_DISC
+
+ EQUS "Variant: BBC Micro Sideways RAM version"
  EQUB 10, 13
 
 ENDIF

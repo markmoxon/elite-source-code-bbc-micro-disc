@@ -44,6 +44,9 @@ for arg in argv[1:]:
     if arg == "-rel2":
         release = 2
         folder = "sth"
+    if arg == "-rel3":
+        print("Sideways RAM variant is not encrypted")
+        exit()
 
 # Configuration variables for D.CODE
 
