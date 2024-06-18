@@ -11,10 +11,10 @@
 \ in the documentation are entirely my fault
 \
 \ The terminology and notations used in this commentary are explained at
-\ https://www.bbcelite.com/terminology
+\ https://elite.bbcelite.com/terminology
 \
 \ The deep dive articles referred to in this commentary can be found at
-\ https://www.bbcelite.com/deep_dives
+\ https://elite.bbcelite.com/deep_dives
 \
 \ ------------------------------------------------------------------------------
 \
@@ -25361,11 +25361,13 @@ ENDIF
                         \     Fer-de-lance and Moray
                         \
                         \ It's hard to know what the authors' original intent
-                        \ was, but the Cobra Mk III (pirate) can already be
-                        \ spawned as part of a group of pirates (see mt1 below),
-                        \ so I suspect the first fix might be the correct one,
-                        \ as then there is no overlap between pirates and bounty
-                        \ hunters
+                        \ was, but the second approach makes the Moray and Cobra
+                        \ Mk III the rarest choices, with the Asp Mk II, Python
+                        \ and Fer-de-Lance being more likely, and as the Moray
+                        \ is described in the literature as a rare ship, and the
+                        \ Cobra can already be spawned as part of a group of
+                        \ pirates (see mt1 below), I tend to favour the LSR A
+                        \ solution over the SEC approach
 
  TAY                    \ Copy the new ship type to Y
 
