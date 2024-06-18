@@ -11,10 +11,10 @@
 \ in the documentation are entirely my fault
 \
 \ The terminology and notations used in this commentary are explained at
-\ https://www.bbcelite.com/terminology
+\ https://elite.bbcelite.com/terminology
 \
 \ The deep dive articles referred to in this commentary can be found at
-\ https://www.bbcelite.com/deep_dives
+\ https://elite.bbcelite.com/deep_dives
 \
 \ ------------------------------------------------------------------------------
 \
@@ -1883,7 +1883,7 @@
 \
 \       Name: K%
 \       Type: Workspace
-\    Address: &0900 to &0D3F
+\    Address: &0900 to &0CFF
 \   Category: Workspaces
 \    Summary: Ship data blocks and ship line heaps
 \  Deep dive: Ship data blocks
@@ -1915,7 +1915,7 @@
 \
 \       Name: WP
 \       Type: Workspace
-\    Address: &0E00 to &0E3B
+\    Address: &0E00 to &0FD2
 \   Category: Workspaces
 \    Summary: Variables
 \
@@ -2088,6 +2088,30 @@
 
  JSR OSCLI              \ Call OSCLI to run the OS command in LTLI, which *RUNs
                         \ the main docked code in T.CODE
+                        \
+                        \ Note that this is a JSR rather than a JMP, so if LTLI
+                        \ is still set to "L.T.CODE" (rather than "R.T.CODE"),
+                        \ then once the command has been run and the docked code
+                        \ has loaded, execution will continue from the next
+                        \ instruction
+                        \
+                        \ By this point the T.CODE binary has loaded over the
+                        \ top of this one, so we don't fall through into the
+                        \ LTLI variable (as that's in the flight code), but
+                        \ instead we fall through into the DOBEGIN routine in
+                        \ the docked code)
+                        \
+                        \ This means that if the LTLI command is unchanged, then
+                        \ we load the docked code and fall through into DOBEGIN
+                        \ to restart the game from the title screen, so by
+                        \ default, loading the docked code will restart the game
+                        \
+                        \ However if we call DOENTRY in the flight code first,
+                        \ then the command in LTLI is changed to the "R.T.CODE"
+                        \ version, which *RUNs the docked code and starts
+                        \ execution from the start of the docked binary at S%,
+                        \ which contains a JMP DOENTRY instruction that docks at
+                        \ the station instead
 
 \ ******************************************************************************
 \
@@ -2244,6 +2268,14 @@
 
  LDA #'R'               \ Modify the command in LTLI from "L.T.CODE" to
  STA LTLI               \ "R.T.CODE" so it *RUNs the code rather than loading it
+                        \
+                        \ This ensures that when we load the docked code, then
+                        \ instead of continuing execution following a *LOAD,
+                        \ which would restart the game by falling through into
+                        \ the DOBEGIN routine in the docked code, we instead
+                        \ jump to the start of the docked code at S%, which
+                        \ jumps to the docked DOENTRY routine to dock with the
+                        \ space station
 
                         \ Fall into DEATH2 to reset most variables and *RUN the
                         \ docked code
@@ -3837,8 +3869,8 @@
                         \ docking computer manoeuvring
 
  LDA auto               \ If auto is zero, then the docking computer is not
- BEQ MA23               \ activated, so jump to MA33 to skip the
-                        \ docking computer manoeuvring
+ BEQ MA23               \ activated, so jump to MA23 to skip to the next
+                        \ section
 
  LDA #123               \ Set A = 123 and jump down to MA34 to print token 123
  BNE MA34               \ ("DOCKING COMPUTERS ON") as an in-flight message
@@ -15022,8 +15054,8 @@ ENDIF
  JSR spc                \ 67 + A, followed by a space, so:
                         \
                         \   A = 0 prints token 67 ("LARGE") and a space
-                        \   A = 1 prints token 67 ("FIERCE") and a space
-                        \   A = 2 prints token 67 ("SMALL") and a space
+                        \   A = 1 prints token 68 ("FIERCE") and a space
+                        \   A = 2 prints token 69 ("SMALL") and a space
 
 .TT205
 
@@ -15077,14 +15109,14 @@ ENDIF
 
  ADC #242               \ A = 0 to 7, so print recursive token 82 + A, so:
  JSR TT27               \
-                        \   A = 0 prints token 76 ("RODENT")
-                        \   A = 1 prints token 76 ("FROG")
-                        \   A = 2 prints token 76 ("LIZARD")
-                        \   A = 3 prints token 76 ("LOBSTER")
-                        \   A = 4 prints token 76 ("BIRD")
-                        \   A = 5 prints token 76 ("HUMANOID")
-                        \   A = 6 prints token 76 ("FELINE")
-                        \   A = 7 prints token 76 ("INSECT")
+                        \   A = 0 prints token 82 ("RODENT")
+                        \   A = 1 prints token 83 ("FROG")
+                        \   A = 2 prints token 84 ("LIZARD")
+                        \   A = 3 prints token 85 ("LOBSTER")
+                        \   A = 4 prints token 86 ("BIRD")
+                        \   A = 5 prints token 87 ("HUMANOID")
+                        \   A = 6 prints token 88 ("FELINE")
+                        \   A = 7 prints token 89 ("INSECT")
 
 .TT76
 
@@ -16950,6 +16982,12 @@ ENDIF
 \ Arguments:
 \
 \   A                   The text token to be printed
+\
+\ ------------------------------------------------------------------------------
+\
+\ Other entry points:
+\
+\   prq+3               Print a question mark
 \
 \ ******************************************************************************
 
@@ -25158,6 +25196,37 @@ ENDIF
                         \ passed through the BCS above), so A is now one of the
                         \ lone bounty hunter ships, i.e. Cobra Mk III (pirate),
                         \ Asp Mk II, Python (pirate) or Fer-de-lance
+                        \
+                        \ Interestingly, this logic means that the Moray, which
+                        \ is the ship after the Fer-de-lance in the XX21 table,
+                        \ never spawns, as the above logic chooses a blueprint
+                        \ number in the range CYL2 to CYL2+3 (i.e. 24 to 27),
+                        \ and the Moray is blueprint 28
+                        \
+                        \ No other code spawns the ship with blueprint 28, so
+                        \ this means the Moray is never seen in Elite
+                        \
+                        \ This is presumably a bug, which could be very easily
+                        \ fixed by inserting one of the following instructions
+                        \ before the ADC #CYL2 instruction above:
+                        \
+                        \   * SEC would change the range to 25 to 28, which
+                        \     would cover the Asp Mk II, Python (pirate),
+                        \     Fer-de-lance and Moray
+                        \
+                        \   * LSR A would set the C flag to a random number to
+                        \     give a range of 24 to 28, which would cover the
+                        \     Cobra Mk III (pirate), Asp Mk II, Python (pirate),
+                        \     Fer-de-lance and Moray
+                        \
+                        \ It's hard to know what the authors' original intent
+                        \ was, but the second approach makes the Moray and Cobra
+                        \ Mk III the rarest choices, with the Asp Mk II, Python
+                        \ and Fer-de-Lance being more likely, and as the Moray
+                        \ is described in the literature as a rare ship, and the
+                        \ Cobra can already be spawned as part of a group of
+                        \ pirates (see mt1 below), I tend to favour the LSR A
+                        \ solution over the SEC approach
 
  TAY                    \ Copy the new ship type to Y
 

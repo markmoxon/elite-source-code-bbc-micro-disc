@@ -11,10 +11,10 @@
 \ in the documentation are entirely my fault
 \
 \ The terminology and notations used in this commentary are explained at
-\ https://www.bbcelite.com/terminology
+\ https://elite.bbcelite.com/terminology
 \
 \ The deep dive articles referred to in this commentary can be found at
-\ https://www.bbcelite.com/deep_dives
+\ https://elite.bbcelite.com/deep_dives
 \
 \ ------------------------------------------------------------------------------
 \
@@ -963,10 +963,24 @@ ENDIF
                         \ address is modified by the code above that adds PROT1
                         \ to the address)
 
- EQUB 23, 0, 10, 32     \ Set 6845 register R10 = 32
+ EQUB 23, 0, 10, 32     \ Set 6845 register R10 = %00100000 = 32
  EQUB 0, 0, 0           \
- EQUB 0, 0, 0           \ This is the "cursor start" register, which sets the
-                        \ cursor start line at 0, so it turns the cursor off
+ EQUB 0, 0, 0           \ This is the "cursor start" register, and bits 5 and 6
+                        \ define the "cursor display mode", as follows:
+                        \
+                        \   * %00 = steady, non-blinking cursor
+                        \
+                        \   * %01 = do not display a cursor
+                        \
+                        \   * %10 = fast blinking cursor (blink at 1/16 of the
+                        \           field rate)
+                        \
+                        \   * %11 = slow blinking cursor (blink at 1/32 of the
+                        \           field rate)
+                        \
+                        \ We can therefore turn off the cursor completely by
+                        \ setting cursor display mode %01, with bit 6 of R10
+                        \ clear and bit 5 of R10 set
 
  NOP                    \ Marks the end of the VDU block
 

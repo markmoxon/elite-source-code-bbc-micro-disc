@@ -4,6 +4,8 @@
 \
 \ Elite was written by Ian Bell and David Braben and is copyright Acornsoft 1984
 \
+\ The sideways RAM menu and loader were written by Stuart McConnachie in 1988-9
+\
 \ The code on this site has been reconstructed from a disassembly of the version
 \ released on Ian Bell's personal website at http://www.elitehomepage.org/
 \
@@ -11,10 +13,10 @@
 \ in the documentation are entirely my fault
 \
 \ The terminology and notations used in this commentary are explained at
-\ https://www.bbcelite.com/terminology
+\ https://elite.bbcelite.com/terminology
 \
 \ The deep dive articles referred to in this commentary can be found at
-\ https://www.bbcelite.com/deep_dives
+\ https://elite.bbcelite.com/deep_dives
 \
 \ ------------------------------------------------------------------------------
 \
@@ -272,6 +274,12 @@
 \   Category: Loader
 \    Summary: Copy a pre-generated ship blueprints ROM image from address &3400
 \             into sideways RAM
+\
+\ ------------------------------------------------------------------------------
+\
+\ Arguments:
+\
+\   X                   The bank number of sideways RAM to use for Elite
 \
 \ ******************************************************************************
 
@@ -1005,8 +1013,8 @@
  CMP &8000,Y            \ If the character from bank X does not match the same
  BNE tbbc4              \ character from the copyright message in copyMatch,
                         \ then bank X is not a valid ROM, so jump to tbbc4 to
-                        \ the top four bits of the first byte in ROM bank X and
-                        \ move on to the next test
+                        \ set the top four bits of the first byte in ROM bank X
+                        \ and move on to the next test
 
  INY                    \ Increment the character pointer into the copyright
                         \ message in bank X
@@ -1251,6 +1259,7 @@
 
  EQUS "D.MOA"
  EQUB 13
+
 \ ******************************************************************************
 \
 \       Name: eliteRomHeader
@@ -1524,5 +1533,5 @@
 \
 \ ******************************************************************************
 
- PRINT "T.MNUCODE ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
+ PRINT "S.MNUCODE ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
  SAVE "3-assembled-output/MNUCODE.bin", CODE%, P%, LOAD%
