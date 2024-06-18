@@ -5409,6 +5409,469 @@ TVT1 = &1100
 NA% = &1181 
 CHK2 = &11D3 
 .ZP
+     0070
+.P
+     0072
+.R
+     0074
+.S
+     0075
+.T
+     0076
+.U
+     0077
+.V
+     0078
+.sram%
+     7400
+.used%
+     7410
+.dupl%
+     7420
+.eliterom%
+     7430   FF
+.proflag%
+     7431
+.testbbc%
+     7432   4C 30 76   JMP &7630
+.testpro%
+     7435   4C C9 76   JMP &76C9
+.loadrom%
+     7438   4C 3E 74   JMP &743E
+.makerom%
+     743B   4C 75 74   JMP &7475
+.LoadRom
+     743E   A5 F4      LDA &F4
+     7440   48         PHA
+     7441   86 F4      STX &F4
+     7443   8E 30 FE   STX &FE30
+     7446   A9 34      LDA #&34
+     7448   8D 56 74   STA &7456
+     744B   A9 80      LDA #&80
+     744D   8D 59 74   STA &7459
+     7450   A0 00      LDY #&00
+     7452   A2 40      LDX #&40
+.lrom1
+     7454   B9 00 34   LDA &3400,Y
+.lrom2
+     7457   99 00 80   STA &8000,Y
+     745A   C8         INY
+     745B   D0 F7      BNE &7454
+     745D   EE 56 74   INC &7456
+     7460   EE 59 74   INC &7459
+     7463   CA         DEX
+     7464   D0 EE      BNE &7454
+     7466   A6 F4      LDX &F4
+     7468   AD 06 80   LDA &8006
+     746B   9D A1 02   STA &02A1,X
+     746E   68         PLA
+     746F   85 F4      STA &F4
+     7471   8D 30 FE   STA &FE30
+     7474   60         RTS
+.MakeRom
+     7475   A5 F4      LDA &F4
+     7477   48         PHA
+     7478   86 F4      STX &F4
+     747A   8E 30 FE   STX &FE30
+     747D   A0 00      LDY #&00
+.mrom1
+     747F   B9 F6 76   LDA &76F6,Y
+     7482   99 00 80   STA &8000,Y
+     7485   A9 00      LDA #&00
+     7487   99 00 81   STA &8100,Y
+     748A   C8         INY
+     748B   D0 F2      BNE &747F
+     748D   A9 00      LDA #&00
+     748F   85 70      STA &70
+     7491   A9 82      LDA #&82
+     7493   85 71      STA &71
+     7495   20 CA 74   JSR &74CA
+     7498   AD BA 0D   LDA &0DBA
+     749B   8D E7 0D   STA &0DE7
+     749E   AD BB 0D   LDA &0DBB
+     74A1   8D E8 0D   STA &0DE8
+     74A4   AD BC 0D   LDA &0DBC
+     74A7   8D E9 0D   STA &0DE9
+     74AA   A9 22      LDA #&22
+     74AC   8D BA 0D   STA &0DBA
+     74AF   A9 80      LDA #&80
+     74B1   8D BB 0D   STA &0DBB
+     74B4   A5 F4      LDA &F4
+     74B6   8D BC 0D   STA &0DBC
+     74B9   A9 48      LDA #&48
+     74BB   8D 30 02   STA &0230
+     74BE   A9 FF      LDA #&FF
+     74C0   8D 31 02   STA &0231
+     74C3   68         PLA
+     74C4   85 F4      STA &F4
+     74C6   8D 30 FE   STA &FE30
+     74C9   60         RTS
+.LoadShipFiles
+     74CA   A9 41      LDA #&41
+     74CC   8D F4 76   STA &76F4
+.ship1
+     74CF   A9 2E      LDA #&2E
+     74D1   20 EE FF   JSR &FFEE
+     74D4   A9 00      LDA #&00
+     74D6   8D E0 76   STA &76E0
+     74D9   A9 56      LDA #&56
+     74DB   8D E1 76   STA &76E1
+     74DE   A9 FF      LDA #&FF
+     74E0   8D E2 76   STA &76E2
+     74E3   8D E3 76   STA &76E3
+     74E6   A9 00      LDA #&00
+     74E8   8D E4 76   STA &76E4
+     74EB   A2 DE      LDX #&DE
+     74ED   A0 76      LDY #&76
+     74EF   A9 FF      LDA #&FF
+     74F1   20 DD FF   JSR &FFDD
+     74F4   A2 00      LDX #&00
+.ship2
+     74F6   8A         TXA
+     74F7   48         PHA
+     74F8   20 24 75   JSR &7524
+     74FB   68         PLA
+     74FC   AA         TAX
+     74FD   E8         INX
+     74FE   E0 1F      CPX #&1F
+     7500   D0 F4      BNE &74F6
+     7502   EE F4 76   INC &76F4
+     7505   AD F4 76   LDA &76F4
+     7508   C9 51      CMP #&51
+     750A   D0 C3      BNE &74CF
+     750C   60         RTS
+.proc1
+     750D   99 01 81   STA &8101,Y
+     7510   A5 72      LDA &72
+     7512   99 00 81   STA &8100,Y
+.proc2
+     7515   60         RTS
+.proc3
+     7516   B9 00 81   LDA &8100,Y
+     7519   8D 7B 80   STA &807B
+     751C   B9 01 81   LDA &8101,Y
+     751F   8D 7C 80   STA &807C
+     7522   D0 18      BNE &753C
+.ProcessBlueprint
+     7524   8A         TXA
+     7525   0A         ASL A
+     7526   A8         TAY
+     7527   B9 01 56   LDA &5601,Y
+     752A   F0 E9      BEQ &7515
+     752C   E0 01      CPX #&01
+     752E   D0 07      BNE &7537
+     7530   AD F4 76   LDA &76F4
+     7533   C9 42      CMP #&42
+     7535   F0 DF      BEQ &7516
+.proc4
+     7537   B9 01 81   LDA &8101,Y
+     753A   D0 D9      BNE &7515
+.proc5
+     753C   A5 70      LDA &70
+     753E   99 00 81   STA &8100,Y
+     7541   A5 71      LDA &71
+     7543   99 01 81   STA &8101,Y
+     7546   BD 3E 56   LDA &563E,X
+     7549   9D 3E 81   STA &813E,X
+     754C   B9 00 56   LDA &5600,Y
+     754F   85 72      STA &72
+     7551   B9 01 56   LDA &5601,Y
+     7554   85 73      STA &73
+     7556   C9 56      CMP #&56
+     7558   90 B3      BCC &750D
+     755A   C9 60      CMP #&60
+     755C   B0 AF      BCS &750D
+     755E   20 B1 75   JSR &75B1
+     7561   A9 00      LDA #&00
+     7563   85 74      STA &74
+     7565   A8         TAY
+     7566   A9 60      LDA #&60
+     7568   85 75      STA &75
+.proc6
+     756A   A5 72      LDA &72
+     756C   D9 00 56   CMP &5600,Y
+     756F   A5 73      LDA &73
+     7571   F9 01 56   SBC &5601,Y
+     7574   B0 16      BCS &758C
+     7576   B9 00 56   LDA &5600,Y
+     7579   C5 74      CMP &74
+     757B   B9 01 56   LDA &5601,Y
+     757E   E5 75      SBC &75
+     7580   B0 0A      BCS &758C
+     7582   B9 00 56   LDA &5600,Y
+     7585   85 74      STA &74
+     7587   B9 01 56   LDA &5601,Y
+     758A   85 75      STA &75
+.proc7
+     758C   C8         INY
+     758D   C8         INY
+     758E   C0 3E      CPY #&3E
+     7590   D0 D8      BNE &756A
+     7592   A0 00      LDY #&00
+.proc8
+     7594   B1 72      LDA (&72),Y
+     7596   91 70      STA (&70),Y
+     7598   E6 72      INC &72
+     759A   D0 02      BNE &759E
+     759C   E6 73      INC &73
+.proc9
+     759E   E6 70      INC &70
+     75A0   D0 02      BNE &75A4
+     75A2   E6 71      INC &71
+.proc10
+     75A4   A5 72      LDA &72
+     75A6   C5 74      CMP &74
+     75A8   D0 EA      BNE &7594
+     75AA   A5 73      LDA &73
+     75AC   C5 75      CMP &75
+     75AE   D0 E4      BNE &7594
+     75B0   60         RTS
+.SetEdgesOffset
+     75B1   98         TYA
+     75B2   48         PHA
+     75B3   8A         TXA
+     75B4   48         PHA
+     75B5   18         CLC
+     75B6   A0 03      LDY #&03
+     75B8   B1 72      LDA (&72),Y
+     75BA   65 72      ADC &72
+     75BC   85 76      STA &76
+     75BE   A0 10      LDY #&10
+     75C0   B1 72      LDA (&72),Y
+     75C2   65 73      ADC &73
+     75C4   85 77      STA &77
+     75C6   A0 00      LDY #&00
+     75C8   A2 00      LDX #&00
+     75CA   A9 00      LDA #&00
+     75CC   85 78      STA &78
+     75CE   A9 56      LDA #&56
+     75D0   85 79      STA &79
+.edge1
+     75D2   B9 00 56   LDA &5600,Y
+     75D5   C5 76      CMP &76
+     75D7   B9 01 56   LDA &5601,Y
+     75DA   E5 77      SBC &77
+     75DC   B0 18      BCS &75F6
+.edge2
+     75DE   B9 00 56   LDA &5600,Y
+     75E1   C5 78      CMP &78
+     75E3   B9 01 56   LDA &5601,Y
+     75E6   E5 79      SBC &79
+     75E8   90 0C      BCC &75F6
+     75EA   B9 00 56   LDA &5600,Y
+     75ED   85 78      STA &78
+     75EF   B9 01 56   LDA &5601,Y
+     75F2   85 79      STA &79
+     75F4   98         TYA
+     75F5   AA         TAX
+.edge3
+     75F6   C8         INY
+     75F7   C8         INY
+     75F8   C0 3E      CPY #&3E
+     75FA   D0 D6      BNE &75D2
+     75FC   38         SEC
+     75FD   A5 76      LDA &76
+     75FF   FD 00 56   SBC &5600,X
+     7602   85 76      STA &76
+     7604   A5 77      LDA &77
+     7606   FD 01 56   SBC &5601,X
+     7609   85 77      STA &77
+     760B   18         CLC
+     760C   BD 00 81   LDA &8100,X
+     760F   65 76      ADC &76
+     7611   85 76      STA &76
+     7613   BD 01 81   LDA &8101,X
+     7616   65 77      ADC &77
+     7618   85 77      STA &77
+     761A   38         SEC
+     761B   A5 76      LDA &76
+     761D   E5 70      SBC &70
+     761F   A0 03      LDY #&03
+     7621   91 72      STA (&72),Y
+     7623   A5 77      LDA &77
+     7625   E5 71      SBC &71
+     7627   A0 10      LDY #&10
+     7629   91 72      STA (&72),Y
+     762B   68         PLA
+     762C   AA         TAX
+     762D   68         PLA
+     762E   A8         TAY
+     762F   60         RTS
+.TestBBC
+     7630   A5 F4      LDA &F4
+     7632   48         PHA
+     7633   A2 0F      LDX #&0F
+.tbbc1
+     7635   86 F4      STX &F4
+     7637   8E 30 FE   STX &FE30
+     763A   AD 06 80   LDA &8006
+     763D   48         PHA
+     763E   49 01      EOR #&01
+     7640   8D 06 80   STA &8006
+     7643   CD 06 80   CMP &8006
+     7646   D0 03      BNE &764B
+     7648   DE 00 74   DEC &7400,X
+.tbbc2
+     764B   68         PLA
+     764C   8D 06 80   STA &8006
+     764F   AC 07 80   LDY &8007
+     7652   A2 FC      LDX #&FC
+.tbbc3
+     7654   BD DE 75   LDA &75DE,X
+     7657   D9 00 80   CMP &8000,Y
+     765A   D0 0C      BNE &7668
+     765C   C8         INY
+     765D   E8         INX
+     765E   D0 F4      BNE &7654
+     7660   A6 F4      LDX &F4
+     7662   DE 10 74   DEC &7410,X
+     7665   4C 70 76   JMP &7670
+.tbbc4
+     7668   A6 F4      LDX &F4
+     766A   8A         TXA
+     766B   09 F0      ORA #&F0
+     766D   8D 00 80   STA &8000
+.tbbc5
+     7670   2C 30 74   BIT &7430
+     7673   10 10      BPL &7685
+     7675   A0 F2      LDY #&F2
+.tbbc6
+     7677   B9 DE 75   LDA &75DE,Y
+     767A   D9 17 7F   CMP &7F17,Y
+     767D   D0 06      BNE &7685
+     767F   C8         INY
+     7680   D0 F5      BNE &7677
+     7682   8E 30 74   STX &7430
+.tbbc7
+     7685   8A         TXA
+     7686   A0 10      LDY #&10
+.tbbc8
+     7688   86 F4      STX &F4
+     768A   8E 30 FE   STX &FE30
+     768D   88         DEY
+     768E   98         TYA
+     768F   C5 F4      CMP &F4
+     7691   F0 25      BEQ &76B8
+     7693   98         TYA
+     7694   49 FF      EOR #&FF
+     7696   85 F6      STA &F6
+     7698   A9 7F      LDA #&7F
+     769A   85 F7      STA &F7
+.tbbc9
+     769C   86 F4      STX &F4
+     769E   8E 30 FE   STX &FE30
+     76A1   B1 F6      LDA (&F6),Y
+     76A3   84 F4      STY &F4
+     76A5   8C 30 FE   STY &FE30
+     76A8   D1 F6      CMP (&F6),Y
+     76AA   D0 DC      BNE &7688
+     76AC   E6 F6      INC &F6
+     76AE   D0 EC      BNE &769C
+     76B0   E6 F7      INC &F7
+     76B2   A5 F7      LDA &F7
+     76B4   C9 84      CMP #&84
+     76B6   D0 E4      BNE &769C
+.tbbc10
+     76B8   98         TYA
+     76B9   9D 20 74   STA &7420,X
+     76BC   CA         DEX
+     76BD   30 03      BMI &76C2
+     76BF   4C 35 76   JMP &7635
+.tbbc11
+     76C2   68         PLA
+     76C3   85 F4      STA &F4
+     76C5   8D 30 FE   STA &FE30
+     76C8   60         RTS
+.TestPro
+     76C9   A9 00      LDA #&00
+     76CB   3A         DEC A
+     76CC   8D 31 74   STA &7431
+     76CF   60         RTS
+.titleMatch
+     76D0   53 52 41 ...
+.copyMatch
+     76DA   00
+     76DB   28 43 29 
+.osfileBlock
+     76DE   F0 76
+     76E0   00 56 FF FF
+     76E4   00 00 00 00
+     76E8   00 00 00 00
+     76EC   00 00 00 00
+.shipFilename
+     76F0   44 2E 4D ...
+     76F5   0D
+.eliteRomHeader
+.ROM
+     8000   4C 21 80   JMP &8021
+     8003   4C 21 80   JMP &8021
+     8006   81
+     8007   13
+     8008   00
+.romTitle
+     8009   53 52 41 ...
+.romCopy
+     8013   00
+     8014   28 43 29 ...
+     8020   00
+.srom1
+     8021   60         RTS
+.FileHandler
+     8022   48         PHA
+     8023   86 F0      STX &F0
+     8025   84 F1      STY &F1
+     8027   A0 00      LDY #&00
+     8029   B1 F0      LDA (&F0),Y
+     802B   85 F2      STA &F2
+     802D   C8         INY
+     802E   B1 F0      LDA (&F0),Y
+     8030   85 F3      STA &F3
+     8032   A0 05      LDY #&05
+.file1
+     8034   B9 75 80   LDA &8075,Y
+     8037   F0 04      BEQ &803D
+     8039   D1 F2      CMP (&F2),Y
+     803B   D0 30      BNE &806D
+.file2
+     803D   88         DEY
+     803E   10 F4      BPL &8034
+     8040   C8         INY
+.file3
+     8041   B9 00 81   LDA &8100,Y
+     8044   99 00 56   STA &5600,Y
+     8047   C8         INY
+     8048   D0 F7      BNE &8041
+     804A   A0 04      LDY #&04
+     804C   B1 F2      LDA (&F2),Y
+     804E   29 01      AND #&01
+     8050   F0 0C      BEQ &805E
+     8052   AD 7B 80   LDA &807B
+     8055   8D 02 56   STA &5602
+     8058   AD 7C 80   LDA &807C
+     805B   8D 03 56   STA &5603
+.file4
+     805E   BA         TSX
+     805F   A5 F4      LDA &F4
+     8061   9D 04 01   STA &0104,X
+     8064   8D 8C 02   STA &028C
+     8067   A6 F0      LDX &F0
+     8069   A4 F1      LDY &F1
+     806B   68         PLA
+     806C   60         RTS
+.file5
+     806D   A6 F0      LDX &F0
+     806F   A4 F1      LDY &F1
+     8071   68         PLA
+     8072   6C 30 02   JMP (&0230)
+.filenamePattern
+     8075   44 2E 4D ...
+     8079   00
+     807A   0D
+.coriolisStation
+     807B
+S.MNUCODE &7400  &7773  &7400  &7400 
+Saving file '3-assembled-output/MNUCODE.bin'
+.ZP
      0000
 .RAND
      0000

@@ -11,10 +11,10 @@
 \ in the documentation are entirely my fault
 \
 \ The terminology and notations used in this commentary are explained at
-\ https://www.bbcelite.com/terminology
+\ https://elite.bbcelite.com/terminology
 \
 \ The deep dive articles referred to in this commentary can be found at
-\ https://www.bbcelite.com/deep_dives
+\ https://elite.bbcelite.com/deep_dives
 \
 \ ------------------------------------------------------------------------------
 \
@@ -28,6 +28,7 @@
 
  _IB_DISC               = (_VARIANT = 1)
  _STH_DISC              = (_VARIANT = 2)
+ _SRAM_DISC             = (_VARIANT = 3)
 
  GUARD &6000            \ Guard against assembling over screen memory
 
@@ -100,6 +101,18 @@
 \    Summary: Important variables used by the loader
 \
 \ ******************************************************************************
+
+IF _SRAM_DISC
+
+ ORG &0004
+
+.TRTB%
+
+ SKIP 2                 \ Contains the address of the keyboard translation
+                        \ table, which is used to translate internal key
+                        \ numbers to ASCII
+
+ENDIF
 
  ORG &0070
 
@@ -258,11 +271,24 @@
                         \ is 49 for modes 4 and 5, but needs to be adjusted for
                         \ our custom screen's width
 
- EQUB 23, 0, 10, 32     \ Set 6845 register R10 = 32
+ EQUB 23, 0, 10, 32     \ Set 6845 register R10 = %00100000 = 32
  EQUB 0, 0, 0           \
- EQUB 0, 0, 0           \ This is the "cursor start" register, so this sets the
-                        \ cursor start line at 0, effectively disabling the
-                        \ cursor
+ EQUB 0, 0, 0           \ This is the "cursor start" register, and bits 5 and 6
+                        \ define the "cursor display mode", as follows:
+                        \
+                        \   * %00 = steady, non-blinking cursor
+                        \
+                        \   * %01 = do not display a cursor
+                        \
+                        \   * %10 = fast blinking cursor (blink at 1/16 of the
+                        \           field rate)
+                        \
+                        \   * %11 = slow blinking cursor (blink at 1/32 of the
+                        \           field rate)
+                        \
+                        \ We can therefore turn off the cursor completely by
+                        \ setting cursor display mode %01, with bit 6 of R10
+                        \ clear and bit 5 of R10 set
 
 \ ******************************************************************************
 \
@@ -339,7 +365,16 @@ ENDMACRO
 
 .ENTRY
 
+IF _STH_DISC OR _IB_DISC
+
  JSR PROT1              \ Call PROT1 to calculate checksums into CHKSM
+
+ELIF _SRAM_DISC
+
+ JSR PROT4              \ Fetch the address of the keyboard translation table
+                        \ before calling PROT1 to calculate checksums into CHKSM
+
+ENDIF
 
  LDA #144               \ Call OSBYTE with A = 144, X = 255 and Y = 0 to move
  LDX #255               \ the screen down one line and turn screen interlace on
@@ -383,9 +418,28 @@ ENDMACRO
  LDX #8                 \ ADC conversion type to 8 bits, for the joystick
  JSR OSB
 
+IF _STH_DISC OR _IB_DISC
+
  LDA #200               \ Call OSBYTE with A = 200, X = 0 and Y = 0 to enable
  LDX #0                 \ the ESCAPE key and disable memory clearing if the
  JSR OSB                \ BREAK key is pressed
+
+ELIF _SRAM_DISC
+
+ LDA #219               \ Store 219 in location &9F. This gets checked by the
+ STA &9F                \ TITLE routine in the main docked code as part of the
+                        \ copy protection (the game hangs if it doesn't match)
+                        \
+                        \ This is normally done in the OSBmod routine, but the
+                        \ sideways RAM variant doesn't call OSBmod as that part
+                        \ of the copy protection is disabled, so we set the
+                        \ value of location &BF here instead
+
+ NOP                    \ Pad out the code so it takes up the same amount of
+ NOP                    \ space as in the original version
+ NOP
+
+ENDIF
 
  LDA #13                \ Call OSBYTE with A = 13, X = 0 and Y = 0 to disable
  LDX #0                 \ the "output buffer empty" event
@@ -403,9 +457,19 @@ ENDMACRO
 
 .OSBjsr
 
+IF _STH_DISC OR _IB_DISC
+
  JSR OSB                \ This JSR gets modified by code inserted into PLL1 so
                         \ that it points to OSBmod instead of OSB, so this
                         \ actually calls OSBmod to calculate some checksums
+
+ELIF _SRAM_DISC
+
+ NOP                    \ The sideways RAM variant has this part of the copy
+ NOP                    \ protection disabled, so pad out the code so it takes
+ NOP                    \ up the same amount of space as in the original version
+
+ENDIF
 
  LDA #13                \ Call OSBYTE with A = 13, X = 2 and Y = 0 to disable
  LDX #2                 \ the "character entering buffer" event
@@ -585,7 +649,15 @@ ENDMACRO
 
  LDA (P),Y              \ Fetch the Y-th byte of the P(1 0) memory block
 
+IF _STH_DISC OR _IB_DISC
+
  EOR #&18               \ Decrypt it by EOR'ing with &18
+
+ELIF _SRAM_DISC
+
+ EOR CHKSM              \ Decrypt it by EOR'ing with the checksum value
+
+ENDIF
 
  STA (ZP),Y             \ Store the decrypted result in the Y-th byte of the
                         \ ZP(1 0) memory block
@@ -724,8 +796,17 @@ IF _REMOVE_CHECKSUMS
 
 ELSE
 
+IF _STH_DISC OR _IB_DISC
+
  BNE P%                 \ If the checksums don't match then enter an infinite
                         \ loop, which hangs the computer
+
+ELIF _SRAM_DISC
+
+ NOP                    \ The sideways RAM variant ignores the result of the
+ NOP                    \ checksum comparison
+
+ENDIF
 
 ENDIF
 
@@ -1809,9 +1890,19 @@ ENDIF
  BNE osb1               \ Loop back to add the next byte until we have added the
                         \ whole page
 
+IF _STH_DISC OR _IB_DISC
+
  CMP #&CF               \ The checksum test has been disabled
  NOP
  NOP
+
+ELIF _SRAM_DISC
+
+ CMP #&CF               \ The sideways RAM variant never calls OSBmod, so it
+ BNE OSBmod             \ still contains the original checksum test that hasn't
+                        \ been disabled
+
+ENDIF
 
  LDA #219               \ Store 219 in location &9F. This gets checked by the
  STA &9F                \ TITLE routine in the main docked code as part of the
@@ -2391,7 +2482,7 @@ ENDIF
 
 \IF _MATCH_ORIGINAL_BINARIES
 \
-\ IF _STH_DISC
+\IF _STH_DISC
 \
 \  EQUB &F0, &00, &00, &00, &00, &00, &00, &00  \ These bytes appear to be
 \  EQUB &F0, &00, &00, &00, &00, &00, &00, &00  \ unused and just contain random
@@ -2414,15 +2505,40 @@ ENDIF
 \  EQUB &F0, &00, &00, &00, &00, &00, &00, &00
 \  EQUB &F0, &00, &00, &00, &00, &00
 \
-\ ELIF _IB_DISC
+\ELIF _SRAM_DISC
 \
-\  SKIP 158             \ These bytes appear to be unused
+\ EQUB &F0, &00, &00, &00, &00, &00, &00, &00   \ These bytes appear to be
+\ EQUB &F0, &00, &00, &00, &00, &00, &00, &00   \ unused and just contain random
+\ EQUB &F0, &00, &00, &00, &00, &00, &00, &00   \ workspace noise left over from
+\ EQUB &F0, &80, &80, &80, &80, &C0, &A4, &96   \ the BBC Micro assembly process
+\ EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\ EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\ EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\ EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\ EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\ EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\ EQUB &F0, &00, &33, &22, &33, &22, &33, &00
+\ EQUB &F0, &00, &AA, &22, &22, &22, &BB, &00
+\ EQUB &F0, &00, &22, &22, &22, &22, &AA, &00
+\ EQUB &F0, &00, &EE, &44, &44, &44, &44, &00
+\ EQUB &F0, &00, &EE, &88, &CC, &88, &EE, &00
+\ EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\ EQUB &F0, &00, &00, &00, &00, &00, &00, &00
+\ EQUB &F0, &00, &00, &00, &00, &00
 \
-\ ENDIF
+\ENDIF
 \
 \ELSE
 \
-\  SKIP 158             \ These bytes appear to be unused
+\IF _STH_DISC OR _IB_DISC
+\
+\SKIP 158               \ These bytes appear to be unused
+\
+\ELIF _SRAM_DISC
+\
+\SKIP 142               \ These bytes appear to be unused
+\
+\ENDIF
 \
 \ENDIF
 
