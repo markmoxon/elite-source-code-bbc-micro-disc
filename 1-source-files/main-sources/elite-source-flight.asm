@@ -2319,6 +2319,8 @@ ORG &00D1
 
 .DEEOR
 
+IF _STH_DISC OR _IB_DISC
+
                         \ --- Mod: Code removed for music: -------------------->
 
 \LDY #0                 \ We're going to work our way through a large number of
