@@ -11,10 +11,10 @@
 \ in the documentation are entirely my fault
 \
 \ The terminology and notations used in this commentary are explained at
-\ https://www.bbcelite.com/terminology
+\ https://elite.bbcelite.com/terminology
 \
 \ The deep dive articles referred to in this commentary can be found at
-\ https://www.bbcelite.com/deep_dives
+\ https://elite.bbcelite.com/deep_dives
 \
 \ ------------------------------------------------------------------------------
 \
@@ -28,6 +28,7 @@
 
  _IB_DISC               = (_VARIANT = 1)
  _STH_DISC              = (_VARIANT = 2)
+ _SRAM_DISC             = (_VARIANT = 3)
 
  GUARD &6000            \ Guard against assembling over screen memory
 
@@ -1984,7 +1985,7 @@ ORG &00D1
 \
 \       Name: K%
 \       Type: Workspace
-\    Address: &0900 to &0D3F
+\    Address: &0900 to &0CFF
 \   Category: Workspaces
 \    Summary: Ship data blocks and ship line heaps
 \  Deep dive: Ship data blocks
@@ -2016,7 +2017,7 @@ ORG &00D1
 \
 \       Name: WP
 \       Type: Workspace
-\    Address: &0E00 to &0E3B
+\    Address: &0E00 to &0FD2
 \   Category: Workspaces
 \    Summary: Variables
 \
@@ -2298,10 +2299,21 @@ ORG &00D1
 
 .INBAY
 
- LDX #0                 \ This code is never run, and seems to have no effect
- LDY #0
- JSR &8888
- JMP SCRAM
+ LDX #0                 \ This code is never run, but it takes up the same
+ LDY #0                 \ number of bytes as the INBAY routine in the flight
+ JSR &8888              \ code, so if the flight code *LOADs the docked code in
+ JMP SCRAM              \ its own version of the INBAY routine, then execution
+                        \ will fall through into the DOBEGIN routine below once
+                        \ the docked binary has loaded
+                        \
+                        \ This enables the docked code to choose whether to load
+                        \ the docked code and jump to DOBEGIN to restart the
+                        \ game (in which case the flight code simply *LOADs the
+                        \ docked code), or whether to dock with the space
+                        \ station and continue the game (in which case the
+                        \ flight code *RUNs the docked code, which has an
+                        \ execution address of S% at the start of the docked
+                        \ code, which contains a JMP DOENTRY instruction)
 
 \ ******************************************************************************
 \
@@ -2331,6 +2343,8 @@ ORG &00D1
 \ ******************************************************************************
 
 .DEEOR
+
+IF _STH_DISC OR _IB_DISC
 
  LDY #0                 \ We're going to work our way through a large number of
                         \ encrypted bytes, so we set Y to 0 to be the index of
@@ -2374,6 +2388,37 @@ ORG &00D1
 
  JMP BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
                         \ and return from the subroutine using a tail call
+
+ELIF _SRAM_DISC
+
+ NOP                    \ The sideways RAM variant is not encrypted, so the
+ NOP                    \ decryption code is disabled and is replaced by NOPs
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+ NOP
+
+ JMP BRKBK              \ Call BRKBK to set BRKV to point to the BRBR routine
+                        \ and return from the subroutine using a tail call
+
+ENDIF
 
 \ ******************************************************************************
 \
@@ -13391,8 +13436,8 @@ ORG &00D1
  JSR spc                \ 67 + A, followed by a space, so:
                         \
                         \   A = 0 prints token 67 ("LARGE") and a space
-                        \   A = 1 prints token 67 ("FIERCE") and a space
-                        \   A = 2 prints token 67 ("SMALL") and a space
+                        \   A = 1 prints token 68 ("FIERCE") and a space
+                        \   A = 2 prints token 69 ("SMALL") and a space
 
 .TT205
 
@@ -13446,14 +13491,14 @@ ORG &00D1
 
  ADC #242               \ A = 0 to 7, so print recursive token 82 + A, so:
  JSR TT27               \
-                        \   A = 0 prints token 76 ("RODENT")
-                        \   A = 1 prints token 76 ("FROG")
-                        \   A = 2 prints token 76 ("LIZARD")
-                        \   A = 3 prints token 76 ("LOBSTER")
-                        \   A = 4 prints token 76 ("BIRD")
-                        \   A = 5 prints token 76 ("HUMANOID")
-                        \   A = 6 prints token 76 ("FELINE")
-                        \   A = 7 prints token 76 ("INSECT")
+                        \   A = 0 prints token 82 ("RODENT")
+                        \   A = 1 prints token 83 ("FROG")
+                        \   A = 2 prints token 84 ("LIZARD")
+                        \   A = 3 prints token 85 ("LOBSTER")
+                        \   A = 4 prints token 86 ("BIRD")
+                        \   A = 5 prints token 87 ("HUMANOID")
+                        \   A = 6 prints token 88 ("FELINE")
+                        \   A = 7 prints token 89 ("INSECT")
 
 .TT76
 
@@ -14274,9 +14319,10 @@ ORG &00D1
  SEC                    \ Subtract ASCII "0" from the key pressed, to leave the
  SBC #'0'               \ numeric value of the key in A (if it was a number key)
 
- BCC OUT                \ If A < 0, jump to OUT to return from the subroutine
-                        \ with a result of 0, as the key pressed was not a
-                        \ number or letter and is less than ASCII "0"
+ BCC OUT                \ If A < 0, jump to OUT to load the current number and
+                        \ return from the subroutine, as the key pressed was
+                        \ RETURN (or some other ncharacter with a value less
+                        \ than ASCII "0")
 
  CMP #10                \ If A >= 10, jump to BAY2 to display the Inventory
  BCS BAY2               \ screen, as the key pressed was a letter or other
@@ -15882,6 +15928,12 @@ ORG &00D1
 \
 \   A                   The text token to be printed
 \
+\ ------------------------------------------------------------------------------
+\
+\ Other entry points:
+\
+\   prq+3               Print a question mark
+\
 \ ******************************************************************************
 
 .prq
@@ -17275,7 +17327,7 @@ ORG &00D1
 \
 \ ******************************************************************************
 
-IF _STH_DISC
+IF _STH_DISC OR _SRAM_DISC
 
  NOP                    \ In the first version of disc Elite, there was a nasty
  NOP                    \ bug where buying a laser that you already owned
@@ -21816,7 +21868,7 @@ ENDIF
 
 .tZ
 
-IF _STH_DISC
+IF _STH_DISC OR _SRAM_DISC
 
  ORA #%00100000         \ Set bit 5 of A to denote that this is the disc version
                         \ with the refund bug fixed (in versions before the bug
@@ -33529,7 +33581,7 @@ ENDMACRO
 \
 \ ******************************************************************************
 
-IF _STH_DISC
+IF _STH_DISC OR _SRAM_DISC
 
  EQUB &45, &4E          \ These bytes appear to be unused
  EQUB &44, &2D
