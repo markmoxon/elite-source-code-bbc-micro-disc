@@ -1,8 +1,15 @@
 
 ---------------------------------------
-Acornsoft Elite... with music!
+Acornsoft Elite (compendium version)
 
 For the BBC Micro with 16K sideways RAM
+
+Contains the flicker-free ship drawing
+routines from the BBC Master version,
+backported by Mark Moxon
+
+Contains flicker-free planet drawing
+routines by Mark Moxon
 
 Based on the Acornsoft SNG38 release
 of Elite by Ian Bell and David Braben
@@ -22,6 +29,6 @@
 
 See www.bbcelite.com for details
 
-Build: 2024-05-09 16:38:04
+Build: 2024-06-27 15:40:00
 ---------------------------------------
 
