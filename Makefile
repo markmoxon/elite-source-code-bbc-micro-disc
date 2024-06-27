@@ -25,7 +25,7 @@ endif
 
 variant-number=2
 folder=/sth
-suffix=-music-sth
+suffix=-elite-compendium-sth
 
 .PHONY:all
 all:

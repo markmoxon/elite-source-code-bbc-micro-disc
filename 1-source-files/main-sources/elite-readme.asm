@@ -35,10 +35,22 @@
  EQUB 10, 13
  EQUS "---------------------------------------"
  EQUB 10, 13
- EQUS "Acornsoft Elite... with music!"
+ EQUS "Acornsoft Elite (compendium version)"
  EQUB 10, 13
  EQUB 10, 13
  EQUS "For the BBC Micro with 16K sideways RAM"
+ EQUB 10, 13
+ EQUB 10, 13
+ EQUS "Contains the flicker-free ship drawing"
+ EQUB 10, 13
+ EQUS "routines from the BBC Master version,"
+ EQUB 10, 13
+ EQUS "backported by Mark Moxon"
+ EQUB 10, 13
+ EQUB 10, 13
+ EQUS "Contains flicker-free planet drawing"
+ EQUB 10, 13
+ EQUS "routines by Mark Moxon"
  EQUB 10, 13
  EQUB 10, 13
  EQUS "Based on the Acornsoft SNG38 release"
