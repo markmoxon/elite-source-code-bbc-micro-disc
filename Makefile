@@ -79,10 +79,12 @@ ifeq ($(variant), ib-disc)
   variant-number=1
   folder=/ib-disc
   suffix=-bbc-master-flicker-free-ib-disc
+  boot=-boot ELITE2
 else
   variant-number=2
   folder=/sth
   suffix=-bbc-master-flicker-free-sth
+  boot=-boot ELITE2
 endif
 
 .PHONY:all
