@@ -27646,6 +27646,13 @@ ENDIF
                         \ logger at location KY7, which is also where the A key
                         \ (fire lasers) key is logged
 
+                        \ --- Mod: Code added for joystick fire button: ------->
+
+ LDY #7                 \ Update the key logger for key 7 in the KYTB table, so
+ JSR DKS1               \ KY7 will be &FF if "A" (fire laser) is being pressed
+
+                        \ --- End of added code ------------------------------->
+
  LDX #1                 \ Call DKS2 to fetch the value of ADC channel 1 (the
  JSR DKS2               \ joystick X value) into (A X), and OR A with 1. This
  ORA #1                 \ ensures that the high byte is at least 1, and then we
@@ -34402,15 +34409,27 @@ ENDMACRO
                         \ add them together to get the result we're after, and
                         \ then set the sign afterwards
 
+                        \ --- Mod: Code removed for joystick fire button: ----->
+
+\LDA K                  \ We now do the following sum:
+\CLC                    \
+\ADC K2                 \   (A y_hi y_lo -) = K(3 2 1 0) + K2(3 2 1 0)
+\                       \
+\                       \ starting with the low bytes (which we don't keep)
+\                       \
+\                       \ The CLC has no effect because MULT3 clears the C
+\                       \ flag, so this instruction could be removed (as it is
+\                       \ in the cassette version, for example)
+
+                        \ --- And replaced by: -------------------------------->
+
  LDA K                  \ We now do the following sum:
- CLC                    \
- ADC K2                 \   (A y_hi y_lo -) = K(3 2 1 0) + K2(3 2 1 0)
+ ADC K2                 \
+                        \   (A y_hi y_lo -) = K(3 2 1 0) + K2(3 2 1 0)
                         \
                         \ starting with the low bytes (which we don't keep)
-                        \
-                        \ The CLC has no effect because MULT3 clears the C
-                        \ flag, so this instruction could be removed (as it is
-                        \ in the cassette version, for example)
+
+                        \ --- End of replacement ------------------------------>
 
  LDA K+1                \ We then do the middle bytes, which go into y_lo
  ADC K2+1
@@ -35479,12 +35498,6 @@ ENDIF
                         \ at the start of each screen refresh)
 
  RTS                    \ Return from the subroutine
-
-                        \ --- Mod: Code added for flicker-free planets: ------->
-
- SKIP 4                 \ These bytes are unused
-
-                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
