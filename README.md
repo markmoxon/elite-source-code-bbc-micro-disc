@@ -164,7 +164,7 @@ For more information on the port to the BBC Master, see the [hacks section of th
 
 ## Elite Compendium
 
-This repository also includes a version of BBC Micro disc Elite for the Elite Compendium, which incorporates all the available hacks in one game. The Compendium versions are in separate branch called `elite-compendium-bbc-master` and `elite-compendium-bbc-micro`, which are included in the [Elite Compendium (BBC Master)](https://github.com/markmoxon/elite-compendium-bbc-master) and [Elite Compendium (BBC Micro)](https://github.com/markmoxon/elite-compendium-bbc-micro) repositories as submodules.
+This repository also includes a version of BBC Micro disc Elite for the Elite Compendium, which incorporates all the available hacks in one game. The Compendium versions are in separate branches called `elite-compendium-bbc-master` and `elite-compendium-bbc-micro`, which are included in the [Elite Compendium (BBC Master)](https://github.com/markmoxon/elite-compendium-bbc-master) and [Elite Compendium (BBC Micro)](https://github.com/markmoxon/elite-compendium-bbc-micro) repositories as submodules.
 
 The annotated source files in the `elite-compendium` branch contain both the original Acornsoft code and all of the modifications for the Elite Compendium, so you can look through the source to see exactly what's changed. Any code that I've removed from the original version is commented out in the source files, so when they are assembled they produce the Compendium binaries, while still containing details of all the modifications. You can find all the diffs by searching the sources for `Mod:`.
 
