@@ -16318,6 +16318,19 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
 .TT23
 
+                        \ --- Mod: Code added for Compendium: ----------------->
+
+ CURRENT% = P%          \ Store the current address
+
+ CLEAR &5600, &5600     \ Clear the guard so we can assemble TT23 into sideways
+                        \ ROM
+
+ ORG &B700              \ Assemble TT23 at &B700, at the end of the music ROM
+
+.TT23_ROM
+
+                        \ --- End of added code ------------------------------->
+
  LDA #128               \ Clear the top part of the screen, draw a white border,
  JSR TT66               \ and set the current view type in QQ11 to 128 (Short-
                         \ range Chart)
@@ -16544,11 +16557,56 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
  INC XX20               \ Increment the counter
 
- BEQ TT111-1            \ If X = 0 then we have done all 256 systems, so return
-                        \ from the subroutine (as TT111-1 contains an RTS)
+                        \ --- Mod: Code removed for Compendium: --------------->
+
+\BEQ TT111-1            \ If X = 0 then we have done all 256 systems, so return
+\                       \ from the subroutine (as TT111-1 contains an RTS)
+\
+\JMP TT182              \ Otherwise jump back up to TT182 to process the next
+\                       \ system
+
+                        \ --- And replaced by: -------------------------------->
+
+ BEQ P%+5               \ If X = 0 then we have done all 256 systems, so return
+                        \ from the subroutine
 
  JMP TT182              \ Otherwise jump back up to TT182 to process the next
                         \ system
+
+ RTS                    \ Return from the subroutine
+
+ SAVE "3-assembled-output/rom-extra.bin", TT23_ROM, P%
+
+ ORG CURRENT%           \ Start assembling the main code again
+
+ GUARD &5600            \ Put the guard back in place that we removed above
+
+ LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
+ PHA                    \ store it on the stack
+
+ LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
+ STA &F4
+ STA &FE30
+
+ TYA                    \ Store X and Y on the stack
+ PHA
+ TXA
+ PHA
+
+ JSR TT23_ROM           \ Call the TT23 routine in the music ROM
+
+ PLA                    \ Retrieve X and Y from the stack
+ TAX
+ PLA
+ TAY
+
+ PLA                    \ Set the ROM number back to the value that we stored
+ STA &F4                \ above, to switch back to the previous ROM
+ STA &FE30
+
+ RTS                    \ Return from the subroutine
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
