@@ -803,7 +803,7 @@
 
 .LSNUM2
 
- SKIP 0                 \ The size of the existing ship line heap for the ship
+ SKIP 1                 \ The size of the existing ship line heap for the ship
                         \ we are drawing in LL9, i.e. the number of lines in the
                         \ old ship that is currently shown on-screen and which
                         \ we need to erase
@@ -827,6 +827,16 @@
 \SKIP 4                 \ Temporary storage, used in a number of places
 
                         \ --- And replaced by: -------------------------------->
+
+.RAT
+
+ SKIP 1                 \ Used to store different signs depending on the current
+                        \ space view, for use in calculating stardust movement
+
+.RAT2
+
+ SKIP 1                 \ Temporary storage, used to store the pitch and roll
+                        \ signs when moving objects and stardust
 
 .CNT2
 
@@ -865,22 +875,12 @@ ORG &00D1
 
 .XX2
 
- SKIP 5                \ Temporary storage, used to store the visibility of the
+ SKIP 10                \ Temporary storage, used to store the visibility of the
                         \ ship's faces during the ship-drawing routine at LL9
 
 .K2
 
  SKIP 4                 \ Temporary storage, used in a number of places
-
-.RAT
-
- SKIP 1                 \ Used to store different signs depending on the current
-                        \ space view, for use in calculating stardust movement
-
-.RAT2
-
- SKIP 1                 \ Temporary storage, used to store the pitch and roll
-                        \ signs when moving objects and stardust
 
 .STP
 
