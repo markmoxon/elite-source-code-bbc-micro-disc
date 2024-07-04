@@ -4285,8 +4285,9 @@ ENDIF
  ROR TRIBBLE            \ cabin temperature is high enough to kill them off
                         \ (this will eventually bring the number down to zero)
 
- LDA #56                \ Call the NOISE routine with A = 56 to make the sound
+ LDA #24                \ Call the NOISE routine with A = 24 to make the sound
  JSR NOISE              \ of Trumbles being killed off by the heat of the sun
+                        \ (using the second part of the two-part kill sound)
 
 .nokilltr
 
@@ -15812,7 +15813,6 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
                         \ --- End of added code ------------------------------->
 
-
 .TT22_ROM
 
  LDA #64                \ Clear the top part of the screen, draw a white border,
@@ -16354,44 +16354,26 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
  JSR TT11               \ Call TT11 to print the number of Trumbles in (Y X),
                         \ with no decimal point
 
- LDA #'L'               \ Print "LITTLE TRUMBLE"
- JSR TT27
- LDA #'i'
- JSR TT27
- LDA #'t'
- JSR TT27
- LDA #'t'
- JSR TT27
- LDA #'l'
- JSR TT27
- LDA #'e'
- JSR TT27
- LDA #' '
- JSR TT27
- LDA #'T'
- JSR TT27
- LDA #'r'
- JSR TT27
- LDA #'u'
- JSR TT27
- LDA #'m'
- JSR TT27
- LDA #'b'
- JSR TT27
- LDA #'l'
- JSR TT27
- LDA #'e'
- JSR TT27
+ JSR TT162              \ Print a space
 
-\JSR DORND              \ Print out a random extended token from 111 to 114, all
-\AND #3                 \ of which are blank in this version of Elite
-\CLC
-\ADC #111
-\JSR DETOK
-\
-\LDA #198               \ Print extended token 198, which is blank, but would
-\JSR DETOK              \ contain the text "LITTLE TRUMBLE" if the Trumbles
-                        \ mission was enabled
+ JSR DORND              \ Print out a random word from the list below, so that's
+ AND #3                 \ "CUDDLY", "CUTE", "FURRY" or "FRIENDLY"
+ ASL A
+ ASL A
+ ASL A
+ CLC
+ ADC #LO(word1)
+ STA R
+ LDA #HI(word1)
+ ADC #0
+ STA R+1
+ JSR PrintMessage
+
+ LDA #LO(word5)         \ Print " LITTLE TRUMBLE"
+ STA R
+ LDA #HI(word5)
+ STA R+1
+ JSR PrintMessage
 
  LDA TRIBBLE+1          \ If we have more than 256 Trumbles, skip to DOANS
  BNE DOANS
@@ -16402,8 +16384,65 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
 .DOANS
 
- LDA #'s'               \ We have more than one Trumble, so print an 's' and
+ LDA #'S'               \ We have more than one Trumble, so print an 'S' and
  JMP TT27               \ return from the subroutine using a tail call
+
+.word1
+
+ EQUS "CUDDLY"
+ EQUB 0, 0
+
+.word2
+
+ EQUS "CUTE"
+ EQUB 0, 0, 0, 0
+
+.word3
+
+ EQUS "FURRY"
+ EQUB 0, 0, 0
+
+.word4
+
+ EQUS "FRIENDLY"
+ EQUB 0
+
+.word5
+
+ EQUS " LITTLE TRUMBLE"
+ EQUB 0
+
+\ ******************************************************************************
+\
+\       Name: PrintMessage
+\       Type: Subroutine
+\   Category: Loader
+\    Summary: Print the null-terminated string at R(1 0)
+\
+\ ******************************************************************************
+
+.PrintMessage
+
+ LDY #0                 \ We are now going to print the characters at ZP(1 0),
+                        \ so set a byte counter in Y
+
+.prin1
+
+ LDA (R),Y              \ Fetch the Y-th byte of the string
+
+ BEQ prin2              \ If A is null then we have reached the end of the
+                        \ string, so jump to prin1 to return from the subroutine
+
+ JSR TT27               \ Print the character in A
+
+ INY                    \ Increment the byte counter
+
+ BNE prin1              \ Loop back for the next byte (this BNE is effectively a
+                        \ JMP as Y is never zero)
+
+.prin2
+
+ RTS                    \ Return from the subroutine
 
  END_OF_TT210 = P%
 
