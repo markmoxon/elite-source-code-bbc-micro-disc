@@ -1569,7 +1569,21 @@ ORG &00D1
                         \
                         \   * &FF = fitted
 
- SKIP 4                 \ These bytes appear to be unused
+                        \ --- Mod: Code removed for Trumbles: ----------------->
+
+\SKIP 4                 \ These bytes appear to be unused
+
+                        \ --- And replaced by: -------------------------------->
+
+ SKIP 1                 \ This byte appears to be unused
+
+.TRIBBLE
+
+ SKIP 2                 \ The number of Trumbles in the cargo hold
+
+ SKIP 1                 \ This byte appears to be unused
+
+                        \ --- End of replacement ------------------------------>
 
 .NOMSL
 
@@ -2104,9 +2118,26 @@ ORG &00D1
 
  SKIP 1                 \ The y-coordinate of the tip of the laser line
 
-.XX24
+                        \ --- Mod: Code removed for docking fee: -------------->
 
- SKIP 1                 \ This byte appears to be unused
+\.XX24
+\
+\SKIP 1                 \ This byte appears to be unused
+
+                        \ --- And replaced by: -------------------------------->
+
+.chargeDockingFee
+
+ SKIP 1                 \ Records whether we have been charged a docking fee, so
+                        \ we don't get charged twice:
+                        \
+                        \   * 0 = we have not been charged a docking fee
+                        \
+                        \   * Non-zero = we have been charged a docking fee
+                        \
+                        \ The docking fee is 5.0 credits
+
+                        \ --- End of replacement ------------------------------>
 
 .ALTIT
 
@@ -2574,6 +2605,34 @@ ENDIF
                         \ to end the mission and get our reward
 
 .EN4
+
+                        \ --- Mod: Code added for Trumbles: ------------------->
+
+\LDA CASH+2             \ This is the Trumbles code from the Commodore 64
+\CMP #&C4               \ version, which triggers the mission when you reach a
+\BCC EN6                \ cash level of &C400 (or 5017.6 credits)
+                        \
+                        \ Instead, we're going to use the NES code, which offers
+                        \ the mission at 6553.6 credits
+
+ LDA CASH+1             \ If the second most significant byte of CASH(0 1 2 3)
+ BEQ EN6                \ is zero then the cash amount is less than &010000
+                        \ (6553.6 credits), so jump to EN6
+
+ LDA TP                 \ If bit 4 of TP is set, then the Tribbles mission has
+ AND #%00010000         \ already been completed, so jump to EN6
+ BNE EN6
+
+                        \ If we get here then cheat mode has not been applied,
+                        \ we have at least 6553.6 credits and the Trumble
+                        \ mission has not yet been offered, so we do that now
+
+ JMP TBRIEF             \ Jump to TBRIEF to offer the Trumble mission, returning
+                        \ from the subroutine using a tail call
+
+.EN6
+
+                        \ --- End of added code ------------------------------->
 
  JMP BAY                \ If we get here them we didn't start or any missions,
                         \ so jump to BAY to go to the docking bay (i.e. show the
@@ -3926,116 +3985,120 @@ ENDIF
 \
 \ ******************************************************************************
 
- AND #%10000000         \ Clear bits 0-6 of A
+                        \ --- Mod: Code removed for Compendium: --------------->
 
-.MVT1
+\ AND #%10000000        \ Clear bits 0-6 of A
+\
+\.MVT1
+\
+\ ASL A                 \ Set the C flag to the sign bit of the delta, leaving
+\                       \ delta_hi << 1 in A
+\
+\ STA S                 \ Set S = delta_hi << 1
+\                       \
+\                       \ This also clears bit 0 of S
+\
+\ LDA #0                \ Set T = just the sign bit of delta (in bit 7)
+\ ROR A
+\ STA T
+\
+\ LSR S                 \ Set S = delta_hi >> 1
+\                       \       = |delta_hi|
+\                       \
+\                       \ This also clear the C flag, as we know that bit 0 of
+\                       \ S was clear before the LSR
+\
+\ EOR INWK+2,X          \ If T EOR x_sign has bit 7 set, then x_sign and delta
+\ BMI MV10              \ have different signs, so jump to MV10
+\
+\                       \ At this point, we know x_sign and delta have the same
+\                       \ sign, that sign is in T, and S contains |delta_hi|,
+\                       \ so now we want to do:
+\                       \
+\                       \   (x_sign x_hi x_lo) = (x_sign x_hi x_lo) + (S R)
+\                       \
+\                       \ and then set the sign of the result to the same sign
+\                       \ as x_sign and delta
+\
+\ LDA R                 \ First we add the low bytes, so:
+\ ADC INWK,X            \
+\ STA INWK,X            \   x_lo = x_lo + R
+\
+\ LDA S                 \ Then we add the high bytes:
+\ ADC INWK+1,X          \
+\ STA INWK+1,X          \   x_hi = x_hi + S
+\
+\ LDA INWK+2,X          \ And finally we add any carry into x_sign, and if the
+\ ADC #0                \ sign of x_sign and delta in T is negative, make sure
+\ ORA T                 \ the result is negative (by OR'ing with T)
+\ STA INWK+2,X
+\
+\ RTS                   \ Return from the subroutine
+\
+\.MV10
+\
+\                       \ If we get here, we know x_sign and delta have
+\                       \ different signs, with delta's sign in T, and
+\                       \ |delta_hi| in S, so now we want to do:
+\                       \
+\                       \   (x_sign x_hi x_lo) = (x_sign x_hi x_lo) - (S R)
+\                       \
+\                       \ and then set the sign of the result according to
+\                       \ the signs of x_sign and delta
+\
+\ LDA INWK,X            \ First we subtract the low bytes, so:
+\ SEC                   \
+\ SBC R                 \   x_lo = x_lo - R
+\ STA INWK,X
+\
+\ LDA INWK+1,X          \ Then we subtract the high bytes:
+\ SBC S                 \
+\ STA INWK+1,X          \   x_hi = x_hi - S
+\
+\ LDA INWK+2,X          \ And finally we subtract any borrow from bits 0-6 of
+\ AND #%01111111        \ x_sign, and give the result the opposite sign bit to T
+\ SBC #0                \ (i.e. give it the sign of the original x_sign)
+\ ORA #%10000000
+\ EOR T
+\ STA INWK+2,X
+\
+\ BCS MV11              \ If the C flag is set by the above SBC, then our sum
+\                       \ above didn't underflow and is correct - to put it
+\                       \ another way, (x_sign x_hi x_lo) >= (S R) so the result
+\                       \ should indeed have the same sign as x_sign, so jump to
+\                       \ MV11 to return from the subroutine
+\
+\                       \ Otherwise our subtraction underflowed because
+\                       \ (x_sign x_hi x_lo) < (S R), so we now need to flip the
+\                       \ subtraction around by using two's complement to this:
+\                       \
+\                       \   (S R) - (x_sign x_hi x_lo)
+\                       \
+\                       \ and then we need to give the result the same sign as
+\                       \ (S R), the delta, as that's the dominant figure in the
+\                       \ sum
+\
+\ LDA #1                \ First we subtract the low bytes, so:
+\ SBC INWK,X            \
+\ STA INWK,X            \   x_lo = 1 - x_lo
+\
+\ LDA #0                \ Then we subtract the high bytes:
+\ SBC INWK+1,X          \
+\ STA INWK+1,X          \   x_hi = 0 - x_hi
+\
+\ LDA #0                \ And then we subtract the sign bytes:
+\ SBC INWK+2,X          \
+\                       \   x_sign = 0 - x_sign
+\
+\ AND #%01111111        \ Finally, we set the sign bit to the sign in T, the
+\ ORA T                 \ sign of the original delta, as the delta is the
+\ STA INWK+2,X          \ dominant figure in the sum
+\
+\.MV11
+\
+\ RTS                   \ Return from the subroutine
 
- ASL A                  \ Set the C flag to the sign bit of the delta, leaving
-                        \ delta_hi << 1 in A
-
- STA S                  \ Set S = delta_hi << 1
-                        \
-                        \ This also clears bit 0 of S
-
- LDA #0                 \ Set T = just the sign bit of delta (in bit 7)
- ROR A
- STA T
-
- LSR S                  \ Set S = delta_hi >> 1
-                        \       = |delta_hi|
-                        \
-                        \ This also clear the C flag, as we know that bit 0 of
-                        \ S was clear before the LSR
-
- EOR INWK+2,X           \ If T EOR x_sign has bit 7 set, then x_sign and delta
- BMI MV10               \ have different signs, so jump to MV10
-
-                        \ At this point, we know x_sign and delta have the same
-                        \ sign, that sign is in T, and S contains |delta_hi|,
-                        \ so now we want to do:
-                        \
-                        \   (x_sign x_hi x_lo) = (x_sign x_hi x_lo) + (S R)
-                        \
-                        \ and then set the sign of the result to the same sign
-                        \ as x_sign and delta
-
- LDA R                  \ First we add the low bytes, so:
- ADC INWK,X             \
- STA INWK,X             \   x_lo = x_lo + R
-
- LDA S                  \ Then we add the high bytes:
- ADC INWK+1,X           \
- STA INWK+1,X           \   x_hi = x_hi + S
-
- LDA INWK+2,X           \ And finally we add any carry into x_sign, and if the
- ADC #0                 \ sign of x_sign and delta in T is negative, make sure
- ORA T                  \ the result is negative (by OR'ing with T)
- STA INWK+2,X
-
- RTS                    \ Return from the subroutine
-
-.MV10
-
-                        \ If we get here, we know x_sign and delta have
-                        \ different signs, with delta's sign in T, and
-                        \ |delta_hi| in S, so now we want to do:
-                        \
-                        \   (x_sign x_hi x_lo) = (x_sign x_hi x_lo) - (S R)
-                        \
-                        \ and then set the sign of the result according to
-                        \ the signs of x_sign and delta
-
- LDA INWK,X             \ First we subtract the low bytes, so:
- SEC                    \
- SBC R                  \   x_lo = x_lo - R
- STA INWK,X
-
- LDA INWK+1,X           \ Then we subtract the high bytes:
- SBC S                  \
- STA INWK+1,X           \   x_hi = x_hi - S
-
- LDA INWK+2,X           \ And finally we subtract any borrow from bits 0-6 of
- AND #%01111111         \ x_sign, and give the result the opposite sign bit to T
- SBC #0                 \ (i.e. give it the sign of the original x_sign)
- ORA #%10000000
- EOR T
- STA INWK+2,X
-
- BCS MV11               \ If the C flag is set by the above SBC, then our sum
-                        \ above didn't underflow and is correct - to put it
-                        \ another way, (x_sign x_hi x_lo) >= (S R) so the result
-                        \ should indeed have the same sign as x_sign, so jump to
-                        \ MV11 to return from the subroutine
-
-                        \ Otherwise our subtraction underflowed because
-                        \ (x_sign x_hi x_lo) < (S R), so we now need to flip the
-                        \ subtraction around by using two's complement to this:
-                        \
-                        \   (S R) - (x_sign x_hi x_lo)
-                        \
-                        \ and then we need to give the result the same sign as
-                        \ (S R), the delta, as that's the dominant figure in the
-                        \ sum
-
- LDA #1                 \ First we subtract the low bytes, so:
- SBC INWK,X             \
- STA INWK,X             \   x_lo = 1 - x_lo
-
- LDA #0                 \ Then we subtract the high bytes:
- SBC INWK+1,X           \
- STA INWK+1,X           \   x_hi = 0 - x_hi
-
- LDA #0                 \ And then we subtract the sign bytes:
- SBC INWK+2,X           \
-                        \   x_sign = 0 - x_sign
-
- AND #%01111111         \ Finally, we set the sign bit to the sign in T, the
- ORA T                  \ sign of the original delta, as the delta is the
- STA INWK+2,X           \ dominant figure in the sum
-
-.MV11
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -4074,85 +4137,89 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MVT3
+                        \ --- Mod: Code removed for Compendium: --------------->
 
- LDA K+3                \ Set S = K+3
- STA S
+\.MVT3
+\
+\ LDA K+3               \ Set S = K+3
+\ STA S
+\
+\ AND #%10000000        \ Set T = sign bit of K(3 2 1)
+\ STA T
+\
+\ EOR INWK+2,X          \ If x_sign has a different sign to K(3 2 1), jump to
+\ BMI MV13              \ MV13 to process the addition as a subtraction
+\
+\ LDA K+1               \ Set K(3 2 1) = K(3 2 1) + (x_sign x_hi x_lo)
+\ CLC                   \ starting with the low bytes
+\ ADC INWK,X
+\ STA K+1
+\
+\ LDA K+2               \ Then the middle bytes
+\ ADC INWK+1,X
+\ STA K+2
+\
+\ LDA K+3               \ And finally the high bytes
+\ ADC INWK+2,X
+\
+\ AND #%01111111        \ Setting the sign bit of K+3 to T, the original sign
+\ ORA T                 \ of K(3 2 1)
+\ STA K+3
+\
+\ RTS                   \ Return from the subroutine
+\
+\.MV13
+\
+\ LDA S                 \ Set S = |K+3| (i.e. K+3 with the sign bit cleared)
+\ AND #%01111111
+\ STA S
+\
+\ LDA INWK,X            \ Set K(3 2 1) = (x_sign x_hi x_lo) - K(3 2 1)
+\ SEC                   \ starting with the low bytes
+\ SBC K+1
+\ STA K+1
+\
+\ LDA INWK+1,X          \ Then the middle bytes
+\ SBC K+2
+\ STA K+2
+\
+\ LDA INWK+2,X          \ And finally the high bytes, doing A = |x_sign| - |K+3|
+\ AND #%01111111        \ and setting the C flag for testing below
+\ SBC S
+\
+\ ORA #%10000000        \ Set the sign bit of K+3 to the opposite sign of T,
+\ EOR T                 \ i.e. the opposite sign to the original K(3 2 1)
+\ STA K+3
+\
+\ BCS MV14              \ If the C flag is set, i.e. |x_sign| >= |K+3|, then
+\                       \ the sign of K(3 2 1). In this case, we want the
+\                       \ result to have the same sign as the largest argument,
+\                       \ which is (x_sign x_hi x_lo), which we know has the
+\                       \ opposite sign to K(3 2 1), and that's what we just set
+\                       \ the sign of K(3 2 1) to... so we can jump to MV14 to
+\                       \ return from the subroutine
+\
+\ LDA #1                \ We need to swap the sign of the result in K(3 2 1),
+\ SBC K+1               \ which we do by calculating 0 - K(3 2 1), which we can
+\ STA K+1               \ do with 1 - C - K(3 2 1), as we know the C flag is
+\                       \ clear. We start with the low bytes
+\
+\ LDA #0                \ Then the middle bytes
+\ SBC K+2
+\ STA K+2
+\
+\ LDA #0                \ And finally the high bytes
+\ SBC K+3
+\
+\ AND #%01111111        \ Set the sign bit of K+3 to the same sign as T,
+\ ORA T                 \ i.e. the same sign as the original K(3 2 1), as
+\ STA K+3               \ that's the largest argument
+\
+\.MV14
+\
+\ RTS                   \ Return from the subroutine
 
- AND #%10000000         \ Set T = sign bit of K(3 2 1)
- STA T
-
- EOR INWK+2,X           \ If x_sign has a different sign to K(3 2 1), jump to
- BMI MV13               \ MV13 to process the addition as a subtraction
-
- LDA K+1                \ Set K(3 2 1) = K(3 2 1) + (x_sign x_hi x_lo)
- CLC                    \ starting with the low bytes
- ADC INWK,X
- STA K+1
-
- LDA K+2                \ Then the middle bytes
- ADC INWK+1,X
- STA K+2
-
- LDA K+3                \ And finally the high bytes
- ADC INWK+2,X
-
- AND #%01111111         \ Setting the sign bit of K+3 to T, the original sign
- ORA T                  \ of K(3 2 1)
- STA K+3
-
- RTS                    \ Return from the subroutine
-
-.MV13
-
- LDA S                  \ Set S = |K+3| (i.e. K+3 with the sign bit cleared)
- AND #%01111111
- STA S
-
- LDA INWK,X             \ Set K(3 2 1) = (x_sign x_hi x_lo) - K(3 2 1)
- SEC                    \ starting with the low bytes
- SBC K+1
- STA K+1
-
- LDA INWK+1,X           \ Then the middle bytes
- SBC K+2
- STA K+2
-
- LDA INWK+2,X           \ And finally the high bytes, doing A = |x_sign| - |K+3|
- AND #%01111111         \ and setting the C flag for testing below
- SBC S
-
- ORA #%10000000         \ Set the sign bit of K+3 to the opposite sign of T,
- EOR T                  \ i.e. the opposite sign to the original K(3 2 1)
- STA K+3
-
- BCS MV14               \ If the C flag is set, i.e. |x_sign| >= |K+3|, then
-                        \ the sign of K(3 2 1). In this case, we want the
-                        \ result to have the same sign as the largest argument,
-                        \ which is (x_sign x_hi x_lo), which we know has the
-                        \ opposite sign to K(3 2 1), and that's what we just set
-                        \ the sign of K(3 2 1) to... so we can jump to MV14 to
-                        \ return from the subroutine
-
- LDA #1                 \ We need to swap the sign of the result in K(3 2 1),
- SBC K+1                \ which we do by calculating 0 - K(3 2 1), which we can
- STA K+1                \ do with 1 - C - K(3 2 1), as we know the C flag is
-                        \ clear. We start with the low bytes
-
- LDA #0                 \ Then the middle bytes
- SBC K+2
- STA K+2
-
- LDA #0                 \ And finally the high bytes
- SBC K+3
-
- AND #%01111111         \ Set the sign bit of K+3 to the same sign as T,
- ORA T                  \ i.e. the same sign as the original K(3 2 1), as
- STA K+3                \ that's the largest argument
-
-.MV14
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -4514,74 +4581,78 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MVT6
+                        \ --- Mod: Code removed for Compendium: --------------->
 
- TAY                    \ Store argument A into Y, for later use
+\.MVT6
+\
+\ TAY                   \ Store argument A into Y, for later use
+\
+\ EOR INWK+2,X          \ Set A = A EOR x_sign
+\
+\ BMI MV50              \ If the sign is negative, i.e. A and x_sign have
+\                       \ different signs, jump to MV50
+\
+\                       \ The signs are the same, so we can add the two
+\                       \ arguments and keep the sign to get the result
+\
+\ LDA P+1               \ First we add the low bytes:
+\ CLC                   \
+\ ADC INWK,X            \   P+1 = P+1 + x_lo
+\ STA P+1
+\
+\ LDA P+2               \ And then the high bytes:
+\ ADC INWK+1,X          \
+\ STA P+2               \   P+2 = P+2 + x_hi
+\
+\ TYA                   \ Restore the original A argument that we stored earlier
+\                       \ so that we keep the original sign
+\
+\ RTS                   \ Return from the subroutine
+\
+\.MV50
+\
+\ LDA INWK,X            \ First we subtract the low bytes:
+\ SEC                   \
+\ SBC P+1               \   P+1 = x_lo - P+1
+\ STA P+1
+\
+\ LDA INWK+1,X          \ And then the high bytes:
+\ SBC P+2               \
+\ STA P+2               \   P+2 = x_hi - P+2
+\
+\ BCC MV51              \ If the last subtraction underflowed, then the C flag
+\                       \ will be clear and x_hi < P+2, so jump to MV51 to
+\                       \ negate the result
+\
+\ TYA                   \ Restore the original A argument that we stored earlier
+\ EOR #%10000000        \ but flip bit 7, which flips the sign. We do this
+\                       \ because x_hi >= P+2 so we want the result to have the
+\                       \ same sign as x_hi (as it's the dominant side in this
+\                       \ calculation). The sign of x_hi is x_sign, and x_sign
+\                       \ has the opposite sign to A, so we flip the sign in A
+\                       \ to return the correct result
+\
+\ RTS                   \ Return from the subroutine
+\
+\.MV51
+\
+\ LDA #1                \ Our subtraction underflowed, so we negate the result
+\ SBC P+1               \ using two's complement, first with the low byte:
+\ STA P+1               \
+\                       \   P+1 = 1 - P+1
+\
+\ LDA #0                \ And then the high byte:
+\ SBC P+2               \
+\ STA P+2               \   P+2 = 0 - P+2
+\
+\ TYA                   \ Restore the original A argument that we stored earlier
+\                       \ as this is the correct sign for the result. This is
+\                       \ because x_hi < P+2, so we want to return the same sign
+\                       \ as P+2, the dominant side
+\
+\ RTS                   \ Return from the subroutine
 
- EOR INWK+2,X           \ Set A = A EOR x_sign
-
- BMI MV50               \ If the sign is negative, i.e. A and x_sign have
-                        \ different signs, jump to MV50
-
-                        \ The signs are the same, so we can add the two
-                        \ arguments and keep the sign to get the result
-
- LDA P+1                \ First we add the low bytes:
- CLC                    \
- ADC INWK,X             \   P+1 = P+1 + x_lo
- STA P+1
-
- LDA P+2                \ And then the high bytes:
- ADC INWK+1,X           \
- STA P+2                \   P+2 = P+2 + x_hi
-
- TYA                    \ Restore the original A argument that we stored earlier
-                        \ so that we keep the original sign
-
- RTS                    \ Return from the subroutine
-
-.MV50
-
- LDA INWK,X             \ First we subtract the low bytes:
- SEC                    \
- SBC P+1                \   P+1 = x_lo - P+1
- STA P+1
-
- LDA INWK+1,X           \ And then the high bytes:
- SBC P+2                \
- STA P+2                \   P+2 = x_hi - P+2
-
- BCC MV51               \ If the last subtraction underflowed, then the C flag
-                        \ will be clear and x_hi < P+2, so jump to MV51 to
-                        \ negate the result
-
- TYA                    \ Restore the original A argument that we stored earlier
- EOR #%10000000         \ but flip bit 7, which flips the sign. We do this
-                        \ because x_hi >= P+2 so we want the result to have the
-                        \ same sign as x_hi (as it's the dominant side in this
-                        \ calculation). The sign of x_hi is x_sign, and x_sign
-                        \ has the opposite sign to A, so we flip the sign in A
-                        \ to return the correct result
-
- RTS                    \ Return from the subroutine
-
-.MV51
-
- LDA #1                 \ Our subtraction underflowed, so we negate the result
- SBC P+1                \ using two's complement, first with the low byte:
- STA P+1                \
-                        \   P+1 = 1 - P+1
-
- LDA #0                 \ And then the high byte:
- SBC P+2                \
- STA P+2                \   P+2 = 0 - P+2
-
- TYA                    \ Restore the original A argument that we stored earlier
-                        \ as this is the correct sign for the result. This is
-                        \ because x_hi < P+2, so we want to return the same sign
-                        \ as P+2, the dominant side
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -5978,17 +6049,21 @@ ENDIF
 \
 \ ******************************************************************************
 
-.PIX1
+                        \ --- Mod: Code removed for Compendium: --------------->
 
- JSR ADD                \ Set (A X) = (A P) + (S R)
+\.PIX1
+\
+\ JSR ADD               \ Set (A X) = (A P) + (S R)
+\
+\ STA YY+1              \ Set YY+1 to A, the high byte of the result
+\
+\ TXA                   \ Set SYL+Y to X, the low byte of the result
+\ STA SYL,Y
+\
+\                       \ Fall through into PIX1 to draw the stardust particle
+\                       \ at (X1,Y1)
 
- STA YY+1               \ Set YY+1 to A, the high byte of the result
-
- TXA                    \ Set SYL+Y to X, the low byte of the result
- STA SYL,Y
-
-                        \ Fall through into PIX1 to draw the stardust particle
-                        \ at (X1,Y1)
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -6015,50 +6090,54 @@ ENDIF
 \
 \ ******************************************************************************
 
-.PIXEL2
+                        \ --- Mod: Code removed for Compendium: --------------->
 
- LDA X1                 \ Fetch the x-coordinate offset into A
+\.PIXEL2
+\
+\ LDA X1                \ Fetch the x-coordinate offset into A
+\
+\ BPL PX1               \ If the x-coordinate offset is positive, jump to PX1
+\                       \ to skip the following negation
+\
+\ EOR #%01111111        \ The x-coordinate offset is negative, so flip all the
+\ CLC                   \ bits apart from the sign bit and add 1, to convert it
+\ ADC #1                \ from a sign-magnitude number to a signed number
+\
+\.PX1
+\
+\ EOR #%10000000        \ Set X = X1 + 128
+\ TAX                   \
+\                       \ So X is now the offset converted to an x-coordinate,
+\                       \ centred on x-coordinate 128
+\
+\ LDA Y1                \ Fetch the y-coordinate offset into A and clear the
+\ AND #%01111111        \ sign bit, so A = |Y1|
+\
+\ CMP #96               \ If |Y1| >= 96 then it's off the screen (as 96 is half
+\ BCS PX4               \ the screen height), so return from the subroutine (as
+\                       \ PX4 contains an RTS)
+\
+\ LDA Y1                \ Fetch the y-coordinate offset into A
+\
+\ BPL PX2               \ If the y-coordinate offset is positive, jump to PX2
+\                       \ to skip the following negation
+\
+\ EOR #%01111111        \ The y-coordinate offset is negative, so flip all the
+\ ADC #1                \ bits apart from the sign bit and subtract 1, to negate
+\                       \ it to a positive number, i.e. A is now |Y1|
+\
+\.PX2
+\
+\ STA T                 \ Set A = 97 - Y1
+\ LDA #97               \
+\ SBC T                 \ So if Y is positive we display the point up from the
+\                       \ centre at y-coordinate 97, while a negative Y means
+\                       \ down from the centre
+\
+\                       \ Fall through into PIXEL to draw the stardust at the
+\                       \ screen coordinates in (X, A)
 
- BPL PX1                \ If the x-coordinate offset is positive, jump to PX1
-                        \ to skip the following negation
-
- EOR #%01111111         \ The x-coordinate offset is negative, so flip all the
- CLC                    \ bits apart from the sign bit and add 1, to convert it
- ADC #1                 \ from a sign-magnitude number to a signed number
-
-.PX1
-
- EOR #%10000000         \ Set X = X1 + 128
- TAX                    \
-                        \ So X is now the offset converted to an x-coordinate,
-                        \ centred on x-coordinate 128
-
- LDA Y1                 \ Fetch the y-coordinate offset into A and clear the
- AND #%01111111         \ sign bit, so A = |Y1|
-
- CMP #96                \ If |Y1| >= 96 then it's off the screen (as 96 is half
- BCS PX4                \ the screen height), so return from the subroutine (as
-                        \ PX4 contains an RTS)
-
- LDA Y1                 \ Fetch the y-coordinate offset into A
-
- BPL PX2                \ If the y-coordinate offset is positive, jump to PX2
-                        \ to skip the following negation
-
- EOR #%01111111         \ The y-coordinate offset is negative, so flip all the
- ADC #1                 \ bits apart from the sign bit and subtract 1, to negate
-                        \ it to a positive number, i.e. A is now |Y1|
-
-.PX2
-
- STA T                  \ Set A = 97 - Y1
- LDA #97                \
- SBC T                  \ So if Y is positive we display the point up from the
-                        \ centre at y-coordinate 97, while a negative Y means
-                        \ down from the centre
-
-                        \ Fall through into PIXEL to draw the stardust at the
-                        \ screen coordinates in (X, A)
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -6398,36 +6477,40 @@ ENDIF
 \
 \ ******************************************************************************
 
-.FLIP
+                        \ --- Mod: Code removed for Compendium: --------------->
 
- LDY NOSTM              \ Set Y to the current number of stardust particles, so
-                        \ we can use it as a counter through all the stardust
+\.FLIP
+\
+\ LDY NOSTM             \ Set Y to the current number of stardust particles, so
+\                       \ we can use it as a counter through all the stardust
+\
+\.FLL1
+\
+\ LDX SY,Y              \ Copy the Y-th particle's y-coordinate from SY+Y into X
+\
+\ LDA SX,Y              \ Copy the Y-th particle's x-coordinate from SX+Y into
+\ STA Y1                \ both Y1 and the particle's y-coordinate
+\ STA SY,Y
+\
+\ TXA                   \ Copy the Y-th particle's original y-coordinate into
+\ STA X1                \ both X1 and the particle's x-coordinate, so the x- and
+\ STA SX,Y              \ y-coordinates are now swapped and (X1, Y1) contains
+\                       \ the particle's new coordinates
+\
+\ LDA SZ,Y              \ Fetch the Y-th particle's distance from SZ+Y into ZZ
+\ STA ZZ
+\
+\ JSR PIXEL2            \ Draw a stardust particle at (X1,Y1) with distance ZZ
+\
+\ DEY                   \ Decrement the counter to point to the next particle of
+\                       \ stardust
+\
+\ BNE FLL1              \ Loop back to FLL1 until we have moved all the stardust
+\                       \ particles
+\
+\ RTS                   \ Return from the subroutine
 
-.FLL1
-
- LDX SY,Y               \ Copy the Y-th particle's y-coordinate from SY+Y into X
-
- LDA SX,Y               \ Copy the Y-th particle's x-coordinate from SX+Y into
- STA Y1                 \ both Y1 and the particle's y-coordinate
- STA SY,Y
-
- TXA                    \ Copy the Y-th particle's original y-coordinate into
- STA X1                 \ both X1 and the particle's x-coordinate, so the x- and
- STA SX,Y               \ y-coordinates are now swapped and (X1, Y1) contains
-                        \ the particle's new coordinates
-
- LDA SZ,Y               \ Fetch the Y-th particle's distance from SZ+Y into ZZ
- STA ZZ
-
- JSR PIXEL2             \ Draw a stardust particle at (X1,Y1) with distance ZZ
-
- DEY                    \ Decrement the counter to point to the next particle of
-                        \ stardust
-
- BNE FLL1               \ Loop back to FLL1 until we have moved all the stardust
-                        \ particles
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -9962,27 +10045,31 @@ ENDIF
 \
 \ ******************************************************************************
 
-.LL164
+                        \ --- Mod: Code removed for Compendium: --------------->
 
- LDA #56                \ Call the NOISE routine with A = 56 to make the sound
- JSR NOISE              \ of the hyperspace drive being engaged
+\.LL164
+\
+\ LDA #56               \ Call the NOISE routine with A = 56 to make the sound
+\ JSR NOISE             \ of the hyperspace drive being engaged
+\
+\ LDA #1                \ Set HFX to 1, which switches the screen mode to a full
+\ STA HFX               \ mode 5 screen, therefore making the hyperspace rings
+\                       \ multi-coloured and all zig-zaggy (see the IRQ1 routine
+\                       \ for details)
+\
+\ LDA #4                \ Set the step size for the hyperspace rings to 4, so
+\                       \ there are more sections in the rings and they are
+\                       \ quite round (compared to the step size of 8 used in
+\                       \ the much more polygonal launch rings)
+\
+\ JSR HFS2              \ Call HFS2 to draw the hyperspace tunnel rings
+\
+\ DEC HFX               \ Set HFX back to 0, so we switch back to the normal
+\                       \ split-screen mode
+\
+\ RTS                   \ Return from the subroutine
 
- LDA #1                 \ Set HFX to 1, which switches the screen mode to a full
- STA HFX                \ mode 5 screen, therefore making the hyperspace rings
-                        \ multi-coloured and all zig-zaggy (see the IRQ1 routine
-                        \ for details)
-
- LDA #4                 \ Set the step size for the hyperspace rings to 4, so
-                        \ there are more sections in the rings and they are
-                        \ quite round (compared to the step size of 8 used in
-                        \ the much more polygonal launch rings)
-
- JSR HFS2               \ Call HFS2 to draw the hyperspace tunnel rings
-
- DEC HFX                \ Set HFX back to 0, so we switch back to the normal
-                        \ split-screen mode
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -9997,17 +10084,21 @@ ENDIF
 \
 \ ******************************************************************************
 
-.LAUN
+                        \ --- Mod: Code removed for Compendium: --------------->
 
- LDA #48                \ Call the NOISE routine with A = 48 to make the sound
- JSR NOISE              \ of the ship launching from the station
+\.LAUN
+\
+\ LDA #48               \ Call the NOISE routine with A = 48 to make the sound
+\ JSR NOISE             \ of the ship launching from the station
+\
+\ LDA #8                \ Set the step size for the launch tunnel rings to 8, so
+\                       \ there are fewer sections in the rings and they are
+\                       \ quite polygonal (compared to the step size of 4 used
+\                       \ in the much rounder hyperspace rings)
+\
+\                       \ Fall through into HFS2 to draw the launch tunnel rings
 
- LDA #8                 \ Set the step size for the launch tunnel rings to 8, so
-                        \ there are fewer sections in the rings and they are
-                        \ quite polygonal (compared to the step size of 4 used
-                        \ in the much rounder hyperspace rings)
-
-                        \ Fall through into HFS2 to draw the launch tunnel rings
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10048,16 +10139,20 @@ ENDIF
 \
 \ ******************************************************************************
 
-.HFS2
+                        \ --- Mod: Code removed for Compendium: --------------->
 
- STA STP                \ Store the step size in A
+\.HFS2
+\
+\ STA STP               \ Store the step size in A
+\
+\ JSR TTX66             \ Clear the screen and draw a white border
+\
+\ JSR HFS1              \ Call HFS1 below and then fall through into the same
+\                       \ routine, so this effectively runs HFS1 twice, and as
+\                       \ HFS1 draws 8 concentric rings, this means we draw 16
+\                       \ of them in all
 
- JSR TTX66              \ Clear the screen and draw a white border
-
- JSR HFS1               \ Call HFS1 below and then fall through into the same
-                        \ routine, so this effectively runs HFS1 twice, and as
-                        \ HFS1 draws 8 concentric rings, this means we draw 16
-                        \ of them in all
+                        \ --- End of removed code ----------------------------->
 
 .HFS1
 
@@ -10130,17 +10225,21 @@ ENDIF
 \
 \ ******************************************************************************
 
- EQUB &8C, &E7
- EQUB &8D, &ED
- EQUB &8A, &E6
- EQUB &C1, &C8
- EQUB &C8, &8B
- EQUB &E0, &8A
- EQUB &E6, &D6
- EQUB &C5, &C6
- EQUB &C1, &CA
- EQUB &95, &9D
- EQUB &9C, &97
+                        \ --- Mod: Code removed for Compendium: --------------->
+
+\ EQUB &8C, &E7
+\ EQUB &8D, &ED
+\ EQUB &8A, &E6
+\ EQUB &C1, &C8
+\ EQUB &C8, &8B
+\ EQUB &E0, &8A
+\ EQUB &E6, &D6
+\ EQUB &C5, &C6
+\ EQUB &C1, &CA
+\ EQUB &95, &9D
+\ EQUB &9C, &97
+
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -12040,6 +12139,47 @@ ENDIF
 
 \ ******************************************************************************
 \
+\       Name: TBRIEF
+\       Type: Subroutine
+\   Category: Missions
+\    Summary: Start mission 3
+\  Deep dive: The Trumbles mission
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for Trumbles: ------------------->
+
+.TBRIEF
+
+ LDA TP                 \ Set bit 4 of TP to indicate that mission 3 has been
+ ORA #%00010000         \ triggered
+ STA TP
+
+ LDA #199               \ Print extended token 199, which is the briefing for
+ JSR DETOK              \ the Trumbles mission
+
+ JSR TT214+8            \ Wait until either "Y" or "N" is pressed
+
+ BCC BAYSTEP            \ If "N" was pressed, then the mission was not accepted,
+                        \ jump to BAYSTEP to go to the docking bay (i.e. show
+                        \ the Status Mode screen)
+
+ LDY #HI(50000)         \ Otherwise the mission was accepted, so subtract
+ LDX #LO(50000)         \ 50,000 CR from the cash pot to pay for the Trumble
+ JSR LCASH
+
+ INC TRIBBLE            \ Increment the number of Trumbles from 0 to 1, so they
+                        \ start breeding
+
+.BAYSTEP
+
+ JMP BAY                \ Go to the docking bay (i.e. show the Status Mode
+                        \ screen)
+
+                        \ --- End of added code ------------------------------->
+
+\ ******************************************************************************
+\
 \       Name: BRIEF
 \       Type: Subroutine
 \   Category: Missions
@@ -12959,6 +13099,13 @@ ENDIF
  BPL Tml                \ Loop back to add in the next market item in the hold,
                         \ until we have added up all market items from 12
                         \ (minerals) down to 0 (food)
+
+                        \ --- Mod: Code added for Trumbles: ------------------->
+
+ ADC TRIBBLE+1          \ Add the high byte of the number of Trumbles in the
+                        \ hold, as 256 Trumbles take up one tonne of cargo space
+
+                        \ --- End of added code ------------------------------->
 
  CMP CRGO               \ If A < CRGO then the C flag will be clear (we have
                         \ room in the hold)
@@ -14610,7 +14757,61 @@ ENDIF
  JMP BAY2               \ And then jump to BAY2 to display the Inventory
                         \ screen, as we have finished selling cargo
 
- RTS                    \ Return from the subroutine
+                        \ --- Mod: Code removed for Trumbles: ----------------->
+
+\RTS                    \ Return from the subroutine
+
+                        \ --- And replaced by: -------------------------------->
+
+ JSR TT69               \ Call TT69 to set Sentence Case and print a newline
+
+ LDA TRIBBLE            \ If there are any Trumbles in the hold, skip the
+ ORA TRIBBLE+1          \ following RTS and continue on
+ BNE P%+3
+
+.zebra
+
+ RTS                    \ There are no Trumbles in the hold, so return from the
+                        \ subroutine
+
+                        \ If we get here then we have Trumbles in the hold, so
+                        \ we print out the number
+
+ CLC                    \ Clear the C flag, so the call to TT11 below doesn't
+                        \ include a decimal point
+
+ LDA #0                 \ Set A = 0, for the call to TT11 below, so we don't pad
+                        \ out the number of Trumbles
+
+ LDX TRIBBLE            \ Fetch the number of Trumbles into (Y X)
+ LDY TRIBBLE+1
+
+ JSR TT11               \ Call TT11 to print the number of Trumbles in (Y X),
+                        \ with no decimal point
+
+ JSR DORND              \ Print out a random extended token from 111 to 114, all
+ AND #3                 \ of which are blank in this version of Elite
+ CLC
+ ADC #111
+ JSR DETOK
+
+ LDA #198               \ Print extended token 198, which is blank, but would
+ JSR DETOK              \ contain the text "LITTLE TRUMBLE" if the Trumbles
+                        \ mission was enabled
+
+ LDA TRIBBLE+1          \ If we have more than 256 Trumbles, skip to DOANS
+ BNE DOANS
+
+ LDX TRIBBLE            \ If we have exactly one Trumble, return from the
+ DEX                    \ subroutine (as zebra contains an RTS)
+ BEQ zebra
+
+.DOANS
+
+ LDA #'s'               \ We have more than one Trumble, so print an 's' and
+ JMP DASC               \ return from the subroutine using a tail call
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
@@ -20770,6 +20971,13 @@ ENDIF
 
  STA MCNT               \ Reset MCNT (the main loop counter) to 0
 
+                        \ --- Mod: Code added for docking fee: ---------------->
+
+ STA chargeDockingFee   \ Set chargeDockingFee to 0 so the docking fee is marked
+                        \ as being not already paid
+
+                        \ --- End of added code ------------------------------->
+
 .modify
 
  LDA #3                 \ Reset DELTA (speed) to 3
@@ -21217,6 +21425,79 @@ ENDIF
 
  LDY #2                 \ Wait for 2/50 of a second (0.04 seconds), to slow the
  JSR DELAY              \ main loop down a bit
+
+                        \ --- Mod: Code added for Trumbles: ------------------->
+
+ LDA TRIBBLE+1          \ If the high byte of TRIBBLE(1 0), the number of
+ BEQ game5              \ Trumbles in the hold, is zero, jump to game5 to skip
+                        \ the following
+
+                        \ We have a lot of Trumbles in the hold, so let's see if
+                        \ any of them are breeding (note that Trumbles always
+                        \ breed when we jump into a new system in the SOLAR
+                        \ routine, but when we have lots of them, they also
+                        \ breed here in the main flight loop)
+
+ JSR DORND              \ Set A and X to random numbers
+
+ CMP #220               \ If A >= 220 then set the C flag (14% chance)
+
+ LDA TRIBBLE            \ Add the C flag to TRIBBLE(1 0), starting with the low
+ ADC #0                 \ bytes
+ STA TRIBBLE
+
+ BCC game5              \ And then the high bytes
+ INC TRIBBLE+1          \
+                        \ So there is a 14% chance of a Trumble being born
+
+ BPL game5              \ If the high byte of TRIBBLE(1 0) is now &80, then
+ DEC TRIBBLE+1          \ decrement it back to &7F, so the number of Trumbles
+                        \ never goes above &7FFF (32767)
+
+.game5
+
+ LDA TRIBBLE+1          \ If the high byte of TRIBBLE(1 0), the number of
+ BEQ game7              \ Trumbles in the hold, is zero, jump to game7 to skip
+                        \ the following
+
+                        \ We have a lot of Trumbles in the hold, so they are
+                        \ probably making a bit of a noise
+
+ LDY CABTMP             \ If the cabin temperature is >= 224 then jump to game6
+ CPY #224               \ to skip the following and leave the value of A as a
+ BCS game6              \ high value, so the chances of the Trumbles making a
+                        \ noise in hot temperature is greater (specifically,
+                        \ this is the temperature at which the fuel scoop start
+                        \ working)
+
+ LSR A                  \ Set A = A / 2
+ LSR A
+
+.game6
+
+ STA T                  \ Set T = A, which will be higher with more Trumbles and
+                        \ higher temperatures
+ 
+ JSR DORND              \ Set A and X to random numbers
+ 
+ CMP T                  \ If A >= T then jump to game7 to skip making any noise,
+ BCS game7              \ so there is a higher chance of Trumbles making noise
+                        \ when there are lots of them or the cabin temperature
+                        \ is hot enough for the fuel scoops to work
+ 
+ AND #%100              \ Set A to our random number, set to either 0 or 4
+
+ ADC #3                 \ Set Y to our random number, set to either 3 or 7 (we
+ TAY                    \ know the C flag is clear as we just passed through a
+                        \ BCS)
+
+ JSR NOISE              \ Call the NOISE routine to make the sound of the
+                        \ Trumbles in Y, which will be one of 3 or 7, with an
+                        \ equal chance of either
+
+.game7
+
+                        \ --- End of added code ------------------------------->
 
  JSR TT17               \ Scan the keyboard for the cursor keys or joystick,
                         \ returning the cursor's delta values in X and Y and
@@ -31106,21 +31387,61 @@ ENDMACRO
  ETOK 209
  EQUB VE
 
- EQUB VE                \ Token 111:    ""
-                        \
-                        \ Encoded as:   ""
+                        \ --- Mod: Code removed for Trumbles: ----------------->
 
- EQUB VE                \ Token 112:    ""
-                        \
-                        \ Encoded as:   ""
+\EQUB VE                \ Token 111:    ""
+\                       \
+\                       \ Encoded as:   ""
+\
+\EQUB VE                \ Token 112:    ""
+\                       \
+\                       \ Encoded as:   ""
+\
+\EQUB VE                \ Token 113:    ""
+\                       \
+\                       \ Encoded as:   ""
+\
+\EQUB VE                \ Token 114:    ""
+\                       \
+\                       \ Encoded as:   ""
 
- EQUB VE                \ Token 113:    ""
-                        \
-                        \ Encoded as:   ""
+                        \ --- And replaced by: -------------------------------->
 
- EQUB VE                \ Token 114:    ""
-                        \
-                        \ Encoded as:   ""
+ ECHR ' '               \ Token 111:    " CUDDLY"
+ ECHR 'C'               \
+ ECHR 'U'               \ Encoded as:   " CUDDLY"
+ ECHR 'D'
+ ECHR 'D'
+ ECHR 'L'
+ ECHR 'Y'
+ EQUB VE
+
+ ECHR ' '               \ Token 112:    " CUTE"
+ ECHR 'C'               \
+ ECHR 'U'               \ Encoded as:   " CUTE"
+ ECHR 'T'
+ ECHR 'E'
+ EQUB VE
+
+ ECHR ' '               \ Token 113:    " FURRY"
+ ECHR 'F'               \
+ ECHR 'U'               \ Encoded as:   " FURRY"
+ ECHR 'R'
+ ECHR 'R'
+ ECHR 'Y'
+ EQUB VE
+
+ ECHR ' '               \ Token 114:    " FRIENDLY"
+ ECHR 'F'               \
+ ECHR 'R'               \ Encoded as:   " FRI<246>DLY"
+ ECHR 'I'
+ ETWO 'E', 'N'
+ ECHR 'D'
+ ECHR 'L'
+ ECHR 'Y'
+ EQUB VE
+
+                        \ --- End of replacement ------------------------------>
 
  ECHR 'W'               \ Token 115:    "WASP"
  ECHR 'A'               \
@@ -31671,13 +31992,249 @@ ENDMACRO
                         \
                         \ Encoded as:   ""
 
- EQUB VE                \ Token 198:    ""
-                        \
-                        \ Encoded as:   ""
+                        \ --- Mod: Code removed for Trumbles: ----------------->
 
- EQUB VE                \ Token 199:    ""
-                        \
-                        \ Encoded as:   ""
+\EQUB VE                \ Token 198:    ""
+\                       \
+\                       \ Encoded as:   ""
+\
+\EQUB VE                \ Token 199:    ""
+\                       \
+\                       \ Encoded as:   ""
+
+                        \ --- And replaced by: -------------------------------->
+
+ ECHR ' '               \ Token 198:    " LITTLE TRUMBLE"
+ ECHR 'L'               \
+ ETWO 'I', 'T'          \ Encoded as:   " L<219>T<229> TRUMB<229>"
+ ECHR 'T'
+ ETWO 'L', 'E'
+ ECHR ' '
+ ECHR 'T'
+ ECHR 'R'
+ ECHR 'U'
+ ECHR 'M'
+ ECHR 'B'
+ ETWO 'L', 'E'
+ EQUB VE  
+
+ EJMP 25                \ Token 199:    "{incoming message screen, wait 2s}
+ EJMP 9                 \                {clear screen}
+ EJMP 23                \                {move to row 10, white, lower case}
+ EJMP 14                \                {justify}
+ ECHR ' '               \                  {single cap}GOOD DAY COMMANDER
+ ECHR ' '               \                {commander name}, ALLOW ME TO INTRODUCE
+ EJMP 19                \                MYSELF. {single cap}I AM {single cap}
+ ECHR 'G'               \                THE {single cap}MERCHANT {single cap}
+ ECHR 'O'               \                PRINCE OF THRUN AND I {single cap}FIND
+ ECHR 'O'               \                MYSELF FORCED TO SELL MY MOST            
+ ECHR 'D'               \                TREASURED POSSESSION.{cr}
+ ECHR ' '               \                 {single cap}I AM OFFERING YOU, FOR THE
+ ECHR 'D'               \                PALTRY SUM OF JUST 5000{single cap}C
+ ECHR 'A'               \                {single cap}R THE RAREST THING IN THE
+ ECHR 'Y'               \                {single cap}KNOWN {single cap}UNIVERSE.
+ ECHR ' '               \                {cr}
+ ETOK 154               \                 {single cap}{single cap}WILL YOU TAKE
+ ECHR ' '               \                IT(Y/N)?{cr}
+ EJMP 4                 \                {left align}{all caps}{tab 6}
+ ECHR ','               \
+ EJMP 13                \ Encoded as:   "{25}{9}{23}{14}  {19}GOOD DAY [154] {4}
+ ECHR ' '               \                ,{13} <228><224>W ME[201]<240>TRODU
+ ETWO 'A', 'L'          \                <233> MY<218>LF. {19}I AM {19}<226>E
+ ETWO 'L', 'O'          \                 {19}M<244>CH<255>T {19}PR<240><233> OF
+ ECHR 'W'               \                 {19}<226>RUN <255>D {19}I{26}F<240>D M
+ ECHR ' '               \                Y<218>LF F<253><233>D[201]<218>LL MY MO
+ ECHR 'M'               \                <222> T<242>ASUR<242> POSS<237>SI<223>
+ ECHR 'E'               \                [204]I AM OFF<244>[195][179], F<253>
+ ETOK 201               \                 [147]P<228>TRY SUM OF JU<222> 5000{19}
+ ETWO 'I', 'N'          \                C{19}R [147]R<238>E<222> <226>[195]
+ ECHR 'T'               \                 <240> <226>E {19}K<227>WN {19}UNIV
+ ECHR 'R'               \                <244><218>[204]W<220>L [179] TAKE <219>
+ ECHR 'O'               \                [206]{12}{15}{1}{8}"
+ ECHR 'D'
+ ECHR 'U'             
+ ETWO 'C', 'E'
+ ECHR ' '             
+ ECHR 'M'
+ ECHR 'Y'
+ ETWO 'S', 'E'
+ ECHR 'L'
+ ECHR 'F'
+ ECHR '.'
+ ECHR ' '
+ EJMP 19
+ ECHR 'I'
+ ECHR ' '
+ ECHR 'A'
+ ECHR 'M'
+ ECHR ' '
+ EJMP 19
+ ETWO 'T', 'H'
+ ECHR 'E'
+ ECHR ' '
+ EJMP 19
+ ECHR 'M'
+ ETWO 'E', 'R'
+ ECHR 'C'
+ ECHR 'H'
+ ETWO 'A', 'N'
+ ECHR 'T'
+ ECHR ' '
+ EJMP 19
+ ECHR 'P'
+ ECHR 'R'
+ ETWO 'I', 'N'
+ ETWO 'C', 'E'
+ ECHR ' '
+ ECHR 'O'
+ ECHR 'F'
+ ECHR ' '
+ EJMP 19
+ ETWO 'T', 'H'
+ ECHR 'R'
+ ECHR 'U'
+ ECHR 'N'
+ ECHR ' '
+ ETWO 'A', 'N'
+ ECHR 'D'
+ ECHR ' '
+ EJMP 19
+ ECHR 'I'
+ ECHR ' '
+ ECHR 'F'
+ ETWO 'I', 'N'
+ ECHR 'D'
+ ECHR ' '
+ ECHR 'M'
+ ECHR 'Y'
+ ETWO 'S', 'E'
+ ECHR 'L'
+ ECHR 'F'
+ ECHR ' '
+ ECHR 'F'
+ ETWO 'O', 'R'
+ ETWO 'C', 'E'
+ ECHR 'D'
+ ETOK 201
+ ETWO 'S', 'E'
+ ECHR 'L'
+ ECHR 'L'
+ ECHR ' '
+ ECHR 'M'
+ ECHR 'Y'
+ ECHR ' '
+ ECHR 'M'
+ ECHR 'O'
+ ETWO 'S', 'T'
+ ECHR ' '
+ ECHR 'T'
+ ETWO 'R', 'E'
+ ECHR 'A'
+ ECHR 'S'
+ ECHR 'U'
+ ECHR 'R'
+ ETWO 'E', 'D'
+ ECHR ' '
+ ECHR 'P'
+ ECHR 'O'
+ ECHR 'S'
+ ECHR 'S'
+ ETWO 'E', 'S'
+ ECHR 'S'
+ ECHR 'I'
+ ETWO 'O', 'N'
+ ETOK 204
+ ECHR 'I'
+ ECHR ' '
+ ECHR 'A'
+ ECHR 'M'
+ ECHR ' '
+ ECHR 'O'
+ ECHR 'F'
+ ECHR 'F'
+ ETWO 'E', 'R'
+ ETOK 195
+ ETOK 179
+ ECHR ','
+ ECHR ' '
+ ECHR 'F'
+ ETWO 'O', 'R'
+ ECHR ' '
+ ETOK 147
+ ECHR 'P'
+ ETWO 'A', 'L'
+ ECHR 'T'
+ ECHR 'R'
+ ECHR 'Y'
+ ECHR ' '
+ ECHR 'S'
+ ECHR 'U'
+ ECHR 'M'
+ ECHR ' '
+ ECHR 'O'
+ ECHR 'F'
+ ECHR ' '
+ ECHR 'J'
+ ECHR 'U'
+ ETWO 'S', 'T'
+ ECHR ' '
+ ECHR '5'
+ ECHR '0'
+ ECHR '0'
+ ECHR '0'
+ EJMP 19
+ ECHR 'C'
+ EJMP 19
+ ECHR 'R'
+ ECHR ' '
+ ETOK 147
+ ECHR 'R'
+ ETWO 'A', 'R'
+ ECHR 'E'
+ ETWO 'S', 'T'
+ ECHR ' '
+ ETWO 'T', 'H'
+ ETOK 195
+ ECHR ' '
+ ETWO 'I', 'N'
+ ECHR ' '
+ ETWO 'T', 'H'
+ ECHR 'E'
+ ECHR ' '
+ EJMP 19
+ ECHR 'K'
+ ETWO 'N', 'O'
+ ECHR 'W'
+ ECHR 'N'
+ ECHR ' '
+ EJMP 19
+ ECHR 'U'
+ ECHR 'N'
+ ECHR 'I'
+ ECHR 'V'
+ ETWO 'E', 'R'
+ ETWO 'S', 'E'
+ ETOK 204
+ ECHR 'W'
+ ETWO 'I', 'L'
+ ECHR 'L'
+ ECHR ' '
+ ETOK 179
+ ECHR ' '
+ ECHR 'T'
+ ECHR 'A'
+ ECHR 'K'
+ ECHR 'E'
+ ECHR ' '
+ ETWO 'I', 'T'
+ ETOK 206
+ EJMP 12
+ EJMP 15
+ EJMP 1
+ EJMP 8
+ EQUB VE
+
+                        \ --- End of replacement ------------------------------>
 
  ECHR ' '               \ Token 200:    " NAME? "
  ECHR 'N'               \
@@ -34802,7 +35359,7 @@ ENDMACRO
 
                         \ --- And replaced by: -------------------------------->
 
- SKIP 72               \ These bytes appear to be unused
+ SKIPTO &6000           \ These bytes appear to be unused
 
                         \ --- End of added code ------------------------------->
 

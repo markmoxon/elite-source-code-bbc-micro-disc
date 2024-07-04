@@ -1558,7 +1558,21 @@ ORG &00D1
                         \
                         \   * &FF = fitted
 
- SKIP 4                 \ These bytes appear to be unused
+                        \ --- Mod: Code removed for Trumbles: ----------------->
+
+\SKIP 4                 \ These bytes appear to be unused
+
+                        \ --- And replaced by: -------------------------------->
+
+ SKIP 1                 \ This byte appears to be unused
+
+.TRIBBLE
+
+ SKIP 2                 \ The number of Trumbles in the cargo hold
+
+ SKIP 1                 \ This byte appears to be unused
+
+                        \ --- End of replacement ------------------------------>
 
 .NOMSL
 
@@ -2093,9 +2107,26 @@ ORG &00D1
 
  SKIP 1                 \ The y-coordinate of the tip of the laser line
 
-.XX24
+                        \ --- Mod: Code removed for docking fee: -------------->
 
- SKIP 1                 \ This byte appears to be unused
+\.XX24
+\
+\SKIP 1                 \ This byte appears to be unused
+
+                        \ --- And replaced by: -------------------------------->
+
+.chargeDockingFee
+
+ SKIP 1                 \ Records whether we have been charged a docking fee, so
+                        \ we don't get charged twice:
+                        \
+                        \   * 0 = we have not been charged a docking fee
+                        \
+                        \   * Non-zero = we have been charged a docking fee
+                        \
+                        \ The docking fee is 5.0 credits
+
+                        \ --- End of replacement ------------------------------>
 
 .ALTIT
 
@@ -2908,6 +2939,55 @@ ENDIF
  AND DKCMP              \ computer fitted, keep going, otherwise jump down to
  BEQ MA68               \ MA68 to skip the following
 
+                        \ --- Mod: Code added for docking fee: ---------------->
+
+                        \ We now deduct a docking fee of 5.0 credits for using
+                        \ the docking computer
+
+ LDA chargeDockingFee   \ If we have already been charged a docking fee
+ BNE barb4              \ (chargeDockingFee is non-zero), then jump to barb4 to
+                        \ engage the docking computer without charging a docking
+                        \ fee
+
+                        \ Otherwise we charge the docking fee
+
+ LDY #0                 \ Set (Y X) = 50, so the docking fee is 5.0 credits
+ LDX #50
+
+ JSR LCASH              \ Subtract (Y X) cash from the cash pot, but only if
+                        \ we have enough cash
+
+ BCS barb3              \ If the C flag is set then we did have enough cash for
+                        \ the transaction, so jump to barb3 to skip the
+                        \ following instruction
+
+                        \ If we get here then we don't have enough cash for the
+                        \ docking fee, so make a beep and return from the
+                        \ subroutine without engaging the docking computer
+
+ LDA #0                 \ Set auto to 0, so the docking computer is no longer
+ STA auto               \ activated
+
+ LDA #40                \ Call the NOISE routine with A = 40 to make a low,
+ JMP NOISE              \ long beep, and return from the subroutine using a tail
+                        \ call
+
+.barb3
+
+ DEC chargeDockingFee   \ Set chargeDockingFee to &FF so we don't charge another
+                        \ docking fee
+
+ LDA #0                 \ Print control code 0 (current amount of cash and
+ JSR MESS               \ newline) as an in-flight message, to show our balance
+                        \ after the docking fee has been paid
+
+.barb4
+
+ LDA #1                 \ Set A to 1 to enable the docking computer and music in
+                        \ the following
+
+                        \ --- End of added code ------------------------------->
+
  STA auto               \ Set auto to the non-zero value of A, so the docking
                         \ computer is activated
 
@@ -3232,10 +3312,21 @@ ENDIF
                         \ the canister is below us and we have a fuel scoop
                         \ fitted
 
- BPL MA58               \ If the result is positive, then we either have no
-                        \ scoop or the canister is above us, and in both cases
+                        \ --- Mod: Code removed for Compendium: --------------->
+
+\BPL MA58               \ If the result is positive, then we either have no
+\                       \ scoop or the canister is above us, and in both cases
+\                       \ this means we can't scoop the item, so jump to MA58
+\                       \ to process a collision
+
+                        \ --- And replaced by: -------------------------------->
+
+ BMI P%+5               \ If the result is positive, then we either have no
+ JMP MA58               \ scoop or the canister is above us, and in both cases
                         \ this means we can't scoop the item, so jump to MA58
                         \ to process a collision
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
@@ -3365,13 +3456,27 @@ ENDIF
 
 .ISDK
 
+                        \ --- Mod: Code removed for better docking computer: -->
+
+\LDA K%+NI%+36          \ 1. Fetch the NEWB flags (byte #36) of the second ship
+\AND #%00000100         \ in the ship data workspace at K%, which is reserved
+\BNE MA62               \ for the sun or the space station (in this case it's
+\                       \ the latter), and if bit 2 is set, meaning the station
+\                       \ is hostile, jump down to MA62 to fail docking (so
+\                       \ trying to dock at a station that we have annoyed does
+\                       \ not end well)
+
+                        \ --- And replaced by: -------------------------------->
+
  LDA K%+NI%+36          \ 1. Fetch the NEWB flags (byte #36) of the second ship
  AND #%00000100         \ in the ship data workspace at K%, which is reserved
- BNE MA62               \ for the sun or the space station (in this case it's
+ BNE MA622              \ for the sun or the space station (in this case it's
                         \ the latter), and if bit 2 is set, meaning the station
-                        \ is hostile, jump down to MA62 to fail docking (so
+                        \ is hostile, jump down to MA622 to fail docking (so
                         \ trying to dock at a station that we have annoyed does
                         \ not end well)
+
+                        \ --- End of replacement ------------------------------>
 
  LDA INWK+14            \ 2. If nosev_z_hi < 214, jump down to MA62 to fail
  CMP #214               \ docking, as the angle of approach is greater than 26
@@ -3415,6 +3520,18 @@ ENDIF
  JMP DOENTRY            \ Go to the docking bay (i.e. show the ship hangar)
 
 .MA62
+
+                        \ --- Mod: Code added for better docking computer: ---->
+
+ LDA auto               \ If the docking computer is engaged, ensure we dock
+ BNE GOIN               \ successfully even if the approach isn't correct, as
+                        \ the docking computer algorithm isn't perfect (so this
+                        \ fixes the issue in the other versions of Elite where
+                        \ the docking computer can kill you)
+
+.MA622
+
+                        \ --- End of added code ------------------------------->
 
                         \ If we arrive here, docking has just failed
 
@@ -4155,14 +4272,54 @@ ENDIF
  CMP #224               \ If the cabin temperature < 224 then jump to MA23 to
  BCC MA23               \ skip fuel scooping, as we aren't close enough
 
+                        \ --- Mod: Code added for Trumbles: ------------------->
+
+ CMP #240               \ If the cabin temperature < 240 then jump to nokilltr
+ BCC nokilltr           \ as the heat isn't high enough to kill Trumbles
+
+ LDA TRIBBLE+1          \ If TRIBBLE(1 0) = 0 then there are no Trumbles in the
+ ORA TRIBBLE            \ hold, so jump to nokilltr to skip the following
+ BEQ nokilltr
+
+ LSR TRIBBLE+1          \ Halve the number of Trumbles in TRIBBLE(1 0) as the
+ ROR TRIBBLE            \ cabin temperature is high enough to kill them off
+                        \ (this will eventually bring the number down to zero)
+
+ LDA #56                \ Call the NOISE routine with A = 56 to make the sound
+ JSR NOISE              \ of Trumbles being killed off by the heat of the sun
+
+.nokilltr
+
+                        \ --- End of added code ------------------------------->
+
  LDA BST                \ If we don't have fuel scoops fitted, jump to BA23 to
  BEQ MA23               \ skip fuel scooping, as we can't scoop without fuel
                         \ scoops
 
+                        \ --- Mod: Code removed for moving fuel scoops: ------->
+
+\LDA DELT4+1            \ We are now successfully fuel scooping, so it's time
+\LSR A                  \ to work out how much fuel we're scooping. Fetch the
+\                       \ high byte of DELT4, which contains our current speed
+\                       \ divided by 4, and halve it to get our current speed
+\                       \ divided by 8 (so it's now a value between 1 and 5, as
+\                       \ our speed is normally between 1 and 40). This gives
+\                       \ us the amount of fuel that's being scooped in A, so
+\                       \ the faster we go, the more fuel we scoop, and because
+\                       \ the fuel levels are stored as 10 * the fuel in light
+\                       \ years, that means we just scooped between 0.1 and 0.5
+\                       \ light years of free fuel
+
+                        \ --- And replaced by: -------------------------------->
+
  LDA DELT4+1            \ We are now successfully fuel scooping, so it's time
- LSR A                  \ to work out how much fuel we're scooping. Fetch the
+ BEQ MA23               \ to work out how much fuel we're scooping. Fetch the
                         \ high byte of DELT4, which contains our current speed
-                        \ divided by 4, and halve it to get our current speed
+                        \ divided by 4, and if it is zero, jump to BA23 to skip
+                        \ skip fuel scooping, as we can't scoop fuel if we are
+                        \ not moving
+
+ LSR A                  \ If we are moving, halve A to get our current speed
                         \ divided by 8 (so it's now a value between 1 and 5, as
                         \ our speed is normally between 1 and 40). This gives
                         \ us the amount of fuel that's being scooped in A, so
@@ -4170,6 +4327,8 @@ ENDIF
                         \ the fuel levels are stored as 10 * the fuel in light
                         \ years, that means we just scooped between 0.1 and 0.5
                         \ light years of free fuel
+
+                        \ --- End of replacement ------------------------------>
 
  ADC QQ14               \ Set A = A + the current fuel level * 10 (from QQ14)
 
@@ -9685,6 +9844,23 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
  STA ESCP               \ The escape pod is a one-use item, so set ESCP to 0 so
                         \ we no longer have one fitted
 
+                        \ --- Mod: Code added for Trumbles: ------------------->
+
+ LDA TRIBBLE            \ If there are no Trumbles in our hold, then both bytes
+ ORA TRIBBLE+1          \ of TRIBBLE(1 0) will be zero, so jump to nosurviv to
+ BEQ nosurviv           \ skip the following
+
+ JSR DORND              \ Otherwise set TRIBBLE(1 0) to a random number between
+ AND #7                 \ 1 and 7, to determine how many Trumbles manage to
+ ORA #1                 \ hitch a ride in the escape pod (so using an escape pod
+ STA TRIBBLE            \ is not a solution to the trouble with Trumbles)
+ LDA #0
+ STA TRIBBLE+1
+
+.nosurviv
+
+                        \ --- End of added code ------------------------------->
+
  LDA #70                \ Our replacement ship is delivered with a full tank of
  STA QQ14               \ fuel, so set the current fuel level in QQ14 to 70, or
                         \ 7.0 light years
@@ -9968,10 +10144,31 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
  AND #%00000100         \ the ship's NEWB flags is set, and if it is (i.e. the
  BNE TN5                \ station is hostile), jump to TN5 to spawn some cops
 
- LDA MANY+SHU+1         \ The station is not hostile, so check how many
- BNE TA1                \ Transporters there are in the vicinity, and if we
+                        \ --- Mod: Code removed for better docking computer: -->
+
+\LDA MANY+SHU+1         \ The station is not hostile, so check how many
+\BNE TA1                \ Transporters there are in the vicinity, and if we
+\                       \ already have one, return from the subroutine (as TA1
+\                       \ contains an RTS)
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDA MANY+SHU+1         \ Set A to the number of Transporters in the vicinity
+
+ ORA auto               \ If the docking computer is on then auto is &FF, so
+                        \ this ensures that A is always non-zero when we are
+                        \ auto-docking, so the following jump to TA1 will be
+                        \ taken and no Transporters will be spawned from the
+                        \ space station (unlike in the disc version, where you
+                        \ can get smashed into space dust by a badly timed
+                        \ Transporter launch when using the docking computer)
+
+ BNE TA1                \ The station is not hostile, so check how many
+                        \ Transporters there are in the vicinity, and if we
                         \ already have one, return from the subroutine (as TA1
                         \ contains an RTS)
+
+                        \ --- End of replacement ------------------------------>
 
                         \ If we get here then the station is not hostile, so we
                         \ can consider spawning a Transporter or Shuttle
@@ -14855,6 +15052,13 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
                         \ until we have added up all market items from 12
                         \ (minerals) down to 0 (food)
 
+                        \ --- Mod: Code added for Trumbles: ------------------->
+
+ ADC TRIBBLE+1          \ Add the high byte of the number of Trumbles in the
+                        \ hold, as 256 Trumbles take up one tonne of cargo space
+
+                        \ --- End of added code ------------------------------->
+
  CMP CRGO               \ If A < CRGO then the C flag will be clear (we have
                         \ room in the hold)
                         \
@@ -15597,6 +15801,20 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
 .TT22
 
+                        \ --- Mod: Code added for Compendium: ----------------->
+
+ CURRENT1% = P%         \ Store the current address
+
+ CLEAR &5600, &5600     \ Clear the guard so we can assemble TT22 and TT23 into
+                        \ sideways ROM
+
+ ORG &B700              \ Assemble TT22 at &B700, at the end of the music ROM
+
+                        \ --- End of added code ------------------------------->
+
+
+.TT22_ROM
+
  LDA #64                \ Clear the top part of the screen, draw a white border,
  JSR TT66               \ and set the current view type in QQ11 to 32 (Long-
                         \ range Chart)
@@ -15705,7 +15923,7 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 \
 \ ******************************************************************************
 
-.TT15
+.TT15_ROM
 
  LDA #24                \ Set A to 24, which we will use as the minimum
                         \ screen indent for the crosshairs (i.e. the minimum
@@ -15823,6 +16041,70 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
                         \ draw from the top edge of the crosshairs to the bottom
                         \ edge, through the centre of the crosshairs, returning
                         \ from the subroutine using a tail call
+
+                        \ --- Mod: Code added for Compendium: ----------------->
+
+ END_OF_TT22 = P%
+
+ SAVE "3-assembled-output/rom-extra1.bin", TT22_ROM, P%
+
+ ORG CURRENT1%          \ Start assembling the main code again
+
+ GUARD &5600            \ Put the guard back in place that we removed above
+
+ LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
+ PHA                    \ store it on the stack
+
+ LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
+ STA &F4
+ STA &FE30
+
+ TYA                    \ Store X and Y on the stack
+ PHA
+ TXA
+ PHA
+
+ JSR TT22_ROM           \ Call the TT22 routine in the music ROM
+
+ PLA                    \ Retrieve X and Y from the stack
+ TAX
+ PLA
+ TAY
+
+ PLA                    \ Set the ROM number back to the value that we stored
+ STA &F4                \ above, to switch back to the previous ROM
+ STA &FE30
+
+ RTS                    \ Return from the subroutine
+
+.TT15
+
+ LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
+ PHA                    \ store it on the stack
+
+ LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
+ STA &F4
+ STA &FE30
+
+ TYA                    \ Store X and Y on the stack
+ PHA
+ TXA
+ PHA
+
+ JSR TT15_ROM           \ Call the TT15 routine in the music ROM
+
+ PLA                    \ Retrieve X and Y from the stack
+ TAX
+ PLA
+ TAY
+
+ PLA                    \ Set the ROM number back to the value that we stored
+ STA &F4                \ above, to switch back to the previous ROM
+ STA &FE30
+
+ RTS                    \ Return from the subroutine
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -15972,6 +16254,19 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
 .TT210
 
+                        \ --- Mod: Code added for Compendium: ----------------->
+
+ CURRENT2% = P%         \ Store the current address
+
+ CLEAR &5600, &5600     \ Clear the guard so we can assemble TT23 into sideways
+                        \ ROM
+
+ ORG END_OF_TT22        \ Assemble TT210 after the end of TT22/TT15
+
+                        \ --- End of added code ------------------------------->
+
+.TT210_ROM
+
  LDY #0                 \ We're going to loop through all the available market
                         \ items and check whether we have any in the hold (and,
                         \ if we are in the Sell Cargo screen, whether we want
@@ -16027,7 +16322,123 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
  CPY #17                \ If Y < 17 then loop back to TT211 to print the next
  BCC TT211              \ item in the hold
 
- RTS                    \ Otherwise return from the subroutine
+                        \ --- Mod: Code removed for Trumbles: ----------------->
+
+\RTS                    \ Otherwise return from the subroutine
+
+                        \ --- And replaced by: -------------------------------->
+
+ JSR TT69               \ Call TT69 to set Sentence Case and print a newline
+
+ LDA TRIBBLE            \ If there are any Trumbles in the hold, skip the
+ ORA TRIBBLE+1          \ following RTS and continue on
+ BNE P%+3
+
+.zebra
+
+ RTS                    \ There are no Trumbles in the hold, so return from the
+                        \ subroutine
+
+                        \ If we get here then we have Trumbles in the hold, so
+                        \ we print out the number
+
+ CLC                    \ Clear the C flag, so the call to TT11 below doesn't
+                        \ include a decimal point
+
+ LDA #0                 \ Set A = 0, for the call to TT11 below, so we don't pad
+                        \ out the number of Trumbles
+
+ LDX TRIBBLE            \ Fetch the number of Trumbles into (Y X)
+ LDY TRIBBLE+1
+
+ JSR TT11               \ Call TT11 to print the number of Trumbles in (Y X),
+                        \ with no decimal point
+
+ LDA #'L'               \ Print "LITTLE TRUMBLE"
+ JSR TT27
+ LDA #'i'
+ JSR TT27
+ LDA #'t'
+ JSR TT27
+ LDA #'t'
+ JSR TT27
+ LDA #'l'
+ JSR TT27
+ LDA #'e'
+ JSR TT27
+ LDA #' '
+ JSR TT27
+ LDA #'T'
+ JSR TT27
+ LDA #'r'
+ JSR TT27
+ LDA #'u'
+ JSR TT27
+ LDA #'m'
+ JSR TT27
+ LDA #'b'
+ JSR TT27
+ LDA #'l'
+ JSR TT27
+ LDA #'e'
+ JSR TT27
+
+\JSR DORND              \ Print out a random extended token from 111 to 114, all
+\AND #3                 \ of which are blank in this version of Elite
+\CLC
+\ADC #111
+\JSR DETOK
+\
+\LDA #198               \ Print extended token 198, which is blank, but would
+\JSR DETOK              \ contain the text "LITTLE TRUMBLE" if the Trumbles
+                        \ mission was enabled
+
+ LDA TRIBBLE+1          \ If we have more than 256 Trumbles, skip to DOANS
+ BNE DOANS
+
+ LDX TRIBBLE            \ If we have exactly one Trumble, return from the
+ DEX                    \ subroutine (as zebra contains an RTS)
+ BEQ zebra
+
+.DOANS
+
+ LDA #'s'               \ We have more than one Trumble, so print an 's' and
+ JMP TT27               \ return from the subroutine using a tail call
+
+ END_OF_TT210 = P%
+
+ SAVE "3-assembled-output/rom-extra2.bin", TT210_ROM, P%
+
+ ORG CURRENT2%          \ Start assembling the main code again
+
+ GUARD &5600            \ Put the guard back in place that we removed above
+
+ LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
+ PHA                    \ store it on the stack
+
+ LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
+ STA &F4
+ STA &FE30
+
+ TYA                    \ Store X and Y on the stack
+ PHA
+ TXA
+ PHA
+
+ JSR TT210_ROM          \ Call the TT210 routine in the music ROM
+
+ PLA                    \ Retrieve X and Y from the stack
+ TAX
+ PLA
+ TAY
+
+ PLA                    \ Set the ROM number back to the value that we stored
+ STA &F4                \ above, to switch back to the previous ROM
+ STA &FE30
+
+ RTS                    \ Return from the subroutine
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
@@ -16320,12 +16731,12 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
                         \ --- Mod: Code added for Compendium: ----------------->
 
- CURRENT% = P%          \ Store the current address
+ CURRENT3% = P%         \ Store the current address
 
  CLEAR &5600, &5600     \ Clear the guard so we can assemble TT23 into sideways
                         \ ROM
 
- ORG &B700              \ Assemble TT23 at &B700, at the end of the music ROM
+ ORG END_OF_TT210       \ Assemble TT23 after the end of TT210
 
 .TT23_ROM
 
@@ -16575,11 +16986,11 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
  RTS                    \ Return from the subroutine
 
- SAVE "3-assembled-output/rom-extra.bin", TT23_ROM, P%
+ SAVE "3-assembled-output/rom-extra3.bin", TT23_ROM, P%
 
- ORG CURRENT%           \ Start assembling the main code again
+ ORG CURRENT3%          \ Start assembling the main code again
 
- GUARD &5600            \ Put the guard back in place that we removed above
+\ GUARD &5600            \ Put the guard back in place that we removed above
 
  LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
  PHA                    \ store it on the stack
@@ -18108,9 +18519,19 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
  JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
 
+                        \ --- Mod: Code removed for docking fee: -------------->
+
+\LDA QQ11               \ If the current view in QQ11 is not a space view (0) or
+\AND #%00111111         \ one of the charts (64 or 128), return from the
+\BNE TT113              \ subroutine (as TT113 contains an RTS)
+
+                        \ --- And replaced by: -------------------------------->
+
  LDA QQ11               \ If the current view in QQ11 is not a space view (0) or
  AND #%00111111         \ one of the charts (64 or 128), return from the
- BNE TT113              \ subroutine (as TT113 contains an RTS)
+ BNE TT18-1             \ subroutine (as TT18-1 contains an RTS)
+
+                        \ --- End of replacement ------------------------------>
 
  JSR TTX66              \ Otherwise clear the screen and draw a white border
 
@@ -18230,6 +18651,67 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 .TT115
 
  JMP TT23               \ Jump to TT23 to display the Short-range Chart
+
+\ ******************************************************************************
+\
+\       Name: LCASH
+\       Type: Subroutine
+\   Category: Maths (Arithmetic)
+\    Summary: Subtract an amount of cash from the cash pot
+\
+\ ------------------------------------------------------------------------------
+\
+\ Subtract (Y X) cash from the cash pot in CASH, but only if there is enough
+\ cash in the pot. As CASH is a four-byte number, this calculates:
+\
+\   CASH(0 1 2 3) = CASH(0 1 2 3) - (0 0 Y X)
+\
+\ ------------------------------------------------------------------------------
+\
+\ Returns:
+\
+\   C flag              If set, there was enough cash to do the subtraction
+\
+\                       If clear, there was not enough cash to do the
+\                       subtraction
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for docking fee: ---------------->
+
+.LCASH
+
+ STX T1                 \ Subtract the least significant bytes:
+ LDA CASH+3             \
+ SEC                    \   CASH+3 = CASH+3 - X
+ SBC T1
+ STA CASH+3
+
+ STY T1                 \ Then the second most significant bytes:
+ LDA CASH+2             \
+ SBC T1                 \   CASH+2 = CASH+2 - Y
+ STA CASH+2
+
+ LDA CASH+1             \ Then the third most significant bytes (which are 0):
+ SBC #0                 \
+ STA CASH+1             \   CASH+1 = CASH+1 - 0
+
+ LDA CASH               \ And finally the most significant bytes (which are 0):
+ SBC #0                 \
+ STA CASH               \   CASH = CASH - 0
+
+ BCS TT113              \ If the C flag is set then the subtraction didn't
+                        \ underflow, so the value in CASH is correct and we can
+                        \ jump to TT113 to return from the subroutine with the
+                        \ C flag set to indicate success (as TT113 contains an
+                        \ RTS)
+
+                        \ Otherwise we didn't have enough cash in CASH to
+                        \ subtract (Y X) from it, so fall through into
+                        \ MCASH to reverse the sum and restore the original
+                        \ value in CASH, and returning with the C flag clear
+
+                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -19763,6 +20245,37 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 \ ******************************************************************************
 
 .SOLAR
+
+                        \ --- Mod: Code added for Trumbles: ------------------->
+
+ LDA TRIBBLE            \ If we have no Trumbles in the hold, skip to nobirths
+ BEQ nobirths
+
+                        \ If we get here then we have Trumbles in the hold, so
+                        \ this is where they breed (though we never get here in
+                        \ the Master version as the number of Trumbles is always
+                        \ zero)
+
+ LDA #0                 \ Trumbles eat food and narcotics during the hyperspace
+ STA QQ20               \ journey, so zero the amount of food and narcotics in
+ STA QQ20+6             \ the hold
+
+ JSR DORND              \ Take the number of Trumbles from TRIBBLE(1 0), add a
+ AND #15                \ random number between 4 and 15, and double the result,
+ ADC TRIBBLE            \ storing the resulting number in TRIBBLE(1 0)
+ ORA #4                 \
+ ROL A                  \ We start with the low byte
+ STA TRIBBLE
+
+ ROL TRIBBLE+1          \ And then do the high byte
+
+ BPL P%+5               \ If bit 7 of the high byte is set, then rotate the high
+ ROR TRIBBLE+1          \ byte back to the right, so the number of Trumbles is
+                        \ always positive
+
+.nobirths
+
+                        \ --- End of added code ------------------------------->
 
  LSR FIST               \ Halve our legal status in FIST, making us less bad,
                         \ and moving bit 0 into the C flag (so every time we
@@ -24815,6 +25328,13 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
  STA MCNT               \ Reset MCNT (the main loop counter) to 0
 
+                        \ --- Mod: Code added for docking fee: ---------------->
+
+ STA chargeDockingFee   \ Set chargeDockingFee to 0 so the docking fee is marked
+                        \ as being not already paid
+
+                        \ --- End of added code ------------------------------->
+
  STA QQ22+1             \ Set the on-screen hyperspace counter to 0
 
  LDA #3                 \ Reset DELTA (speed) to 3
@@ -26864,6 +27384,26 @@ ENDIF
 \ ******************************************************************************
 
 .WARP
+
+                        \ --- Mod: Code added for better docking computer: ---->
+
+ LDA auto               \ If the docking computer is engaged (auto is non-zero)
+ AND SSPR               \ and we are inside the space station safe zone (SSPR
+ BEQ warp1              \ is non-zero), then this sets A to be non-zero, so if
+                        \ this is not the case, jump to warp1 to skip the
+                        \ following
+
+                        \ If we get here then the docking computer is engaged
+                        \ and we are in the space station safe zone, in which
+                        \ case the fast-forward button docks us instantly
+
+ JMP GOIN               \ Go to the docking bay (i.e. show the ship hangar
+                        \ screen) and return from the subroutine with a tail
+                        \ call
+
+.warp1
+
+                        \ --- End of added code ------------------------------->
 
  LDX JUNK               \ Set X to the total number of junk items in the
                         \ vicinity (e.g. asteroids, escape pods, cargo
