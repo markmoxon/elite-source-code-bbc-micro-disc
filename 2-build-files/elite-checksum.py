@@ -192,9 +192,9 @@ elite_file.close()
 
 # SC routine, which EORs bytes between &1300 and &9FFF
 
-if Scramble:
-    for n in range(scramble_from, scramble_to):
-        data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
+#if Scramble:
+#    for n in range(scramble_from, scramble_to):
+#        data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
 
 # LOAD routine, which calculates checksum at &55FF in docked code
 # This checksum is not correct - need to fix this at some point
