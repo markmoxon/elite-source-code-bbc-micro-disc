@@ -17029,7 +17029,7 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
  ORG CURRENT3%          \ Start assembling the main code again
 
-\ GUARD &5600            \ Put the guard back in place that we removed above
+ GUARD &5600            \ Put the guard back in place that we removed above
 
  LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
  PHA                    \ store it on the stack
