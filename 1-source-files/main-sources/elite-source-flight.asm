@@ -792,7 +792,7 @@
 
 .LSNUM2
 
- SKIP 0                 \ The size of the existing ship line heap for the ship
+ SKIP 1                 \ The size of the existing ship line heap for the ship
                         \ we are drawing in LL9, i.e. the number of lines in the
                         \ old ship that is currently shown on-screen and which
                         \ we need to erase
@@ -864,7 +864,7 @@ ORG &00D1
 
 .XX2
 
- SKIP 7                 \ Temporary storage, used to store the visibility of the
+ SKIP 10                \ Temporary storage, used to store the visibility of the
                         \ ship's faces during the ship-drawing routine at LL9
 
 .K2
@@ -6292,15 +6292,13 @@ ENDIF
 
                         \ --- Mod: Code added for flicker-free planets: ------->
 
- JSR DrawPlanetLine     \ Draw the current line from the old planet
+ LDA #&FF               \ Set bit 7 of K3+8 so we do not draw the current line
+ STA K3+8               \ in the call to DrawPlanetLine, but store the
+                        \ coordinates so we we can check them below
 
-\LDA #&FF               \ Set bit 7 of K3+8 so we do not draw the current line
-\STA K3+8               \ in the call to DrawPlanetLine, but store the
-\                       \ coordinates so we we can check them below
-\
-\JSR DrawPlanetLine+2   \ Calculate the current line from the old heap, but do
-\                       \ not draw it, but store the coordinates (X1, Y1) and
-\                      \ (X2, Y2) in K3+4 to K3+7
+ JSR DrawPlanetLine+4   \ Calculate the current line from the old heap, but do
+                        \ not draw it, but store the coordinates (X1, Y1) and
+                        \ (X2, Y2) in K3+4 to K3+7
 
                         \ --- End of added code ------------------------------->
 
@@ -6316,14 +6314,14 @@ ENDIF
 
                         \ --- Mod: Code removed for flicker-free planets: ----->
 
- JSR LOIN               \ Draw a line from (X1, Y1) to (X2, Y2)
+\JSR LOIN               \ Draw a line from (X1, Y1) to (X2, Y2)
 
                         \ --- And replaced by: -------------------------------->
 
-\JSR DrawNewPlanetLine  \ Draw a line from (X1, Y1) to (X2, Y2), but only if it
-\                       \ is different to the old line in K3+4 to K3+7
+ JSR DrawNewPlanetLine  \ Draw a line from (X1, Y1) to (X2, Y2), but only if it
+                        \ is different to the old line in K3+4 to K3+7
 
-                        \ --- End of added code ------------------------------->
+                        \ --- End of replacement ------------------------------>
 
  LDA XX13               \ If XX13 is non-zero, jump up to BL5 to add a &FF
  BNE BL5                \ marker to the end of the line heap. XX13 is non-zero
@@ -6401,11 +6399,11 @@ ENDIF
 
 .DrawPlanetLine
 
-\LDA #0                 \ Clear bit 7 of K3+8 so we draw the current line below
-\STA K3+8
-\
-\LDA #0                 \ Clear bit 7 of K3+9 to indicate that there is no line
-\STA K3+9               \ to draw (we may change this below)
+ LDA #0                 \ Clear bit 7 of K3+8 so we draw the current line below
+ STA K3+8
+
+ LDA #0                 \ Clear bit 7 of K3+9 to indicate that there is no line
+ STA K3+9               \ to draw (we may change this below)
 
  LDA LSNUM              \ If LSNUM = 1, then this is the first point from the
  CMP #2                 \ heap, so jump to plin3 to set the previous coordinate
@@ -6460,11 +6458,11 @@ ENDIF
  CMP #&FF
  BEQ plin1
 
-\DEC K3+9               \ Decrement K3+9 to &FF to indicate that there is a line
-\                       \ to draw
-\
-\BIT K3+8               \ If bit 7 of K3+8 is set, jump to plin2 to store the
-\BMI plin2              \ line coordinates rather than drawing the line
+ DEC K3+9               \ Decrement K3+9 to &FF to indicate that there is a line
+                        \ to draw
+
+ BIT K3+8               \ If bit 7 of K3+8 is set, jump to plin2 to store the
+ BMI plin2              \ line coordinates rather than drawing the line
 
  JSR LL30               \ The coordinates in (X1, Y1) and (X2, Y2) that we just
                         \ pulled from the ball line heap point to a line that is
@@ -6486,18 +6484,18 @@ ENDIF
 
  RTS                    \ Return from the subroutine
 
-\.plin2
+.plin2
 
-\LDA X1                 \ Store X1, Y1, X2, Y2 in K3+4 to K3+7
-\STA K3+4
-\LDA Y1
-\STA K3+5
-\LDA X2
-\STA K3+6
-\LDA Y2
-\STA K3+7
-\
-\JMP plin1              \ Jump to plin1 to return from the subroutine
+ LDA X1                 \ Store X1, Y1, X2, Y2 in K3+4 to K3+7
+ STA K3+4
+ LDA Y1
+ STA K3+5
+ LDA X2
+ STA K3+6
+ LDA Y2
+ STA K3+7
+
+ JMP plin1              \ Jump to plin1 to return from the subroutine
 
 .plin3
 
@@ -6530,47 +6528,47 @@ ENDIF
 
                         \ --- Mod: Code added for flicker-free planets: ------->
 
-\.DrawNewPlanetLine
-\
-\BIT K3+9               \ If bit 7 of K3+9 is clear, then there is no old line
-\BPL nlin2              \ to draw, so jump to nlin2 to draw the new line only
-\
-\LDA K3+4               \ If the old line equals the new line, jump to nlin3
-\CMP X1                 \ to skip drawing both lines
-\BNE nlin1
-\LDA K3+5
-\CMP Y1
-\BNE nlin1
-\LDA K3+6
-\CMP X2
-\BNE nlin1
-\LDA K3+7
-\CMP Y2
-\BEQ nlin3
-\
-\.nlin1
-\
-\                       \ If we get here then the old line is different to the
-\                       \ new line, so we draw them both
-\
-\JSR LL30               \ Draw the new line from (X1, Y1) to (X2, Y2)
-\
-\LDA K3+4               \ Set up the old line's coordinates
-\STA X1
-\LDA K3+5
-\STA Y1
-\LDA K3+6
-\STA X2
-\LDA K3+7
-\STA Y2
-\
-\.nlin2
-\
-\JSR LL30               \ Draw the old line to erase it
-\
-\.nlin3
-\
-\RTS                    \ Return from the subroutine
+.DrawNewPlanetLine
+
+ BIT K3+9               \ If bit 7 of K3+9 is clear, then there is no old line
+ BPL nlin2              \ to draw, so jump to nlin2 to draw the new line only
+
+ LDA K3+4               \ If the old line equals the new line, jump to nlin3
+ CMP X1                 \ to skip drawing both lines
+ BNE nlin1
+ LDA K3+5
+ CMP Y1
+ BNE nlin1
+ LDA K3+6
+ CMP X2
+ BNE nlin1
+ LDA K3+7
+ CMP Y2
+ BEQ nlin3
+
+.nlin1
+
+                        \ If we get here then the old line is different to the
+                        \ new line, so we draw them both
+
+ JSR LL30               \ Draw the new line from (X1, Y1) to (X2, Y2)
+
+ LDA K3+4               \ Set up the old line's coordinates
+ STA X1
+ LDA K3+5
+ STA Y1
+ LDA K3+6
+ STA X2
+ LDA K3+7
+ STA Y2
+
+.nlin2
+
+ JSR LL30               \ Draw the old line to erase it
+
+.nlin3
+
+ RTS                    \ Return from the subroutine
 
                         \ --- End of added code ------------------------------->
 
@@ -16970,6 +16968,8 @@ ENDIF
 
  RTS                    \ Return from the subroutine
 
+ END_OF_TT23 = P%
+
  SAVE "3-assembled-output/rom-extra3.bin", TT23_ROM, P%
 
  ORG CURRENT3%          \ Start assembling the main code again
@@ -17078,6 +17078,19 @@ ENDIF
 \ ******************************************************************************
 
 .TT111
+
+                        \ --- Mod: Code added for Compendium: ----------------->
+
+ CURRENT4% = P%         \ Store the current address
+
+ CLEAR &5600, &5600     \ Clear the guard so we can assemble TT111 into sideways
+                        \ ROM
+
+ ORG END_OF_TT23        \ Assemble TT111 after the end of TT23
+
+.TT111_ROM
+
+                        \ --- End of added code ------------------------------->
 
  JSR TT81               \ Set the seeds in QQ15 to those of system 0 in the
                         \ current galaxy (i.e. copy the seeds from QQ21 to QQ15)
@@ -17318,6 +17331,41 @@ ENDIF
                         \ QQ15 and store them in the relevant locations, so our
                         \ new selected system is fully set up, and return from
                         \ the subroutine using a tail call
+
+ END_OF_TT111 = P%
+
+ SAVE "3-assembled-output/rom-extra4.bin", TT111_ROM, P%
+
+ ORG CURRENT4%          \ Start assembling the main code again
+
+ GUARD &5600            \ Put the guard back in place that we removed above
+
+ LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
+ PHA                    \ store it on the stack
+
+ LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
+ STA &F4
+ STA &FE30
+
+ TYA                    \ Store X and Y on the stack
+ PHA
+ TXA
+ PHA
+
+ JSR TT111_ROM          \ Call the TT111 routine in the music ROM
+
+ PLA                    \ Retrieve X and Y from the stack
+ TAX
+ PLA
+ TAY
+
+ PLA                    \ Set the ROM number back to the value that we stored
+ STA &F4                \ above, to switch back to the previous ROM
+ STA &FE30
+
+ RTS                    \ Return from the subroutine
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
