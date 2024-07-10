@@ -15987,7 +15987,7 @@ ENDIF
 
                         \ --- Mod: Code added for Compendium: ----------------->
 
- END_OF_TT22 = P%
+ END_OF_1% = P%
 
  SAVE "3-assembled-output/rom-extra1.bin", TT22_ROM, P%
 
@@ -16204,7 +16204,7 @@ ENDIF
  CLEAR &5600, &5600     \ Clear the guard so we can assemble TT23 into sideways
                         \ ROM
 
- ORG END_OF_TT22        \ Assemble TT210 after the end of TT22/TT15
+ ORG END_OF_1%          \ Assemble TT210 after the end of block 1
 
 .TT210_ROM
 
@@ -16387,7 +16387,7 @@ ENDIF
 
  RTS                    \ Return from the subroutine
 
- END_OF_TT210 = P%
+ END_OF_2% = P%
 
  SAVE "3-assembled-output/rom-extra2.bin", TT210_ROM, P%
 
@@ -16718,7 +16718,7 @@ ENDIF
  CLEAR &5600, &5600     \ Clear the guard so we can assemble TT23 into sideways
                         \ ROM
 
- ORG END_OF_TT210       \ Assemble TT23 after the end of TT210
+ ORG END_OF_2%          \ Assemble TT23 after the end of block 2
 
 .TT23_ROM
 
@@ -16968,7 +16968,7 @@ ENDIF
 
  RTS                    \ Return from the subroutine
 
- END_OF_TT23 = P%
+ END_OF_3% = P%
 
  SAVE "3-assembled-output/rom-extra3.bin", TT23_ROM, P%
 
@@ -17086,7 +17086,7 @@ ENDIF
  CLEAR &5600, &5600     \ Clear the guard so we can assemble TT111 into sideways
                         \ ROM
 
- ORG END_OF_TT23        \ Assemble TT111 after the end of TT23
+ ORG END_OF_3%          \ Assemble TT111 after the end of block 3
 
 .TT111_ROM
 
@@ -17332,7 +17332,7 @@ ENDIF
                         \ new selected system is fully set up, and return from
                         \ the subroutine using a tail call
 
- END_OF_TT111 = P%
+ END_OF_4% = P%
 
  SAVE "3-assembled-output/rom-extra4.bin", TT111_ROM, P%
 
