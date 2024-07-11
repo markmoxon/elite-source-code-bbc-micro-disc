@@ -22287,10 +22287,10 @@ S.ELTE &304B  &358C  &11E3  &304B
      37BA   20 A1 35   JSR &35A1
 .BEGIN
      37BD   20 F5 12   JSR &12F5
-     37C0   A2 0B      LDX #&0B
+     37C0   A2 0A      LDX #&0A
      37C2   A9 00      LDA #&00
 .BEL1
-     37C4   9D C4 03   STA &03C4,X
+     37C4   9D C5 03   STA &03C5,X
      37C7   CA         DEX
      37C8   10 FA      BPL &37C4
 .TT170
