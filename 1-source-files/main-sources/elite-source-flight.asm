@@ -3284,8 +3284,12 @@ ENDIF
                         \ tonne of this cargo (A is set to 1 by this call, and
                         \ the C flag contains the result)
 
- LDY #78                \ This instruction has no effect, so presumably it used
-                        \ to do something, but didn't get removed
+                        \ --- Mod: Code removed for music: -------------------->
+
+\LDY #78                \ This instruction has no effect, so presumably it used
+\                       \ to do something, but didn't get removed
+
+                        \ --- End of removed code ----------------------------->
 
  BCS MA59               \ If the C flag is set then we have no room in the hold
                         \ for the scooped item, so jump down to MA59 make a
@@ -6560,9 +6564,13 @@ ENDIF
  STA SZ,Y               \ z_hi so the new particle starts in the far distance
  STA ZZ
 
- LDA Y1                 \ Set A to the new value of y_hi. This has no effect as
-                        \ STC1 starts with a jump to PIXEL2, which starts with a
-                        \ LDA instruction
+                        \ --- Mod: Code removed for music: -------------------->
+
+\LDA Y1                 \ Set A to the new value of y_hi. This has no effect as
+\                       \ STC1 starts with a jump to PIXEL2, which starts with a
+\                       \ LDA instruction
+
+                        \ --- End of removed code ----------------------------->
 
  JMP STC1               \ Jump up to STC1 to draw this new particle
 
@@ -13753,11 +13761,15 @@ ENDIF
  LDA S                  \ Set A = |S|
  AND #%01111111
 
- BMI DV9                \ If bit 7 of A is set, jump down to DV9 to skip the
-                        \ left-shifting of the denominator (though this branch
-                        \ instruction has no effect as bit 7 of the above AND
-                        \ can never be set, which is why this instruction was
-                        \ removed from later versions)
+                        \ --- Mod: Code removed for music: -------------------->
+
+\BMI DV9                \ If bit 7 of A is set, jump down to DV9 to skip the
+\                       \ left-shifting of the denominator (though this branch
+\                       \ instruction has no effect as bit 7 of the above AND
+\                       \ can never be set, which is why this instruction was
+\                       \ removed from later versions)
+
+                        \ --- End of removed code ----------------------------->
 
 .DVL6
 
@@ -15753,8 +15765,12 @@ ENDIF
  LDA QQ19+4             \ Store the updated y-coordinate in QQ10 (the current
  STA QQ10               \ y-coordinate of the crosshairs)
 
- STA QQ19+1             \ This instruction has no effect, as QQ19+1 is
-                        \ overwritten below, both in TT103 and TT105
+                        \ --- Mod: Code removed for music: -------------------->
+
+\STA QQ19+1             \ This instruction has no effect, as QQ19+1 is
+\                       \ overwritten below, both in TT103 and TT105
+
+                        \ --- End of removed code ----------------------------->
 
  PLA                    \ Store the x-delta in QQ19+3 and fetch the current
  STA QQ19+3             \ x-coordinate of the crosshairs from QQ10 into A, ready
@@ -15767,8 +15783,12 @@ ENDIF
  LDA QQ19+4             \ Store the updated x-coordinate in QQ9 (the current
  STA QQ9                \ x-coordinate of the crosshairs)
 
- STA QQ19               \ This instruction has no effect, as QQ19 is overwritten
-                        \ below, both in TT103 and TT105
+                        \ --- Mod: Code removed for music: -------------------->
+
+\STA QQ19               \ This instruction has no effect, as QQ19 is overwritten
+\                       \ below, both in TT103 and TT105
+
+                        \ --- End of removed code ----------------------------->
 
                         \ Now we've updated the coordinates of the crosshairs,
                         \ fall through into TT103 to redraw them at their new
@@ -26683,6 +26703,27 @@ ENDIF
 
  STX T                  \ Store the distance in T
 
+                        \ --- Mod: Code added for music: ---------------------->
+
+ LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
+ PHA                    \ store it on the stack
+
+ LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
+ STA &F4
+ STA &FE30
+
+ LDA &8021              \ Set U to the current volume level from the music ROM
+ SEC                    \ at location localVOL (which is at &8021), with the
+ ASL A                  \ low nibble inverted and the whole thing doubled plus
+ EOR #%00001111         \ 1, it's now in the range 14 to 1 rather than 0 to 7
+ STA U
+
+ PLA                    \ Set the ROM number back to the value that we stored
+ STA &F4                \ above, to switch back to the previous ROM
+ STA &FE30
+
+                        \ --- End of added code ------------------------------->
+
  LDA #24                \ Set A = 24 to denote the sound of us making a hit or
  JSR NOS1               \ kill (part 1 of the explosion), and call NOS1 to set
                         \ up the sound block in XX16
@@ -26700,6 +26741,14 @@ ENDIF
                         \ 7 = %0111 or 15 = %1111, so AND'ing with 15 will
                         \ not affect A, while AND'ing with 7 will clear bit
                         \ 3, reducing the maximum value in A to 7
+
+                        \ --- Mod: Code added for music: ---------------------->
+
+ ORA U                  \ Reduce the volume according to the volume setting (U
+                        \ will be higher for low volumes, so this makes A higher
+                        \ for low volumes, which is what we want)
+
+                        \ --- End of added code ------------------------------->
 
  ORA #%11110001         \ The SOUND statement's amplitude ranges from 0 (for no
                         \ sound) to -15 (full volume), so we can set bits 0 and
@@ -32768,12 +32817,22 @@ ENDMACRO
                         \ (z_sign z_hi z_lo) = (z_sign z_hi z_lo) + (A R)
                         \                    = (z_sign z_hi z_lo) - speed
 
+                        \ --- Mod: Code removed for music: -------------------->
+
+\LDA TYPE               \ If the ship type is not the sun (129) then skip the
+\AND #%10000001         \ next instruction, otherwise return from the subroutine
+\CMP #129               \ as we don't need to rotate the sun around its origin.
+\BNE P%+3               \ Having both the AND and the CMP is a little odd, as
+\                       \ the sun is the only ship type with bits 0 and 7 set,
+\                       \ so the AND has no effect and could be removed
+
+                        \ --- And replaced by: -------------------------------->
+
  LDA TYPE               \ If the ship type is not the sun (129) then skip the
- AND #%10000001         \ next instruction, otherwise return from the subroutine
- CMP #129               \ as we don't need to rotate the sun around its origin.
- BNE P%+3               \ Having both the AND and the CMP is a little odd, as
-                        \ the sun is the only ship type with bits 0 and 7 set,
-                        \ so the AND has no effect and could be removed
+ CMP #129               \ next instruction, otherwise return from the subroutine
+ BNE P%+3               \ as we don't need to rotate the sun around its origin
+ 
+                        \ --- End of replacement ------------------------------>
 
  RTS                    \ Return from the subroutine, as the ship we are moving
                         \ is the sun and doesn't need any of the following
@@ -33155,8 +33214,12 @@ ENDMACRO
                         \
                         \ nosev_y = nosev_y - alpha * nosev_x_hi
 
- STX P                  \ This instruction has no effect as MAD overwrites P,
-                        \ but it sets P = nosev_y_lo
+                        \ --- Mod: Code removed for music: -------------------->
+
+\STX P                  \ This instruction has no effect as MAD overwrites P,
+\                       \ but it sets P = nosev_y_lo
+
+                        \ --- End of removed code ----------------------------->
 
  LDX INWK,Y             \ Set (S R) = nosev_x
  STX R
@@ -33172,8 +33235,12 @@ ENDMACRO
                         \
                         \ nosev_x = nosev_x + alpha * nosev_y_hi
 
- STX P                  \ This instruction has no effect as MAD overwrites P,
-                        \ but it sets P = nosev_x_lo
+                        \ --- Mod: Code removed for music: -------------------->
+
+\STX P                  \ This instruction has no effect as MAD overwrites P,
+\                       \ but it sets P = nosev_x_lo
+
+                        \ --- End of removed code ----------------------------->
 
  LDA BETA               \ Set Q = beta (the pitch angle to rotate through)
  STA Q
@@ -33184,8 +33251,12 @@ ENDMACRO
  STX S
  LDX INWK+4,Y
 
- STX P                  \ This instruction has no effect as MAD overwrites P,
-                        \ but it sets P = nosev_y
+                        \ --- Mod: Code removed for music: -------------------->
+
+\STX P                  \ This instruction has no effect as MAD overwrites P,
+\                       \ but it sets P = nosev_y
+
+                        \ --- End of removed code ----------------------------->
 
  LDA INWK+5,Y           \ Set A = -nosev_z_hi
  EOR #%10000000
@@ -33197,8 +33268,12 @@ ENDMACRO
                         \
                         \ nosev_y = nosev_y - beta * nosev_z_hi
 
- STX P                  \ This instruction has no effect as MAD overwrites P,
-                        \ but it sets P = nosev_y_lo
+                        \ --- Mod: Code removed for music: -------------------->
+
+\STX P                  \ This instruction has no effect as MAD overwrites P,
+\                       \ but it sets P = nosev_y_lo
+
+                        \ --- End of removed code ----------------------------->
 
  LDX INWK+4,Y           \ Set (S R) = nosev_z
  STX R
@@ -33449,15 +33524,27 @@ ENDMACRO
                         \ add them together to get the result we're after, and
                         \ then set the sign afterwards
 
+                        \ --- Mod: Code removed for Econet: ------------------->
+
+\LDA K                  \ We now do the following sum:
+\CLC                    \
+\ADC K2                 \   (A y_hi y_lo -) = K(3 2 1 0) + K2(3 2 1 0)
+\                       \
+\                       \ starting with the low bytes (which we don't keep)
+\                       \
+\                       \ The CLC has no effect because MULT3 clears the C
+\                       \ flag, so this instruction could be removed (as it is
+\                       \ in the cassette version, for example)
+
+                        \ --- And replaced by: -------------------------------->
+
  LDA K                  \ We now do the following sum:
- CLC                    \
- ADC K2                 \   (A y_hi y_lo -) = K(3 2 1 0) + K2(3 2 1 0)
+ ADC K2                 \
+                        \   (A y_hi y_lo -) = K(3 2 1 0) + K2(3 2 1 0)
                         \
                         \ starting with the low bytes (which we don't keep)
-                        \
-                        \ The CLC has no effect because MULT3 clears the C
-                        \ flag, so this instruction could be removed (as it is
-                        \ in the cassette version, for example)
+
+                        \ --- End of replacement ------------------------------>
 
  LDA K+1                \ We then do the middle bytes, which go into y_lo
  ADC K2+1
