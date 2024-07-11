@@ -27763,6 +27763,27 @@ ENDIF
 
  STX T                  \ Store the distance in T
 
+                        \ --- Mod: Code added for music: ---------------------->
+
+ LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
+ PHA                    \ store it on the stack
+
+ LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
+ STA &F4
+ STA &FE30
+
+ LDA &8021              \ Set U to the current volume level from the music ROM
+ SEC                    \ at location localVOL (which is at &8021), with the
+ ASL A                  \ low nibble inverted and the whole thing doubled plus
+ EOR #%00001111         \ 1, it's now in the range 14 to 1 rather than 0 to 7
+ STA U
+
+ PLA                    \ Set the ROM number back to the value that we stored
+ STA &F4                \ above, to switch back to the previous ROM
+ STA &FE30
+
+                        \ --- End of added code ------------------------------->
+
  LDA #24                \ Set A = 24 to denote the sound of us making a hit or
  JSR NOS1               \ kill (part 1 of the explosion), and call NOS1 to set
                         \ up the sound block in XX16
@@ -27780,6 +27801,14 @@ ENDIF
                         \ 7 = %0111 or 15 = %1111, so AND'ing with 15 will
                         \ not affect A, while AND'ing with 7 will clear bit
                         \ 3, reducing the maximum value in A to 7
+
+                        \ --- Mod: Code added for music: ---------------------->
+
+ ORA U                  \ Reduce the volume according to the volume setting (U
+                        \ will be higher for low volumes, so this makes A higher
+                        \ for low volumes, which is what we want)
+
+                        \ --- End of added code ------------------------------->
 
  ORA #%11110001         \ The SOUND statement's amplitude ranges from 0 (for no
                         \ sound) to -15 (full volume), so we can set bits 0 and
