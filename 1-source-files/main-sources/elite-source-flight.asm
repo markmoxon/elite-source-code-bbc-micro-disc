@@ -5893,6 +5893,9 @@
 
  JSR DrawPlanetLine     \ Draw the current line from the old planet
 
+                        \ The following code is for full flicker-free planets,
+                        \ which is not supported in this version
+
 \LDA #&FF               \ Set bit 7 of K3+8 so we do not draw the current line
 \STA K3+8               \ in the call to DrawPlanetLine, but store the
 \                       \ coordinates so we we can check them below
@@ -5918,6 +5921,9 @@
  JSR LOIN               \ Draw a line from (X1, Y1) to (X2, Y2)
 
                         \ --- And replaced by: -------------------------------->
+
+                        \ The following code is for full flicker-free planets,
+                        \ which is not supported in this version
 
 \JSR DrawNewPlanetLine  \ Draw a line from (X1, Y1) to (X2, Y2), but only if it
 \                       \ is different to the old line in K3+4 to K3+7
@@ -6000,6 +6006,9 @@
 
 .DrawPlanetLine
 
+                        \ The following code is for full flicker-free planets,
+                        \ which is not supported in this version
+
 \LDA #0                 \ Clear bit 7 of K3+8 so we draw the current line below
 \STA K3+8
 \
@@ -6059,6 +6068,9 @@
  CMP #&FF
  BEQ plin1
 
+                        \ The following code is for full flicker-free planets,
+                        \ which is not supported in this version
+
 \DEC K3+9               \ Decrement K3+9 to &FF to indicate that there is a line
 \                       \ to draw
 \
@@ -6085,8 +6097,11 @@
 
  RTS                    \ Return from the subroutine
 
-\.plin2
+                        \ The following code is for full flicker-free planets,
+                        \ which is not supported in this version
 
+\.plin2
+\
 \LDA X1                 \ Store X1, Y1, X2, Y2 in K3+4 to K3+7
 \STA K3+4
 \LDA Y1
@@ -6128,6 +6143,9 @@
 \ ******************************************************************************
 
                         \ --- Mod: Code added for flicker-free planets: ------->
+
+                        \ The following code is for full flicker-free planets,
+                        \ which is not supported in this version
 
 \.DrawNewPlanetLine
 \
