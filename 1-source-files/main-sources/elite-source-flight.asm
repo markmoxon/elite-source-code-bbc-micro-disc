@@ -12894,9 +12894,9 @@ ENDIF
 \LDA #0
 \LDX #8
 \LSR P
-
+\
 \.MUL6
-
+\
 \BCC P%+4
 \ADC T
 \ROR A
