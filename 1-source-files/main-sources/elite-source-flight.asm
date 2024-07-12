@@ -57,7 +57,7 @@ ENDIF
                         \ --- Mod: Code removed for Econet: ------------------->
 
 \CODE% = &11E3          \ The address where the code will be run
-
+\
 \LOAD% = &11E3          \ The address where the code will be loaded
 
                         \ --- And replaced by: -------------------------------->
@@ -13009,9 +13009,9 @@ ENDIF
 \LDA #0
 \LDX #8
 \LSR P
-
+\
 \.MUL6
-
+\
 \BCC P%+4
 \ADC T
 \ROR A

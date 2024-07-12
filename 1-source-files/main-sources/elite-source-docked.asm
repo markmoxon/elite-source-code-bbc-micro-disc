@@ -41,7 +41,7 @@
                         \ --- Mod: Code removed for Econet: ------------------->
 
 \CODE% = &11E3          \ The address where the code will be run
-
+\
 \LOAD% = &11E3          \ The address where the code will be loaded
 
                         \ --- And replaced by: -------------------------------->

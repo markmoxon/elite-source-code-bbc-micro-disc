@@ -246,28 +246,28 @@
                         \ We now check if ROM bank X contains the ANFS ROM
 
 \LDY #&F6               \ Set X = -10 to use as a counter for checking the ROM
-                        \ title
-
+\                       \ title
+\
 \.drom8
-
+\
 \LDA anfsMatch-&F6,Y    \ Fetch the next character of the ROM title message from
-                        \ anfsMatch
-
+\                       \ anfsMatch
+\
 \CMP &8009-&F6,Y        \ If the character from bank X does not match the same
 \BNE drom9              \ character from the ROM title in eliteMatch, then bank
-                        \ X is not the ANFS ROM, so jump to drom9 to move on to
-                        \ the next test
-
+\                       \ X is not the ANFS ROM, so jump to drom9 to move on to
+\                       \ the next test
+\
 \INY                    \ Increment the character pointer into the ROM title in
-                        \ bank X
-
+\                       \ bank X
+\
 \BNE drom8              \ Loop back until we have checked all 10 characters
-
+\
 \LDA #'A'               \ If we get here then bank X contains the correct ROM
 \JSR OSWRCH             \ title for the ANFS ROM, so print an "A"
-
+\
 \JMP drom14             \ Jump to drom14 to leave the ROM alone
-
+\
 \.drom9
 
                         \ We now check if ROM bank X contains the NFS ROM
