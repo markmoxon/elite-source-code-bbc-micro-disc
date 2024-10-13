@@ -51,8 +51,8 @@ for arg in argv[1:]:
 # Configuration variables for D.CODE
 
 load_address = 0x11E3
-scramble_from = 0x1300
-scramble_to = 0x5600
+unscramble_from = 0x5600
+unscramble_to = 0x1300
 scramble_eor = 0x33
 
 data_block = bytearray()
@@ -71,7 +71,7 @@ print("[ Read    ] 4-reference-binaries/" + folder + "/D.CODE.bin")
 # SC routine, which EORs bytes between &1300 and &9FFF
 # Can be reversed by simply repeating the EOR
 
-for n in range(scramble_from, scramble_to):
+for n in range(unscramble_to, unscramble_from):
     data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
 
 print("[ Decrypt ] 4-reference-binaries/" + folder + "/D.CODE.bin")
@@ -87,8 +87,8 @@ print("[ Save    ] 4-reference-binaries/" + folder + "/D.CODE.decrypt.bin")
 # Configuration variables for T.CODE
 
 load_address = 0x11E3
-scramble_from = 0x1300
-scramble_to = 0x6000
+unscramble_to = 0x1300
+unscramble_from = 0x6000
 scramble_eor = 0x33
 
 data_block = bytearray()
@@ -107,7 +107,7 @@ print("[ Read    ] 4-reference-binaries/" + folder + "/T.CODE.bin")
 # SC routine, which EORs bytes between &1300 and &9FFF
 # Can be reversed by simply repeating the EOR
 
-for n in range(scramble_from, scramble_to):
+for n in range(unscramble_to, unscramble_from):
     data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
 
 print("[ Decrypt ] 4-reference-binaries/" + folder + "/T.CODE.bin")
