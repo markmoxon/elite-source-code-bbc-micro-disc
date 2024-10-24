@@ -77,17 +77,17 @@ endif
 
 ifeq ($(variant), ib-disc)
   variant-number=1
-  folder=/ib-disc
+  folder=ib-disc
   suffix=-ib-disc
   boot=-boot ELITE2
 else ifeq ($(variant), sideways-ram)
   variant-number=3
-  folder=/sideways-ram
+  folder=sideways-ram
   suffix=-sideways-ram
   boot=-opt 3
 else
   variant-number=2
-  folder=/sth
+  folder=sth
   suffix=-sth
   boot=-boot ELITE2
 endif
@@ -127,7 +127,7 @@ all:
 	$(PYTHON) 2-build-files/elite-checksum.py $(unencrypt) -rel$(variant-number)
 	$(BEEBASM) -i 1-source-files/main-sources/elite-disc.asm -do 5-compiled-game-discs/elite-disc$(suffix).ssd $(boot) -title "E L I T E"
 ifneq ($(verify), no)
-	@$(PYTHON) 2-build-files/crc32.py 4-reference-binaries$(folder) 3-assembled-output
+	@$(PYTHON) 2-build-files/crc32.py 4-reference-binaries/$(folder) 3-assembled-output
 endif
 
 .PHONY:b2
