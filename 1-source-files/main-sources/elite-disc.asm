@@ -23,6 +23,7 @@
 \
 \   * elite-disc-sth.ssd
 \   * elite-disc-ib-disc.ssd
+\   * elite-disc-sideways-ram.ssd
 \
 \ This can be loaded into an emulator or a real BBC Micro.
 \
