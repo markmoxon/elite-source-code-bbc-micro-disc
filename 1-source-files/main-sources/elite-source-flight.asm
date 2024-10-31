@@ -177,6 +177,13 @@
  E% = &563E             \ The address of the default NEWB ship bytes within the
                         \ loaded ship blueprints file
 
+                        \ --- Mod: Code added for Compendium: ----------------->
+
+ ROM_EXTRA% = &B700     \ The address in sideways ROM where we can put extra
+                        \ code, after the end of the music part of the ROM
+
+                        \ --- End of added code ------------------------------->
+
  VIA = &FE00            \ Memory-mapped space for accessing internal hardware,
                         \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
                         \ known as SHEILA)
@@ -15752,10 +15759,10 @@ ENDIF
 
  CURRENT1% = P%         \ Store the current address
 
- CLEAR &5600, &5600     \ Clear the guard so we can assemble TT22 and TT23 into
+ CLEAR &5600, &5600     \ Clear the guard so we can assemble block 1 into
                         \ sideways ROM
 
- ORG &B700              \ Assemble TT22 at &B700, at the end of the music ROM
+ ORG ROM_EXTRA%         \ Assemble block 1 at ROM_EXTRA
 
 .TT22_ROM
 
@@ -16000,7 +16007,7 @@ ENDIF
 
  END_OF_1% = P%
 
- SAVE "3-assembled-output/rom-extra1.bin", TT22_ROM, P%
+ SAVE "3-assembled-output/rom-extra1.bin", ROM_EXTRA%, END_OF_1%
 
  ORG CURRENT1%          \ Start assembling the main code again
 
@@ -16212,10 +16219,10 @@ ENDIF
 
  CURRENT2% = P%         \ Store the current address
 
- CLEAR &5600, &5600     \ Clear the guard so we can assemble TT23 into sideways
-                        \ ROM
+ CLEAR &5600, &5600     \ Clear the guard so we can assemble block 2 into
+                        \ sideways ROM
 
- ORG END_OF_1%          \ Assemble TT210 after the end of block 1
+ ORG END_OF_1%          \ Assemble block 2 after block 1
 
 .TT210_ROM
 
@@ -16400,7 +16407,7 @@ ENDIF
 
  END_OF_2% = P%
 
- SAVE "3-assembled-output/rom-extra2.bin", TT210_ROM, P%
+ SAVE "3-assembled-output/rom-extra2.bin", END_OF_1%, END_OF_2%
 
  ORG CURRENT2%          \ Start assembling the main code again
 
@@ -16726,10 +16733,10 @@ ENDIF
 
  CURRENT3% = P%         \ Store the current address
 
- CLEAR &5600, &5600     \ Clear the guard so we can assemble TT23 into sideways
-                        \ ROM
+ CLEAR &5600, &5600     \ Clear the guard so we can assemble block 3 into
+                        \ sideways ROM
 
- ORG END_OF_2%          \ Assemble TT23 after the end of block 2
+ ORG END_OF_2%          \ Assemble block 3 after block 2
 
 .TT23_ROM
 
@@ -16981,7 +16988,7 @@ ENDIF
 
  END_OF_3% = P%
 
- SAVE "3-assembled-output/rom-extra3.bin", TT23_ROM, P%
+ SAVE "3-assembled-output/rom-extra3.bin", END_OF_2%, END_OF_3%
 
  ORG CURRENT3%          \ Start assembling the main code again
 
@@ -17094,10 +17101,10 @@ ENDIF
 
  CURRENT4% = P%         \ Store the current address
 
- CLEAR &5600, &5600     \ Clear the guard so we can assemble TT111 into sideways
-                        \ ROM
+ CLEAR &5600, &5600     \ Clear the guard so we can assemble block 4 into
+                        \ sideways ROM
 
- ORG END_OF_3%          \ Assemble TT111 after the end of block 3
+ ORG END_OF_3%          \ Assemble block 4 after block 3
 
 .TT111_ROM
 
@@ -17347,7 +17354,7 @@ ENDIF
 
  END_OF_4% = P%
 
- SAVE "3-assembled-output/rom-extra4.bin", TT111_ROM, P%
+ SAVE "3-assembled-output/rom-extra4.bin", END_OF_3%, END_OF_4%
 
  ORG CURRENT4%          \ Start assembling the main code again
 
@@ -28049,10 +28056,10 @@ ENDIF
 
  CURRENT5% = P%         \ Store the current address
 
- CLEAR &5600, &5600     \ Clear the guard so we can assemble b_14 into sideways
-                        \ ROM
+ CLEAR &5600, &5600     \ Clear the guard so we can assemble block 5 into
+                        \ sideways ROM
 
- ORG END_OF_4%          \ Assemble b_14 after the end of block 4
+ ORG END_OF_4%          \ Assemble block 5 after block 4
 
 .b_13
 
@@ -28268,7 +28275,7 @@ ENDIF
 
  END_OF_5% = P%
 
- SAVE "3-assembled-output/rom-extra5.bin", b_13, P%
+ SAVE "3-assembled-output/rom-extra5.bin", END_OF_4%, END_OF_5%
 
  ORG CURRENT5%          \ Start assembling the main code again
 
@@ -29470,19 +29477,18 @@ ENDMACRO
 \
 \ ******************************************************************************
 
-.TIDY
-
                         \ --- Mod: Code added for Compendium: ----------------->
+
+.TIDY
 
  CURRENT6% = P%         \ Store the current address
 
- CLEAR &5600, &5600     \ Clear the guard so we can assemble TIDY into sideways
-                        \ ROM
+ CLEAR &5600, &5600     \ Clear the guard so we can assemble block 6 into
+                        \ sideways ROM
 
- ORG END_OF_5%          \ Assemble TIDY after the end of block 5
+ ORG END_OF_5%          \ Assemble block 6 after block 5
 
                         \ --- End of added code ------------------------------->
-
 
 .TI2
 
@@ -29643,7 +29649,7 @@ ENDMACRO
 
  END_OF_6% = P%
 
- SAVE "3-assembled-output/rom-extra6.bin", TT111_ROM, P%
+ SAVE "3-assembled-output/rom-extra6.bin", END_OF_5%, END_OF_6%
 
  ORG CURRENT6%          \ Start assembling the main code again
 
@@ -29661,7 +29667,7 @@ ENDMACRO
  TXA
  PHA
 
- JSR TT111_ROM          \ Call the TT111 routine in the music ROM
+ JSR TIDY_ROM           \ Call the TIDY routine in the music ROM
 
  PLA                    \ Retrieve X and Y from the stack
  TAX
