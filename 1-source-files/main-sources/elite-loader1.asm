@@ -45,6 +45,14 @@
  BYTEV = &020A          \ The BYTEV vector that we check as part of the copy
                         \ protection
 
+                        \ --- Mod: Code added for Delta 14B: ------------------>
+
+ VIA = &FE00            \ Memory-mapped space for accessing internal hardware,
+                        \ such as the video ULA, 6845 CRTC and 6522 VIAs (also
+                        \ known as SHEILA)
+
+                        \ --- End of added code ------------------------------->
+
  OSWRCH = &FFEE         \ The address for the OSWRCH routine
 
  OSBYTE = &FFF4         \ The address for the OSBYTE routine
@@ -276,6 +284,17 @@
 
  CPY #9                 \ Loop back to do the next byte until we have done 9 of
  BNE loop1              \ them
+
+                        \ --- Mod: Code added for Delta 14B: ------------------>
+
+ LDA #%11110000         \ Set the Data Direction Register (DDR) of port B of the
+ STA VIA+&62            \ user port so we can read the buttons on the Delta 14B
+                        \ joystick, using PB4 to PB7 as output (so we can write
+                        \ to the button columns to select the column we are
+                        \ interested in) and PB0 to PB3 as input (so we can read
+                        \ from the button rows)
+
+                        \ --- End of added code ------------------------------->
 
  LDY #0                 \ We are now going to send the 12 VDU bytes in the table
                         \ at B% to OSWRCH to switch to mode 7
