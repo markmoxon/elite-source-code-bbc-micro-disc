@@ -16055,7 +16055,7 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
                         \ --- Mod: Code added for Compendium: ----------------->
 
- END_OF_TT22 = P%
+ END_OF_1% = P%
 
  SAVE "3-assembled-output/rom-extra1.bin", TT22_ROM, P%
 
@@ -16272,7 +16272,7 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
  CLEAR &5600, &5600     \ Clear the guard so we can assemble TT23 into sideways
                         \ ROM
 
- ORG END_OF_TT22        \ Assemble TT210 after the end of TT22/TT15
+ ORG END_OF_1%          \ Assemble TT210 after the end of block 1
 
                         \ --- End of added code ------------------------------->
 
@@ -16455,7 +16455,7 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
  RTS                    \ Return from the subroutine
 
- END_OF_TT210 = P%
+ END_OF_2% = P%
 
  SAVE "3-assembled-output/rom-extra2.bin", TT210_ROM, P%
 
@@ -16786,7 +16786,7 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
  CLEAR &5600, &5600     \ Clear the guard so we can assemble TT23 into sideways
                         \ ROM
 
- ORG END_OF_TT210       \ Assemble TT23 after the end of TT210
+ ORG END_OF_2%          \ Assemble TT23 after the end of block 2
 
 .TT23_ROM
 
@@ -17036,7 +17036,7 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
  RTS                    \ Return from the subroutine
 
- END_OF_TT23 = P%
+ END_OF_3% = P%
 
  SAVE "3-assembled-output/rom-extra3.bin", TT23_ROM, P%
 
@@ -28059,7 +28059,7 @@ ENDIF
  CLEAR &5600, &5600     \ Clear the guard so we can assemble b_14 into sideways
                         \ ROM
 
- ORG END_OF_TT23        \ Assemble b_14 after the end of TT23
+ ORG END_OF_3%          \ Assemble TT111 after the end of block 3
 
 .b_13
 
@@ -28273,7 +28273,7 @@ ENDIF
  EQUB &38               \ Right column   Bottom row   KYTB+15   Docking computer
  EQUB &68               \ Left column    Bottom row   KYTB+16   Cancel docking
 
- END_OF_B_14 = P%
+ END_OF_4% = P%
 
  SAVE "3-assembled-output/rom-extra4.bin", b_13, P%
 
