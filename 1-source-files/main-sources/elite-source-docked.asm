@@ -24506,8 +24506,8 @@ ENDIF
  JSR PlayMusic
 
  BCC skipMusicToggles   \ If no music-related options were changed, then the C
-                        \ flag will be clear, so jump to DK7 to skip the
-                        \ following
+                        \ flag will be clear, so jump to skipMusicToggles to
+                        \ skip the following
 
  JSR BELL               \ Make a beep sound so we know something has happened
 
