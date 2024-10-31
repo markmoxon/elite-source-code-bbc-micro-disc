@@ -14453,7 +14453,7 @@ Saving file '3-assembled-output/rom-extra6.bin'
      4671   48         PHA
      4672   8A         TXA
      4673   48         PHA
-     4674   20 0C B9   JSR &B90C
+     4674   20 0E BA   JSR &BA0E
      4677   68         PLA
      4678   AA         TAX
      4679   68         PLA
