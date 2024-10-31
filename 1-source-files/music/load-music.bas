@@ -5,18 +5,18 @@ unique = &80
 RomSel = &FE30
 romNumber = &8E : REM Set to address of .musicRomNumber
 
-PRINT"Acornsoft Elite... with music!"
-PRINT"=============================="
-PRINT'"For the BBC Micro with 16K sideways RAM"
+PRINT"BBC Micro Elite (Compendium version)"
+PRINT"===================================="
 PRINT'"Based on the Acornsoft SNG38 release"
 PRINT"of Elite by Ian Bell and David Braben"
 PRINT"Copyright (c) Acornsoft 1984"
+PRINT'"Flicker-free routines, bug fixes and"
+PRINT"music integration by Mark Moxon"
 PRINT'"Sound routines by Kieran Connell and"
 PRINT"Simon Morris"
 PRINT'"Original music by Aidan Bell and Julie"
 PRINT"Dunn (c) D. Braben and I. Bell 1985,"
 PRINT"ported from the C64 by Negative Charge"
-PRINT'"Elite integration by Mark Moxon"
 PRINT'"Sideways RAM detection and loading"
 PRINT"routines by Tricky and J.G.Harston"
 
