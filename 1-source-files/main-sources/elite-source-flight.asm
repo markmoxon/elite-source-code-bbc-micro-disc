@@ -18938,6 +18938,19 @@ ENDIF
 
 .cpl
 
+                        \ --- Mod: Code added for Compendium: ----------------->
+
+ CURRENT5% = P%         \ Store the current address
+
+ CLEAR &5600, &5600     \ Clear the guard so we can assemble block 5 into
+                        \ sideways ROM
+
+ ORG END_OF_4%          \ Assemble block 5 after block 4
+
+.cpl_ROM
+
+                        \ --- End of added code ------------------------------->
+
  LDX #5                 \ First we need to back up the seeds in QQ15, so set up
                         \ a counter in X to cover three 16-bit seeds (i.e.
                         \ 6 bytes)
@@ -19002,6 +19015,43 @@ ENDIF
 
  RTS                    \ Once all the seeds are restored, return from the
                         \ subroutine
+
+                        \ --- Mod: Code added for Compendium: ----------------->
+
+ END_OF_5% = P%
+
+ SAVE "3-assembled-output/rom-extra5.bin", END_OF_4%, END_OF_5%
+
+ ORG CURRENT5%          \ Start assembling the main code again
+
+ GUARD &5600            \ Put the guard back in place that we removed above
+
+ LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
+ PHA                    \ store it on the stack
+
+ LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
+ STA &F4
+ STA &FE30
+
+ TYA                    \ Store X and Y on the stack
+ PHA
+ TXA
+ PHA
+
+ JSR cpl_ROM            \ Call the cpl routine in the music ROM
+
+ PLA                    \ Retrieve X and Y from the stack
+ TAX
+ PLA
+ TAY
+
+ PLA                    \ Set the ROM number back to the value that we stored
+ STA &F4                \ above, to switch back to the previous ROM
+ STA &FE30
+
+ RTS                    \ Return from the subroutine
+
+                        \ --- End of replacement ------------------------------>
 
 \ ******************************************************************************
 \
@@ -21102,7 +21152,24 @@ ENDIF
 
 .OOPS
 
- STA T                  \ Store the amount of damage in T
+                        \ --- Mod: Code added for Compendium: ----------------->
+
+ CURRENT6% = P%         \ Store the current address
+
+ CLEAR &5600, &5600     \ Clear the guard so we can assemble block 6 into
+                        \ sideways ROM
+
+ ORG END_OF_5%          \ Assemble block 6 after block 5
+
+.OOPS_ROM
+
+                        \ --- End of added code ------------------------------->
+
+                        \ --- Mod: Code removed for music: -------------------->
+
+\STA T                  \ Store the amount of damage in T
+
+                        \ --- End of removed code ----------------------------->
 
  LDX #0                 \ Fetch byte #8 (z_sign) for the ship attacking us, and
  LDY #8                 \ set X = 0
@@ -21176,6 +21243,47 @@ ENDIF
 
  JMP OUCH               \ And jump to OUCH to take damage and return from the
                         \ subroutine using a tail call
+
+                        \ --- Mod: Code added for Compendium: ----------------->
+
+ END_OF_6% = P%
+
+ SAVE "3-assembled-output/rom-extra6.bin", END_OF_5%, END_OF_6%
+
+ ORG CURRENT6%          \ Start assembling the main code again
+
+ GUARD &5600            \ Put the guard back in place that we removed above
+
+ STA T                  \ Store the amount of damage in T, to pass it to the
+                        \ routine in ROM
+
+ LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
+ PHA                    \ store it on the stack
+
+ LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
+ STA &F4
+ STA &FE30
+
+ TYA                    \ Store X and Y on the stack
+ PHA
+ TXA
+ PHA
+
+ JSR OOPS_ROM           \ Call the OOPS routine in the music ROM
+
+ PLA                    \ Retrieve X and Y from the stack
+ TAX
+ PLA
+ TAY
+
+ PLA                    \ Set the ROM number back to the value that we stored
+ STA &F4                \ above, to switch back to the previous ROM
+ STA &FE30
+
+ RTS                    \ Return from the subroutine
+
+                        \ --- End of replacement ------------------------------>
+
 
 \ ******************************************************************************
 \
@@ -28017,6 +28125,68 @@ ENDIF
 
 \ ******************************************************************************
 \
+\       Name: b_table
+\       Type: Variable
+\   Category: Keyboard
+\    Summary: Lookup table for Delta 14B joystick buttons
+\  Deep dive: Delta 14B joystick support
+\
+\ ------------------------------------------------------------------------------
+\
+\ In the following table, which maps buttons on the Delta 14B to the flight
+\ controls, the high nibble of the value gives the column:
+\
+\   &6 = %110 = left column
+\   &5 = %101 = middle column
+\   &3 = %011 = right column
+\
+\ while the low nibble gives the row:
+\
+\   &1 = %0001 = top row
+\   &2 = %0010 = second row
+\   &4 = %0100 = third row
+\   &8 = %1000 = bottom row
+\
+\ This results in the following mapping (as the top two fire buttons are treated
+\ the same as the top button in the middle row):
+\
+\   Fire laser                                    Fire laser
+\
+\   Slow down              Fire laser             Speed up
+\   Unarm missile          Fire missile           Target missile
+\   Front view             E.C.M.                 Rear view
+\   Docking computer off   In-system jump         Docking computer on
+\
+\ Note that this is different to the layout in Angus Duggan's documentation, as
+\ he has the docking computer buttons the wrong way around in his instructions.
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for Delta 14B: ------------------>
+
+.b_table
+
+ EQUB &61               \ Left column    Top row      KYTB+1    Slow down
+ EQUB &31               \ Right column   Top row      KYTB+2    Speed up
+ EQUB &80               \ -                           KYTB+3    Roll left
+ EQUB &80               \ -                           KYTB+4    Roll right
+ EQUB &80               \ -                           KYTB+5    Pitch up
+ EQUB &80               \ -                           KYTB+6    Pitch down
+ EQUB &51               \ Middle column  Top row      KYTB+7    Fire lasers
+ EQUB &64               \ Left column    Third row    -         Front view
+ EQUB &34               \ Right column   Third row    -         Rear view
+ EQUB &32               \ Right column   Second row   KYTB+10   Arm missile
+ EQUB &62               \ Left column    Second row   KYTB+11   Unarm missile
+ EQUB &52               \ Middle column  Second row   KYTB+12   Fire missile
+ EQUB &54               \ Middle column  Third row    KYTB+13   E.C.M.
+ EQUB &58               \ Middle column  Bottom row   KYTB+14   In-system jump
+ EQUB &38               \ Right column   Bottom row   KYTB+15   Docking computer
+ EQUB &68               \ Left column    Bottom row   KYTB+16   Cancel docking
+
+                        \ --- End of added code ------------------------------->
+
+\ ******************************************************************************
+\
 \       Name: b_14
 \       Type: Subroutine
 \   Category: Keyboard
@@ -28052,22 +28222,13 @@ ENDIF
 
                         \ --- Mod: Code added for Delta 14B: ------------------>
 
-.b_14
-
- CURRENT5% = P%         \ Store the current address
-
- CLEAR &5600, &5600     \ Clear the guard so we can assemble block 5 into
-                        \ sideways ROM
-
- ORG END_OF_4%          \ Assemble block 5 after block 4
-
 .b_13
 
  LDA #0                 \ Set A = 0 for the second pass through the following,
                         \ so we can check the joystick plugged into the rear
                         \ socket of the Delta 14B adaptor
 
-.b_14_ROM
+.b_14
 
                         \ This is the entry point for the routine, which is
                         \ called with A = 128 (the value of BSTK when the Delta
@@ -28208,104 +28369,6 @@ ENDIF
 .b_return
 
  STX KL                 \ Set the key "pressed" to the internal key in X
-
- RTS                    \ Return from the subroutine
-
-                        \ --- End of added code ------------------------------->
-
-\ ******************************************************************************
-\
-\       Name: b_table
-\       Type: Variable
-\   Category: Keyboard
-\    Summary: Lookup table for Delta 14B joystick buttons
-\  Deep dive: Delta 14B joystick support
-\
-\ ------------------------------------------------------------------------------
-\
-\ In the following table, which maps buttons on the Delta 14B to the flight
-\ controls, the high nibble of the value gives the column:
-\
-\   &6 = %110 = left column
-\   &5 = %101 = middle column
-\   &3 = %011 = right column
-\
-\ while the low nibble gives the row:
-\
-\   &1 = %0001 = top row
-\   &2 = %0010 = second row
-\   &4 = %0100 = third row
-\   &8 = %1000 = bottom row
-\
-\ This results in the following mapping (as the top two fire buttons are treated
-\ the same as the top button in the middle row):
-\
-\   Fire laser                                    Fire laser
-\
-\   Slow down              Fire laser             Speed up
-\   Unarm missile          Fire missile           Target missile
-\   Front view             E.C.M.                 Rear view
-\   Docking computer off   In-system jump         Docking computer on
-\
-\ Note that this is different to the layout in Angus Duggan's documentation, as
-\ he has the docking computer buttons the wrong way around in his instructions.
-\
-\ ******************************************************************************
-
-                        \ --- Mod: Code added for Delta 14B: ------------------>
-
-.b_table
-
- EQUB &61               \ Left column    Top row      KYTB+1    Slow down
- EQUB &31               \ Right column   Top row      KYTB+2    Speed up
- EQUB &80               \ -                           KYTB+3    Roll left
- EQUB &80               \ -                           KYTB+4    Roll right
- EQUB &80               \ -                           KYTB+5    Pitch up
- EQUB &80               \ -                           KYTB+6    Pitch down
- EQUB &51               \ Middle column  Top row      KYTB+7    Fire lasers
- EQUB &64               \ Left column    Third row    -         Front view
- EQUB &34               \ Right column   Third row    -         Rear view
- EQUB &32               \ Right column   Second row   KYTB+10   Arm missile
- EQUB &62               \ Left column    Second row   KYTB+11   Unarm missile
- EQUB &52               \ Middle column  Second row   KYTB+12   Fire missile
- EQUB &54               \ Middle column  Third row    KYTB+13   E.C.M.
- EQUB &58               \ Middle column  Bottom row   KYTB+14   In-system jump
- EQUB &38               \ Right column   Bottom row   KYTB+15   Docking computer
- EQUB &68               \ Left column    Bottom row   KYTB+16   Cancel docking
-
- END_OF_5% = P%
-
- SAVE "3-assembled-output/rom-extra5.bin", END_OF_4%, END_OF_5%
-
- ORG CURRENT5%          \ Start assembling the main code again
-
- GUARD &5600            \ Put the guard back in place that we removed above
-
- LDA &F4                \ Fetch the RAM copy of the currently selected ROM and
- PHA                    \ store it on the stack
-
- LDA musicRomNumber     \ Fetch the number of the music ROM and switch to it
- STA &F4
- STA &FE30
-
- TYA                    \ Store X and Y on the stack
- PHA
- TXA
- PHA
-
- LDA #%10000000         \ Set A to 128, as that's what the b_14 routine expects
-                        \ as a parameter
-
- JSR b_14_ROM           \ Call the b_14 routine in the music ROM
-
- PLA                    \ Retrieve X and Y from the stack
- TAX
- PLA
- TAY
-
- PLA                    \ Set the ROM number back to the value that we stored
- STA &F4                \ above, to switch back to the previous ROM
- STA &FE30
 
  RTS                    \ Return from the subroutine
 
@@ -29481,12 +29544,12 @@ ENDMACRO
 
 .TIDY
 
- CURRENT6% = P%         \ Store the current address
+ CURRENT7% = P%         \ Store the current address
 
- CLEAR &5600, &5600     \ Clear the guard so we can assemble block 6 into
+ CLEAR &5600, &5600     \ Clear the guard so we can assemble block 7 into
                         \ sideways ROM
 
- ORG END_OF_5%          \ Assemble block 6 after block 5
+ ORG END_OF_6%          \ Assemble block 7 after block 6
 
                         \ --- End of added code ------------------------------->
 
@@ -29647,11 +29710,11 @@ ENDMACRO
 
                         \ --- Mod: Code added for Compendium: ----------------->
 
- END_OF_6% = P%
+ END_OF_7% = P%
 
- SAVE "3-assembled-output/rom-extra6.bin", END_OF_5%, END_OF_6%
+ SAVE "3-assembled-output/rom-extra7.bin", END_OF_6%, END_OF_7%
 
- ORG CURRENT6%          \ Start assembling the main code again
+ ORG CURRENT7%          \ Start assembling the main code again
 
  GUARD &5600            \ Put the guard back in place that we removed above
 
