@@ -28406,6 +28406,9 @@ ENDIF
  BEQ fill1              \ is not configured, so jump to fill1 to skip the
                         \ following
 
+ LDA #%10000000         \ Set A to 128, as that's what the b_14 routine expects
+                        \ as a parameter
+
  JSR b_14               \ Call b_14 to check the Delta 14B joystick buttons and
                         \ populate the key logger
 
