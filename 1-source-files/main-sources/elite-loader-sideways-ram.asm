@@ -630,7 +630,7 @@
  LDA XX21,Y             \ Set P(1 0) to the X-th address in the XX21 table,
  STA P                  \ which is the address of the blueprint X data within
  LDA XX21+1,Y           \ the ship blueprint file that we have loaded at address
- STA P+1				\ XX21
+ STA P+1                \ XX21
 
  CMP #HI(XX21)          \ Ship blueprint files are 9 pages in size, so if the
  BCC proc1              \ high byte of the address in P(1 0) is outside of the
