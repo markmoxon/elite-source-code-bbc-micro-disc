@@ -184,7 +184,7 @@
 \
 \       Name: ZP
 \       Type: Workspace
-\    Address: &0000 to &00B0
+\    Address: &0000 to &00E1
 \   Category: Workspaces
 \    Summary: Lots of important variables are stored in the zero page workspace
 \             as it is quicker and more space-efficient to access memory here
@@ -26662,7 +26662,7 @@ ENDIF
 .CTRL
 
  LDX #1                 \ Set X to the internal key number for CTRL and fall
-                        \ through to DKS4 to scan the keyboard
+                        \ through into DKS4 to scan the keyboard
 
 \ ******************************************************************************
 \
@@ -27243,7 +27243,7 @@ ENDIF
 .DK4
 
  JSR RDKEY              \ Scan the keyboard for a key press and return the
-                        \ internal key number in X (or 0 for no key press)
+                        \ internal key number in A and X (or 0 for no key press)
 
  STX KL                 \ Store X in KL, byte #0 of the key logger
 
@@ -27262,7 +27262,7 @@ ENDIF
                         \ screen gets drawn
 
  JSR RDKEY              \ Scan the keyboard for a key press and return the
-                        \ internal key number in X (or 0 for no key press)
+                        \ internal key number in A and X (or 0 for no key press)
 
  CPX #&51               \ If "S" is not being pressed, skip to DK6
  BNE DK6
