@@ -410,7 +410,7 @@
  LDA #LO(FileHandler)   \ Set the extended vector XFILEV to point to the
  STA XFILEV             \ FileHandler routine in the sideways RAM bank that we
  LDA #HI(FileHandler)   \ are building
- STA XFILEV+1           \ 
+ STA XFILEV+1           \
  LDA &F4                \ The format for the extended vector is the address of
  STA XFILEV+2           \ the handler in the first two bytes, followed by the
                         \ ROM bank number in the third byte, which we can fetch
@@ -452,7 +452,7 @@
  LDA #'.'               \ Print a full stop to show progress during loading
  JSR OSWRCH
 
- LDA #LO(XX21)          \ Set the load address in bytes 2 and 3 of the OSFILE 
+ LDA #LO(XX21)          \ Set the load address in bytes 2 and 3 of the OSFILE
  STA osfileBlock+2      \ block to XX21, which is where ship blueprint files
  LDA #HI(XX21)          \ get loaded in the normal disc version
  STA osfileBlock+3      \
@@ -975,7 +975,7 @@
 
  LDA &8000+6            \ Set A to the type of ROM in bank X, which is in byte
  PHA                    \ #6 of the ROM header, and store it on the stack
- 
+
  EOR #%00000001         \ Flip bit 0 of the ROM type and store the updated type
  STA &8000+6            \ in byte #6 of bank X
 
