@@ -772,7 +772,7 @@
 
  SKIP 2                 \ Temporary storage, used in a number of places
 
- PRINT "Zero page variables from ", ~ZP, " to ", ~P%
+ PRINT "ZP workspace from ", ~ZP, "to ", ~P%-1, "inclusive"
 
 \ ******************************************************************************
 \
@@ -807,6 +807,10 @@
 \ ******************************************************************************
 
  ORG &0300
+
+.UP
+
+ SKIP 0                 \ The start of the UP workspace
 
 .KL
 
@@ -1836,6 +1840,8 @@
                         \ of the catalogue, between the two lists of filenames,
                         \ so it can be dropped without affecting the layout)
 
+ PRINT "UP workspace from ", ~UP, "to ", ~P%-1, "inclusive"
+
 \ ******************************************************************************
 \
 \       Name: K%
@@ -1867,6 +1873,8 @@
 .K%
 
  SKIP NOSH * NI%        \ Ship data blocks and ship line heap
+
+ PRINT "K% workspace from ", ~K%, "to ", ~P%-1, "inclusive"
 
 \ ******************************************************************************
 \
@@ -1985,7 +1993,7 @@
                         \ through the list of pirate ship blueprints until we
                         \ find one that has been loaded
 
- PRINT "WP workspace from  ", ~WP," to ", ~P%
+ PRINT "WP workspace from ", ~WP, "to ", ~P%-1, "inclusive"
 
 \ ******************************************************************************
 \
@@ -2023,6 +2031,8 @@
                         \ JMP BRBR1 instruction. This ensures that any code that
                         \ updates BRKV will update this instruction instead of
                         \ the actual vector
+
+ PRINT "S% workspace (docked) from ", ~S%, "to ", ~P%-1, "inclusive"
 
 \ ******************************************************************************
 \

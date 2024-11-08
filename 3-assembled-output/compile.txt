@@ -6174,9 +6174,11 @@ Saving file '3-assembled-output/MNUCODE.bin'
      00D2
 .K4
      00E0
-Zero page variables from &0  to &E2 
+ZP workspace from &0 to &E1 inclusive
 .XX3
      0100
+.UP
+     0300
 .KL
      0300
 .KY1
@@ -6375,8 +6377,10 @@ Zero page variables from &0  to &E2
      03CE
 .CATF
      03CF
+UP workspace from &300 to &3CF inclusive
 .K%
      0900
+K% workspace from &900 to &ABB inclusive
 .WP
      0E00
 .LSX
@@ -6411,13 +6415,14 @@ Zero page variables from &0  to &E2
      0FD1
 .CPIR
      0FD2
-WP workspace from  &E00  to &FD3 
+WP workspace from &E00 to &FD2 inclusive
 .S%
      11E3   4C 01 12   JMP &1201
      11E6   4C 01 12   JMP &1201
      11E9   4C FC 1E   JMP &1EFC
      11EC   4B 11
      11EE   4C D5 11   JMP &11D5
+S% workspace (flight) from &11E3 to &11F0 inclusive
 .INBAY
      11F1   A2 F8      LDX #&F8
      11F3   A0 11      LDY #&11
@@ -16347,9 +16352,11 @@ Saving file '3-assembled-output/D.CODE.unprot.bin'
      00D2
 .K4
      00E0
-Zero page variables from &0  to &E2 
+ZP workspace from &0 to &E1 inclusive
 .XX3
      0100
+.UP
+     0300
 .KL
      0300
 .KY1
@@ -16548,8 +16555,10 @@ Zero page variables from &0  to &E2
      03CE
 .CATF
      03CF
+UP workspace from &300 to &3CF inclusive
 .K%
      0900
+K% workspace from &900 to &ABB inclusive
 .WP
      0E00
 .LSX
@@ -16584,13 +16593,14 @@ Zero page variables from &0  to &E2
      0FD1
 .CPIR
      0FD2
-WP workspace from  &E00  to &FD3 
+WP workspace from &E00 to &FD2 inclusive
 .S%
      11E3   4C 1B 12   JMP &121B
      11E6   4C FB 11   JMP &11FB
      11E9   4C 56 1D   JMP &1D56
      11EC   4B 11
      11EE   4C D5 11   JMP &11D5
+S% workspace (docked) from &11E3 to &11F0 inclusive
 .INBAY
      11F1   A2 00      LDX #&00
      11F3   A0 00      LDY #&00
