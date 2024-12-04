@@ -18,6 +18,11 @@
 \
 \ ------------------------------------------------------------------------------
 \
+\ This source file contains the second of three game loaders for BBC Micro disc
+\ Elite.
+\
+\ ------------------------------------------------------------------------------
+\
 \ This source file produces the following binary file:
 \
 \   * ELITE3.bin

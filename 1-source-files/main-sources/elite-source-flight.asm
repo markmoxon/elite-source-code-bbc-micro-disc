@@ -18,6 +18,12 @@
 \
 \ ------------------------------------------------------------------------------
 \
+\ This source file contains the main game code for BBC Micro disc Elite, for
+\ when the player is flying in space. It loads the ship blueprints from one of
+\ the ship blueprint files.
+\
+\ ------------------------------------------------------------------------------
+\
 \ This source file produces the following binary file:
 \
 \   * D.CODE.unprot.bin

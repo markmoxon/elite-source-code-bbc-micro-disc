@@ -18,6 +18,10 @@
 \
 \ ------------------------------------------------------------------------------
 \
+\ This source file contains the missile ship blueprint for BBC Micro disc Elite.
+\
+\ ------------------------------------------------------------------------------
+\
 \ This source file produces the following binary file:
 \
 \   * MISSILE.bin

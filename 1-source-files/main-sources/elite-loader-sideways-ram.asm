@@ -20,6 +20,11 @@
 \
 \ ------------------------------------------------------------------------------
 \
+\ This source file contains the game loader for the sideways RAM variant of BBC
+\ Micro disc Elite.
+\
+\ ------------------------------------------------------------------------------
+\
 \ This source file produces the following binary file:
 \
 \   * MNUCODE.bin

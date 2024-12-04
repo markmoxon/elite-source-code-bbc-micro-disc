@@ -18,6 +18,10 @@
 \
 \ ------------------------------------------------------------------------------
 \
+\ This source file contains ship blueprints for BBC Micro disc Elite.
+\
+\ ------------------------------------------------------------------------------
+\
 \ This source file produces the following binary file:
 \
 \   * D.MOA.bin
