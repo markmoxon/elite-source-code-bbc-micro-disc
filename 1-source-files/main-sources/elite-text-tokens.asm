@@ -1,8 +1,9 @@
 \ ******************************************************************************
 \
-\ DISC ELITE RECURSIVE TEXT TOKEN FILE
+\ BBC MICRO DISC ELITE GAME DATA SOURCE
 \
-\ Elite was written by Ian Bell and David Braben and is copyright Acornsoft 1984
+\ BBC Micro disc Elite was written by Ian Bell and David Braben and is copyright
+\ Acornsoft 1984
 \
 \ The code on this site has been reconstructed from a disassembly of the version
 \ released on Ian Bell's personal website at http://www.elitehomepage.org/
@@ -18,8 +19,8 @@
 \
 \ ------------------------------------------------------------------------------
 \
-\ This source file contains the game data for BBC Micro disc Elite, which
-\ includes the game text.
+\ This source file contains the game data for BBC Micro disc Elite, including
+\ the game text.
 \
 \ ------------------------------------------------------------------------------
 \

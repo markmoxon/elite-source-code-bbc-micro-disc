@@ -1,8 +1,9 @@
 \ ******************************************************************************
 \
-\ DISC ELITE SHIP BLUEPRINTS FILE D
+\ BBC MICRO DISC ELITE SHIP BLUEPRINTS FILE D SOURCE
 \
-\ Elite was written by Ian Bell and David Braben and is copyright Acornsoft 1984
+\ BBC Micro disc Elite was written by Ian Bell and David Braben and is copyright
+\ Acornsoft 1984
 \
 \ The code on this site has been reconstructed from a disassembly of the version
 \ released on Ian Bell's personal website at http://www.elitehomepage.org/

@@ -1,8 +1,9 @@
 \ ******************************************************************************
 \
-\ DISC ELITE SIDEWAYS RAM LOADER SOURCE
+\ BBC MICRO DISC ELITE SIDEWAYS RAM LOADER SOURCE
 \
-\ Elite was written by Ian Bell and David Braben and is copyright Acornsoft 1984
+\ BBC Micro disc Elite was written by Ian Bell and David Braben and is copyright
+\ Acornsoft 1984
 \
 \ The sideways RAM menu and loader were written by Stuart McConnachie in 1988-9
 \
