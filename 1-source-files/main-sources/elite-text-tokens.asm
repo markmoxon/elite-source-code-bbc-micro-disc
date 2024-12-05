@@ -5,7 +5,7 @@
 \ BBC Micro disc Elite was written by Ian Bell and David Braben and is copyright
 \ Acornsoft 1984
 \
-\ The code on this site has been reconstructed from a disassembly of the version
+\ The code in this file has been reconstructed from a disassembly of the version
 \ released on Ian Bell's personal website at http://www.elitehomepage.org/
 \
 \ The commentary is copyright Mark Moxon, and any misunderstandings or mistakes
