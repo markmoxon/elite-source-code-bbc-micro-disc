@@ -312,6 +312,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Dodecahedron ("Dodo") space station
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -430,6 +431,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for an escape pod
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -493,6 +495,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a cargo canister
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -573,6 +576,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for an asteroid
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -665,6 +669,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a splinter
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ------------------------------------------------------------------------------
 \
@@ -676,7 +681,7 @@ ENDMACRO
 .SHIP_SPLINTER
 
  EQUB 0 + (11 << 4)     \ Max. canisters on demise = 0
-                        \ Market item when scooped = 11 + 1 = 12 (Minerals)
+                        \ Market item when scooped = 11 + 1 = 12 (minerals)
  EQUW 16 * 16           \ Targetable area          = 16 * 16
 
  EQUB LO(SHIP_ESCAPE_POD_EDGES - SHIP_SPLINTER)    \ Edges from escape pod
@@ -723,6 +728,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Shuttle
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -833,6 +839,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Python
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -931,6 +938,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Viper
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -1021,6 +1029,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Sidewinder
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -1101,6 +1110,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Krait
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -1193,6 +1203,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Cobra Mk III (pirate)
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 

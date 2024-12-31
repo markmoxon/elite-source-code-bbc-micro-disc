@@ -312,6 +312,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Dodecahedron ("Dodo") space station
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -430,6 +431,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for an escape pod
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -493,6 +495,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a cargo canister
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -573,6 +576,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a boulder
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -653,6 +657,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Transporter
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -798,6 +803,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Cobra Mk III
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -925,6 +931,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Boa
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -1023,6 +1030,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Viper
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -1113,6 +1121,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Sidewinder
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -1193,6 +1202,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Gecko
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 

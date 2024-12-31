@@ -312,6 +312,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Dodecahedron ("Dodo") space station
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -430,6 +431,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for an escape pod
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -493,6 +495,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a cargo canister
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -573,6 +576,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Cobra Mk III
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -700,6 +704,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for an Anaconda
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -800,6 +805,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Viper
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -890,6 +896,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Sidewinder
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -970,6 +977,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Mamba
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -1076,6 +1084,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Worm
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -1158,6 +1167,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Fer-de-Lance
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 

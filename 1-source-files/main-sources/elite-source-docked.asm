@@ -33027,6 +33027,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a cargo canister
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -33107,6 +33108,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Shuttle
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -33217,6 +33219,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Transporter
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -33362,6 +33365,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Cobra Mk III
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -33489,6 +33493,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Python
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -33587,6 +33592,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Viper
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -33677,6 +33683,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Krait
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -33769,6 +33776,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a Constrictor
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
