@@ -32783,7 +32783,8 @@ ENDIF
 \       Name: XX21
 \       Type: Variable
 \   Category: Drawing ships
-\    Summary: Ship blueprints lookup table for the ship hangar
+\    Summary: Ship blueprints lookup table for the ship hangar and mission 1
+\             briefing
 \  Deep dive: Ship blueprints in the BBC Micro disc version
 \
 \ ******************************************************************************
