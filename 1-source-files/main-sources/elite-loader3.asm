@@ -829,6 +829,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Save and load
 \    Summary: Load disc sectors 0 and 1 to &0E00 and &0F00 respectively
+\  Deep dive: Swapping between the docked and flight code
 \
 \ ------------------------------------------------------------------------------
 \
@@ -2353,6 +2354,7 @@ ENDIF
 \   Category: Loader
 \    Summary: Loader break handler: print a newline and the error message, and
 \             then hang the computer
+\  Deep dive: Swapping between the docked and flight code
 \
 \ ------------------------------------------------------------------------------
 \

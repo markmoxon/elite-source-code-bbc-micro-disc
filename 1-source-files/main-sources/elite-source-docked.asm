@@ -1953,6 +1953,7 @@
 \    Address: &11E3 to &11F0
 \   Category: Workspaces
 \    Summary: Entry points and vector addresses in the main docked code
+\  Deep dive: Swapping between the docked and flight code
 \
 \ ******************************************************************************
 
@@ -1981,6 +1982,7 @@
 \       Type: Subroutine
 \   Category: Loader
 \    Summary: An unused routine that is never run
+\  Deep dive: Swapping between the docked and flight code
 \
 \ ******************************************************************************
 
@@ -2116,6 +2118,7 @@ ENDIF
 \             mission progression
 \  Deep dive: The Constrictor mission
 \             The Thargoid Plans mission
+\             Swapping between the docked and flight code
 \
 \ ******************************************************************************
 
@@ -16032,6 +16035,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Flight
 \    Summary: Launch from a station or show the front space view
+\             Swapping between the docked and flight code
 \
 \ ------------------------------------------------------------------------------
 \
@@ -16226,6 +16230,7 @@ ENDIF
 \       Type: Variable
 \   Category: Loader
 \    Summary: The OS command string for running the flight code in file D.CODE
+\  Deep dive: Swapping between the docked and flight code
 \
 \ ******************************************************************************
 
@@ -21135,6 +21140,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Utility routines
 \    Summary: The standard BRKV handler for the game
+\  Deep dive: Swapping between the docked and flight code
 \
 \ ------------------------------------------------------------------------------
 \
@@ -22227,6 +22233,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Save and load
 \    Summary: The BRKV handler for disc access operations
+\  Deep dive: Swapping between the docked and flight code
 \
 \ ------------------------------------------------------------------------------
 \
