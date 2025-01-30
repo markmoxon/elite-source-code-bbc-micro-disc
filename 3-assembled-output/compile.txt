@@ -9606,7 +9606,7 @@ S.ELTB &1695  &2102  &11E3  &1695
      2866   A9 00      LDA #&00
      2868   A2 08      LDX #&08
      286A   46 1B      LSR &1B
-.MUL6
+.MUL6K
      286C   90 02      BCC &2870
      286E   65 D1      ADC &D1
      2870   6A         ROR A
@@ -19039,7 +19039,7 @@ S.ELTB &175B  &1F99  &11E3  &175B
      2219   A9 00      LDA #&00
      221B   A2 08      LDX #&08
      221D   46 1B      LSR &1B
-.MUL6
+.MUL6K
      221F   90 02      BCC &2223
      2221   65 D1      ADC &D1
      2223   6A         ROR A
@@ -19370,7 +19370,7 @@ S.ELTB &175B  &1F99  &11E3  &175B
      2422   D0 CE      BNE &23F2
 .PD1
      2424   A2 03      LDX #&03
-.PDL1
+.PDL1K
      2426   B5 6E      LDA &6E,X
      2428   95 00      STA &00,X
      242A   CA         DEX

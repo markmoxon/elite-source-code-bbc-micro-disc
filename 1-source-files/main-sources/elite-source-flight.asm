@@ -12575,7 +12575,6 @@ ENDIF
 \
 \ ******************************************************************************
 
-{
  LDX Q
  BEQ MU1
  DEX
@@ -12584,16 +12583,20 @@ ENDIF
  LDX #8
  LSR P
 
-.MUL6
+.MUL6K                  \ This label is a duplicate of a label in the MULTU
+                        \ routine
+                        \
+                        \ In the original source this label is MUL6, but
+                        \ because BeebAsm doesn't allow us to redefine labels,
+                        \ I have renamed it to MUL6K
 
  BCC P%+4
  ADC T
  ROR A
  ROR P
  DEX
- BNE MUL6
+ BNE MUL6K
  RTS
-}
 
 \ ******************************************************************************
 \
