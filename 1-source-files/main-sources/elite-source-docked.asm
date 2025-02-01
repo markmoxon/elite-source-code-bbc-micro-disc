@@ -20945,8 +20945,8 @@ ENDIF
 \
 \ Arguments:
 \
-\   A                   The internal key number of the key pressed (see p.142 of
-\                       the "Advanced User Guide for the BBC Micro" by Bray,
+\   A                   The internal key number of the key pressed (see page 142
+\                       of the "Advanced User Guide for the BBC Micro" by Bray,
 \                       Dickens and Holmes for a list of internal key numbers)
 \
 \   X                   The amount to move the crosshairs in the x-axis
@@ -23049,9 +23049,9 @@ ENDIF
 \ ------------------------------------------------------------------------------
 \
 \ Scan the keyboard, starting with internal key number 16 ("Q") and working
-\ through the set of internal key numbers (see p.142 of the "Advanced User Guide
-\ for the BBC Micro" by Bray, Dickens and Holmes for a list of internal key
-\ numbers).
+\ through the set of internal key numbers (see page 142 of the "Advanced User
+\ Guide for the BBC Micro" by Bray, Dickens and Holmes for a list of internal
+\ key numbers).
 \
 \ This routine is effectively the same as OSBYTE 122, though the OSBYTE call
 \ preserves A, unlike this routine.
@@ -23432,7 +23432,7 @@ ENDIF
 \
 \ Arguments:
 \
-\   X                   The internal number of the key to check (see p.142 of
+\   X                   The internal number of the key to check (see page 142 of
 \                       the "Advanced User Guide for the BBC Micro" by Bray,
 \                       Dickens and Holmes for a list of internal key numbers)
 \
@@ -23569,7 +23569,7 @@ ENDIF
 \   * J toggles reverse both joystick channels (&45)
 \   * K toggles keyboard and joystick (&46)
 \
-\ The numbers in brackets are the internal key numbers (see p.142 of the
+\ The numbers in brackets are the internal key numbers (see page 142 of the
 \ "Advanced User Guide for the BBC Micro" by Bray, Dickens and Holmes for a list
 \ of internal key numbers). We pass the key that has been pressed in X, and the
 \ configuration option to check it against in Y, so this routine is typically
