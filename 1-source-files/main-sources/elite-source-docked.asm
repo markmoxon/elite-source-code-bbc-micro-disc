@@ -27412,15 +27412,19 @@ ENDMACRO
                         \ clipped to fit on-screen, returning the clipped line's
                         \ end-points in (X1, Y1) and (X2, Y2)
 
- BCS LL78               \ If the C flag is set then the line is not visible on
-                        \ screen, so jump to LL78 so we don't store this line
-                        \ in the ship line heap
-
                         \ --- Mod: Code removed for flicker-free ships: ------->
 
+\BCS LL79-3             \ If the C flag is set then the line is not visible on
+\                       \ screen, so jump to LL78 (via LL79-3) so we don't store
+\                       \ this line in the ship line heap
+\
 \JMP LL80               \ Jump down to part 11 to draw this edge
 
                         \ --- And replaced by: -------------------------------->
+
+ BCS LL78               \ If the C flag is set then the line is not visible on
+                        \ screen, so jump to LL78 so we don't store this line
+                        \ in the ship line heap
 
  JSR LSPUT              \ Draw this edge using smooth animation, by first
                         \ drawing the ship's new line and then erasing the
