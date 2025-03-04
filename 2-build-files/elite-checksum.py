@@ -80,7 +80,7 @@ if release == 1 or release == 2:
     scramble4_eor = 0xA5
 elif release == 3:
     scramble4_from = 0x2A62     # ELITE
-    scramble4_to = 0x2DF0       # End of ELITE4 file (at PROT4)
+    scramble4_to = 0x2E24       # End of ELITE4 file (at PROT4)
     scramble4_eor = 0xA5
 
 # Commander file checksum
