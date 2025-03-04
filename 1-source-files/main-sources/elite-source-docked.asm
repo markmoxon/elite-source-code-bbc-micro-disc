@@ -213,7 +213,7 @@
  SKIP 4                 \ Four 8-bit seeds for the random number generation
                         \ system implemented in the DORND routine
 
-                        \ --- Mod: Code removed for music: -------------------->
+                        \ --- Mod: Code removed for flicker-free ships: ------->
 
 \.TRTB%
 \
@@ -23965,7 +23965,7 @@ ENDIF
  TAY                    \ Copy A to Y, so Y contains the internal key number
                         \ of the key pressed
 
-                        \ --- Mod: Code removed for music: -------------------->
+                        \ --- Mod: Code removed for flicker-free ships: ------->
 
 \LDA (TRTB%),Y          \ The address in TRTB% points to the MOS key
                         \ translation table, which is used to translate
