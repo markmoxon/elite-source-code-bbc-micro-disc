@@ -31304,12 +31304,17 @@ ENDMACRO
  LSR A
  TAX
 
- LDA XX2,X              \ If XX2+X is zero then we decided in part 5 that
- BEQ LL78               \ face 2 is hidden, so jump to LL78
-
                         \ --- Mod: Code removed for flicker-free ships: ------->
 
+\LDA XX2,X              \ If XX2+X is non-zero then we decided in part 5 that
+\BNE LL79               \ face 2 is visible, so skip the following instruction
+\
 \JMP LL78               \ Face 2 is hidden, so jump to LL78
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDA XX2,X              \ If XX2+X is zero then we decided in part 5 that
+ BEQ LL78               \ face 2 is hidden, so jump to LL78
 
                         \ --- End of removed code ----------------------------->
 
