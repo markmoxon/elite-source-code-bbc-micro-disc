@@ -826,6 +826,27 @@
 
                         \ --- And replaced by: -------------------------------->
 
+                        \ --- Mod: Code added for flicker-free ships: --------->
+
+.LSNUM2
+
+ SKIP 0                 \ The size of the existing ship line heap for the ship
+                        \ we are drawing in LL9, i.e. the number of lines in the
+                        \ old ship that is currently shown on-screen and which
+                        \ we need to erase
+
+                        \ --- End of added code ------------------------------->
+
+.RAT
+
+ SKIP 1                 \ Used to store different signs depending on the current
+                        \ space view, for use in calculating stardust movement
+
+.RAT2
+
+ SKIP 1                 \ Temporary storage, used to store the pitch and roll
+                        \ signs when moving objects and stardust
+
 .CNT2
 
  SKIP 1                 \ Temporary storage, used in the planet-drawing routine
@@ -846,25 +867,16 @@
 
 .LSNUM
 
- SKIP 1                 \ The pointer to the current position in the ship line
+ SKIP 0                 \ The pointer to the current position in the ship line
                         \ heap as we work our way through the new ship's edges
                         \ (and the corresponding old ship's edges) when drawing
                         \ the ship in the main ship-drawing routine at LL9
 
                         \ --- End of added code ------------------------------->
 
-                        \ --- Mod: Code added for flicker-free ships: --------->
-
-.LSNUM2
-
- SKIP 1                 \ The size of the existing ship line heap for the ship
-                        \ we are drawing in LL9, i.e. the number of lines in the
-                        \ old ship that is currently shown on-screen and which
-                        \ we need to erase
-
-                        \ --- End of added code ------------------------------->
-
                         \ --- Mod: Code added for Econet: --------------------->
+
+.econet
 
  SKIP 14                \ &90-9F is reserved for Econet (we still use &90-&91,
                         \ but these should be unused)
@@ -892,22 +904,16 @@
 
 .XX2
 
- SKIP 5                 \ Temporary storage, used to store the visibility of the
+ SKIP 9                 \ Temporary storage, used to store the visibility of the
                         \ ship's faces during the ship-drawing routine at LL9
 
+.COL
+
+ SKIP 1                 \ Temporary storage, used to store colour information
+                        \ when drawing pixels in the dashboard
 .K2
 
  SKIP 4                 \ Temporary storage, used in a number of places
-
-.RAT
-
- SKIP 1                 \ Used to store different signs depending on the current
-                        \ space view, for use in calculating stardust movement
-
-.RAT2
-
- SKIP 1                 \ Temporary storage, used to store the pitch and roll
-                        \ signs when moving objects and stardust
 
 .STP
 
@@ -925,11 +931,6 @@
                         \ As the step size increases we move from smoother
                         \ circles at the top to more polygonal at the bottom.
                         \ See the CIRCLE2 routine for more details
-
-.COL
-
- SKIP 1                 \ Temporary storage, used to store colour information
-                        \ when drawing pixels in the dashboard
 
 .FLAG
 
@@ -35846,6 +35847,13 @@ ENDIF
  ETWO 'E', 'S'
  ECHR ' '
  EQUB VE
+
+IF _SRAM_DISC
+
+ ORG &A200              \ This is where the flicker-free planet code goes, which
+                        \ is assembled into Planet.bin by the flight code
+
+ENDIF
 
                         \ --- End of added code ------------------------------->
 
