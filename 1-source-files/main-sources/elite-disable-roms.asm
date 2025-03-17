@@ -550,28 +550,28 @@
 
 .breakKey
 
- EQUS "KEY10CLS:PRINT''"
+ EQUS "KEY10CLS:P.''"
  EQUS '"'
- EQUS "User memory now starts at address &"
+ EQUS "User memory now starts at &"
  EQUS '"'
  EQUS ";~PAGE"
- EQUS ":IFPAGE>&1200THENPRINT"
+ EQUS ":IFPAGE>&1200P."
  EQUS '"'
- EQUS "but this is still too high for Elite"
+ EQUS "which is still too high for Elite"
  EQUS '"'
- EQUS " ELSE PRINT"
+ EQUS "ELSEP."
  EQUS '"'
- EQUS "so there is enough memory to run Elite"
+ EQUS "which is good enough to run Elite"
  EQUS '"'
  EQUS "''"
  EQUS '"'
  EQUS "Press any key to load Elite over Econet"
  EQUS '"'
- EQUS "':A=GET:OSCLI("
+ EQUS "':A=GET:OS.("
  EQUS '"'
  EQUS "DIR"
  EQUS '"'
- EQUS "):OSCLI("
+ EQUS "):OS.("
  EQUS '"'
  EQUS "DIR EliteCmdrs"
  EQUS '"'
