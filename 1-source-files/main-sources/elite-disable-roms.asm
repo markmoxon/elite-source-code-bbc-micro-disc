@@ -567,7 +567,15 @@
  EQUS '"'
  EQUS "Press any key to load Elite over Econet"
  EQUS '"'
- EQUS "':A=GET:*Elite|M"
+ EQUS "':A=GET:OSCLI("
+ EQUS '"'
+ EQUS "DIR"
+ EQUS '"'
+ EQUS "):OSCLI("
+ EQUS '"'
+ EQUS "DIR EliteCmdrs"
+ EQUS '"'
+ EQUS "):*Elite|M"
  EQUB 13
 
 \ ******************************************************************************
