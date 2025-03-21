@@ -2291,12 +2291,6 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
-IF _STH_DISC OR _IB_DISC
-
- JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
-
-ENDIF
-
  LDX #LO(MESS1)         \ Set (Y X) to point to MESS1 ("DIR")
  LDY #HI(MESS1)
 
@@ -2308,6 +2302,12 @@ ENDIF
 
  JSR OSCLI              \ Call OSCLI to run the OS command in MESS2, which
                         \ changes the directory to EliteCmdrs
+
+IF _STH_DISC OR _IB_DISC
+
+ JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
+
+ENDIF
 
  JMP RSHIPS             \ Call RSHIPS to launch from the station and jump into
                         \ the main game loop

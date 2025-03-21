@@ -6413,13 +6413,13 @@ Zero page variables from &0  to &E2
      12F8   45 6C 69 ...
      1300   0D
 .DEEOR
-     1301   20 EC 3F   JSR &3FEC
-     1304   A2 15      LDX #&15
-     1306   A0 13      LDY #&13
-     1308   20 F7 FF   JSR &FFF7
-     130B   A2 19      LDX #&19
-     130D   A0 13      LDY #&13
-     130F   20 F7 FF   JSR &FFF7
+     1301   A2 15      LDX #&15
+     1303   A0 13      LDY #&13
+     1305   20 F7 FF   JSR &FFF7
+     1308   A2 19      LDX #&19
+     130A   A0 13      LDY #&13
+     130C   20 F7 FF   JSR &FFF7
+     130F   20 EC 3F   JSR &3FEC
      1312   4C DE 3F   JMP &3FDE
 .MESS1
      1315   44 49 52 
