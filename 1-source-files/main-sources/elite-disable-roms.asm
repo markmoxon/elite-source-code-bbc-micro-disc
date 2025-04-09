@@ -153,52 +153,64 @@
  STX &F4                \ Switch ROM bank X into memory
  STX VIA+&30
 
+ LDA &02A1,X            \ If this ROM's entry in the ROM table at &02A1 is
+ BNE drom2              \ non-zero then bank X does contain a ROM (as the table
+                        \ contains the ROM type), so jump to drom2 to work out
+                        \ what the ROM is and whether we need to disable it
+
+ LDA #'.'               \ If we get here then bank X is empty, so print a "."
+ JSR OSWRCH             \ to indicate that this ROM bank is empty
+
+ JMP drom15             \ Jump to drom15 to move on to the next ROM bank
+
+.drom2
+
                         \ We now check if ROM bank X contains the Elite ROM
 
  LDY #&F6               \ Set X = -10 to use as a counter for checking the ROM
                         \ title
 
-.drom2
+.drom3
 
  LDA eliteMatch-&F6,Y   \ Fetch the next character of the ROM title message from
                         \ eliteMatch
 
  CMP &8009-&F6,Y        \ If the character from bank X does not match the same
- BNE drom3              \ character from the ROM title in eliteMatch, then bank
-                        \ X is not the Elite ROM, so jump to drom3 to move on to
+ BNE drom4              \ character from the ROM title in eliteMatch, then bank
+                        \ X is not the Elite ROM, so jump to drom4 to move on to
                         \ the next test
 
  INY                    \ Increment the character pointer into the ROM title in
                         \ bank X
 
- BNE drom2              \ Loop back until we have checked all 10 characters
+ BNE drom3              \ Loop back until we have checked all 10 characters
 
  LDA #'E'               \ If we get here then bank X contains the correct ROM
  JSR OSWRCH             \ title for the Elite ROM, so print an "E"
 
- JMP drom14             \ Jump to drom14 to leave the ROM alone
+ JMP drom15             \ Jump to drom15 to leave the ROM alone
 
-.drom3
+.drom4
 
                         \ We now check if ROM bank X contains the DNFS ROM
 
  LDY #&F9               \ Set X = -7 to use as a counter for checking the ROM
                         \ title
 
-.drom4
+.drom5
 
  LDA dnfsMatch-&F9,Y    \ Fetch the next character of the ROM title message from
                         \ dnfsMatch
 
  CMP &8009-&F9,Y        \ If the character from bank X does not match the same
- BNE drom5              \ character from the ROM title in eliteMatch, then bank
-                        \ X is not the DNFS ROM, so jump to drom5 to move on to
+ BNE drom6              \ character from the ROM title in dnfsMatch, then bank
+                        \ X is not the DNFS ROM, so jump to drom6 to move on to
                         \ the next test
 
  INY                    \ Increment the character pointer into the ROM title in
                         \ bank X
 
- BNE drom4              \ Loop back until we have checked all 7 characters
+ BNE drom5              \ Loop back until we have checked all 7 characters
 
                         \ If we get here then disable the DFS part of the ROM
 
@@ -214,151 +226,153 @@
  LDY #0
  STA (ZP),Y
 
- JMP drom14             \ Jump to drom14 to leave the rest of the ROM alone
+ JMP drom15             \ Jump to drom15 to leave the rest of the ROM alone
 
-.drom5
+.drom6
 
                         \ We now check if ROM bank X contains the DFS ROM
 
  LDY #&FD               \ Set X = -3 to use as a counter for checking the ROM
                         \ title
 
-.drom6
+.drom7
 
  LDA dfsMatch-&FD,Y     \ Fetch the next character of the ROM title message from
                         \ dfsMatch
 
  CMP &8009-&FD,Y        \ If the character from bank X does not match the same
- BNE drom7              \ character from the ROM title in eliteMatch, then bank
-                        \ X is not the DFS ROM, so jump to drom7 to move on to
+ BNE drom8              \ character from the ROM title in dfsMatch, then bank
+                        \ X is not the DFS ROM, so jump to drom8 to move on to
                         \ the next test
 
  INY                    \ Increment the character pointer into the ROM title in
                         \ bank X
 
- BNE drom6              \ Loop back until we have checked all 3 characters
+ BNE drom7              \ Loop back until we have checked all 3 characters
 
- JMP drom13             \ If we get here then bank X contains the correct ROM
-                        \ title for the DFS ROM, so jump to drom13 to disable it
+ JMP drom14             \ If we get here then bank X contains the correct ROM
+                        \ title for the DFS ROM, so jump to drom14 to disable it
 
-.drom7
+.drom8
 
                         \ We now check if ROM bank X contains the ANFS ROM
 
 \LDY #&F6               \ Set X = -10 to use as a counter for checking the ROM
 \                       \ title
 \
-\.drom8
+\.drom9
 \
 \LDA anfsMatch-&F6,Y    \ Fetch the next character of the ROM title message from
 \                       \ anfsMatch
 \
 \CMP &8009-&F6,Y        \ If the character from bank X does not match the same
-\BNE drom9              \ character from the ROM title in eliteMatch, then bank
-\                       \ X is not the ANFS ROM, so jump to drom9 to move on to
+\BNE drom10             \ character from the ROM title in anfsMatch, then bank
+\                       \ X is not the ANFS ROM, so jump to drom10 to move on to
 \                       \ the next test
 \
 \INY                    \ Increment the character pointer into the ROM title in
 \                       \ bank X
 \
-\BNE drom8              \ Loop back until we have checked all 10 characters
+\BNE drom9              \ Loop back until we have checked all 10 characters
 \
 \LDA #'A'               \ If we get here then bank X contains the correct ROM
 \JSR OSWRCH             \ title for the ANFS ROM, so print an "A"
 \
-\JMP drom14             \ Jump to drom14 to leave the ROM alone
+\JMP drom15             \ Jump to drom15 to leave the ROM alone
 \
-\.drom9
+\.drom10
 
                         \ We now check if ROM bank X contains the NFS ROM
 
  LDY #&FD               \ Set X = -3 to use as a counter for checking the ROM
                         \ title
 
-.drom10
+.drom11
 
  LDA nfsMatch-&FD,Y     \ Fetch the next character of the ROM title message from
                         \ nfsMatch
 
  CMP &8009-&FD,Y        \ If the character from bank X does not match the same
- BNE drom11             \ character from the ROM title in eliteMatch, then bank
-                        \ X is not the NFS ROM, so jump to drom11 to move on to
+ BNE drom12             \ character from the ROM title in nfsMatch, then bank
+                        \ X is not the NFS ROM, so jump to drom12 to move on to
                         \ the next test
 
  INY                    \ Increment the character pointer into the ROM title in
                         \ bank X
 
- BNE drom10             \ Loop back until we have checked all 10 characters
+ BNE drom11             \ Loop back until we have checked all 10 characters
 
  LDA #'N'               \ If we get here then bank X contains the correct ROM
  JSR OSWRCH             \ title for the NFS ROM, so print an "N"
 
- JMP drom14             \ Jump to drom14 to leave the ROM alone
+ JMP drom15             \ Jump to drom15 to leave the ROM alone
 
-.drom11
+.drom12
 
                         \ We now check if ROM bank X contains the BASIC ROM
 
  LDY #&FB               \ Set X = -5 to use as a counter for checking the ROM
                         \ title
 
-.drom12
+.drom13
 
  LDA basicMatch-&FB,Y   \ Fetch the next character of the ROM title message from
                         \ basicMatch
 
  CMP &8009-&FB,Y        \ If the character from bank X does not match the same
- BNE drom13             \ character from the ROM title in eliteMatch, then bank
-                        \ X is not the NFS ROM, so jump to drom11 to move on to
+ BNE drom14             \ character from the ROM title in basicMatch, then bank
+                        \ X is not the NFS ROM, so jump to drom12 to move on to
                         \ the next test
 
  INY                    \ Increment the character pointer into the ROM title in
                         \ bank X
 
- BNE drom12             \ Loop back until we have checked all 10 characters
+ BNE drom13             \ Loop back until we have checked all 10 characters
 
  LDA #'B'               \ If we get here then bank X contains the correct ROM
  JSR OSWRCH             \ title for the BASIC ROM, so print a "B"
 
- JMP drom14             \ Jump to drom14 to leave the ROM alone
+ JMP drom15             \ Jump to drom15 to leave the ROM alone
 
-.drom13
+.drom14
 
-                        \ If we get here then the ROM in bank X is not NFS,
-                        \ DNFS, ANFS or BASIC, so disable the ROM in bank X
+                        \ If we get here then the ROM in bank X is not the Elite
+                        \ ROM, NFS, DNFS, ANFS or BASIC, so disable the ROM in
+                        \ bank X
 
- LDA #'x'               \ Print an 'x'
- JSR OSWRCH
+ LDA #'x'               \ Print an 'x' to indicate that we are disabling this
+ JSR OSWRCH             \ ROM
 
  TXA                    \ Set &0DF0+X = &FF, where X is the ROM number
- ORA #&F0
- STA ZP
- LDA #&0D
+ ORA #&F0               \
+ STA ZP                 \ This will ensure that this ROM is disabled when BREAK
+ LDA #&0D               \ is pressed
  STA ZP+1
  LDA #&FF
  LDY #0
  STA (ZP),Y
 
- TXA                    \ Set &02A1+X = 0, where X is the ROM number
- CLC
- ADC #&A1
- STA ZP
- LDA #&02
- STA ZP+1
- LDA #0
- LDY #0
- STA (ZP),Y
+\TXA                    \ Set &02A1+X = 0, where X is the ROM number
+\CLC                    \
+\ADC #&A1               \ This would ensure that this ROM were disabled
+\STA ZP                 \ immediately (though only until BREAK were pressed, as
+\LDA #&02               \ this table is recreated by the MOS at that point, so
+\STA ZP+1               \ this setting would only persist until then)
+\LDA #0                 \
+\LDY #0                 \ We don't need to disable ROMs immediately, as PAGE is
+\STA (ZP),Y             \ is only changed once BREAK is pressed, but I've left
+                        \ this code in here in case it's ever needed
 
-.drom14
+.drom15
 
  DEX                    \ Decrement the bank number we are testing in X
 
- BMI drom15             \ If we have tested all 16 banks, jump to drom11 to
+ BMI drom16             \ If we have tested all 16 banks, jump to drom12 to
                         \ return from the subroutine
 
  JMP drom1              \ Otherwise loop back to drom1 to test the next ROM bank
 
-.drom15
+.drom16
 
  PLA                    \ Switch back to the ROM bank number that we saved on
  STA &F4                \ the stack at the start of the routine
@@ -376,9 +390,9 @@
  STA ZP+1
  JSR PrintString
 
-.drom16
+.drom17
 
- JMP drom16             \ Wait for the user to press BREAK
+ JMP drom17             \ Wait for the user to press BREAK
 
 \ ******************************************************************************
 \
@@ -476,7 +490,7 @@
 
 \ ******************************************************************************
 \
-\       Name: eliteMatch
+\       Name: dnfsMatch
 \       Type: Variable
 \   Category: Loader
 \    Summary: The title of the DNFS ROM
@@ -489,7 +503,7 @@
 
 \ ******************************************************************************
 \
-\       Name: eliteMatch
+\       Name: dfsMatch
 \       Type: Variable
 \   Category: Loader
 \    Summary: The title of the DFS ROM
@@ -502,7 +516,7 @@
 
 \ ******************************************************************************
 \
-\       Name: eliteMatch
+\       Name: anfsMatch
 \       Type: Variable
 \   Category: Loader
 \    Summary: The title of the ANFS ROM
