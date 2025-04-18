@@ -2022,7 +2022,7 @@ IF _STH_DISC OR _IB_DISC
 
 .netTally
 
- SKIP 1                 \ Stores a one-point-per-kill combat score for the
+ SKIP 2                 \ Stores a one-point-per-kill combat score for the
                         \ scoreboard (so all platforms have the same point
                         \ system)
 
@@ -27001,9 +27001,9 @@ ENDIF
 
 IF _SRAM_DISC
 
- INC netTally           \ Increment the kill count in netTally, up to a maximum
- BNE taly1              \ of 256
- DEC netTally
+ INC netTally           \ Increment the kill count in netTally(1 0)
+ BNE taly1
+ INC netTally+1
 
 .taly1
 
@@ -27014,9 +27014,9 @@ IF _SRAM_DISC
 
 ELIF _STH_DISC OR _IB_DISC
 
- INC netTally           \ Increment the kill count in netTally, up to a maximum
- BNE taly1              \ of 256
- DEC netTally
+ INC netTally           \ Increment the kill count in netTally(1 0)
+ BNE taly1
+ INC netTally+1
 
 .taly1
 
@@ -34289,7 +34289,7 @@ IF _STH_DISC OR _IB_DISC
                         \               0 = docked, 1 = green
                         \               2 = yellow, 3 = red
                         \
-                        \   * Byte #10 = commander's kill count
+                        \   * Byte #10 = commander's kill count (low byte)
                         \
                         \   * Byte #11 = commander's death count
                         \
@@ -34298,6 +34298,14 @@ IF _STH_DISC OR _IB_DISC
                         \   * Byte #16 = machine type
                         \                0 = BBC Micro SRAM, 1 = Master,
                         \                2 = 6502SP, 3 = BBC Micro standard
+                        \
+                        \   * Byte #17 = reserved for the forwarding station
+                        \                number, for when packets are forwarded
+                        \
+                        \   * Byte #18 = reserved for the forwarding network
+                        \                number, for when packets are forwarded
+                        \
+                        \   * Byte #19 = commander's kill count (high byte)
                         \
                         \ Credits are transmitted with the low byte first
                         \ (unlike the way that credits are stored in the game)
@@ -35160,8 +35168,10 @@ IF _STH_DISC OR _IB_DISC
 
  STX transmitBuffer+9   \ Store the commander's condition in transmitBuffer+9
 
- LDA netTally           \ Copy the commander's combat score from netTally to
- STA transmitBuffer+10  \ transmitBuffer+10
+ LDA netTally           \ Copy the commander's combat score from netTally(1 0)
+ STA transmitBuffer+10  \ to transmitBuffer(19 10)
+ LDA netTally+1
+ STA transmitBuffer+19
 
  LDA netDeaths          \ Copy the commander's death count from netDeaths to
  STA transmitBuffer+11  \ transmitBuffer+11
@@ -35433,7 +35443,7 @@ IF _SRAM_DISC
 
 .netTally
 
- SKIP 1                 \ Stores a one-point-per-kill combat score for the
+ SKIP 2                 \ Stores a one-point-per-kill combat score for the
                         \ scoreboard (so all platforms have the same point
                         \ system)
 
@@ -35460,7 +35470,7 @@ IF _SRAM_DISC
                         \               0 = docked, 1 = green
                         \               2 = yellow, 3 = red
                         \
-                        \   * Byte #10 = commander's kill count
+                        \   * Byte #10 = commander's kill count (low byte)
                         \
                         \   * Byte #11 = commander's death count
                         \
@@ -35469,6 +35479,14 @@ IF _SRAM_DISC
                         \   * Byte #16 = machine type
                         \                0 = BBC Micro SRAM, 1 = Master,
                         \                2 = 6502SP, 3 = BBC Micro standard
+                        \
+                        \   * Byte #17 = reserved for the forwarding station
+                        \                number, for when packets are forwarded
+                        \
+                        \   * Byte #18 = reserved for the forwarding network
+                        \                number, for when packets are forwarded
+                        \
+                        \   * Byte #19 = commander's kill count (high byte)
                         \
                         \ Credits are transmitted with the low byte first
                         \ (unlike the way that credits are stored in the game)

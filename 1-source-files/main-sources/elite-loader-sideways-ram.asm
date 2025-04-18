@@ -94,7 +94,7 @@
  TransmitCmdrData = &A008   \ The address of the TransmitCmdrData routine in the
                             \ Elite ROM
 
- GetNetworkDetails = &A0AD  \ The address of the GetNetworkDetails routine in
+ GetNetworkDetails = &A0B3  \ The address of the GetNetworkDetails routine in
                             \ the Elite ROM
 
                         \ --- End of added code ------------------------------->
