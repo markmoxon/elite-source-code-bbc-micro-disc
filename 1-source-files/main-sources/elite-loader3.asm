@@ -654,13 +654,12 @@ ENDIF
 
                         \ --- And replaced by: -------------------------------->
 
- LDA #0                 \ Zero scorePort to netDeaths
- STA scorePort
- STA scoreStation
- STA scoreNetwork
- STA netTally
- STA netDeaths
- NOP
+ STX scorePort          \ Zero scorePort to netDeaths (X is set to zero by the
+ STX scoreStation       \ call to MVBL above)
+ STX scoreNetwork
+ STX netTally
+ STX netTally+1
+ STX netDeaths
  NOP
 
                         \ --- End of replacement ------------------------------>
