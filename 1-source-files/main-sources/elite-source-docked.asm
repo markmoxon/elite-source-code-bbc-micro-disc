@@ -23100,15 +23100,35 @@ ENDIF
  JSR t                  \ Scan the keyboard until a key is pressed, returning
                         \ the ASCII code in A and X
 
+                        \ --- Mod: Code removed for Scoreboard: --------------->
+
+\CMP #'1'               \ If A < ASCII "1", jump to SVEX to exit as the key
+\BCC SVEX               \ press doesn't match a menu option
+
+                        \ --- And replaced by: -------------------------------->
+
  CMP #'1'               \ If A < ASCII "1", jump to SVEX to exit as the key
- BCC SVEX               \ press doesn't match a menu option
+ BCS P%+5               \ press doesn't match a menu option
+ JMP SVEX
+
+                        \ --- End of replacement ------------------------------>
 
  CMP #'4'               \ If "4" was pressed, jump to DELT to process option 4
  BEQ DELT               \ (delete a file)
 
- BCS SVEX               \ If A >= ASCII "4", jump to SVEX to exit as the key
-                        \ press is either option 5 (exit), or it doesn't match a
+                        \ --- Mod: Code removed for Scoreboard: --------------->
+
+\BCS SVEX               \ If A >= ASCII "4", jump to SVEX to exit as the key
+\                       \ press is either option 5 (exit), or it doesn't match a
+\                       \ menu option (as we already checked for "4" above)
+
+                        \ --- And replaced by: -------------------------------->
+
+ BCC P%+5               \ If A >= ASCII "4", jump to SVEX to exit as the key
+ JMP SVEX               \ press is either option 5 (exit), or it doesn't match a
                         \ menu option (as we already checked for "4" above)
+
+                        \ --- End of replacement ------------------------------>
 
  CMP #'2'               \ If A >= ASCII "2" (i.e. save or catalogue), skip to
  BCS SV1                \ SV1
@@ -23217,6 +23237,17 @@ ENDIF
                         \ End address for save = &00000C00 in &0C0E to &0C11
                         \
                         \ Y is left containing &C which we use below
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+ LDA netTally           \ Store the scoreboard scores in the last three bytes of
+ STA &0B00+253          \ the buffer so they get saved
+ LDA netTally+1
+ STA &0B00+254
+ LDA netDeaths
+ STA &0B00+255
+
+                        \ --- End of added code ------------------------------->
 
  LDA #0                 \ Call QUS1 with A = 0, Y = &C to save the commander
  JSR QUS1               \ file with the filename we copied to INWK at the start
@@ -23415,11 +23446,15 @@ ENDIF
 
                         \ --- Mod: Code added for Scoreboard: ----------------->
 
- LDA #0                 \ Zero scorePort, netTally and netDeaths to reset the
- STA scorePort          \ scores and stop transmissions to the scoreboard
- STA netTally
+ LDA &0B00+253          \ Restore the scoreboard scores from the last three
+ STA netTally           \ bytes of the loaded file
+ LDA &0B00+254
  STA netTally+1
+ LDA &0B00+255
  STA netDeaths
+
+ LDA #0                 \ Zero scorePort to stop transmissions to the scoreboard
+ STA scorePort
 
                         \ --- End of added code ------------------------------->
 
@@ -35043,21 +35078,12 @@ ENDIF
  LDX scoreNetwork       \ Get the current scoreboard network number from
                         \ scoreNetwork
 
- CLC                    \ Print the 8-bit number in X to 3 digits, without a
- JSR pr2                \ decimal point
+ JSR GetNumber          \ Print the number in X to 4 digits, followed by a
+                        \ question mark, and wait for a number to be entered,
+                        \ returning the result in A
 
- LDA #7                 \ Print extended token 7 ("   ")
- JSR PrintToken
-
- JSR prq+3              \ Print a question mark
-
- JSR TT162              \ Print a space
-
- JSR gnum               \ Call gnum to get a number from the keyboard
-
- LDX T1                 \ If no number was entered, skip the following to leave
- CPX #12                \ this seed alone
- BEQ gnet1
+ BEQ gnet1              \ If no number was entered, skip the following
+                        \ instruction
 
  STA scoreNetwork       \ Store the network number in scoreNetwork
 
@@ -35075,21 +35101,12 @@ ENDIF
  LDX scoreStation       \ Get the current scoreboard station number from the low
                         \ byte of scoreStation
 
- CLC                    \ Print the 8-bit number in X to 3 digits, without a
- JSR pr2                \ decimal point
+ JSR GetNumber          \ Print the number in X to 4 digits, followed by a
+                        \ question mark, and wait for a number to be entered,
+                        \ returning the result in A
 
- LDA #7                 \ Print extended token 7 ("   ")
- JSR PrintToken
-
- JSR prq+3              \ Print a question mark
-
- JSR TT162              \ Print a space
-
- JSR gnum               \ Call gnum to get a number from the keyboard
-
- LDX T1                 \ If no number was entered, skip the following to leave
- CPX #12                \ this seed alone
- BEQ gnet2
+ BEQ gnet2              \ If no number was entered, skip the following
+                        \ instruction
 
  STA scoreStation       \ Store the station number in the low byte of
                         \ scoreStation
@@ -35110,21 +35127,12 @@ ENDIF
 
  LDX scorePort          \ Get the current scoreboard port number from scorePort
 
- CLC                    \ Print the 8-bit number in X to 3 digits, without a
- JSR pr2                \ decimal point
+ JSR GetNumber          \ Print the number in X to 4 digits, followed by a
+                        \ question mark, and wait for a number to be entered,
+                        \ returning the result in A
 
- LDA #7                 \ Print extended token 7 ("   ")
- JSR PrintToken
-
- JSR prq+3              \ Print a question mark
-
- JSR TT162              \ Print a space
-
- JSR gnum               \ Call gnum to get a number from the keyboard
-
- LDX T1                 \ If no number was entered, skip the following to leave
- CPX #12                \ this seed alone
- BEQ gnet3
+ BEQ gnet3              \ If no number was entered, skip the following
+                        \ instruction
                         
  STA scorePort          \ Store the port number in scorePort
 
@@ -35136,11 +35144,12 @@ ENDIF
  LDA #8                 \ Print extended token 8 ("RESET SCORES ")
  JSR PrintToken
 
- LDX netTally           \ Get the current combat score from netTally
+ LDX netTally           \ Get the current combat score from netTally(1 0)
+ LDY netTally+1
 
- CLC                    \ Call pr2 to print the score level as a 3-digit
- JSR pr2                \ number without a decimal point (by clearing the C
-                        \ flag)
+ LDA #4                 \ Call TT11 to print the score in (Y X) as a 4-digit
+ CLC                    \ number without a decimal point (by clearing the C
+ JSR TT11               \ flag)
 
  JSR TT162              \ Print a space
 
@@ -35150,10 +35159,10 @@ ENDIF
  JSR pr2                \ number without a decimal point (by clearing the C
                         \ flag)
 
- LDA #7                 \ Print extended token 7 ("   ")
+ LDA #9                 \ Print extended token 9 ("  ")
  JSR PrintToken
 
- JSR TT214+3            \ Print a "Y/N?" prompt (without a leading question)
+ JSR TT214+3            \ Ask a question with a "Y/N?" prompt
 
  BCC gnet4              \ If the answer was not "yes", jump to gnet4
 
@@ -35194,6 +35203,52 @@ ENDIF
  LDA #f8                \ Jump into the main loop at FRCE, setting the key
  JMP FRCE               \ "pressed" to red key f8 (so we show the Status Mode
                         \ screen)
+
+                        \ --- End of added code ------------------------------->
+
+\ ******************************************************************************
+\
+\       Name: GetNumber
+\       Type: Subroutine
+\   Category: Econet
+\    Summary: Print a number, then a question mark, and wait for a number to be
+\             entered
+\
+\ ------------------------------------------------------------------------------
+\
+\ Arguments:
+\
+\   X                   The number to print
+\
+\ ------------------------------------------------------------------------------
+\
+\ Returns:
+\
+\   Z flag              Set if no number was entered, clear otherwise
+\
+\ ******************************************************************************
+
+                        \ --- Mod: Code added for Scoreboard: ----------------->
+
+.GetNumber
+
+ LDA #4                 \ Print the 8-bit number in X to 4 digits, without a
+ CLC                    \ decimal point
+ JSR pr2+2
+
+ LDA #9                 \ Print extended token 9 ("  ")
+ JSR PrintToken
+
+ JSR prq+3              \ Print a question mark
+
+ JSR TT162              \ Print a space
+
+ JSR gnum               \ Call gnum to get a number from the keyboard
+
+ LDX T1                 \ If no number was entered, set the Z flag (so a BEQ
+ CPX #12                \ branch will be taken if nothing is entered)
+
+ RTS                    \ Return from the subroutine
 
                         \ --- End of added code ------------------------------->
 
@@ -35324,6 +35379,10 @@ ENDIF
  ECHR 'C'
  ETWO 'O', 'R'
  ETWO 'E', 'S'
+ ECHR ' '
+ EQUB VE
+
+ ECHR ' '               \ Token 9:    "  "
  ECHR ' '
  EQUB VE
 
