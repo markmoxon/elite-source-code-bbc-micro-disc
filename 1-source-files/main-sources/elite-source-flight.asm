@@ -5896,7 +5896,7 @@
 \
 \JSR DrawPlanetLine+2   \ Calculate the current line from the old heap, but do
 \                       \ not draw it, but store the coordinates (X1, Y1) and
-\                      \ (X2, Y2) in K3+4 to K3+7
+\                       \ (X2, Y2) in K3+4 to K3+7
 
                         \ --- End of added code ------------------------------->
 
