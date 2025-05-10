@@ -300,7 +300,7 @@
  INY                    \ Increment the character pointer into the ROM title in
                         \ bank X
 
- BNE drom12             \ Loop back until we have checked all the characters
+ BNE drom11             \ Loop back until we have checked all the characters
 
  LDA #'N'               \ If we get here then bank X contains the correct ROM
  JSR OSWRCH             \ title for the NFS ROM, so print an "N"

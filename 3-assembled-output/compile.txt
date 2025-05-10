@@ -92524,7 +92524,7 @@ Saving file '3-assembled-output/README.txt'
      74A2   D9 0C 7F   CMP &7F0C,Y
      74A5   D0 0D      BNE &74B4
      74A7   C8         INY
-     74A8   D0 0A      BNE &74B4
+     74A8   D0 F5      BNE &749F
      74AA   A9 4E      LDA #&4E
      74AC   20 EE FF   JSR &FFEE
      74AF   4C F0 74   JMP &74F0
