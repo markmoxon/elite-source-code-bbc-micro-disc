@@ -7973,37 +7973,40 @@ ENDIF
 \INY                    \ If QQ17 = 255 then printing is disabled, so jump to
 \BEQ RR4                \ RR4, which doesn't print anything, it just restores
 \                       \ the registers and returns from the subroutine
-
+\
+\TAY                    \ Set Y = the character to be printed
+\
+\BEQ RR4                \ If the character is zero, which is typically a string
+\                       \ terminator character, jump down to RR4 to restore the
+\                       \ registers and return from the subroutine
+\
+\BMI RR4                \ If A > 127 then there is nothing to print, so jump to
+\                       \ RR4 to restore the registers and return from the
+\                       \ subroutine
+\
+\CMP #7                 \ If this is a beep character (A = 7), jump to R5,
+\BEQ R5                 \ which will emit the beep, restore the registers and
+\                       \ return from the subroutine
                         \ --- And replaced by: -------------------------------->
 
  INY                    \ If QQ17 = 255 then printing is disabled, so jump to
  BEQ RR4S               \ RR4, which doesn't print anything, it just restores
                         \ the registers and returns from the subroutine
 
-                        \ --- End of replacement ------------------------------>
-
  TAY                    \ Set Y = the character to be printed
 
- BEQ RR4                \ If the character is zero, which is typically a string
+ BEQ RR4S               \ If the character is zero, which is typically a string
                         \ terminator character, jump down to RR4 to restore the
                         \ registers and return from the subroutine
 
- BMI RR4                \ If A > 127 then there is nothing to print, so jump to
+ BMI RR4S               \ If A > 127 then there is nothing to print, so jump to
                         \ RR4 to restore the registers and return from the
                         \ subroutine
 
-                        \ --- Mod: Code removed for Econet: ------------------->
+ CMP #7                 \ If this is not control code 7 (beep), skip the next
+ BNE P%+5               \ instruction
 
-\CMP #7                 \ If this is a beep character (A = 7), jump to R5,
-\BEQ R5                 \ which will emit the beep, restore the registers and
-\                       \ return from the subroutine
-
-                        \ --- And replaced by: -------------------------------->
-
-\CMP #7                 \ If this is not control code 7 (beep), skip the next
-\BNE P%+5               \ instruction
-\
-\JMP R5                 \ This is control code 7 (beep), so jump to R5 to make
+ JMP R5                 \ This is control code 7 (beep), so jump to R5 to make
                         \ a beep and return from the subroutine via RR4
 
                         \ --- End of replacement ------------------------------>
@@ -23335,9 +23338,7 @@ ENDIF
 \
 \BCS QUR                \ If the C flag is set, then an invalid drive number was
 \                       \ entered, so jump to QUR to return from the subroutine
-
-                        \ --- Mod: Code removed for Econet: ------------------->
-
+\
 \LDX #INWK              \ Store a pointer to INWK at the start of the block at
 \STX &0C00              \ &0C00, storing #INWK in the low byte because INWK is
 \                       \ in zero page
@@ -34043,7 +34044,8 @@ IF _STH_DISC OR _IB_DISC
                         \
                         \   * Byte #16 = machine type
                         \                0 = BBC Micro SRAM, 1 = Master,
-                        \                2 = 6502SP, 3 = BBC Micro standard
+                        \                2 = 6502SP, 3 = BBC Micro standard,
+                        \                4 = Archimedes, 5 = Electron
                         \
                         \   * Byte #17 = reserved for the forwarding station
                         \                number, for when packets are forwarded
@@ -35453,7 +35455,7 @@ ENDIF
  LDX #0                 \ Set X to condition docked (0)
 
  LDY QQ12               \ Fetch the docked status from QQ12, and if we are
- BNE trcm3              \ docked, jump to wearedocked
+ BNE trcm3              \ docked, jump to trcm3
 
  INX                    \ Set X to condition green (1)
 
@@ -35703,13 +35705,6 @@ ENDIF
  STA netTally           \ death count
  STA netTally+1
  STA netDeaths
-
- STA CASH               \ And set the credit level to 100 Cr
- STA CASH+1
- LDA #&03
- STA CASH+2
- LDA #&E8
- STA CASH+3
 
 .gnet4
 
@@ -36042,7 +36037,8 @@ IF _SRAM_DISC
                         \
                         \   * Byte #16 = machine type
                         \                0 = BBC Micro SRAM, 1 = Master,
-                        \                2 = 6502SP, 3 = BBC Micro standard
+                        \                2 = 6502SP, 3 = BBC Micro standard,
+                        \                4 = Archimedes, 5 = Electron
                         \
                         \   * Byte #17 = reserved for the forwarding station
                         \                number, for when packets are forwarded
