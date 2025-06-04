@@ -8286,6 +8286,7 @@ ENDIF
                         \ tapped
 
 .skipReturn
+
                         \ --- End of added code ------------------------------->
 
  JSR TTX66              \ Otherwise we are off the bottom of the screen, so
