@@ -1,6 +1,6 @@
 
 ---------------------------------------
-Acornsoft Elite (compendium version)
+Acornsoft Elite (Compendium version)
 
 For the BBC Micro with 16K sideways RAM
 
@@ -29,6 +29,6 @@
 
 See www.bbcelite.com for details
 
-Build: 2025-07-03 16:46:10
+Build: 2025-07-03 16:48:09
 ---------------------------------------
 
