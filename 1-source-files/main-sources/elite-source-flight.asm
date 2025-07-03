@@ -3492,27 +3492,13 @@ ENDIF
 
 .ISDK
 
-                        \ --- Mod: Code removed for better docking computer: -->
-
-\LDA K%+NI%+36          \ 1. Fetch the NEWB flags (byte #36) of the second ship
-\AND #%00000100         \ in the ship data workspace at K%, which is reserved
-\BNE MA62               \ for the sun or the space station (in this case it's
-\                       \ the latter), and if bit 2 is set, meaning the station
-\                       \ is hostile, jump down to MA62 to fail docking (so
-\                       \ trying to dock at a station that we have annoyed does
-\                       \ not end well)
-
-                        \ --- And replaced by: -------------------------------->
-
  LDA K%+NI%+36          \ 1. Fetch the NEWB flags (byte #36) of the second ship
  AND #%00000100         \ in the ship data workspace at K%, which is reserved
- BNE MA622              \ for the sun or the space station (in this case it's
+ BNE MA62               \ for the sun or the space station (in this case it's
                         \ the latter), and if bit 2 is set, meaning the station
-                        \ is hostile, jump down to MA622 to fail docking (so
+                        \ is hostile, jump down to MA62 to fail docking (so
                         \ trying to dock at a station that we have annoyed does
                         \ not end well)
-
-                        \ --- End of replacement ------------------------------>
 
  LDA INWK+14            \ 2. If nosev_z_hi < 214, jump down to MA62 to fail
  CMP #214               \ docking, as the angle of approach is greater than 26
@@ -3556,18 +3542,6 @@ ENDIF
  JMP DOENTRY            \ Go to the docking bay (i.e. show the ship hangar)
 
 .MA62
-
-                        \ --- Mod: Code added for better docking computer: ---->
-
- LDA auto               \ If the docking computer is engaged, ensure we dock
- BNE GOIN               \ successfully even if the approach isn't correct, as
-                        \ the docking computer algorithm isn't perfect (so this
-                        \ fixes the issue in the other versions of Elite where
-                        \ the docking computer can kill you)
-
-.MA622
-
-                        \ --- End of added code ------------------------------->
 
                         \ If we arrive here, docking has just failed
 
