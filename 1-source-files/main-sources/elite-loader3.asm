@@ -110,7 +110,7 @@
 
 IF _SRAM_DISC
 
- ORG &0004
+ ORG &0004              \ Set the assembly address to &0004
 
 .TRTB%
 
@@ -120,7 +120,7 @@ IF _SRAM_DISC
 
 ENDIF
 
- ORG &0070
+ ORG &0070              \ Set the assembly address to &0070
 
 .ZP
 
@@ -159,7 +159,7 @@ ENDIF
 
  SKIP 2                 \ Used in the copy protection code
 
- ORG &008B
+ ORG &008B              \ Set the assembly address to &008B
 
 .DL
 
@@ -177,7 +177,7 @@ ENDIF
 \
 \ ******************************************************************************
 
- ORG CODE%
+ ORG CODE%              \ Set the assembly address to CODE%
 
 \ ******************************************************************************
 \
@@ -700,7 +700,7 @@ ENDIF
 
 .LOADcode
 
- ORG &0B00
+ ORG &0B00              \ Set the assembly address to &0B00
 
 \ ******************************************************************************
 \
@@ -821,7 +821,7 @@ ENDIF
 
 .CATDcode
 
- ORG &0D7A
+ ORG &0D7A              \ Set the assembly address to &0D7A
 
 \ ******************************************************************************
 \
@@ -1915,7 +1915,7 @@ ENDIF
 
 .TVT1code
 
- ORG &1100
+ ORG &1100              \ Set the assembly address to &1100
 
 \ ******************************************************************************
 \

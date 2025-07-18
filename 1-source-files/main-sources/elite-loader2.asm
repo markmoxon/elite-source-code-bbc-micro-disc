@@ -68,7 +68,7 @@
 \
 \ ******************************************************************************
 
- ORG &0004
+ ORG &0004              \ Set the assembly address to &0004
 
 .TRTB%
 
@@ -76,7 +76,7 @@
                         \ table, which is used to translate internal key
                         \ numbers to ASCII
 
- ORG &0070
+ ORG &0070              \ Set the assembly address to &0070
 
 .S
 
@@ -102,7 +102,7 @@
 
  SKIP 1                 \ Temporary storage, used in a number of places
 
- ORG &0081
+ ORG &0081              \ Set the assembly address to &0081
 
 .SC
 
@@ -123,7 +123,7 @@
 \
 \ ******************************************************************************
 
- ORG CODE%
+ ORG CODE%              \ Set the assembly address to CODE%
 
 \ ******************************************************************************
 \
@@ -343,7 +343,7 @@ ENDIF
 
 .LOADcode
 
- ORG &0400
+ ORG &0400              \ Set the assembly address to &0400
 
 \ ******************************************************************************
 \
