@@ -20601,6 +20601,7 @@ ENDIF
 \   Category: Universe
 \    Summary: Initialise the INWK workspace to a fairly aggressive ship
 \  Deep dive: Fixing ship positions
+\             Aggression and hostility in ship tactics
 \
 \ ------------------------------------------------------------------------------
 \
