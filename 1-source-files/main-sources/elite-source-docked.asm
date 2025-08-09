@@ -2135,26 +2135,9 @@ ORG &00D1
 
  SKIP 1                 \ The y-coordinate of the tip of the laser line
 
-                        \ --- Mod: Code removed for docking fee: -------------->
+.XX24
 
-\.XX24
-\
-\SKIP 1                 \ This byte appears to be unused
-
-                        \ --- And replaced by: -------------------------------->
-
-.chargeDockingFee
-
- SKIP 1                 \ Records whether we have been charged a docking fee, so
-                        \ we don't get charged twice:
-                        \
-                        \   * 0 = we have not been charged a docking fee
-                        \
-                        \   * Non-zero = we have been charged a docking fee
-                        \
-                        \ The docking fee is 5.0 credits
-
-                        \ --- End of replacement ------------------------------>
+ SKIP 1                 \ This byte appears to be unused
 
 .ALTIT
 
@@ -20939,13 +20922,6 @@ ENDIF
  STA BET2+1             \ pitch sign) to positive, i.e. pitch and roll negative
 
  STA MCNT               \ Reset MCNT (the main loop counter) to 0
-
-                        \ --- Mod: Code added for docking fee: ---------------->
-
- STA chargeDockingFee   \ Set chargeDockingFee to 0 so the docking fee is marked
-                        \ as being not already paid
-
-                        \ --- End of added code ------------------------------->
 
 .modify
 
