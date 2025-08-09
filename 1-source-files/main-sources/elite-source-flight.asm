@@ -2131,26 +2131,9 @@ ORG &00D1
 
  SKIP 1                 \ The y-coordinate of the tip of the laser line
 
-                        \ --- Mod: Code removed for docking fee: -------------->
+.XX24
 
-\.XX24
-\
-\SKIP 1                 \ This byte appears to be unused
-
-                        \ --- And replaced by: -------------------------------->
-
-.chargeDockingFee
-
- SKIP 1                 \ Records whether we have been charged a docking fee, so
-                        \ we don't get charged twice:
-                        \
-                        \   * 0 = we have not been charged a docking fee
-                        \
-                        \   * Non-zero = we have been charged a docking fee
-                        \
-                        \ The docking fee is 5.0 credits
-
-                        \ --- End of replacement ------------------------------>
+ SKIP 1                 \ This byte appears to be unused
 
 .ALTIT
 
@@ -2962,55 +2945,6 @@ ENDIF
  LDA KY19               \ If "C" is being pressed, and we have a docking
  AND DKCMP              \ computer fitted, keep going, otherwise jump down to
  BEQ MA68               \ MA68 to skip the following
-
-                        \ --- Mod: Code added for docking fee: ---------------->
-
-                        \ We now deduct a docking fee of 5.0 credits for using
-                        \ the docking computer
-
- LDA chargeDockingFee   \ If we have already been charged a docking fee
- BNE barb4              \ (chargeDockingFee is non-zero), then jump to barb4 to
-                        \ engage the docking computer without charging a docking
-                        \ fee
-
-                        \ Otherwise we charge the docking fee
-
- LDY #0                 \ Set (Y X) = 50, so the docking fee is 5.0 credits
- LDX #50
-
- JSR LCASH              \ Subtract (Y X) cash from the cash pot, but only if
-                        \ we have enough cash
-
- BCS barb3              \ If the C flag is set then we did have enough cash for
-                        \ the transaction, so jump to barb3 to skip the
-                        \ following instruction
-
-                        \ If we get here then we don't have enough cash for the
-                        \ docking fee, so make a beep and return from the
-                        \ subroutine without engaging the docking computer
-
- LDA #0                 \ Set auto to 0, so the docking computer is no longer
- STA auto               \ activated
-
- LDA #40                \ Call the NOISE routine with A = 40 to make a low,
- JMP NOISE              \ long beep, and return from the subroutine using a tail
-                        \ call
-
-.barb3
-
- DEC chargeDockingFee   \ Set chargeDockingFee to &FF so we don't charge another
-                        \ docking fee
-
- LDA #0                 \ Print control code 0 (current amount of cash and
- JSR MESS               \ newline) as an in-flight message, to show our balance
-                        \ after the docking fee has been paid
-
-.barb4
-
- LDA #1                 \ Set A to 1 to enable the docking computer and music in
-                        \ the following
-
-                        \ --- End of added code ------------------------------->
 
  STA auto               \ Set auto to the non-zero value of A, so the docking
                         \ computer is activated
@@ -18602,19 +18536,9 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 
  JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
 
-                        \ --- Mod: Code removed for docking fee: -------------->
-
-\LDA QQ11               \ If the current view in QQ11 is not a space view (0) or
-\AND #%00111111         \ one of the charts (64 or 128), return from the
-\BNE TT113              \ subroutine (as TT113 contains an RTS)
-
-                        \ --- And replaced by: -------------------------------->
-
  LDA QQ11               \ If the current view in QQ11 is not a space view (0) or
  AND #%00111111         \ one of the charts (64 or 128), return from the
- BNE TT18-1             \ subroutine (as TT18-1 contains an RTS)
-
-                        \ --- End of replacement ------------------------------>
+ BNE TT113              \ subroutine (as TT113 contains an RTS)
 
  JSR TTX66              \ Otherwise clear the screen and draw a white border
 
@@ -18734,67 +18658,6 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
 .TT115
 
  JMP TT23               \ Jump to TT23 to display the Short-range Chart
-
-\ ******************************************************************************
-\
-\       Name: LCASH
-\       Type: Subroutine
-\   Category: Maths (Arithmetic)
-\    Summary: Subtract an amount of cash from the cash pot
-\
-\ ------------------------------------------------------------------------------
-\
-\ Subtract (Y X) cash from the cash pot in CASH, but only if there is enough
-\ cash in the pot. As CASH is a four-byte number, this calculates:
-\
-\   CASH(0 1 2 3) = CASH(0 1 2 3) - (0 0 Y X)
-\
-\ ------------------------------------------------------------------------------
-\
-\ Returns:
-\
-\   C flag              If set, there was enough cash to do the subtraction
-\
-\                       If clear, there was not enough cash to do the
-\                       subtraction
-\
-\ ******************************************************************************
-
-                        \ --- Mod: Code added for docking fee: ---------------->
-
-.LCASH
-
- STX T1                 \ Subtract the least significant bytes:
- LDA CASH+3             \
- SEC                    \   CASH+3 = CASH+3 - X
- SBC T1
- STA CASH+3
-
- STY T1                 \ Then the second most significant bytes:
- LDA CASH+2             \
- SBC T1                 \   CASH+2 = CASH+2 - Y
- STA CASH+2
-
- LDA CASH+1             \ Then the third most significant bytes (which are 0):
- SBC #0                 \
- STA CASH+1             \   CASH+1 = CASH+1 - 0
-
- LDA CASH               \ And finally the most significant bytes (which are 0):
- SBC #0                 \
- STA CASH               \   CASH = CASH - 0
-
- BCS TT113              \ If the C flag is set then the subtraction didn't
-                        \ underflow, so the value in CASH is correct and we can
-                        \ jump to TT113 to return from the subroutine with the
-                        \ C flag set to indicate success (as TT113 contains an
-                        \ RTS)
-
-                        \ Otherwise we didn't have enough cash in CASH to
-                        \ subtract (Y X) from it, so fall through into
-                        \ MCASH to reverse the sum and restore the original
-                        \ value in CASH, and returning with the C flag clear
-
-                        \ --- End of added code ------------------------------->
 
 \ ******************************************************************************
 \
@@ -25412,13 +25275,6 @@ SAVE "3-assembled-output/PLANETCODE.unprot.bin", &1000, P%, &1000
  ASL A                  \ This sets A to 0
 
  STA MCNT               \ Reset MCNT (the main loop counter) to 0
-
-                        \ --- Mod: Code added for docking fee: ---------------->
-
- STA chargeDockingFee   \ Set chargeDockingFee to 0 so the docking fee is marked
-                        \ as being not already paid
-
-                        \ --- End of added code ------------------------------->
 
  STA QQ22+1             \ Set the on-screen hyperspace counter to 0
 
