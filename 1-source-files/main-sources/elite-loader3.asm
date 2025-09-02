@@ -28,6 +28,12 @@
 \
 \   * ELITE4.bin
 \
+\ after reading in the following files:
+\
+\   * P.DIALS.bin
+\   * MISSILE.bin
+\   * WORDS.bin
+\
 \ ******************************************************************************
 
  INCLUDE "1-source-files/main-sources/elite-build-options.asm"
