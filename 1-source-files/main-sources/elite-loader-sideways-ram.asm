@@ -1,12 +1,13 @@
 \ ******************************************************************************
 \
-\ DISC ELITE SIDEWAYS RAM LOADER SOURCE
+\ BBC MICRO DISC ELITE SIDEWAYS RAM LOADER SOURCE
 \
-\ Elite was written by Ian Bell and David Braben and is copyright Acornsoft 1984
+\ BBC Micro disc Elite was written by Ian Bell and David Braben and is copyright
+\ Acornsoft 1984
 \
 \ The sideways RAM menu and loader were written by Stuart McConnachie in 1988-9
 \
-\ The code on this site has been reconstructed from a disassembly of the version
+\ The code in this file has been reconstructed from a disassembly of the version
 \ released on Ian Bell's personal website at http://www.elitehomepage.org/
 \
 \ The commentary is copyright Mark Moxon, and any misunderstandings or mistakes
@@ -17,6 +18,11 @@
 \
 \ The deep dive articles referred to in this commentary can be found at
 \ https://elite.bbcelite.com/deep_dives
+\
+\ ------------------------------------------------------------------------------
+\
+\ This source file contains the game loader for the sideways RAM variant of BBC
+\ Micro disc Elite.
 \
 \ ------------------------------------------------------------------------------
 \
@@ -89,7 +95,7 @@
 \
 \ ******************************************************************************
 
- ORG &0070
+ ORG &0070              \ Set the assembly address to &0070
 
 .ZP
 
@@ -126,7 +132,7 @@
 \
 \ ******************************************************************************
 
- ORG CODE%
+ ORG CODE%              \ Set the assembly address to CODE%
 
 \ ******************************************************************************
 \
@@ -410,7 +416,7 @@
  LDA #LO(FileHandler)   \ Set the extended vector XFILEV to point to the
  STA XFILEV             \ FileHandler routine in the sideways RAM bank that we
  LDA #HI(FileHandler)   \ are building
- STA XFILEV+1           \ 
+ STA XFILEV+1           \
  LDA &F4                \ The format for the extended vector is the address of
  STA XFILEV+2           \ the handler in the first two bytes, followed by the
                         \ ROM bank number in the third byte, which we can fetch
@@ -452,7 +458,7 @@
  LDA #'.'               \ Print a full stop to show progress during loading
  JSR OSWRCH
 
- LDA #LO(XX21)          \ Set the load address in bytes 2 and 3 of the OSFILE 
+ LDA #LO(XX21)          \ Set the load address in bytes 2 and 3 of the OSFILE
  STA osfileBlock+2      \ block to XX21, which is where ship blueprint files
  LDA #HI(XX21)          \ get loaded in the normal disc version
  STA osfileBlock+3      \
@@ -630,7 +636,7 @@
  LDA XX21,Y             \ Set P(1 0) to the X-th address in the XX21 table,
  STA P                  \ which is the address of the blueprint X data within
  LDA XX21+1,Y           \ the ship blueprint file that we have loaded at address
- STA P+1				\ XX21
+ STA P+1                \ XX21
 
  CMP #HI(XX21)          \ Ship blueprint files are 9 pages in size, so if the
  BCC proc1              \ high byte of the address in P(1 0) is outside of the
@@ -975,7 +981,7 @@
 
  LDA &8000+6            \ Set A to the type of ROM in bank X, which is in byte
  PHA                    \ #6 of the ROM header, and store it on the stack
- 
+
  EOR #%00000001         \ Flip bit 0 of the ROM type and store the updated type
  STA &8000+6            \ in byte #6 of bank X
 

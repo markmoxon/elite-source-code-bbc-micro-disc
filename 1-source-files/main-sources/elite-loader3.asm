@@ -1,10 +1,11 @@
 \ ******************************************************************************
 \
-\ DISC ELITE LOADER (PART 3) SOURCE
+\ BBC MICRO DISC ELITE GAME LOADER SOURCE (PART 3 OF 3)
 \
-\ Elite was written by Ian Bell and David Braben and is copyright Acornsoft 1984
+\ BBC Micro disc Elite was written by Ian Bell and David Braben and is copyright
+\ Acornsoft 1984
 \
-\ The code on this site has been reconstructed from a disassembly of the version
+\ The code in this file has been reconstructed from a disassembly of the version
 \ released on Ian Bell's personal website at http://www.elitehomepage.org/
 \
 \ The commentary is copyright Mark Moxon, and any misunderstandings or mistakes
@@ -18,9 +19,20 @@
 \
 \ ------------------------------------------------------------------------------
 \
+\ This source file contains the third of three game loaders for BBC Micro disc
+\ Elite.
+\
+\ ------------------------------------------------------------------------------
+\
 \ This source file produces the following binary file:
 \
 \   * ELITE4.bin
+\
+\ after reading in the following files:
+\
+\   * P.DIALS.bin
+\   * MISSILE.bin
+\   * WORDS.bin
 \
 \ ******************************************************************************
 
@@ -104,7 +116,7 @@
 
 IF _SRAM_DISC
 
- ORG &0004
+ ORG &0004              \ Set the assembly address to &0004
 
 .TRTB%
 
@@ -114,7 +126,7 @@ IF _SRAM_DISC
 
 ENDIF
 
- ORG &0070
+ ORG &0070              \ Set the assembly address to &0070
 
 .ZP
 
@@ -143,9 +155,7 @@ ENDIF
                         \ Elite draws on-screen by poking bytes directly into
                         \ screen memory, and SC(1 0) is typically set to the
                         \ address of the character block containing the pixel
-                        \ we want to draw (see the deep dives on "Drawing
-                        \ monochrome pixels in mode 4" and "Drawing colour
-                        \ pixels in mode 5" for more details)
+                        \ we want to draw
 
 .SCH
 
@@ -155,7 +165,7 @@ ENDIF
 
  SKIP 2                 \ Used in the copy protection code
 
- ORG &008B
+ ORG &008B              \ Set the assembly address to &008B
 
 .DL
 
@@ -173,7 +183,7 @@ ENDIF
 \
 \ ******************************************************************************
 
- ORG CODE%
+ ORG CODE%              \ Set the assembly address to CODE%
 
 \ ******************************************************************************
 \
@@ -182,7 +192,7 @@ ENDIF
 \   Category: Drawing the screen
 \    Summary: VDU commands for setting the square mode 4 screen
 \  Deep dive: The split-screen mode in BBC Micro Elite
-\             Drawing monochrome pixels in mode 4
+\             Drawing monochrome pixels on the BBC Micro
 \
 \ ------------------------------------------------------------------------------
 \
@@ -211,13 +221,11 @@ ENDIF
 \
 \ This almost-square mode 4 variant makes life a lot easier when drawing to the
 \ screen, as there are 256 pixels on each row (or, to put it in screen memory
-\ terms, there's one page of memory per row of pixels). For more details of the
-\ screen mode, see the deep dive on "Drawing monochrome pixels in mode 4".
+\ terms, there's one page of memory per row of pixels).
 \
 \ There is also an interrupt-driven routine that switches the bytes-per-pixel
 \ setting from that of mode 4 to that of mode 5, when the raster reaches the
-\ split between the space view and the dashboard. See the deep dive on "The
-\ split-screen mode" for details.
+\ split between the space view and the dashboard.
 \
 \ ******************************************************************************
 
@@ -301,8 +309,8 @@ ENDIF
 \
 \ This table contains the sound envelope data, which is passed to OSWORD by the
 \ FNE macro to create the four sound envelopes used in-game. Refer to chapter 30
-\ of the BBC Micro User Guide for details of sound envelopes and what all the
-\ parameters mean.
+\ of the "BBC Microcomputer User Guide" by John Coll for details of sound
+\ envelopes and what all the parameters mean.
 \
 \ The envelopes are as follows:
 \
@@ -698,7 +706,7 @@ ENDIF
 
 .LOADcode
 
- ORG &0B00
+ ORG &0B00              \ Set the assembly address to &0B00
 
 \ ******************************************************************************
 \
@@ -819,7 +827,7 @@ ENDIF
 
 .CATDcode
 
- ORG &0D7A
+ ORG &0D7A              \ Set the assembly address to &0D7A
 
 \ ******************************************************************************
 \
@@ -827,6 +835,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Save and load
 \    Summary: Load disc sectors 0 and 1 to &0E00 and &0F00 respectively
+\  Deep dive: Swapping between the docked and flight code
 \
 \ ------------------------------------------------------------------------------
 \
@@ -1097,7 +1106,7 @@ ENDIF
                         \
                         \   x = random number from 0 to 255
                         \   y = random number from 0 to 255
-                        \   (x^2 + y^2) div 256 >= 17
+                        \   HI(x^2 + y^2) >= 17
                         \
                         \ which is what we want
 
@@ -1455,13 +1464,14 @@ ENDIF
  AND #%11111000
  STA ZP
 
- TYA                    \ Set Y = Y AND %111
- AND #%00000111
- TAY
+ TYA                    \ Set Y = Y mod 8, which is the pixel row within the
+ AND #7                 \ character block at which we want to draw our pixel
+ TAY                    \ (as each character block has 8 rows)
 
- TXA                    \ Set X = X AND %111
- AND #%00000111
- TAX
+ TXA                    \ Set X = X mod 8, which is the horizontal pixel number
+ AND #7                 \ within the character block where the pixel lies (as
+ TAX                    \ each pixel line in the character block is 8 pixels
+                        \ wide)
 
  LDA TWOS,X             \ Fetch a pixel from TWOS and poke it into ZP+Y
  STA (ZP),Y
@@ -1911,7 +1921,7 @@ ENDIF
 
 .TVT1code
 
- ORG &1100
+ ORG &1100              \ Set the assembly address to &1100
 
 \ ******************************************************************************
 \
@@ -1927,16 +1937,18 @@ ENDIF
 \
 \ Palette data is given as a set of bytes, with each byte mapping a logical
 \ colour to a physical one. In each byte, the logical colour is given in bits
-\ 4-7 and the physical colour in bits 0-3. See p.379 of the Advanced User Guide
-\ for details of how palette mapping works, as in modes 4 and 5 we have to do
-\ multiple palette commands to change the colours correctly, and the physical
-\ colour value is EOR'd with 7, just to make things even more confusing.
+\ 4-7 and the physical colour in bits 0-3. See page 379 of the "Advanced User
+\ Guide for the BBC Micro" by Bray, Dickens and Holmes for details of how
+\ palette mapping works, as in modes 4 and 5 we have to do multiple palette
+\ commands to change the colours correctly, and the physical colour value is
+\ EOR'd with 7, just to make things even more confusing.
 \
 \ Similarly, the palette at TVT1+16 is for the monochrome space view, where
 \ logical colour 1 is mapped to physical colour 0 EOR 7 = 7 (white), and
 \ logical colour 0 is mapped to physical colour 7 EOR 7 = 0 (black). Each of
-\ these mappings requires six calls to SHEILA &21 - see p.379 of the Advanced
-\ User Guide for an explanation.
+\ these mappings requires six calls to SHEILA &21 - see page 379 of the
+\ "Advanced User Guide for the BBC Micro" by Bray, Dickens and Holmes for an
+\ explanation.
 \
 \ The mode 5 palette table has two blocks which overlap. The block used depends
 \ on whether or not we have an escape pod fitted. The block at TVT1 is used for
@@ -1991,8 +2003,7 @@ ENDIF
 \
 \ ------------------------------------------------------------------------------
 \
-\ The main interrupt handler, which implements Elite's split-screen mode (see
-\ the deep dive on "The split-screen mode in BBC Micro Elite" for details).
+\ The main interrupt handler, which implements Elite's split-screen mode.
 \
 \ IRQ1V is set to point to IRQ1 by the loading process.
 \
@@ -2180,9 +2191,9 @@ ENDIF
 
  EQUS "JAMESON"         \ The current commander name, which defaults to JAMESON
  EQUB 13                \
-                        \ The commander name can be up to 7 characters (the DFS
-                        \ limit for filenames), and is terminated by a carriage
-                        \ return
+                        \ The commander name can be up to seven characters (the
+                        \ DFS limit for filenames), and is terminated by a
+                        \ carriage return
 
                         \ NA%+8 is the start of the commander data block
                         \
@@ -2351,6 +2362,7 @@ ENDIF
 \   Category: Loader
 \    Summary: Loader break handler: print a newline and the error message, and
 \             then hang the computer
+\  Deep dive: Swapping between the docked and flight code
 \
 \ ------------------------------------------------------------------------------
 \

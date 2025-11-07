@@ -1,10 +1,11 @@
 \ ******************************************************************************
 \
-\ DISC ELITE RECURSIVE TEXT TOKEN FILE
+\ BBC MICRO DISC ELITE GAME DATA SOURCE
 \
-\ Elite was written by Ian Bell and David Braben and is copyright Acornsoft 1984
+\ BBC Micro disc Elite was written by Ian Bell and David Braben and is copyright
+\ Acornsoft 1984
 \
-\ The code on this site has been reconstructed from a disassembly of the version
+\ The code in this file has been reconstructed from a disassembly of the version
 \ released on Ian Bell's personal website at http://www.elitehomepage.org/
 \
 \ The commentary is copyright Mark Moxon, and any misunderstandings or mistakes
@@ -15,6 +16,11 @@
 \
 \ The deep dive articles referred to in this commentary can be found at
 \ https://elite.bbcelite.com/deep_dives
+\
+\ ------------------------------------------------------------------------------
+\
+\ This source file contains the game data for BBC Micro disc Elite, including
+\ the game text.
 \
 \ ------------------------------------------------------------------------------
 \
@@ -55,7 +61,7 @@
  RE = &23               \ The obfuscation byte used to hide the recursive tokens
                         \ table from crackers viewing the binary code
 
- ORG CODE_WORDS%
+ ORG CODE_WORDS%        \ Set the assembly address to CODE_WORDS%
 
 \ ******************************************************************************
 \
@@ -72,9 +78,6 @@
 \   CHAR 'x'            Insert ASCII character "x"
 \
 \ To include an apostrophe, use a backtick character, as in CHAR '`'.
-\
-\ See the deep dive on "Printing text tokens" for details on how characters are
-\ stored in the recursive token table.
 \
 \ ------------------------------------------------------------------------------
 \
@@ -108,9 +111,6 @@ ENDMACRO
 \
 \   TWOK 'x', 'y'       Insert two-letter token "xy"
 \
-\ See the deep dive on "Printing text tokens" for details on how two-letter
-\ tokens are stored in the recursive token table.
-\
 \ ------------------------------------------------------------------------------
 \
 \ Arguments:
@@ -125,38 +125,133 @@ ENDMACRO
 
 MACRO TWOK t, k
 
- IF t = 'A' AND k = 'L' : EQUB 128 EOR RE : ENDIF
- IF t = 'L' AND k = 'E' : EQUB 129 EOR RE : ENDIF
- IF t = 'X' AND k = 'E' : EQUB 130 EOR RE : ENDIF
- IF t = 'G' AND k = 'E' : EQUB 131 EOR RE : ENDIF
- IF t = 'Z' AND k = 'A' : EQUB 132 EOR RE : ENDIF
- IF t = 'C' AND k = 'E' : EQUB 133 EOR RE : ENDIF
- IF t = 'B' AND k = 'I' : EQUB 134 EOR RE : ENDIF
- IF t = 'S' AND k = 'O' : EQUB 135 EOR RE : ENDIF
- IF t = 'U' AND k = 'S' : EQUB 136 EOR RE : ENDIF
- IF t = 'E' AND k = 'S' : EQUB 137 EOR RE : ENDIF
- IF t = 'A' AND k = 'R' : EQUB 138 EOR RE : ENDIF
- IF t = 'M' AND k = 'A' : EQUB 139 EOR RE : ENDIF
- IF t = 'I' AND k = 'N' : EQUB 140 EOR RE : ENDIF
- IF t = 'D' AND k = 'I' : EQUB 141 EOR RE : ENDIF
- IF t = 'R' AND k = 'E' : EQUB 142 EOR RE : ENDIF
- IF t = 'A' AND k = '?' : EQUB 143 EOR RE : ENDIF
- IF t = 'E' AND k = 'R' : EQUB 144 EOR RE : ENDIF
- IF t = 'A' AND k = 'T' : EQUB 145 EOR RE : ENDIF
- IF t = 'E' AND k = 'N' : EQUB 146 EOR RE : ENDIF
- IF t = 'B' AND k = 'E' : EQUB 147 EOR RE : ENDIF
- IF t = 'R' AND k = 'A' : EQUB 148 EOR RE : ENDIF
- IF t = 'L' AND k = 'A' : EQUB 149 EOR RE : ENDIF
- IF t = 'V' AND k = 'E' : EQUB 150 EOR RE : ENDIF
- IF t = 'T' AND k = 'I' : EQUB 151 EOR RE : ENDIF
- IF t = 'E' AND k = 'D' : EQUB 152 EOR RE : ENDIF
- IF t = 'O' AND k = 'R' : EQUB 153 EOR RE : ENDIF
- IF t = 'Q' AND k = 'U' : EQUB 154 EOR RE : ENDIF
- IF t = 'A' AND k = 'N' : EQUB 155 EOR RE : ENDIF
- IF t = 'T' AND k = 'E' : EQUB 156 EOR RE : ENDIF
- IF t = 'I' AND k = 'S' : EQUB 157 EOR RE : ENDIF
- IF t = 'R' AND k = 'I' : EQUB 158 EOR RE : ENDIF
- IF t = 'O' AND k = 'N' : EQUB 159 EOR RE : ENDIF
+ IF t = 'A' AND k = 'L'
+  EQUB 128 EOR RE
+ ENDIF
+
+ IF t = 'L' AND k = 'E'
+  EQUB 129 EOR RE
+ ENDIF
+
+ IF t = 'X' AND k = 'E'
+  EQUB 130 EOR RE
+ ENDIF
+
+ IF t = 'G' AND k = 'E'
+  EQUB 131 EOR RE
+ ENDIF
+
+ IF t = 'Z' AND k = 'A'
+  EQUB 132 EOR RE
+ ENDIF
+
+ IF t = 'C' AND k = 'E'
+  EQUB 133 EOR RE
+ ENDIF
+
+ IF t = 'B' AND k = 'I'
+  EQUB 134 EOR RE
+ ENDIF
+
+ IF t = 'S' AND k = 'O'
+  EQUB 135 EOR RE
+ ENDIF
+
+ IF t = 'U' AND k = 'S'
+  EQUB 136 EOR RE
+ ENDIF
+
+ IF t = 'E' AND k = 'S'
+  EQUB 137 EOR RE
+ ENDIF
+
+ IF t = 'A' AND k = 'R'
+  EQUB 138 EOR RE
+ ENDIF
+
+ IF t = 'M' AND k = 'A'
+  EQUB 139 EOR RE
+ ENDIF
+
+ IF t = 'I' AND k = 'N'
+  EQUB 140 EOR RE
+ ENDIF
+
+ IF t = 'D' AND k = 'I'
+  EQUB 141 EOR RE
+ ENDIF
+
+ IF t = 'R' AND k = 'E'
+  EQUB 142 EOR RE
+ ENDIF
+
+ IF t = 'A' AND k = '?'
+  EQUB 143 EOR RE
+ ENDIF
+
+ IF t = 'E' AND k = 'R'
+  EQUB 144 EOR RE
+ ENDIF
+
+ IF t = 'A' AND k = 'T'
+  EQUB 145 EOR RE
+ ENDIF
+
+ IF t = 'E' AND k = 'N'
+  EQUB 146 EOR RE
+ ENDIF
+
+ IF t = 'B' AND k = 'E'
+  EQUB 147 EOR RE
+ ENDIF
+
+ IF t = 'R' AND k = 'A'
+  EQUB 148 EOR RE
+ ENDIF
+
+ IF t = 'L' AND k = 'A'
+  EQUB 149 EOR RE
+ ENDIF
+
+ IF t = 'V' AND k = 'E'
+  EQUB 150 EOR RE
+ ENDIF
+
+ IF t = 'T' AND k = 'I'
+  EQUB 151 EOR RE
+ ENDIF
+
+ IF t = 'E' AND k = 'D'
+  EQUB 152 EOR RE
+ ENDIF
+
+ IF t = 'O' AND k = 'R'
+  EQUB 153 EOR RE
+ ENDIF
+
+ IF t = 'Q' AND k = 'U'
+  EQUB 154 EOR RE
+ ENDIF
+
+ IF t = 'A' AND k = 'N'
+  EQUB 155 EOR RE
+ ENDIF
+
+ IF t = 'T' AND k = 'E'
+  EQUB 156 EOR RE
+ ENDIF
+
+ IF t = 'I' AND k = 'S'
+  EQUB 157 EOR RE
+ ENDIF
+
+ IF t = 'R' AND k = 'I'
+  EQUB 158 EOR RE
+ ENDIF
+
+ IF t = 'O' AND k = 'N'
+  EQUB 159 EOR RE
+ ENDIF
 
 ENDMACRO
 
@@ -173,9 +268,6 @@ ENDMACRO
 \ The following macro is used when building the recursive token table:
 \
 \   CONT n              Insert control code token {n}
-\
-\ See the deep dive on "Printing text tokens" for details on how characters are
-\ stored in the recursive token table.
 \
 \ ------------------------------------------------------------------------------
 \
@@ -211,9 +303,6 @@ ENDMACRO
 \
 \                         * Tokens 96-127 get stored as n
 \
-\ See the deep dive on "Printing text tokens" for details on how recursive
-\ tokens are stored in the recursive token table.
-\
 \ ------------------------------------------------------------------------------
 \
 \ Arguments:
@@ -244,6 +333,14 @@ ENDMACRO
 \   Category: Text
 \    Summary: The recursive token table for tokens 0-148
 \  Deep dive: Printing text tokens
+\
+\ ------------------------------------------------------------------------------
+\
+\ The encodings shown for each recursive text token use the following notation:
+\
+\   {n}           Control code              n = 0 to 13
+\   <n>           Two-letter token          n = 128 to 159
+\   [n]           Recursive token           n = 0 to 148
 \
 \ ******************************************************************************
 
@@ -1406,12 +1503,10 @@ ENDMACRO
   N = ABS(SIN((I% / 64) * 2 * PI))
 
   IF N >= 1
-   B% = 255
+   EQUB 255
   ELSE
-   B% = INT(256 * N + 0.5)
+   EQUB INT(256 * N + 0.5)
   ENDIF
-
-  EQUB B%
 
  NEXT
 
@@ -1478,5 +1573,5 @@ ENDMACRO
  PRINT "Execute at ", ~LOAD_WORDS%
  PRINT "Reload at ", ~LOAD_WORDS%
 
- PRINT "S.WORDS ",~CODE_WORDS%," ",~P%," ",~LOAD_WORDS%," ",~LOAD_WORDS%
+ PRINT "S.WORDS ", ~CODE_WORDS%, " ", ~P%, " ", ~LOAD_WORDS%, " ", ~LOAD_WORDS%
  SAVE "3-assembled-output/WORDS.bin", CODE_WORDS%, P%, LOAD_WORDS%

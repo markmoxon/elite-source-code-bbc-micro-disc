@@ -1,10 +1,11 @@
 \ ******************************************************************************
 \
-\ DISC ELITE LOADER (PART 2) SOURCE
+\ BBC MICRO DISC ELITE GAME LOADER SOURCE (PART 2 OF 3)
 \
-\ Elite was written by Ian Bell and David Braben and is copyright Acornsoft 1984
+\ BBC Micro disc Elite was written by Ian Bell and David Braben and is copyright
+\ Acornsoft 1984
 \
-\ The code on this site has been reconstructed from a disassembly of the version
+\ The code in this file has been reconstructed from a disassembly of the version
 \ released on Ian Bell's personal website at http://www.elitehomepage.org/
 \
 \ The commentary is copyright Mark Moxon, and any misunderstandings or mistakes
@@ -15,6 +16,11 @@
 \
 \ The deep dive articles referred to in this commentary can be found at
 \ https://elite.bbcelite.com/deep_dives
+\
+\ ------------------------------------------------------------------------------
+\
+\ This source file contains the second of three game loaders for BBC Micro disc
+\ Elite.
 \
 \ ------------------------------------------------------------------------------
 \
@@ -62,7 +68,7 @@
 \
 \ ******************************************************************************
 
- ORG &0004
+ ORG &0004              \ Set the assembly address to &0004
 
 .TRTB%
 
@@ -70,7 +76,7 @@
                         \ table, which is used to translate internal key
                         \ numbers to ASCII
 
- ORG &0070
+ ORG &0070              \ Set the assembly address to &0070
 
 .S
 
@@ -96,7 +102,7 @@
 
  SKIP 1                 \ Temporary storage, used in a number of places
 
- ORG &0081
+ ORG &0081              \ Set the assembly address to &0081
 
 .SC
 
@@ -105,9 +111,7 @@
                         \ Elite draws on-screen by poking bytes directly into
                         \ screen memory, and SC(1 0) is typically set to the
                         \ address of the character block containing the pixel
-                        \ we want to draw (see the deep dives on "Drawing
-                        \ monochrome pixels in mode 4" and "Drawing colour
-                        \ pixels in mode 5" for more details)
+                        \ we want to draw
 
 .SCH
 
@@ -119,7 +123,7 @@
 \
 \ ******************************************************************************
 
- ORG CODE%
+ ORG CODE%              \ Set the assembly address to CODE%
 
 \ ******************************************************************************
 \
@@ -339,7 +343,7 @@ ENDIF
 
 .LOADcode
 
- ORG &0400
+ ORG &0400              \ Set the assembly address to &0400
 
 \ ******************************************************************************
 \

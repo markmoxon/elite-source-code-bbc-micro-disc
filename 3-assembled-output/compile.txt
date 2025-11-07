@@ -6178,9 +6178,11 @@ Saving file '3-assembled-output/MNUCODE.bin'
      00D2
 .K4
      00E0
-Zero page variables from &0  to &E2 
+ZP workspace from &0 to &E1 inclusive
 .XX3
      0100
+.UP
+     0300
 .KL
      0300
 .KY1
@@ -6375,8 +6377,10 @@ Zero page variables from &0  to &E2
      03CC
 .CATF
      03CD
+UP workspace from &300 to &3CD inclusive
 .K%
      0900
+K% workspace from &900 to &ABB inclusive
 .WP
      0E00
 .LSX
@@ -6411,13 +6415,14 @@ Zero page variables from &0  to &E2
      0FD1
 .CPIR
      0FD2
-WP workspace from  &E00  to &FD3 
+WP workspace from &E00 to &FD2 inclusive
 .S%
      11E3   4C 3C 42   JMP &423C
      11E6   4C 3C 42   JMP &423C
      11E9   4C 54 1F   JMP &1F54
      11EC   4B 11
      11EE   4C D5 11   JMP &11D5
+S% workspace (flight) from &11E3 to &11F0 inclusive
 .INBAY
      11F1   A2 F8      LDX #&F8
      11F3   A0 11      LDY #&11
@@ -16347,9 +16352,11 @@ Saving file '3-assembled-output/D.CODE.unprot.bin'
      00D2
 .K4
      00E0
-Zero page variables from &0  to &E2 
+ZP workspace from &0 to &E1 inclusive
 .XX3
      0100
+.UP
+     0300
 .KL
      0300
 .KY1
@@ -16544,8 +16551,10 @@ Zero page variables from &0  to &E2
      03CC
 .CATF
      03CD
+UP workspace from &300 to &3CD inclusive
 .K%
      0900
+K% workspace from &900 to &ABB inclusive
 .WP
      0E00
 .LSX
@@ -16580,13 +16589,14 @@ Zero page variables from &0  to &E2
      0FD1
 .CPIR
      0FD2
-WP workspace from  &E00  to &FD3 
+WP workspace from &E00 to &FD2 inclusive
 .S%
      11E3   4C 1B 12   JMP &121B
      11E6   4C FB 11   JMP &11FB
      11E9   4C 56 1D   JMP &1D56
      11EC   4B 11
      11EE   4C D5 11   JMP &11D5
+S% workspace (docked) from &11E3 to &11F0 inclusive
 .INBAY
      11F1   A2 00      LDX #&00
      11F3   A0 00      LDY #&00
@@ -19020,7 +19030,7 @@ S.ELTB &175B  &1F99  &11E3  &175B
      2211   60         RTS
      2212   A2 08      LDX #&08
      2214   46 1B      LSR &1B
-.MUL6
+.MUL6K
      2216   90 02      BCC &221A
      2218   65 D1      ADC &D1
      221A   6A         ROR A
@@ -19351,7 +19361,7 @@ S.ELTB &175B  &1F99  &11E3  &175B
      2419   D0 CE      BNE &23E9
 .PD1
      241B   A2 03      LDX #&03
-.PDL1
+.PDL1K
      241D   B5 6E      LDA &6E,X
      241F   95 00      STA &00,X
      2421   CA         DEX
