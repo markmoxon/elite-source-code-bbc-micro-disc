@@ -5171,8 +5171,11 @@ End macro FNE
      1D44   2A 44 49 ...
      1D4A   0D
 .DIALS
+     1D4B   F0 80 87 ... INCBIN "versions/disc/1-source-files/images/P.DIALS.bin"
 .SHIP_MISSILE
+     244B   00 40 06 ... INCBIN "versions/disc/3-assembled-output/MISSILE.bin"
 .WORDS
+     254B   4C 32 24 ... INCBIN "versions/disc/3-assembled-output/WORDS.bin"
 .OSBmod
      294B   38         SEC
      294C   A0 00      LDY #&00
@@ -5380,8 +5383,11 @@ End macro FNE
      11FE   3C
      11FF   C6
 .ELITE
+     2A62   00 00 00 ... INCBIN "versions/disc/1-source-files/images/P.ELITE.bin"
 .ASOFT
+     2B62   00 00 00 ... INCBIN "versions/disc/1-source-files/images/P.A-SOFT.bin"
 .CpASOFT
+     2C62   00 00 00 ... INCBIN "versions/disc/1-source-files/images/P.(C)ASFT.bin"
      2D62   F0
      2D63   00
      2D64   00
