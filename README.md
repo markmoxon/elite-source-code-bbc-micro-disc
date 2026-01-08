@@ -16,7 +16,7 @@ See [my profile](https://github.com/markmoxon) for more repositories to explore.
 
 ![Screenshot of the first mission in the disc version of Elite on the BBC Micro](https://elite.bbcelite.com/images/github/mission1a.png)
 
-This repository contains source code for the disc version of Elite on the BBC Micro, with every single line documented and (for the most part) explained. It has been reconstructed by hand from a disassembly of the original game binaries.
+This repository contains source code for the disc version of Ian Bell and David Braben's classic game Elite on the BBC Micro, with every single line documented and (for the most part) explained. It has been reconstructed by hand from a disassembly of the original game binaries.
 
 It is a companion to the [elite.bbcelite.com website](https://elite.bbcelite.com).
 
