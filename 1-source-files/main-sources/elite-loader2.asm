@@ -871,17 +871,12 @@ ENDIF
  STX S                  \ BBC Micro (0) or an Electron (&FF)
 
  LDY #&FF               \ Call OSBYTE with A = 129, X = 0 and Y = &FF to detect
- LDA #129               \ the machine type. This call is undocumented and is not
- JSR OSBYTE             \ the recommended way to determine the machine type
-                        \ (OSBYTE 0 is the correct way), but this call returns
-                        \ the following:
-                        \
-                        \   * X = Y = 0   if this is a BBC Micro with MOS 0.1
-                        \   * X = Y = 1   if this is an Electron
-                        \   * X = Y = &FF if this is a BBC Micro with MOS 1.20
+ LDA #129               \ the machine type, which returns the following:
+ JSR OSBYTE             \
+                        \   * X = 1 if this is an Electron
 
- CPX #1                 \ If X is not 1, then this is not an Electron, so jump
- BNE bbc                \ to bbc
+ CPX #1                 \ If X <> 1 then this is not an Electron, so jump to bbc
+ BNE bbc                \ to skip the following
 
  DEC S                  \ Decrement S to &FF, to denote that this is an Acorn
                         \ Electron
