@@ -5182,8 +5182,11 @@ End macro FNE
      1D57   2A 44 49 ...
      1D5D   0D
 .DIALS
+     1D5E   F0 80 87 ... INCBIN "1-source-files/images/P.DIALS.bin"
 .SHIP_MISSILE
+     245E   00 40 06 ... INCBIN "3-assembled-output/MISSILE.bin"
 .WORDS
+     255E   4C 32 24 ... INCBIN "3-assembled-output/WORDS.bin"
 .OSBmod
      295E   38         SEC
      295F   A0 00      LDY #&00
@@ -5391,9 +5394,13 @@ End macro FNE
      11FE   3C
      11FF   C6
 .ELITE
+     2A75   00 00 00 ... INCBIN "1-source-files/images/P.ELITE.bin"
 .ASOFT
+     2B75   00 00 00 ... INCBIN "1-source-files/images/P.A-SOFT.bin"
 .CpASOFT
+     2C75   00 00 00 ... INCBIN "1-source-files/images/P.(C)ASFT.bin"
 .PlanetCode
+     2D75   A4 9B C4 ... INCBIN "3-assembled-output/PLANETCODE.unprot.bin"
 S.ELITE4 &1900  &2E43  &1900  &1900 
 Saving file '3-assembled-output/ELITE4.unprot.bin'
 Addresses for the scramble routines in elite-checksum.py
