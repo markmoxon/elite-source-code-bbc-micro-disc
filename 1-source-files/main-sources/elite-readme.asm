@@ -35,10 +35,19 @@
  EQUB 10, 13
  EQUS "---------------------------------------"
  EQUB 10, 13
- EQUS "Acornsoft Elite (Compendium version)"
+ EQUS "BBC Micro Elite (Compendium version)"
  EQUB 10, 13
  EQUB 10, 13
- EQUS "For the BBC Micro with 16K sideways RAM"
+ EQUS "The updated BBC Micro disc version"
+ EQUB 10, 13
+ EQUS "for the BBC Micro with 16K sideways RAM"
+ EQUB 10, 13
+ EQUB 10, 13
+ EQUS "Based on the Acornsoft SNG38 release"
+ EQUB 10, 13
+ EQUS "of Elite by Ian Bell and David Braben"
+ EQUB 10, 13
+ EQUS "Copyright (c) Acornsoft 1984"
  EQUB 10, 13
  EQUB 10, 13
  EQUS "Contains the flicker-free ship drawing"
@@ -53,13 +62,6 @@
  EQUS "routines by Mark Moxon"
  EQUB 10, 13
  EQUB 10, 13
- EQUS "Based on the Acornsoft SNG38 release"
- EQUB 10, 13
- EQUS "of Elite by Ian Bell and David Braben"
- EQUB 10, 13
- EQUS "Copyright (c) Acornsoft 1984"
- EQUB 10, 13
- EQUB 10, 13
  EQUS "Sound routines by Kieran Connell and"
  EQUB 10, 13
  EQUS "Simon Morris"
@@ -70,14 +72,6 @@
  EQUS "Dunn (c) D. Braben and I. Bell 1985,"
  EQUB 10, 13
  EQUS "ported from the C64 by Negative Charge"
- EQUB 10, 13
- EQUB 10, 13
- EQUS "Elite integration by Mark Moxon"
- EQUB 10, 13
- EQUB 10, 13
- EQUS "Sideways RAM detection and loading"
- EQUB 10, 13
- EQUS "routines by Tricky and J.G.Harston"
  EQUB 10, 13
  EQUB 10, 13
 

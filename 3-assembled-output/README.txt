@@ -1,8 +1,13 @@
 
 ---------------------------------------
-Acornsoft Elite (Compendium version)
+BBC Micro Elite (Compendium version)
 
-For the BBC Micro with 16K sideways RAM
+The updated BBC Micro disc version
+for the BBC Micro with 16K sideways RAM
+
+Based on the Acornsoft SNG38 release
+of Elite by Ian Bell and David Braben
+Copyright (c) Acornsoft 1984
 
 Contains the flicker-free ship drawing
 routines from the BBC Master version,
@@ -11,10 +16,6 @@
 Contains flicker-free planet drawing
 routines by Mark Moxon
 
-Based on the Acornsoft SNG38 release
-of Elite by Ian Bell and David Braben
-Copyright (c) Acornsoft 1984
-
 Sound routines by Kieran Connell and
 Simon Morris
 
@@ -22,13 +23,8 @@
 Dunn (c) D. Braben and I. Bell 1985,
 ported from the C64 by Negative Charge
 
-Elite integration by Mark Moxon
-
-Sideways RAM detection and loading
-routines by Tricky and J.G.Harston
-
 See www.bbcelite.com for details
 
-Build: 2026-01-15 13:36:13
+Build: 2026-01-15 15:17:04
 ---------------------------------------
 
