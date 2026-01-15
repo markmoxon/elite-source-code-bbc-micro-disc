@@ -93355,24 +93355,16 @@ Saving file '3-assembled-output/D.MOP.bin'
      01B3   0D
      01B4   0A
      01B5   0D
-     01B6   53 69 64 ...
+     01B6   53 65 65 ...
+     01D6   0A
+     01D7   0D
      01D8   0A
      01D9   0D
-     01DA   72 6F 75 ...
-     01FC   0A
-     01FD   0D
-     01FE   0A
-     01FF   0D
-     0200   53 65 65 ...
-     0220   0A
-     0221   0D
-     0222   0A
-     0223   0D
-     0224   42 75 69 ...
-     022B   32 30 32 ...
-     023E   0A
-     023F   0D
-     0240   2D 2D 2D ...
-     0267   0A
-     0268   0D
+     01DA   42 75 69 ...
+     01E1   32 30 32 ...
+     01F4   0A
+     01F5   0D
+     01F6   2D 2D 2D ...
+     021D   0A
+     021E   0D
 Saving file '3-assembled-output/README.txt'

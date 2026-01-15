@@ -17,11 +17,8 @@
 
 Elite integration by Mark Moxon
 
-Sideways RAM detection and loading
-routines by Tricky and J.G.Harston
-
 See www.bbcelite.com for details
 
-Build: 2026-01-15 12:48:00
+Build: 2026-01-15 15:17:42
 ---------------------------------------
 
