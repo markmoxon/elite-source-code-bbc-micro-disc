@@ -941,7 +941,8 @@ ENDIF
                         \ main game code's random seeds in RAND (so this seeds
                         \ the random number generator)
 
- JSR DORND              \ Set A and X to random numbers, say A = r1
+ JSR DORND              \ Set A and X to signed random numbers between -128 and
+                        \ 127, so let's say A = r1
 
  JSR SQUA2              \ Set (A P) = A * A
                         \           = r1^2
@@ -955,7 +956,8 @@ ENDIF
                         \ instead of OSB, and this is where we modify the low
                         \ byte of the destination address
 
- JSR DORND              \ Set A and X to random numbers, say A = r2
+ JSR DORND              \ Set A and X to signed random numbers between -128 and
+                        \ 127, so let's say A = r2
 
  STA YY                 \ Set YY = A
                         \        = r2
@@ -1062,7 +1064,7 @@ ENDIF
 .PLL2
 
  JSR DORND              \ Set A and X to signed random numbers between -128 and
-                        \ 127, say A = r3
+                        \ 127, so let's say A = r3
 
  TAX                    \ Set X = A
                         \       = r3
@@ -1074,7 +1076,7 @@ ENDIF
                         \          = r3^2 / 256
 
  JSR DORND              \ Set A and X to signed random numbers between -128 and
-                        \ 127, say A = r4
+                        \ 127, so let's say A = r4
 
  STA YY                 \ Set YY = r4
 
@@ -1125,7 +1127,8 @@ ENDIF
 
 .PLL3
 
- JSR DORND              \ Set A and X to random numbers, say A = r5
+ JSR DORND              \ Set A and X to signed random numbers between -128 and
+                        \ 127, so let's say A = r5
 
  STA ZP                 \ Set ZP = r5
 
@@ -1140,7 +1143,8 @@ ENDIF
                         \ instead of OSB, and this is where we modify the high
                         \ byte of the destination address
 
- JSR DORND              \ Set A and X to random numbers, say A = r6
+ JSR DORND              \ Set A and X to signed random numbers between -128 and
+                        \ 127, so let's say A = r6
 
  STA YY                 \ Set YY = r6
 
