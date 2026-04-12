@@ -862,6 +862,16 @@ ENDIF
  LDY #HI(CATBLOCK)
  JMP OSWORD
 
+\ ******************************************************************************
+\
+\       Name: CATBLOCK
+\       Type: Subroutine
+\   Category: Save and load
+\    Summary: OSWORD block for loading  disc sectors 0 and 1
+\  Deep dive: Swapping between the docked and flight code
+\
+\ ******************************************************************************
+
 .CATBLOCK
 
  EQUB 0                 \ 0 = Drive = 0
