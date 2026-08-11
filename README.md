@@ -156,7 +156,7 @@ The annotated source files in the `flicker-free` branch contain both the origina
 
 The repository also includes a variant that incorporates both the flicker-free ship-drawing routines and a fix for planets so they no longer flicker, though this version only works when running on a BBC Master. The flicker-free code is in a separate branch called `bbc-master-flicker-free`.
 
-For more information on flicker-free Elite, see the [hacks section of the accompanying website](https://elite.bbcelite.com/hacks/flicker-free_elite.html).
+For more information on flicker-free Elite, see the [hacks section of the accompanying website](https://elite.bbcelite.com/hacks/flicker-free_elite/).
 
 ## BBC Micro Elite with music
 
@@ -166,7 +166,7 @@ The annotated source files in the `music` branch contain both the original Acorn
 
 The music itself is built as a sideways ROM using the code in the [elite-music repository](https://github.com/markmoxon/elite-music/).
 
-For more information on the music, see the [hacks section of the accompanying website](https://elite.bbcelite.com/hacks/bbc_elite_with_music.html).
+For more information on the music, see the [hacks section of the accompanying website](https://elite.bbcelite.com/hacks/bbc_elite_with_music/).
 
 ## BBC Micro Elite on the BBC Master
 
@@ -176,7 +176,7 @@ The annotated source files in the `bbc-master` branch contain both the original 
 
 The repository also includes a variant of the BBC Master version that incorporates both the flicker-free ship-drawing routines and a fix for planets so they no longer flicker. The flicker-free code is in a separate branch called `bbc-master-flicker-free`.
 
-For more information on the port to the BBC Master, see the [hacks section of the accompanying website](https://elite.bbcelite.com/hacks/bbc_master_disc_elite.html).
+For more information on the port to the BBC Master, see the [hacks section of the accompanying website](https://elite.bbcelite.com/hacks/bbc_master_disc_elite/).
 
 ## Elite Compendium
 
@@ -184,7 +184,7 @@ This repository also includes a version of BBC Micro disc Elite for the Elite Co
 
 The annotated source files in the `elite-compendium` branch contain both the original Acornsoft code and all of the modifications for the Elite Compendium, so you can look through the source to see exactly what's changed. Any code that I've removed from the original version is commented out in the source files, so when they are assembled they produce the Compendium binaries, while still containing details of all the modifications. You can find all the diffs by searching the sources for `Mod:`.
 
-For more information on the Elite Compendium, see the [hacks section of the accompanying website](https://elite.bbcelite.com/hacks/elite_compendium.html).
+For more information on the Elite Compendium, see the [hacks section of the accompanying website](https://elite.bbcelite.com/hacks/elite_compendium/).
 
 ## Elite over Econet
 
@@ -192,7 +192,7 @@ This repository also includes a version of BBC Micro disc Elite that loads over 
 
 The annotated source files in the `econet` branch contain both the original Acornsoft code and all of the modifications for Elite over Econet, so you can look through the source to see exactly what's changed. Any code that I've removed from the original version is commented out in the source files, so when they are assembled they produce the Elite over Econet binaries, while still containing details of all the modifications. You can find all the diffs by searching the sources for `Mod:`.
 
-For more information on Elite over Econet, see the [hacks section of the accompanying website](https://elite.bbcelite.com/hacks/elite_over_econet.html).
+For more information on Elite over Econet, see the [hacks section of the accompanying website](https://elite.bbcelite.com/hacks/elite_over_econet/).
 
 ## Building BBC Micro disc Elite from the source
 
