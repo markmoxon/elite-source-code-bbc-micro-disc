@@ -5562,6 +5562,26 @@ TVT1code = &2962
 TVT1 = &1100 
 NA% = &1181 
 CHK2 = &11D3 
+.screenData
+     7800   91 9A A0 ... INCBIN "1-source-files/images/$.SCREEN.bin"
+.LoadScreen
+     7BE8   A0 19      LDY #&19
+     7BEA   A2 04      LDX #&04
+.loop1
+     7BEC   B9 E7 77   LDA &77E7,Y
+     7BEF   20 EE FF   JSR &FFEE
+     7BF2   C8         INY
+     7BF3   D0 F7      BNE &7BEC
+     7BF5   EE EE 7B   INC &7BEE
+     7BF8   CA         DEX
+     7BF9   D0 F1      BNE &7BEC
+     7BFB   60         RTS
+     7BFC   20
+     7BFD   20
+     7BFE   20
+     7BFF   20
+S.SCREEN &7800  &7C00  &7800  &7800 
+Saving file '3-assembled-output/SCREEN.bin'
 .ZP
      0070
 .P

@@ -10,6 +10,8 @@ This folder contains the image binaries from the original game disc for the BBC 
 
 * [P.ELITE.bin](P.ELITE.bin) is the "ELITE" image for the title screen
 
+* [$.SCREEN.bin]($.SCREEN.bin) is the Acornsoft loading screen image from the sideways RAM disc
+
 ---
 
 Right on, Commanders!

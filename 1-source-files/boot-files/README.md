@@ -6,8 +6,6 @@ This folder contains the boot and menu files from the disc containing the sidewa
 
 * [$.MENU.bin]($.MENU.bin) is the menu file from the sideways RAM disc
 
-* [$.SCREEN.bin]($.SCREEN.bin) displays the Acornsoft loading screen from the sideways RAM disc
-
 ---
 
 Right on, Commanders!

@@ -309,6 +309,8 @@ ec04b4d2   5376  ec04b4d2   5376   Yes   ELITE4.bin
 42f42f63  19997  42f42f63  19997   Yes   T.CODE.bin
 8819c78b  19997  8819c78b  19997   Yes   T.CODE.unprot.bin
 52bac547   1024  52bac547   1024   Yes   WORDS.bin
+-             -  fbf74546    883    -    MNUCODE.bin
+-             -  3c56d637   1024    -    SCREEN.bin
 ```
 
 All the compiled binaries match the originals, so we know we are producing the same final game as the Stairway to Hell variant.
@@ -399,6 +401,7 @@ ec04b4d2   5376  ec04b4d2   5376   Yes   ELITE4.bin
 8819c78b  19997  8819c78b  19997   Yes   T.CODE.unprot.bin
 52bac547   1024  52bac547   1024   Yes   WORDS.bin
 -             -  fbf74546    883    -    MNUCODE.bin
+-             -  3c56d637   1024    -    SCREEN.bin
 ```
 
 ### Building the Ian Bell disc variant
@@ -454,6 +457,7 @@ e99072dc    256  -             -    -    ELITE6.bin
 a1cf4199  19997  a1cf4199  19997   Yes   T.CODE.unprot.bin
 52bac547   1024  52bac547   1024   Yes   WORDS.bin
 -             -  fbf74546    883    -    MNUCODE.bin
+-             -  3c56d637   1024    -    SCREEN.bin
 ```
 
 The failed matches are because I haven't yet converted the loader into BeebAsm source files (see the next section for details).
@@ -503,6 +507,7 @@ f1c2e0e6   5376  f1c2e0e6   5376   Yes   ELITE4.bin
 5a89086e   5376  5a89086e   5376   Yes   ELITE4.unprot.bin
 4f2febe4    256  4f2febe4    256   Yes   MISSILE.bin
 fbf74546    883  fbf74546    883   Yes   MNUCODE.bin
+3c56d637   1024  3c56d637   1024   Yes   SCREEN.bin
 201036b2  19997  201036b2  19997   Yes   T.CODE.bin
 201036b2  19997  201036b2  19997   Yes   T.CODE.unprot.bin
 52bac547   1024  52bac547   1024   Yes   WORDS.bin
