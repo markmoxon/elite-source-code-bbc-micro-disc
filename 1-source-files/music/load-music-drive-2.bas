@@ -26,7 +26,7 @@ PRINT"BBC Micro Elite (Compendium version)"
 PRINT"===================================="
 PRINT
 PRINT"The updated BBC Micro disc version"
-PRINT"for the BBC Micro with 16K sideways RAM"
+PRINT"ported to the BBC Master 128"
 PRINT
 PRINT"Based on the Acornsoft SNG38 release"
 PRINT"of Elite by Ian Bell and David Braben"
