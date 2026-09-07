@@ -1054,6 +1054,15 @@
                         \ We now check if ROM bank X contains a ROM image, and
                         \ update the X-th entry in the used% table accordingly
 
+                        \ --- Mod: Code added for Econet: --------------------->
+
+ LDY &F4                \ First we check the entry in the ROM table at &02A1,
+ LDA &02A1,Y            \ and if it is >= 4 then we count the ROM as used, so
+ CMP #4                 \ we can skip the copyright check and jump straight to
+ BCS setAsUsed          \ setAsUsed
+
+                        \ --- End of added code ------------------------------->
+
  LDY &8000+7            \ Set Y to the offset of the ROM's copyright message,
                         \ which is in byte #7 of bank X
 
@@ -1083,6 +1092,12 @@
                         \ message in copyMatch
 
  BNE tbbc3              \ Loop back until we have checked all four characters
+
+                        \ --- Mod: Code added for Econet: --------------------->
+
+.setAsUsed
+
+                        \ --- End of added code ------------------------------->
 
  LDX &F4                \ If we get here then bank X contains the correct
  DEC used%,X            \ copyright string for identifying a ROM, so decrement
