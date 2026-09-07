@@ -1056,7 +1056,7 @@
 
                         \ --- Mod: Code added for Econet: --------------------->
 
- TAY                    \ First we check the entry in the ROM table at &02A1,
+ LDY &F4                \ First we check the entry in the ROM table at &02A1,
  LDA &02A1,Y            \ and if it is >= 4 then we count the ROM as used, so
  CMP #4                 \ we can skip the copyright check and jump straight to
  BCS setAsUsed          \ setAsUsed
