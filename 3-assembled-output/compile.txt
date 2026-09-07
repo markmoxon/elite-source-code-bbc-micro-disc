@@ -5170,8 +5170,11 @@ End macro FNE
      1D44   2A 44 49 ...
      1D4A   0D
 .DIALS
+     1D4B   F0 80 87 ... INCBIN "1-source-files/images/P.DIALS.bin"
 .SHIP_MISSILE
+     244B   00 40 06 ... INCBIN "3-assembled-output/MISSILE.bin"
 .WORDS
+     254B   4C 32 24 ... INCBIN "3-assembled-output/WORDS.bin"
 .OSBmod
      294B   38         SEC
      294C   A0 00      LDY #&00
@@ -5379,8 +5382,11 @@ End macro FNE
      12FE   3C
      12FF   C6
 .ELITE
+     2A62   00 00 00 ... INCBIN "1-source-files/images/P.ELITE.bin"
 .ASOFT
+     2B62   00 00 00 ... INCBIN "1-source-files/images/P.A-SOFT.bin"
 .CpASOFT
+     2C62   00 00 00 ... INCBIN "1-source-files/images/P.(C)ASFT.bin"
      2D62   F0
      2D63   00
      2D64   00
@@ -5582,7 +5588,7 @@ CHK2 = &12D3
 .testbbc%
      7432   4C 51 76   JMP &7651
 .testpro%
-     7435   4C EA 76   JMP &76EA
+     7435   4C F2 76   JMP &76F2
 .loadrom%
      7438   4C 3E 74   JMP &743E
 .makerom%
@@ -5623,7 +5629,7 @@ CHK2 = &12D3
      747D   8E 30 FE   STX &FE30
      7480   A0 00      LDY #&00
 .mrom1
-     7482   B9 17 77   LDA &7717,Y
+     7482   B9 1F 77   LDA &771F,Y
      7485   99 00 80   STA &8000,Y
      7488   A9 00      LDA #&00
      748A   99 00 81   STA &8100,Y
@@ -5669,21 +5675,21 @@ CHK2 = &12D3
      74EA   60         RTS
 .LoadShipFiles
      74EB   A9 41      LDA #&41
-     74ED   8D 15 77   STA &7715
+     74ED   8D 1D 77   STA &771D
 .ship1
      74F0   A9 2E      LDA #&2E
      74F2   20 EE FF   JSR &FFEE
      74F5   A9 00      LDA #&00
-     74F7   8D 01 77   STA &7701
+     74F7   8D 09 77   STA &7709
      74FA   A9 57      LDA #&57
-     74FC   8D 02 77   STA &7702
+     74FC   8D 0A 77   STA &770A
      74FF   A9 FF      LDA #&FF
-     7501   8D 03 77   STA &7703
-     7504   8D 04 77   STA &7704
+     7501   8D 0B 77   STA &770B
+     7504   8D 0C 77   STA &770C
      7507   A9 00      LDA #&00
-     7509   8D 05 77   STA &7705
-     750C   A2 FF      LDX #&FF
-     750E   A0 76      LDY #&76
+     7509   8D 0D 77   STA &770D
+     750C   A2 07      LDX #&07
+     750E   A0 77      LDY #&77
      7510   A9 FF      LDA #&FF
      7512   20 DD FF   JSR &FFDD
      7515   A2 00      LDX #&00
@@ -5696,8 +5702,8 @@ CHK2 = &12D3
      751E   E8         INX
      751F   E0 1F      CPX #&1F
      7521   D0 F4      BNE &7517
-     7523   EE 15 77   INC &7715
-     7526   AD 15 77   LDA &7715
+     7523   EE 1D 77   INC &771D
+     7526   AD 1D 77   LDA &771D
      7529   C9 51      CMP #&51
      752B   D0 C3      BNE &74F0
      752D   60         RTS
@@ -5721,7 +5727,7 @@ CHK2 = &12D3
      754B   F0 E9      BEQ &7536
      754D   E0 01      CPX #&01
      754F   D0 07      BNE &7558
-     7551   AD 15 77   LDA &7715
+     7551   AD 1D 77   LDA &771D
      7554   C9 42      CMP #&42
      7556   F0 DF      BEQ &7537
 .proc4
@@ -5875,93 +5881,98 @@ CHK2 = &12D3
 .tbbc2
      766C   68         PLA
      766D   8D 06 80   STA &8006
-     7670   AC 07 80   LDY &8007
-     7673   A2 FC      LDX #&FC
+     7670   A8         TAY
+     7671   B9 A1 02   LDA &02A1,Y
+     7674   C9 04      CMP #&04
+     7676   B0 11      BCS &7689
+     7678   AC 07 80   LDY &8007
+     767B   A2 FC      LDX #&FC
 .tbbc3
-     7675   BD FF 75   LDA &75FF,X
-     7678   D9 00 80   CMP &8000,Y
-     767B   D0 0C      BNE &7689
-     767D   C8         INY
-     767E   E8         INX
-     767F   D0 F4      BNE &7675
-     7681   A6 F4      LDX &F4
-     7683   DE 10 74   DEC &7410,X
-     7686   4C 91 76   JMP &7691
-.tbbc4
+     767D   BD 07 76   LDA &7607,X
+     7680   D9 00 80   CMP &8000,Y
+     7683   D0 0C      BNE &7691
+     7685   C8         INY
+     7686   E8         INX
+     7687   D0 F4      BNE &767D
+.setAsUsed
      7689   A6 F4      LDX &F4
-     768B   8A         TXA
-     768C   09 F0      ORA #&F0
-     768E   8D 00 80   STA &8000
+     768B   DE 10 74   DEC &7410,X
+     768E   4C 99 76   JMP &7699
+.tbbc4
+     7691   A6 F4      LDX &F4
+     7693   8A         TXA
+     7694   09 F0      ORA #&F0
+     7696   8D 00 80   STA &8000
 .tbbc5
-     7691   2C 30 74   BIT &7430
-     7694   10 10      BPL &76A6
-     7696   A0 F2      LDY #&F2
+     7699   2C 30 74   BIT &7430
+     769C   10 10      BPL &76AE
+     769E   A0 F2      LDY #&F2
 .tbbc6
-     7698   B9 FF 75   LDA &75FF,Y
-     769B   D9 17 7F   CMP &7F17,Y
-     769E   D0 06      BNE &76A6
-     76A0   C8         INY
-     76A1   D0 F5      BNE &7698
-     76A3   8E 30 74   STX &7430
+     76A0   B9 07 76   LDA &7607,Y
+     76A3   D9 17 7F   CMP &7F17,Y
+     76A6   D0 06      BNE &76AE
+     76A8   C8         INY
+     76A9   D0 F5      BNE &76A0
+     76AB   8E 30 74   STX &7430
 .tbbc7
-     76A6   8A         TXA
-     76A7   A0 10      LDY #&10
+     76AE   8A         TXA
+     76AF   A0 10      LDY #&10
 .tbbc8
-     76A9   86 F4      STX &F4
-     76AB   8E 30 FE   STX &FE30
-     76AE   88         DEY
-     76AF   98         TYA
-     76B0   C5 F4      CMP &F4
-     76B2   F0 25      BEQ &76D9
-     76B4   98         TYA
-     76B5   49 FF      EOR #&FF
-     76B7   85 F6      STA &F6
-     76B9   A9 7F      LDA #&7F
-     76BB   85 F7      STA &F7
+     76B1   86 F4      STX &F4
+     76B3   8E 30 FE   STX &FE30
+     76B6   88         DEY
+     76B7   98         TYA
+     76B8   C5 F4      CMP &F4
+     76BA   F0 25      BEQ &76E1
+     76BC   98         TYA
+     76BD   49 FF      EOR #&FF
+     76BF   85 F6      STA &F6
+     76C1   A9 7F      LDA #&7F
+     76C3   85 F7      STA &F7
 .tbbc9
-     76BD   86 F4      STX &F4
-     76BF   8E 30 FE   STX &FE30
-     76C2   B1 F6      LDA (&F6),Y
-     76C4   84 F4      STY &F4
-     76C6   8C 30 FE   STY &FE30
-     76C9   D1 F6      CMP (&F6),Y
-     76CB   D0 DC      BNE &76A9
-     76CD   E6 F6      INC &F6
-     76CF   D0 EC      BNE &76BD
-     76D1   E6 F7      INC &F7
-     76D3   A5 F7      LDA &F7
-     76D5   C9 84      CMP #&84
-     76D7   D0 E4      BNE &76BD
+     76C5   86 F4      STX &F4
+     76C7   8E 30 FE   STX &FE30
+     76CA   B1 F6      LDA (&F6),Y
+     76CC   84 F4      STY &F4
+     76CE   8C 30 FE   STY &FE30
+     76D1   D1 F6      CMP (&F6),Y
+     76D3   D0 DC      BNE &76B1
+     76D5   E6 F6      INC &F6
+     76D7   D0 EC      BNE &76C5
+     76D9   E6 F7      INC &F7
+     76DB   A5 F7      LDA &F7
+     76DD   C9 84      CMP #&84
+     76DF   D0 E4      BNE &76C5
 .tbbc10
-     76D9   98         TYA
-     76DA   9D 20 74   STA &7420,X
-     76DD   CA         DEX
-     76DE   30 03      BMI &76E3
-     76E0   4C 56 76   JMP &7656
+     76E1   98         TYA
+     76E2   9D 20 74   STA &7420,X
+     76E5   CA         DEX
+     76E6   30 03      BMI &76EB
+     76E8   4C 56 76   JMP &7656
 .tbbc11
-     76E3   68         PLA
-     76E4   85 F4      STA &F4
-     76E6   8D 30 FE   STA &FE30
-     76E9   60         RTS
+     76EB   68         PLA
+     76EC   85 F4      STA &F4
+     76EE   8D 30 FE   STA &FE30
+     76F1   60         RTS
 .TestPro
-     76EA   A9 00      LDA #&00
-     76EC   3A         DEC A
-     76ED   8D 31 74   STA &7431
-     76F0   60         RTS
+     76F2   A9 00      LDA #&00
+     76F4   3A         DEC A
+     76F5   8D 31 74   STA &7431
+     76F8   60         RTS
 .titleMatch
-     76F1   53 52 41 ...
+     76F9   53 52 41 ...
 .copyMatch
-     76FB   00
-     76FC   28 43 29 
+     7703   00
+     7704   28 43 29 
 .osfileBlock
-     76FF   11 77
-     7701   00 57 FF FF
-     7705   00 00 00 00
-     7709   00 00 00 00
+     7707   19 77
+     7709   00 57 FF FF
      770D   00 00 00 00
+     7711   00 00 00 00
+     7715   00 00 00 00
 .shipFilename
-     7711   44 2E 4D ...
-     7716   0D
+     7719   44 2E 4D ...
+     771E   0D
 .eliteRomHeader
 .ROM
      8000   4C 21 80   JMP &8021
@@ -6030,7 +6041,7 @@ CHK2 = &12D3
      807A   0D
 .coriolisStation
      807B
-S.MNUCODE &7400  &7794  &7400  &7400 
+S.MNUCODE &7400  &779C  &7400  &7400 
 Saving file '3-assembled-output/MNUCODE.bin'
 .ZP
      0000
