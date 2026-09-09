@@ -2363,12 +2363,7 @@ IF _STH_DISC OR _IB_DISC
 \CPX #&56               \ Loop back to DEEORL to decrypt the next page until we
 \BNE DEEORL             \ reach the start of page &56
 
-                        \ --- And replaced by: -------------------------------->
-
- JSR StopMusic          \ Stop any music that is currently playing and update
-                        \ the volume of sound effects in SFX
-
-                        \ --- End of replacement ------------------------------>
+                        \ --- End of removed code ----------------------------->
 
  JMP RSHIPS             \ Call RSHIPS to launch from the station, load a new set
                         \ of ship blueprints and jump into the main game loop
@@ -25807,6 +25802,13 @@ ENDIF
 \ ******************************************************************************
 
 .RSHIPS
+
+                        \ --- Mod: Code added for music: ---------------------->
+
+ JSR StopMusic          \ Stop any music that is currently playing and update
+                        \ the volume of sound effects in SFX
+
+                        \ --- End of added code ------------------------------->
 
  JSR LOMOD              \ Call LOMOD to load a new ship blueprints file
 
