@@ -23,6 +23,9 @@ PYTHON?=python
 #   match=no            Do not attempt to match the original game binaries
 #                       (i.e. omit workspace noise)
 #
+#   fix-interlace=yes   By default the game forces interlace to be on; this
+#                       uses the interlace setting from when the game is run
+#
 #   verify=no           Disable crc32 verification of the game binaries
 #
 # So, for example:
@@ -78,19 +81,27 @@ else
   match-original-binaries=TRUE
 endif
 
+ifeq ($(fix-interlace), yes)
+  interlace=-i
+  interlace-fix=TRUE
+else
+  interlace=
+  interlace-fix=FALSE
+endif
+
 ifeq ($(variant), ib-disc)
   variant-number=1
-  folder=/ib-disc
+  folder=ib-disc
   suffix=-ib-disc
   boot=-boot ELITE2
 else ifeq ($(variant), sideways-ram)
   variant-number=3
-  folder=/sideways-ram
+  folder=sideways-ram
   suffix=-econet-sideways-ram
   boot=
 else
   variant-number=2
-  folder=/sth
+  folder=sth
   suffix=-econet-sth
   boot=
 endif
@@ -102,11 +113,13 @@ all:
 	echo _REMOVE_CHECKSUMS=$(remove-checksums) >> 1-source-files/main-sources/elite-build-options.asm
 	echo _MATCH_ORIGINAL_BINARIES=$(match-original-binaries) >> 1-source-files/main-sources/elite-build-options.asm
 	echo _MAX_COMMANDER=$(max-commander) >> 1-source-files/main-sources/elite-build-options.asm
+	echo _INTERLACE_FIX=$(interlace-fix) >> 1-source-files/main-sources/elite-build-options.asm
 	$(BEEBASM) -i 1-source-files/main-sources/elite-text-tokens.asm -v > 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-missile.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-loader1.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-loader2.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-loader3.asm -v >> 3-assembled-output/compile.txt
+	$(BEEBASM) -i 1-source-files/main-sources/elite-loader-screen.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-loader-sideways-ram.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-source-flight.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-source-docked.asm -v >> 3-assembled-output/compile.txt
@@ -130,10 +143,10 @@ all:
 	$(BEEBASM) -i 1-source-files/main-sources/elite-disable-roms.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-integra-fix.asm -v >> 3-assembled-output/compile.txt
 	cat 1-source-files/boot-files/$$.ELTROMEC.bin 3-assembled-output/Scoreboard.bin > 3-assembled-output/ELTROM.bin
-	$(PYTHON) 2-build-files/elite-checksum.py $(unencrypt) -rel$(variant-number)
+	$(PYTHON) 2-build-files/elite-checksum.py $(unencrypt) $(interlace) -rel$(variant-number)
 	$(BEEBASM) -i 1-source-files/main-sources/elite-disc.asm -do 5-compiled-game-discs/elite-disc$(suffix).ssd $(boot) -title "E L I T E"
 ifneq ($(verify), no)
-	@$(PYTHON) 2-build-files/crc32.py 4-reference-binaries$(folder) 3-assembled-output
+	@$(PYTHON) 2-build-files/crc32.py 4-reference-binaries/$(folder) 3-assembled-output
 endif
 
 .PHONY:b2

@@ -27,12 +27,15 @@ import sys
 argv = sys.argv
 argc = len(argv)
 Encrypt = True
+interlace_offset = 0
 Scramble = False
 release = 1
 
 for arg in argv[1:]:
     if arg == "-u":
         Encrypt = False
+    if arg == "-i":
+        interlace_offset = 21
     if arg == "-rel1":
         release = 1
     if arg == "-rel2":
@@ -89,6 +92,19 @@ tvt1 = 0x1200               # TVT1
 na_per_cent = 0x1281        # NA%
 chk2 = 0x12D3               # CHK2
 
+# Add an offset to the scramble addresses that matches the number of extra bytes
+# there are in the ENTRY routine for the interlace fix (0 = fix not included)
+
+scramble1_from += interlace_offset
+scramble1_to += interlace_offset
+scramble2_from += interlace_offset
+scramble2_to += interlace_offset
+scramble3_from += interlace_offset
+scramble3_to += interlace_offset
+scramble4_from += interlace_offset
+scramble4_to += interlace_offset
+tvt1_code += interlace_offset
+
 # Load assembled code file for ELITE4
 
 data_block = bytearray()
@@ -105,6 +121,7 @@ else:
 # Commander data checksum
 
 na_per_cent_offset = na_per_cent - tvt1 + tvt1_code - load_address
+checksum_offset = chk2 - tvt1 + tvt1_code - load_address
 CH = 0x4B - 2
 CY = 0
 for i in range(CH, 0, -1):
@@ -115,12 +132,8 @@ for i in range(CH, 0, -1):
 
 print("Commander checksum = ", hex(CH))
 
-# Must have Commander checksum otherwise game will lock:
-
-if Encrypt:
-    checksum_offset = chk2 - tvt1 + tvt1_code - load_address
-    data_block[checksum_offset] = CH ^ 0xA9
-    data_block[checksum_offset + 1] = CH
+data_block[checksum_offset] = CH ^ 0xA9
+data_block[checksum_offset + 1] = CH
 
 # Extract unscrambled &1100-&11E3 for use in &55FF checksum below
 

@@ -10,9 +10,7 @@ This folder contains the boot and menu files from the disc containing the sidewa
 
 * [$.MENU.bin]($.MENU.bin) is the menu file from the sideways RAM disc
 
-* [$.MENU.bin]($.MENUEC.bin) is the menu file from the sideways RAM disc, updated for Econet
-
-* [$.SCREEN.bin]($.SCREEN.bin) displays the Acornsoft loading screen from the sideways RAM disc
+* [$.MENUEC.bin]($.MENUEC.bin) is the menu file from the sideways RAM disc, updated for Econet
 
 ---
 
