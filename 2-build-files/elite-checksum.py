@@ -26,13 +26,16 @@ import sys
 
 argv = sys.argv
 argc = len(argv)
-Encrypt = True
+encrypt = True
+interlace_offset = 0
 Scramble = True
 release = 1
 
 for arg in argv[1:]:
     if arg == "-u":
-        Encrypt = False
+        encrypt = False
+    if arg == "-i":
+        interlace_offset = 21
     if arg == "-rel1":
         release = 1
     if arg == "-rel2":
@@ -42,7 +45,7 @@ for arg in argv[1:]:
         release = 3
 
 print("Disc Elite Checksum")
-print("Encryption = ", Encrypt)
+print("Encryption = ", encrypt)
 print("Scramble main code = ", Scramble)
 
 # Configuration variables for scrambling code and calculating checksums
@@ -90,6 +93,19 @@ tvt1 = 0x1100               # TVT1
 na_per_cent = 0x1181        # NA%
 chk2 = 0x11D3               # CHK2
 
+# Add an offset to the scramble addresses that matches the number of extra bytes
+# there are in the ENTRY routine for the interlace fix (0 = fix not included)
+
+scramble1_from += interlace_offset
+scramble1_to += interlace_offset
+scramble2_from += interlace_offset
+scramble2_to += interlace_offset
+scramble3_from += interlace_offset
+scramble3_to += interlace_offset
+scramble4_from += interlace_offset
+scramble4_to += interlace_offset
+tvt1_code += interlace_offset
+
 # Load assembled code file for ELITE4
 
 data_block = bytearray()
@@ -101,6 +117,7 @@ elite_file.close()
 # Commander data checksum
 
 na_per_cent_offset = na_per_cent - tvt1 + tvt1_code - load_address
+checksum_offset = chk2 - tvt1 + tvt1_code - load_address
 CH = 0x4B - 2
 CY = 0
 for i in range(CH, 0, -1):
@@ -111,12 +128,8 @@ for i in range(CH, 0, -1):
 
 print("Commander checksum = ", hex(CH))
 
-# Must have Commander checksum otherwise game will lock:
-
-if Encrypt:
-    checksum_offset = chk2 - tvt1 + tvt1_code - load_address
-    data_block[checksum_offset] = CH ^ 0xA9
-    data_block[checksum_offset + 1] = CH
+data_block[checksum_offset] = CH ^ 0xA9
+data_block[checksum_offset + 1] = CH
 
 # Extract unscrambled &1100-&11E3 for use in &55FF checksum below
 
@@ -222,7 +235,7 @@ if release == 3:
     # checksum is disabled in LOAD in the sideways RAM variant
     d_checksum = 0xE6
 
-if Encrypt:
+if encrypt:
     data_block[checksum_address - load_address] = d_checksum
 
 print("&55FF docked code checksum = ", hex(d_checksum))
