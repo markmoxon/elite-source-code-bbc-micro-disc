@@ -23,13 +23,8 @@ else
   match-original-binaries=TRUE
 endif
 
-ifeq ($(fix-interlace), yes)
-  interlace=-i
-  interlace-fix=TRUE
-else
-  interlace=
-  interlace-fix=FALSE
-endif
+interlace=-i
+interlace-fix=TRUE
 
 variant-number=2
 folder=sth
