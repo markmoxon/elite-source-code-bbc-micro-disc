@@ -3959,29 +3959,29 @@ ENDIF
 
                         \ --- Mod: Code removed for Compendium: --------------->
 
-\ AND #%10000000        \ Clear bits 0-6 of A
+\AND #%10000000         \ Clear bits 0-6 of A
 \
 \.MVT1
 \
-\ ASL A                 \ Set the C flag to the sign bit of the delta, leaving
+\ASL A                  \ Set the C flag to the sign bit of the delta, leaving
 \                       \ delta_hi << 1 in A
 \
-\ STA S                 \ Set S = delta_hi << 1
+\STA S                  \ Set S = delta_hi << 1
 \                       \
 \                       \ This also clears bit 0 of S
 \
-\ LDA #0                \ Set T = just the sign bit of delta (in bit 7)
-\ ROR A
-\ STA T
+\LDA #0                 \ Set T = just the sign bit of delta (in bit 7)
+\ROR A
+\STA T
 \
-\ LSR S                 \ Set S = delta_hi >> 1
+\LSR S                  \ Set S = delta_hi >> 1
 \                       \       = |delta_hi|
 \                       \
 \                       \ This also clear the C flag, as we know that bit 0 of
 \                       \ S was clear before the LSR
 \
-\ EOR INWK+2,X          \ If T EOR x_sign has bit 7 set, then x_sign and delta
-\ BMI MV10              \ have different signs, so jump to MV10
+\EOR INWK+2,X           \ If T EOR x_sign has bit 7 set, then x_sign and delta
+\BMI MV10               \ have different signs, so jump to MV10
 \
 \                       \ At this point, we know x_sign and delta have the same
 \                       \ sign, that sign is in T, and S contains |delta_hi|,
@@ -3992,20 +3992,20 @@ ENDIF
 \                       \ and then set the sign of the result to the same sign
 \                       \ as x_sign and delta
 \
-\ LDA R                 \ First we add the low bytes, so:
-\ ADC INWK,X            \
-\ STA INWK,X            \   x_lo = x_lo + R
+\LDA R                  \ First we add the low bytes, so:
+\ADC INWK,X             \
+\STA INWK,X             \   x_lo = x_lo + R
 \
-\ LDA S                 \ Then we add the high bytes:
-\ ADC INWK+1,X          \
-\ STA INWK+1,X          \   x_hi = x_hi + S
+\LDA S                  \ Then we add the high bytes:
+\ADC INWK+1,X           \
+\STA INWK+1,X           \   x_hi = x_hi + S
 \
-\ LDA INWK+2,X          \ And finally we add any carry into x_sign, and if the
-\ ADC #0                \ sign of x_sign and delta in T is negative, make sure
-\ ORA T                 \ the result is negative (by OR'ing with T)
-\ STA INWK+2,X
+\LDA INWK+2,X           \ And finally we add any carry into x_sign, and if the
+\ADC #0                 \ sign of x_sign and delta in T is negative, make sure
+\ORA T                  \ the result is negative (by OR'ing with T)
+\STA INWK+2,X
 \
-\ RTS                   \ Return from the subroutine
+\RTS                    \ Return from the subroutine
 \
 \.MV10
 \
@@ -4018,23 +4018,23 @@ ENDIF
 \                       \ and then set the sign of the result according to
 \                       \ the signs of x_sign and delta
 \
-\ LDA INWK,X            \ First we subtract the low bytes, so:
-\ SEC                   \
-\ SBC R                 \   x_lo = x_lo - R
-\ STA INWK,X
+\LDA INWK,X             \ First we subtract the low bytes, so:
+\SEC                    \
+\SBC R                  \   x_lo = x_lo - R
+\STA INWK,X
 \
-\ LDA INWK+1,X          \ Then we subtract the high bytes:
-\ SBC S                 \
-\ STA INWK+1,X          \   x_hi = x_hi - S
+\LDA INWK+1,X           \ Then we subtract the high bytes:
+\SBC S                  \
+\STA INWK+1,X           \   x_hi = x_hi - S
 \
-\ LDA INWK+2,X          \ And finally we subtract any borrow from bits 0-6 of
-\ AND #%01111111        \ x_sign, and give the result the opposite sign bit to T
-\ SBC #0                \ (i.e. give it the sign of the original x_sign)
-\ ORA #%10000000
-\ EOR T
-\ STA INWK+2,X
+\LDA INWK+2,X           \ And finally we subtract any borrow from bits 0-6 of
+\AND #%01111111         \ x_sign, and give the result the opposite sign bit to T
+\SBC #0                 \ (i.e. give it the sign of the original x_sign)
+\ORA #%10000000
+\EOR T
+\STA INWK+2,X
 \
-\ BCS MV11              \ If the C flag is set by the above SBC, then our sum
+\BCS MV11               \ If the C flag is set by the above SBC, then our sum
 \                       \ above didn't underflow and is correct - to put it
 \                       \ another way, (x_sign x_hi x_lo) >= (S R) so the result
 \                       \ should indeed have the same sign as x_sign, so jump to
@@ -4050,25 +4050,25 @@ ENDIF
 \                       \ (S R), the delta, as that's the dominant figure in the
 \                       \ sum
 \
-\ LDA #1                \ First we subtract the low bytes, so:
-\ SBC INWK,X            \
-\ STA INWK,X            \   x_lo = 1 - x_lo
+\LDA #1                 \ First we subtract the low bytes, so:
+\SBC INWK,X             \
+\STA INWK,X             \   x_lo = 1 - x_lo
 \
-\ LDA #0                \ Then we subtract the high bytes:
-\ SBC INWK+1,X          \
-\ STA INWK+1,X          \   x_hi = 0 - x_hi
+\LDA #0                 \ Then we subtract the high bytes:
+\SBC INWK+1,X           \
+\STA INWK+1,X           \   x_hi = 0 - x_hi
 \
-\ LDA #0                \ And then we subtract the sign bytes:
-\ SBC INWK+2,X          \
+\LDA #0                 \ And then we subtract the sign bytes:
+\SBC INWK+2,X           \
 \                       \   x_sign = 0 - x_sign
 \
-\ AND #%01111111        \ Finally, we set the sign bit to the sign in T, the
-\ ORA T                 \ sign of the original delta, as the delta is the
-\ STA INWK+2,X          \ dominant figure in the sum
+\AND #%01111111         \ Finally, we set the sign bit to the sign in T, the
+\ORA T                  \ sign of the original delta, as the delta is the
+\STA INWK+2,X           \ dominant figure in the sum
 \
 \.MV11
 \
-\ RTS                   \ Return from the subroutine
+\RTS                    \ Return from the subroutine
 
                         \ --- End of removed code ----------------------------->
 
@@ -4113,57 +4113,57 @@ ENDIF
 
 \.MVT3
 \
-\ LDA K+3               \ Set S = K+3
-\ STA S
+\LDA K+3                \ Set S = K+3
+\STA S
 \
-\ AND #%10000000        \ Set T = sign bit of K(3 2 1)
-\ STA T
+\AND #%10000000         \ Set T = sign bit of K(3 2 1)
+\STA T
 \
-\ EOR INWK+2,X          \ If x_sign has a different sign to K(3 2 1), jump to
-\ BMI MV13              \ MV13 to process the addition as a subtraction
+\EOR INWK+2,X           \ If x_sign has a different sign to K(3 2 1), jump to
+\BMI MV13               \ MV13 to process the addition as a subtraction
 \
-\ LDA K+1               \ Set K(3 2 1) = K(3 2 1) + (x_sign x_hi x_lo)
-\ CLC                   \ starting with the low bytes
-\ ADC INWK,X
-\ STA K+1
+\LDA K+1                \ Set K(3 2 1) = K(3 2 1) + (x_sign x_hi x_lo)
+\CLC                    \ starting with the low bytes
+\ADC INWK,X
+\STA K+1
 \
-\ LDA K+2               \ Then the middle bytes
-\ ADC INWK+1,X
-\ STA K+2
+\LDA K+2                \ Then the middle bytes
+\ADC INWK+1,X
+\STA K+2
 \
-\ LDA K+3               \ And finally the high bytes
-\ ADC INWK+2,X
+\LDA K+3                \ And finally the high bytes
+\ADC INWK+2,X
 \
-\ AND #%01111111        \ Setting the sign bit of K+3 to T, the original sign
-\ ORA T                 \ of K(3 2 1)
-\ STA K+3
+\AND #%01111111         \ Setting the sign bit of K+3 to T, the original sign
+\ORA T                  \ of K(3 2 1)
+\STA K+3
 \
-\ RTS                   \ Return from the subroutine
+\RTS                    \ Return from the subroutine
 \
 \.MV13
 \
-\ LDA S                 \ Set S = |K+3| (i.e. K+3 with the sign bit cleared)
-\ AND #%01111111
-\ STA S
+\LDA S                  \ Set S = |K+3| (i.e. K+3 with the sign bit cleared)
+\AND #%01111111
+\STA S
 \
-\ LDA INWK,X            \ Set K(3 2 1) = (x_sign x_hi x_lo) - K(3 2 1)
-\ SEC                   \ starting with the low bytes
-\ SBC K+1
-\ STA K+1
+\LDA INWK,X             \ Set K(3 2 1) = (x_sign x_hi x_lo) - K(3 2 1)
+\SEC                    \ starting with the low bytes
+\SBC K+1
+\STA K+1
 \
-\ LDA INWK+1,X          \ Then the middle bytes
-\ SBC K+2
-\ STA K+2
+\LDA INWK+1,X           \ Then the middle bytes
+\SBC K+2
+\STA K+2
 \
-\ LDA INWK+2,X          \ And finally the high bytes, doing A = |x_sign| - |K+3|
-\ AND #%01111111        \ and setting the C flag for testing below
-\ SBC S
+\LDA INWK+2,X           \ And finally the high bytes, doing A = |x_sign| - |K+3|
+\AND #%01111111         \ and setting the C flag for testing below
+\SBC S
 \
-\ ORA #%10000000        \ Set the sign bit of K+3 to the opposite sign of T,
-\ EOR T                 \ i.e. the opposite sign to the original K(3 2 1)
-\ STA K+3
+\ORA #%10000000         \ Set the sign bit of K+3 to the opposite sign of T,
+\EOR T                  \ i.e. the opposite sign to the original K(3 2 1)
+\STA K+3
 \
-\ BCS MV14              \ If the C flag is set, i.e. |x_sign| >= |K+3|, then
+\BCS MV14               \ If the C flag is set, i.e. |x_sign| >= |K+3|, then
 \                       \ the sign of K(3 2 1). In this case, we want the
 \                       \ result to have the same sign as the largest argument,
 \                       \ which is (x_sign x_hi x_lo), which we know has the
@@ -4171,25 +4171,25 @@ ENDIF
 \                       \ the sign of K(3 2 1) to... so we can jump to MV14 to
 \                       \ return from the subroutine
 \
-\ LDA #1                \ We need to swap the sign of the result in K(3 2 1),
-\ SBC K+1               \ which we do by calculating 0 - K(3 2 1), which we can
-\ STA K+1               \ do with 1 - C - K(3 2 1), as we know the C flag is
+\LDA #1                 \ We need to swap the sign of the result in K(3 2 1),
+\SBC K+1                \ which we do by calculating 0 - K(3 2 1), which we can
+\STA K+1                \ do with 1 - C - K(3 2 1), as we know the C flag is
 \                       \ clear. We start with the low bytes
 \
-\ LDA #0                \ Then the middle bytes
-\ SBC K+2
-\ STA K+2
+\LDA #0                 \ Then the middle bytes
+\SBC K+2
+\STA K+2
 \
-\ LDA #0                \ And finally the high bytes
-\ SBC K+3
+\LDA #0                 \ And finally the high bytes
+\SBC K+3
 \
-\ AND #%01111111        \ Set the sign bit of K+3 to the same sign as T,
-\ ORA T                 \ i.e. the same sign as the original K(3 2 1), as
-\ STA K+3               \ that's the largest argument
+\AND #%01111111         \ Set the sign bit of K+3 to the same sign as T,
+\ORA T                  \ i.e. the same sign as the original K(3 2 1), as
+\STA K+3                \ that's the largest argument
 \
 \.MV14
 \
-\ RTS                   \ Return from the subroutine
+\RTS                    \ Return from the subroutine
 
                         \ --- End of removed code ----------------------------->
 
@@ -4556,72 +4556,72 @@ ENDIF
 
 \.MVT6
 \
-\ TAY                   \ Store argument A into Y, for later use
+\TAY                    \ Store argument A into Y, for later use
 \
-\ EOR INWK+2,X          \ Set A = A EOR x_sign
+\EOR INWK+2,X           \ Set A = A EOR x_sign
 \
-\ BMI MV50              \ If the sign is negative, i.e. A and x_sign have
+\BMI MV50               \ If the sign is negative, i.e. A and x_sign have
 \                       \ different signs, jump to MV50
 \
 \                       \ The signs are the same, so we can add the two
 \                       \ arguments and keep the sign to get the result
 \
-\ LDA P+1               \ First we add the low bytes:
-\ CLC                   \
-\ ADC INWK,X            \   P+1 = P+1 + x_lo
-\ STA P+1
+\LDA P+1                \ First we add the low bytes:
+\CLC                    \
+\ADC INWK,X             \   P+1 = P+1 + x_lo
+\STA P+1
 \
-\ LDA P+2               \ And then the high bytes:
-\ ADC INWK+1,X          \
-\ STA P+2               \   P+2 = P+2 + x_hi
+\LDA P+2                \ And then the high bytes:
+\ADC INWK+1,X           \
+\STA P+2                \   P+2 = P+2 + x_hi
 \
-\ TYA                   \ Restore the original A argument that we stored earlier
+\TYA                    \ Restore the original A argument that we stored earlier
 \                       \ so that we keep the original sign
 \
-\ RTS                   \ Return from the subroutine
+\RTS                    \ Return from the subroutine
 \
 \.MV50
 \
-\ LDA INWK,X            \ First we subtract the low bytes:
-\ SEC                   \
-\ SBC P+1               \   P+1 = x_lo - P+1
-\ STA P+1
+\LDA INWK,X             \ First we subtract the low bytes:
+\SEC                    \
+\SBC P+1                \   P+1 = x_lo - P+1
+\STA P+1
 \
-\ LDA INWK+1,X          \ And then the high bytes:
-\ SBC P+2               \
-\ STA P+2               \   P+2 = x_hi - P+2
+\LDA INWK+1,X           \ And then the high bytes:
+\SBC P+2                \
+\STA P+2                \   P+2 = x_hi - P+2
 \
-\ BCC MV51              \ If the last subtraction underflowed, then the C flag
+\BCC MV51               \ If the last subtraction underflowed, then the C flag
 \                       \ will be clear and x_hi < P+2, so jump to MV51 to
 \                       \ negate the result
 \
-\ TYA                   \ Restore the original A argument that we stored earlier
-\ EOR #%10000000        \ but flip bit 7, which flips the sign. We do this
+\TYA                    \ Restore the original A argument that we stored earlier
+\EOR #%10000000         \ but flip bit 7, which flips the sign. We do this
 \                       \ because x_hi >= P+2 so we want the result to have the
 \                       \ same sign as x_hi (as it's the dominant side in this
 \                       \ calculation). The sign of x_hi is x_sign, and x_sign
 \                       \ has the opposite sign to A, so we flip the sign in A
 \                       \ to return the correct result
 \
-\ RTS                   \ Return from the subroutine
+\RTS                    \ Return from the subroutine
 \
 \.MV51
 \
-\ LDA #1                \ Our subtraction underflowed, so we negate the result
-\ SBC P+1               \ using two's complement, first with the low byte:
-\ STA P+1               \
+\LDA #1                 \ Our subtraction underflowed, so we negate the result
+\SBC P+1                \ using two's complement, first with the low byte:
+\STA P+1                \
 \                       \   P+1 = 1 - P+1
 \
-\ LDA #0                \ And then the high byte:
-\ SBC P+2               \
-\ STA P+2               \   P+2 = 0 - P+2
+\LDA #0                 \ And then the high byte:
+\SBC P+2                \
+\STA P+2                \   P+2 = 0 - P+2
 \
-\ TYA                   \ Restore the original A argument that we stored earlier
+\TYA                    \ Restore the original A argument that we stored earlier
 \                       \ as this is the correct sign for the result. This is
 \                       \ because x_hi < P+2, so we want to return the same sign
 \                       \ as P+2, the dominant side
 \
-\ RTS                   \ Return from the subroutine
+\RTS                    \ Return from the subroutine
 
                         \ --- End of removed code ----------------------------->
 
@@ -6031,12 +6031,12 @@ ENDIF
 
 \.PIX1
 \
-\ JSR ADD               \ Set (A X) = (A P) + (S R)
+\JSR ADD                \ Set (A X) = (A P) + (S R)
 \
-\ STA YY+1              \ Set YY+1 to A, the high byte of the result
+\STA YY+1               \ Set YY+1 to A, the high byte of the result
 \
-\ TXA                   \ Set SYL+Y to X, the low byte of the result
-\ STA SYL,Y
+\TXA                    \ Set SYL+Y to X, the low byte of the result
+\STA SYL,Y
 \
 \                       \ Fall through into PIXEL2 to draw the stardust particle
 \                       \ at (X1,Y1)
@@ -6471,34 +6471,34 @@ ENDIF
 
 \.FLIP
 \
-\ LDY NOSTM             \ Set Y to the current number of stardust particles, so
+\LDY NOSTM              \ Set Y to the current number of stardust particles, so
 \                       \ we can use it as a counter through all the stardust
 \
 \.FLL1
 \
-\ LDX SY,Y              \ Copy the Y-th particle's y-coordinate from SY+Y into X
+\LDX SY,Y               \ Copy the Y-th particle's y-coordinate from SY+Y into X
 \
-\ LDA SX,Y              \ Copy the Y-th particle's x-coordinate from SX+Y into
-\ STA Y1                \ both Y1 and the particle's y-coordinate
-\ STA SY,Y
+\LDA SX,Y               \ Copy the Y-th particle's x-coordinate from SX+Y into
+\STA Y1                 \ both Y1 and the particle's y-coordinate
+\STA SY,Y
 \
-\ TXA                   \ Copy the Y-th particle's original y-coordinate into
-\ STA X1                \ both X1 and the particle's x-coordinate, so the x- and
-\ STA SX,Y              \ y-coordinates are now swapped and (X1, Y1) contains
+\TXA                    \ Copy the Y-th particle's original y-coordinate into
+\STA X1                 \ both X1 and the particle's x-coordinate, so the x- and
+\STA SX,Y               \ y-coordinates are now swapped and (X1, Y1) contains
 \                       \ the particle's new coordinates
 \
-\ LDA SZ,Y              \ Fetch the Y-th particle's distance from SZ+Y into ZZ
-\ STA ZZ
+\LDA SZ,Y               \ Fetch the Y-th particle's distance from SZ+Y into ZZ
+\STA ZZ
 \
-\ JSR PIXEL2            \ Draw a stardust particle at (X1,Y1) with distance ZZ
+\JSR PIXEL2             \ Draw a stardust particle at (X1,Y1) with distance ZZ
 \
-\ DEY                   \ Decrement the counter to point to the next particle of
+\DEY                    \ Decrement the counter to point to the next particle of
 \                       \ stardust
 \
-\ BNE FLL1              \ Loop back to FLL1 until we have moved all the stardust
+\BNE FLL1               \ Loop back to FLL1 until we have moved all the stardust
 \                       \ particles
 \
-\ RTS                   \ Return from the subroutine
+\RTS                    \ Return from the subroutine
 
                         \ --- End of removed code ----------------------------->
 
@@ -9996,25 +9996,25 @@ ENDIF
 
 \.LL164
 \
-\ LDA #56               \ Call the NOISE routine with A = 56 to make the sound
-\ JSR NOISE             \ of the hyperspace drive being engaged
+\LDA #56                \ Call the NOISE routine with A = 56 to make the sound
+\JSR NOISE              \ of the hyperspace drive being engaged
 \
-\ LDA #1                \ Set HFX to 1, which switches the screen mode to a full
-\ STA HFX               \ mode 5 screen, therefore making the hyperspace rings
+\LDA #1                 \ Set HFX to 1, which switches the screen mode to a full
+\STA HFX                \ mode 5 screen, therefore making the hyperspace rings
 \                       \ multi-coloured and all zig-zaggy (see the IRQ1 routine
 \                       \ for details)
 \
-\ LDA #4                \ Set the step size for the hyperspace rings to 4, so
+\LDA #4                 \ Set the step size for the hyperspace rings to 4, so
 \                       \ there are more sections in the rings and they are
 \                       \ quite round (compared to the step size of 8 used in
 \                       \ the much more polygonal launch rings)
 \
-\ JSR HFS2              \ Call HFS2 to draw the hyperspace tunnel rings
+\JSR HFS2               \ Call HFS2 to draw the hyperspace tunnel rings
 \
-\ DEC HFX               \ Set HFX back to 0, so we switch back to the normal
+\DEC HFX                \ Set HFX back to 0, so we switch back to the normal
 \                       \ split-screen mode
 \
-\ RTS                   \ Return from the subroutine
+\RTS                    \ Return from the subroutine
 
                         \ --- End of removed code ----------------------------->
 
@@ -10035,10 +10035,10 @@ ENDIF
 
 \.LAUN
 \
-\ LDA #48               \ Call the NOISE routine with A = 48 to make the sound
-\ JSR NOISE             \ of the ship launching from the station
+\LDA #48                \ Call the NOISE routine with A = 48 to make the sound
+\JSR NOISE              \ of the ship launching from the station
 \
-\ LDA #8                \ Set the step size for the launch tunnel rings to 8, so
+\LDA #8                 \ Set the step size for the launch tunnel rings to 8, so
 \                       \ there are fewer sections in the rings and they are
 \                       \ quite polygonal (compared to the step size of 4 used
 \                       \ in the much rounder hyperspace rings)
@@ -10090,11 +10090,11 @@ ENDIF
 
 \.HFS2
 \
-\ STA STP               \ Store the step size in A
+\STA STP                \ Store the step size in A
 \
-\ JSR TTX66             \ Clear the screen and draw a border box
+\JSR TTX66              \ Clear the screen and draw a border box
 \
-\ JSR HFS1              \ Call HFS1 below and then fall through into the same
+\JSR HFS1               \ Call HFS1 below and then fall through into the same
 \                       \ routine, so this effectively runs HFS1 twice, and as
 \                       \ HFS1 draws 8 concentric rings, this means we draw 16
 \                       \ of them in all
@@ -10174,17 +10174,17 @@ ENDIF
 
                         \ --- Mod: Code removed for Compendium: --------------->
 
-\ EQUB &8C, &E7
-\ EQUB &8D, &ED
-\ EQUB &8A, &E6
-\ EQUB &C1, &C8
-\ EQUB &C8, &8B
-\ EQUB &E0, &8A
-\ EQUB &E6, &D6
-\ EQUB &C5, &C6
-\ EQUB &C1, &CA
-\ EQUB &95, &9D
-\ EQUB &9C, &97
+\EQUB &8C, &E7
+\EQUB &8D, &ED
+\EQUB &8A, &E6
+\EQUB &C1, &C8
+\EQUB &C8, &8B
+\EQUB &E0, &8A
+\EQUB &E6, &D6
+\EQUB &C5, &C6
+\EQUB &C1, &CA
+\EQUB &95, &9D
+\EQUB &9C, &97
 
                         \ --- End of removed code ----------------------------->
 
