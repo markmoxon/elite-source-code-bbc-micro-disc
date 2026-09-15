@@ -252,6 +252,8 @@ By default the build process will create a typical Elite game disc with a standa
 
 * `match=no` - Do not attempt to match the original game binaries (i.e. omit workspace noise)
 
+* `fix-interlace=yes` - By default the game forces interlace to be on, which can cause issues with some monitors and video scalers; this option uses the interlace setting from when the game is run
+
 * `verify=no` - Disable crc32 verification of the game binaries
 
 So, for example:
