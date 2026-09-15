@@ -5561,6 +5561,26 @@ TVT1code = &2962
 TVT1 = &1200 
 NA% = &1281 
 CHK2 = &12D3 
+.screenData
+     7800   91 9A A0 ... INCBIN "1-source-files/images/$.SCREEN.bin"
+.LoadScreen
+     7BE8   A0 19      LDY #&19
+     7BEA   A2 04      LDX #&04
+.loop1
+     7BEC   B9 E7 77   LDA &77E7,Y
+     7BEF   20 EE FF   JSR &FFEE
+     7BF2   C8         INY
+     7BF3   D0 F7      BNE &7BEC
+     7BF5   EE EE 7B   INC &7BEE
+     7BF8   CA         DEX
+     7BF9   D0 F1      BNE &7BEC
+     7BFB   60         RTS
+     7BFC   20
+     7BFD   20
+     7BFE   20
+     7BFF   20
+S.SCREEN &7800  &7C00  &7800  &7800 
+Saving file '3-assembled-output/SCREEN.bin'
 .ZP
      0070
 .P
@@ -6192,9 +6212,11 @@ Saving file '3-assembled-output/MNUCODE.bin'
      00E1
 .K4
      00E2
-Zero page variables from &0  to &E4 
+ZP workspace from &0 to &E3 inclusive
 .XX3
      0100
+.UP
+     0300
 .KL
      0300
 .KY1
@@ -6413,12 +6435,14 @@ Zero page variables from &0  to &E4
      03D9
 .K%
      0900
+K% workspace from &900 to &ABB inclusive
 .S%
      12E3   4C 01 13   JMP &1301
      12E6   4C 01 13   JMP &1301
      12E9   4C 03 20   JMP &2003
      12EC   4B 12
      12EE   4C D5 12   JMP &12D5
+S% workspace (flight) from &12E3 to &12F0 inclusive
 .INBAY
      12F1   A2 F8      LDX #&F8
      12F3   A0 12      LDY #&12
@@ -15897,9 +15921,11 @@ WP workspace from  &540C  to &55DF
      00E1
 .K4
      00E2
-Zero page variables from &0  to &E4 
+ZP workspace from &0 to &E3 inclusive
 .XX3
      0100
+.UP
+     0300
 .KL
      0300
 .KY1
@@ -16118,6 +16144,7 @@ Zero page variables from &0  to &E4
      03D9
 .K%
      0900
+K% workspace from &900 to &ABB inclusive
 .WP
      5E00
 .LSX
@@ -16152,13 +16179,14 @@ Zero page variables from &0  to &E4
      5FD1
 .CPIR
      5FD2
-WP workspace from  &5E00  to &5FD3 
+WP workspace from &5E00 to &5FD2 inclusive
 .S%
      12E3   4C 25 13   JMP &1325
      12E6   4C FB 12   JMP &12FB
      12E9   4C 3B 1D   JMP &1D3B
      12EC   4B 12
      12EE   4C D5 12   JMP &12D5
+S% workspace (docked) from &12E3 to &12F0 inclusive
 .INBAY
      12F1   A2 00      LDX #&00
      12F3   A0 00      LDY #&00
@@ -18511,7 +18539,7 @@ S.ELTB &1781  &1F91  &12E3  &1781
      22A4   D0 CE      BNE &2274
 .PD1
      22A6   A2 03      LDX #&03
-.PDL1
+.PDL1K
      22A8   B5 6C      LDA &6C,X
      22AA   95 00      STA &00,X
      22AC   CA         DEX

@@ -22,6 +22,10 @@ This folder contains the annotated source code for the BBC Micro disc version of
 
   * [elite-loader3.asm](elite-loader3.asm) contains the source for the third stage of the loader
 
+  * [elite-loader-sideways-ram.asm](elite-loader-sideways-ram.asm) contains the source for the game loader for the sideways RAM variant
+
+  * [elite-loader-screen.asm](elite-loader-sideways-ram.asm) contains the mode 7 Acornsoft screen data for the sideways RAM variant
+
   * [elite-disc.asm](elite-disc.asm) builds the SSD disc image from the assembled binaries and other source files
 
   * [elite-readme.asm](elite-readme.asm) generates a README file for inclusion on the SSD disc image
