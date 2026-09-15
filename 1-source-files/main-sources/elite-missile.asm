@@ -1,10 +1,11 @@
 \ ******************************************************************************
 \
-\ DISC ELITE MISSILE SHIP BLUEPRINT FILE
+\ BBC MICRO DISC ELITE MISSILE SHIP BLUEPRINT FILE
 \
-\ Elite was written by Ian Bell and David Braben and is copyright Acornsoft 1984
+\ BBC Micro disc Elite was written by Ian Bell and David Braben and is copyright
+\ Acornsoft 1984
 \
-\ The code on this site has been reconstructed from a disassembly of the version
+\ The code in this file has been reconstructed from a disassembly of the version
 \ released on Ian Bell's personal website at http://www.elitehomepage.org/
 \
 \ The commentary is copyright Mark Moxon, and any misunderstandings or mistakes
@@ -15,6 +16,10 @@
 \
 \ The deep dive articles referred to in this commentary can be found at
 \ https://elite.bbcelite.com/deep_dives
+\
+\ ------------------------------------------------------------------------------
+\
+\ This source file contains the missile ship blueprint for BBC Micro disc Elite.
 \
 \ ------------------------------------------------------------------------------
 \
@@ -45,7 +50,7 @@
 
  LOAD% = &244B          \ The address where the code will be loaded
 
- ORG CODE%
+ ORG CODE%              \ Set the assembly address to CODE%
 
 \ ******************************************************************************
 \
@@ -54,16 +59,13 @@
 \   Category: Drawing ships
 \    Summary: Macro definition for adding vertices to ship blueprints
 \  Deep dive: Ship blueprints
+\             Drawing ships
 \
 \ ------------------------------------------------------------------------------
 \
 \ The following macro is used to build the ship blueprints:
 \
 \   VERTEX x, y, z, face1, face2, face3, face4, visibility
-\
-\ See the deep dive on "Ship blueprints" for details of how vertices are stored
-\ in the ship blueprints, and the deep dive on "Drawing ships" for information
-\ on how vertices are used to draw 3D wireframe ships.
 \
 \ ------------------------------------------------------------------------------
 \
@@ -126,6 +128,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Macro definition for adding edges to ship blueprints
 \  Deep dive: Ship blueprints
+\             Drawing ships
 \
 \ ------------------------------------------------------------------------------
 \
@@ -133,9 +136,10 @@ ENDMACRO
 \
 \   EDGE vertex1, vertex2, face1, face2, visibility
 \
-\ See the deep dive on "Ship blueprints" for details of how edges are stored
-\ in the ship blueprints, and the deep dive on "Drawing ships" for information
-\ on how edges are used to draw 3D wireframe ships.
+\ When stored in memory, bytes #2 and #3 contain the vertex numbers multiplied
+\ by 4, so we can use them as indices into the heap at XX3 to fetch the screen
+\ coordinates for each vertex, as they are stored as four bytes containing two
+\ 16-bit numbers (see part 10 of the LL9 routine for details).
 \
 \ ------------------------------------------------------------------------------
 \
@@ -168,16 +172,13 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Macro definition for adding faces to ship blueprints
 \  Deep dive: Ship blueprints
+\             Drawing ships
 \
 \ ------------------------------------------------------------------------------
 \
 \ The following macro is used to build the ship blueprints:
 \
 \   FACE normal_x, normal_y, normal_z, visibility
-\
-\ See the deep dive on "Ship blueprints" for details of how faces are stored
-\ in the ship blueprints, and the deep dive on "Drawing ships" for information
-\ on how faces are used to draw 3D wireframe ships.
 \
 \ ------------------------------------------------------------------------------
 \
@@ -230,6 +231,7 @@ ENDMACRO
 \   Category: Drawing ships
 \    Summary: Ship blueprint for a missile
 \  Deep dive: Ship blueprints
+\             Comparing ship specifications
 \
 \ ******************************************************************************
 
@@ -311,23 +313,23 @@ ENDMACRO
 .SHIP_MISSILE_FACES
 
     \ normal_x, normal_y, normal_z, visibility
- FACE      -64,        0,       16,         31    \ Face 0
- FACE        0,      -64,       16,         31    \ Face 1
- FACE       64,        0,       16,         31    \ Face 2
- FACE        0,       64,       16,         31    \ Face 3
- FACE       32,        0,        0,         31    \ Face 4
- FACE        0,      -32,        0,         31    \ Face 5
- FACE      -32,        0,        0,         31    \ Face 6
+ FACE      -64,        0,       16,         31      \ Face 0
+ FACE        0,      -64,       16,         31      \ Face 1
+ FACE       64,        0,       16,         31      \ Face 2
+ FACE        0,       64,       16,         31      \ Face 3
+ FACE       32,        0,        0,         31      \ Face 4
+ FACE        0,      -32,        0,         31      \ Face 5
+ FACE      -32,        0,        0,         31      \ Face 6
 
 IF _STH_DISC OR _IB_DISC
 
- FACE        0,      160,      110,         31    \ Face 7
- FACE        0,       64,        4,          0    \ Face 8
+ FACE        0,      160,      110,         31      \ Face 7
+ FACE        0,       64,        4,          0      \ Face 8
 
 ELIF _SRAM_DISC
 
- FACE        0,       32,        0,         31    \ Face 7
- FACE        0,        0,     -176,         31    \ Face 8
+ FACE        0,       32,        0,         31      \ Face 7
+ FACE        0,        0,     -176,         31      \ Face 8
 
 ENDIF
 
@@ -375,5 +377,5 @@ ENDIF
  PRINT "Execute at ", ~LOAD%
  PRINT "Reload at ", ~LOAD%
 
- PRINT "S.MISSILE ",~CODE%," ",~P%," ",~LOAD%," ",~LOAD%
+ PRINT "S.MISSILE ", ~CODE%, " ", ~P%, " ", ~LOAD%, " ", ~LOAD%
  SAVE "3-assembled-output/MISSILE.bin", CODE%, P%, LOAD%

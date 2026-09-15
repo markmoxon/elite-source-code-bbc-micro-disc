@@ -1,10 +1,11 @@
 \ ******************************************************************************
 \
-\ DISC ELITE DISC IMAGE SCRIPT
+\ BBC MICRO DISC ELITE DISC IMAGE SCRIPT
 \
-\ Elite was written by Ian Bell and David Braben and is copyright Acornsoft 1984
+\ BBC Micro disc Elite was written by Ian Bell and David Braben and is copyright
+\ Acornsoft 1984
 \
-\ The code on this site has been reconstructed from a disassembly of the version
+\ The code in this file has been reconstructed from a disassembly of the version
 \ released on Ian Bell's personal website at http://www.elitehomepage.org/
 \
 \ The commentary is copyright Mark Moxon, and any misunderstandings or mistakes
@@ -18,11 +19,16 @@
 \
 \ ------------------------------------------------------------------------------
 \
+\ This source file produces an SSD disc image for BBC Micro disc Elite.
+\
+\ ------------------------------------------------------------------------------
+\
 \ This source file produces one of the following SSD disc images, depending on
 \ which release is being built:
 \
 \   * elite-disc-sth.ssd
 \   * elite-disc-ib-disc.ssd
+\   * elite-disc-sideways-ram.ssd
 \
 \ This can be loaded into an emulator or a real BBC Micro.
 \
@@ -44,7 +50,7 @@ ELIF _SRAM_DISC
 
  PUTFILE "1-source-files/boot-files/$.!BOOT.bin", "!BOOT", &FFFFFF, &FFFFFF
  PUTFILE "1-source-files/boot-files/$.MENU.bin", "MENU", &FF1900, &FF8023
- PUTFILE "1-source-files/boot-files/$.SCREEN.bin", "SCREEN", &007800, &007BE8
+ PUTFILE "3-assembled-output/SCREEN.bin", "SCREEN", &007800, &007BE8
  PUTFILE "3-assembled-output/MNUCODE.bin", "MNUCODE", &007400, &00743B
  PUTFILE "3-assembled-output/ELITE4.bin", "INTRO", &001900, &00197B
 

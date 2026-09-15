@@ -5562,6 +5562,26 @@ TVT1code = &2962
 TVT1 = &1100 
 NA% = &1181 
 CHK2 = &11D3 
+.screenData
+     7800   91 9A A0 ... INCBIN "1-source-files/images/$.SCREEN.bin"
+.LoadScreen
+     7BE8   A0 19      LDY #&19
+     7BEA   A2 04      LDX #&04
+.loop1
+     7BEC   B9 E7 77   LDA &77E7,Y
+     7BEF   20 EE FF   JSR &FFEE
+     7BF2   C8         INY
+     7BF3   D0 F7      BNE &7BEC
+     7BF5   EE EE 7B   INC &7BEE
+     7BF8   CA         DEX
+     7BF9   D0 F1      BNE &7BEC
+     7BFB   60         RTS
+     7BFC   20
+     7BFD   20
+     7BFE   20
+     7BFF   20
+S.SCREEN &7800  &7C00  &7800  &7800 
+Saving file '3-assembled-output/SCREEN.bin'
 .ZP
      0070
 .P
@@ -6184,9 +6204,11 @@ Saving file '3-assembled-output/MNUCODE.bin'
      00DF
 .K4
      00E0
-Zero page variables from &0  to &E2 
+ZP workspace from &0 to &E1 inclusive
 .XX3
      0100
+.UP
+     0300
 .KL
      0300
 .KY1
@@ -6385,8 +6407,10 @@ Zero page variables from &0  to &E2
      03CE
 .CATF
      03CF
+UP workspace from &300 to &3CF inclusive
 .K%
      0900
+K% workspace from &900 to &ABB inclusive
 .WP
      0E00
 .LSX
@@ -6421,13 +6445,14 @@ Zero page variables from &0  to &E2
      0FD1
 .CPIR
      0FD2
-WP workspace from  &E00  to &FD3 
+WP workspace from &E00 to &FD2 inclusive
 .S%
      11E3   4C 55 12   JMP &1255
      11E6   4C 55 12   JMP &1255
      11E9   4C 3D 1F   JMP &1F3D
      11EC   4B 11
      11EE   4C D5 11   JMP &11D5
+<<<<<<< HEAD
 .IRQMusic
      11F1   8D 45 FE   STA &FE45
      11F4   A5 8F      LDA &8F
@@ -6497,6 +6522,9 @@ WP workspace from  &E00  to &FD3
      1242   00
      1243   00
      1244   00
+=======
+S% workspace (flight) from &11E3 to &11F0 inclusive
+>>>>>>> main
 .INBAY
      1245   A2 4C      LDX #&4C
      1247   A0 12      LDY #&12
@@ -9649,11 +9677,63 @@ S.ELTB &16D8  &2143  &11E3  &16D8
      288C   85 1B      STA &1B
      288E   A9 00      LDA #&00
 .MUL3
+<<<<<<< HEAD
      2890   B0 08      BCS &289A
      2892   65 81      ADC &81
      2894   6A         ROR A
      2895   46 1B      LSR &1B
      2897   D0 F7      BNE &2890
+=======
+     284F   B0 08      BCS &2859
+     2851   65 81      ADC &81
+     2853   6A         ROR A
+     2854   46 1B      LSR &1B
+     2856   D0 F7      BNE &284F
+     2858   60         RTS
+.MU7
+     2859   4A         LSR A
+     285A   46 1B      LSR &1B
+     285C   D0 F1      BNE &284F
+     285E   60         RTS
+     285F   A6 81      LDX &81
+     2861   F0 AF      BEQ &2812
+     2863   CA         DEX
+     2864   86 D1      STX &D1
+     2866   A9 00      LDA #&00
+     2868   A2 08      LDX #&08
+     286A   46 1B      LSR &1B
+.MUL6K
+     286C   90 02      BCC &2870
+     286E   65 D1      ADC &D1
+     2870   6A         ROR A
+     2871   66 1B      ROR &1B
+     2873   CA         DEX
+     2874   D0 F6      BNE &286C
+     2876   60         RTS
+     2877   86 81      STX &81
+.MLTU2
+     2879   49 FF      EOR #&FF
+     287B   4A         LSR A
+     287C   85 1C      STA &1C
+     287E   A9 00      LDA #&00
+     2880   A2 10      LDX #&10
+     2882   66 1B      ROR &1B
+.MUL7
+     2884   B0 0B      BCS &2891
+     2886   65 81      ADC &81
+     2888   6A         ROR A
+     2889   66 1C      ROR &1C
+     288B   66 1B      ROR &1B
+     288D   CA         DEX
+     288E   D0 F4      BNE &2884
+     2890   60         RTS
+.MU21
+     2891   4A         LSR A
+     2892   66 1C      ROR &1C
+     2894   66 1B      ROR &1B
+     2896   CA         DEX
+     2897   D0 EB      BNE &2884
+>>>>>>> main
      2899   60         RTS
 .MU7
      289A   4A         LSR A
@@ -16348,9 +16428,11 @@ Saving file '3-assembled-output/D.CODE.unprot.bin'
      00DF
 .K4
      00E0
-Zero page variables from &0  to &E2 
+ZP workspace from &0 to &E1 inclusive
 .XX3
      0100
+.UP
+     0300
 .KL
      0300
 .KY1
@@ -16549,8 +16631,10 @@ Zero page variables from &0  to &E2
      03CE
 .CATF
      03CF
+UP workspace from &300 to &3CF inclusive
 .K%
      0900
+K% workspace from &900 to &ABB inclusive
 .WP
      0E00
 .LSX
@@ -16585,13 +16669,14 @@ Zero page variables from &0  to &E2
      0FD1
 .CPIR
      0FD2
-WP workspace from  &E00  to &FD3 
+WP workspace from &E00 to &FD2 inclusive
 .S%
      11E3   4C 6F 12   JMP &126F
      11E6   4C 4F 12   JMP &124F
      11E9   4C AD 1D   JMP &1DAD
      11EC   4B 11
      11EE   4C D5 11   JMP &11D5
+<<<<<<< HEAD
 .IRQMusic
      11F1   8D 45 FE   STA &FE45
      11F4   A5 8F      LDA &8F
@@ -16661,6 +16746,9 @@ WP workspace from  &E00  to &FD3
      1242   00
      1243   00
      1244   00
+=======
+S% workspace (docked) from &11E3 to &11F0 inclusive
+>>>>>>> main
 .INBAY
      1245   A2 00      LDX #&00
      1247   A0 00      LDY #&00
@@ -19052,8 +19140,72 @@ S.ELTB &17B2  &1FF0  &11E3  &17B2
      222A   A6 81      LDX &81
      222C   F0 EE      BEQ &221C
 .MU11
+<<<<<<< HEAD
      222E   CA         DEX
      222F   86 D1      STX &D1
+=======
+     21D7   CA         DEX
+     21D8   86 D1      STX &D1
+     21DA   A9 00      LDA #&00
+     21DC   A2 08      LDX #&08
+     21DE   46 1B      LSR &1B
+.MUL6
+     21E0   90 02      BCC &21E4
+     21E2   65 D1      ADC &D1
+     21E4   6A         ROR A
+     21E5   66 1B      ROR &1B
+     21E7   CA         DEX
+     21E8   D0 F6      BNE &21E0
+     21EA   60         RTS
+.MU6
+     21EB   85 1C      STA &1C
+     21ED   85 1B      STA &1B
+     21EF   60         RTS
+.FMLTU2
+     21F0   29 1F      AND #&1F
+     21F2   AA         TAX
+     21F3   BD C0 07   LDA &07C0,X
+     21F6   85 81      STA &81
+     21F8   A5 40      LDA &40
+.FMLTU
+     21FA   49 FF      EOR #&FF
+     21FC   38         SEC
+     21FD   6A         ROR A
+     21FE   85 1B      STA &1B
+     2200   A9 00      LDA #&00
+.MUL3
+     2202   B0 08      BCS &220C
+     2204   65 81      ADC &81
+     2206   6A         ROR A
+     2207   46 1B      LSR &1B
+     2209   D0 F7      BNE &2202
+     220B   60         RTS
+.MU7
+     220C   4A         LSR A
+     220D   46 1B      LSR &1B
+     220F   D0 F1      BNE &2202
+     2211   60         RTS
+     2212   A6 81      LDX &81
+     2214   F0 AF      BEQ &21C5
+     2216   CA         DEX
+     2217   86 D1      STX &D1
+     2219   A9 00      LDA #&00
+     221B   A2 08      LDX #&08
+     221D   46 1B      LSR &1B
+.MUL6K
+     221F   90 02      BCC &2223
+     2221   65 D1      ADC &D1
+     2223   6A         ROR A
+     2224   66 1B      ROR &1B
+     2226   CA         DEX
+     2227   D0 F6      BNE &221F
+     2229   60         RTS
+     222A   86 81      STX &81
+.MLTU2
+     222C   49 FF      EOR #&FF
+     222E   4A         LSR A
+     222F   85 1C      STA &1C
+>>>>>>> main
      2231   A9 00      LDA #&00
      2233   A2 08      LDX #&08
      2235   46 1B      LSR &1B
@@ -19415,6 +19567,7 @@ S.ELTB &17B2  &1FF0  &11E3  &17B2
      2460   88         DEY
      2461   D0 CE      BNE &2431
 .PD1
+<<<<<<< HEAD
      2463   A2 03      LDX #&03
 .PDL1
      2465   B5 6E      LDA &6E,X
@@ -19422,6 +19575,15 @@ S.ELTB &17B2  &1FF0  &11E3  &17B2
      2469   CA         DEX
      246A   10 F9      BPL &2465
      246C   A9 05      LDA #&05
+=======
+     2424   A2 03      LDX #&03
+.PDL1K
+     2426   B5 6E      LDA &6E,X
+     2428   95 00      STA &00,X
+     242A   CA         DEX
+     242B   10 F9      BPL &2426
+     242D   A9 05      LDA #&05
+>>>>>>> main
 .PD4
      246E   4C 25 13   JMP &1325
 .BRIEF2
