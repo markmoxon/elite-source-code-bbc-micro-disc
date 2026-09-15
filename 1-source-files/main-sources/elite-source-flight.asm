@@ -32698,7 +32698,7 @@ ENDMACRO
  INY                    \ Increment Y to point to byte #2
 
  LDA (V),Y              \ Fetch byte #2 for this edge into X, which contains
- TAX                    \ the number of the vertex at the end of the edge
+ TAX                    \ the number of the vertex at the start of the edge
                         \
                         \ Byte #2 contains the vertex number multiplied by 4,
                         \ so we can use it as an index into the heap at XX3 to
