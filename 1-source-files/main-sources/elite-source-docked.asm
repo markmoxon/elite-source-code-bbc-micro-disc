@@ -10301,11 +10301,11 @@ ENDIF
 
                         \ --- Mod: Code removed for flicker-free ships: ------->
 
-\ LDX Q
-\ BEQ MU1
-\ DEX
-\ STX T
-\ LDA #0
+\LDX Q
+\BEQ MU1
+\DEX
+\STX T
+\LDA #0
 
                         \ --- End of removed code ----------------------------->
 
