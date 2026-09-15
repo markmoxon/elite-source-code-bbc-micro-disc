@@ -377,7 +377,7 @@
 .ECMA
 
  SKIP 1                 \ The E.C.M. countdown timer, which determines whether
-                        \ an E.C.M. system is currently operating:
+                        \ an E.C.M. system is currently operating
                         \
                         \   * 0 = E.C.M. is off
                         \
@@ -530,7 +530,7 @@
 .QQ17
 
  SKIP 1                 \ Contains a number of flags that affect how text tokens
-                        \ are printed, particularly capitalisation:
+                        \ are printed, particularly capitalisation
                         \
                         \   * If all bits are set (255) then text printing is
                         \     disabled
@@ -739,7 +739,9 @@
                         \ the smoother the circle. The values used are:
                         \
                         \   * 2 for big planets and the circles on the charts
+                        \
                         \   * 4 for medium planets and the launch tunnel
+                        \
                         \   * 8 for small planets and the hyperspace tunnel
                         \
                         \ As the step size increases we move from smoother
@@ -1337,14 +1339,17 @@
 .LASER
 
  SKIP 4                 \ The specifications of the lasers fitted to each of the
-                        \ four space views:
+                        \ four space views
                         \
                         \   * Byte #0 = front view
+                        \
                         \   * Byte #1 = rear view
+                        \
                         \   * Byte #2 = left view
+                        \
                         \   * Byte #3 = right view
                         \
-                        \ For each of the views:
+                        \ The value for each view is as follows:
                         \
                         \   * 0 = no laser is fitted to this view
                         \
@@ -1460,7 +1465,7 @@
 .FIST
 
  SKIP 1                 \ Our legal status (FIST stands for "fugitive/innocent
-                        \ status"):
+                        \ status")
                         \
                         \   * 0 = Clean
                         \
@@ -4212,7 +4217,7 @@ ENDIF
  LDX Q                  \ Restore the value of X from before the call to ADD
 
  LDA K                  \ Set roofv_x = K(1 0)
- STA INWK,X             \              = (1-1/512) * roofv_x +/- nosev_x / 16
+ STA INWK,X             \             = (1-1/512) * roofv_x +/- nosev_x / 16
  LDA K+1
  STA INWK+1,X
 
@@ -4454,7 +4459,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Draw a line: Calculate the line gradient in the form of deltas
-\  Deep dive: Bresenham's line algorithm
+\  Deep dive: Elite's line-drawing algorithm
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4558,7 +4563,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Draw a line: Line has a shallow gradient, step right along x-axis
-\  Deep dive: Bresenham's line algorithm
+\  Deep dive: Elite's line-drawing algorithm
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4704,7 +4709,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Draw a shallow line going right and up or left and down
-\  Deep dive: Bresenham's line algorithm
+\  Deep dive: Elite's line-drawing algorithm
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4804,7 +4809,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Draw a shallow line going right and down or left and up
-\  Deep dive: Bresenham's line algorithm
+\  Deep dive: Elite's line-drawing algorithm
 \
 \ ------------------------------------------------------------------------------
 \
@@ -4892,7 +4897,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Draw a line: Line has a steep gradient, step up along y-axis
-\  Deep dive: Bresenham's line algorithm
+\  Deep dive: Elite's line-drawing algorithm
 \
 \ ------------------------------------------------------------------------------
 \
@@ -5040,7 +5045,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Draw a steep line going up and left or down and right
-\  Deep dive: Bresenham's line algorithm
+\  Deep dive: Elite's line-drawing algorithm
 \
 \ ------------------------------------------------------------------------------
 \
@@ -5127,7 +5132,7 @@ ENDIF
 \       Type: Subroutine
 \   Category: Drawing lines
 \    Summary: Draw a steep line going up and right or down and left
-\  Deep dive: Bresenham's line algorithm
+\  Deep dive: Elite's line-drawing algorithm
 \
 \ ------------------------------------------------------------------------------
 \
@@ -5805,8 +5810,10 @@ ENDIF
                         \ to skip the following negation
 
  EOR #%01111111         \ The y-coordinate offset is negative, so flip all the
- ADC #1                 \ bits apart from the sign bit and subtract 1, to negate
-                        \ it to a positive number, i.e. A is now |Y1|
+ ADC #1                 \ bits apart from the sign bit and subtract 1 to convert
+                        \ A from a sign-magnitude number into a traditional
+                        \ signed number, so A is now Y1 in a form that can be
+                        \ used with the SBC instruction
 
 .PX2
 
@@ -7814,7 +7821,7 @@ ENDIF
  LDX CATF               \ If CATF = 0, jump to RR5, otherwise we are printing a
  BEQ RR5                \ disc catalogue
 
- CPY #' '               \ If the character we want to print in Y is a space,
+ CPY #' '               \ If the character we want to print in Y is not a space,
  BNE RR5                \ jump to RR5
 
                         \ If we get here, then CATF is non-zero, so we are
@@ -11471,8 +11478,8 @@ ENDIF
                         \ If we get here, then we need to apply auto-recentre,
                         \ if it is configured
 
- LDA DJD                \ If keyboard auto-recentre is disabled, then
- BNE RE2+2              \ jump to RE2+2 to restore A and return
+ LDA DJD                \ If keyboard auto-recentre is disabled, then jump to
+ BNE RE2+2              \ RE2+2 to restore A and return
 
  LDX #128               \ If we get here then keyboard auto-recentre is enabled,
  BMI RE2+2              \ so set X to 128 (the middle of our range) and jump to
@@ -16403,9 +16410,9 @@ ENDIF
  LDA #14
 
  STA Q                  \ Set QQ25 = A (so QQ25 is in the range 3-14 and
- STA QQ25               \ represents number of the most advanced item available
- INC Q                  \ in this system, which we can pass to gnum below when
-                        \ asking which item we want to buy)
+ STA QQ25               \ represents the number of the most advanced item
+ INC Q                  \ available in this system, which we can pass to gnum
+                        \ below when asking which item we want to buy)
                         \
                         \ Set Q = A + 1 (so Q is in the range 4-15 and contains
                         \ QQ25 + 1, i.e. the highest item number on sale + 1)
@@ -18163,7 +18170,7 @@ ENDIF
 
  BEQ WS2                \ If the slot contains 0 then it is empty and we have
                         \ checked all the slots (as they are always shuffled
-                        \ down in the main loop to close up and gaps), so jump
+                        \ down in the main loop to close up any gaps), so jump
                         \ to WS2 as we are done
 
  BMI WS1                \ If the slot contains a ship type with bit 7 set, then
@@ -18756,7 +18763,7 @@ ENDIF
 \       Name: ABORT
 \       Type: Subroutine
 \   Category: Dashboard
-\    Summary: Disarm missiles and update the dashboard indicators
+\    Summary: Unarm missiles and update the dashboard indicators
 \
 \ ------------------------------------------------------------------------------
 \
@@ -18770,7 +18777,7 @@ ENDIF
 \
 \                         * &E0 = yellow/white (armed)
 \
-\                         * &EE = green/cyan (disarmed)
+\                         * &EE = green/cyan (unarmed)
 \
 \ ******************************************************************************
 
@@ -18780,7 +18787,7 @@ ENDIF
                         \ no target lock for our missile
 
                         \ Fall through into ABORT2 to set the missile lock to
-                        \ the value in X, which effectively disarms the missile
+                        \ the value in X, which effectively unarms the missile
 
 \ ******************************************************************************
 \
@@ -18808,7 +18815,7 @@ ENDIF
 \
 \                         * &E0 = yellow/white (armed)
 \
-\                         * &EE = green/cyan (disarmed)
+\                         * &EE = green/cyan (unarmed)
 \
 \ ******************************************************************************
 
@@ -18942,7 +18949,7 @@ ENDIF
 \
 \                         * &E0 = yellow/white (armed)
 \
-\                         * &EE = green/cyan (disarmed)
+\                         * &EE = green/cyan (unarmed)
 \
 \ ------------------------------------------------------------------------------
 \
@@ -18957,14 +18964,14 @@ ENDIF
 .MSBAR
 
  TXA                    \ Set T = X * 8
- ASL A
- ASL A
- ASL A
+ ASL A                  \
+ ASL A                  \ This also clears the C flag, as X is in the range 0
+ ASL A                  \ to 3
  STA T
 
- LDA #49                \ Set SC = 49 - T
- SBC T                  \        = 48 + 1 - (X * 8)
- STA SC
+ LDA #49                \ Set SC = 49 - T - (1 - C)
+ SBC T                  \        = 49 - (X * 8) - 1
+ STA SC                 \        = 48 - (X * 8)
 
                         \ So the low byte of SC(1 0) contains the row address
                         \ for the rightmost missile indicator, made up as
@@ -18972,9 +18979,6 @@ ENDIF
                         \
                         \   * 48 (character block 7, as byte #7 * 8 = 48), the
                         \     character block of the rightmost missile
-                        \
-                        \   * 1 (so we start drawing on the second row of the
-                        \     character block)
                         \
                         \   * Move left one character (8 bytes) for each count
                         \     of X, so when X = 0 we are drawing the rightmost
@@ -25076,9 +25080,7 @@ ENDMACRO
 \ When called from part 6 of LL9, XX12 contains the vector [x y z] of the vertex
 \ we're analysing, and XX16 contains the transposed orientation vectors with
 \ each of them containing the x, y and z elements of the original vectors, so it
-\ ------------------------------------------------------------------------------
-\
-\ Returns:
+\ returns:
 \
 \   [ x ]   [ sidev_x ]         [ x ]   [ sidev_y ]         [ x ]   [ sidev_z ]
 \   [ y ] . [ roofv_x ]         [ y ] . [ roofv_y ]         [ y ] . [ roofv_z ]
@@ -25454,7 +25456,7 @@ ENDMACRO
                         \ this vertex's entry in the XX3 heap will still be 255,
                         \ which we can check in part 9 to see if the laser
                         \ vertex is visible (and therefore whether we should
-                        \ draw laser lines if the ship is firing on us)
+                        \ draw laser lines if the ship is firing at us)
 
  LDA XX1+6              \ Set (A T) = (z_hi z_lo)
  STA T
