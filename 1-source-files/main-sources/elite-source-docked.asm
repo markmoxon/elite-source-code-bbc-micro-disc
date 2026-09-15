@@ -27366,12 +27366,12 @@ ENDMACRO
 
                         \ --- And replaced by: -------------------------------->
 
- INY                    \ Increment Y to point to byte #3
+ INY                    \ Increment Y to point to byte #2
 
- LDA (V),Y              \ Fetch byte #3 for this edge into X, which contains
+ LDA (V),Y              \ Fetch byte #2 for this edge into X, which contains
  TAX                    \ the number of the vertex at the start of the edge
                         \
-                        \ Byte #3 contains the vertex number multiplied by 4,
+                        \ Byte #2 contains the vertex number multiplied by 4,
                         \ so we can use it as an index into the heap at XX3 to
                         \ fetch the vertex's screen coordinates, which are
                         \ stored as four bytes containing two 16-bit numbers
