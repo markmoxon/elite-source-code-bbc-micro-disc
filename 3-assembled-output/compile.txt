@@ -5417,6 +5417,26 @@ TVT1code = &2975
 TVT1 = &1100 
 NA% = &1181 
 CHK2 = &11D3 
+.screenData
+     7800   91 9A A0 ... INCBIN "1-source-files/images/$.SCREEN.bin"
+.LoadScreen
+     7BE8   A0 19      LDY #&19
+     7BEA   A2 04      LDX #&04
+.loop1
+     7BEC   B9 E7 77   LDA &77E7,Y
+     7BEF   20 EE FF   JSR &FFEE
+     7BF2   C8         INY
+     7BF3   D0 F7      BNE &7BEC
+     7BF5   EE EE 7B   INC &7BEE
+     7BF8   CA         DEX
+     7BF9   D0 F1      BNE &7BEC
+     7BFB   60         RTS
+     7BFC   20
+     7BFD   20
+     7BFE   20
+     7BFF   20
+S.SCREEN &7800  &7C00  &7800  &7800 
+Saving file '3-assembled-output/SCREEN.bin'
 .ZP
      0070
 .P
@@ -6041,9 +6061,11 @@ Saving file '3-assembled-output/MNUCODE.bin'
      00E2
 .K4
      00E3
-Zero page variables from &0  to &E5 
+ZP workspace from &0 to &E4 inclusive
 .XX3
      0100
+.UP
+     0300
 .KL
      0300
 .KY1
@@ -6246,8 +6268,10 @@ Zero page variables from &0  to &E5
      03CE
 .CATF
      03CF
+UP workspace from &300 to &3CF inclusive
 .K%
      0900
+K% workspace from &900 to &ABB inclusive
 .WP
      0E00
 .LSX
@@ -6282,13 +6306,14 @@ Zero page variables from &0  to &E5
      0FD1
 .CPIR
      0FD2
-WP workspace from  &E00  to &FD3 
+WP workspace from &E00 to &FD2 inclusive
 .S%
      11E3   4C 55 12   JMP &1255
      11E6   4C 55 12   JMP &1255
      11E9   4C 6A 1F   JMP &1F6A
      11EC   4B 11
      11EE   4C D5 11   JMP &11D5
+S% workspace (flight) from &11E3 to &11F0 inclusive
 .IRQMusic
      11F1   8D 45 FE   STA &FE45
      11F4   A5 8F      LDA &8F
@@ -16602,9 +16627,11 @@ Saving file '3-assembled-output/D.CODE.unprot.bin'
      00E2
 .K4
      00E3
-Zero page variables from &0  to &E5 
+ZP workspace from &0 to &E4 inclusive
 .XX3
      0100
+.UP
+     0300
 .KL
      0300
 .KY1
@@ -16807,8 +16834,10 @@ Zero page variables from &0  to &E5
      03CE
 .CATF
      03CF
+UP workspace from &300 to &3CF inclusive
 .K%
      0900
+K% workspace from &900 to &ABB inclusive
 .WP
      0E00
 .LSX
@@ -16843,13 +16872,14 @@ Zero page variables from &0  to &E5
      0FD1
 .CPIR
      0FD2
-WP workspace from  &E00  to &FD3 
+WP workspace from &E00 to &FD2 inclusive
 .S%
      11E3   4C 58 12   JMP &1258
      11E6   4C 4F 12   JMP &124F
      11E9   4C 72 1C   JMP &1C72
      11EC   4B 11
      11EE   4C D5 11   JMP &11D5
+S% workspace (docked) from &11E3 to &11F0 inclusive
 .IRQMusic
      11F1   8D 45 FE   STA &FE45
      11F4   A5 8F      LDA &8F
@@ -19457,7 +19487,7 @@ S.ELTB &16C2  &1EC2  &11E3  &16C2
      22FB   D0 CE      BNE &22CB
 .PD1
      22FD   A2 03      LDX #&03
-.PDL1
+.PDL1K
      22FF   B5 6E      LDA &6E,X
      2301   95 00      STA &00,X
      2303   CA         DEX
