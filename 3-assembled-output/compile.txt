@@ -5171,8 +5171,11 @@ End macro FNE
      1D44   2A 44 49 ...
      1D4A   0D
 .DIALS
+     1D4B   F0 80 87 ... INCBIN "1-source-files/images/P.DIALS.bin"
 .SHIP_MISSILE
+     244B   00 40 06 ... INCBIN "3-assembled-output/MISSILE.bin"
 .WORDS
+     254B   4C 32 24 ... INCBIN "3-assembled-output/WORDS.bin"
 .OSBmod
      294B   38         SEC
      294C   A0 00      LDY #&00
@@ -5380,8 +5383,11 @@ End macro FNE
      11FE   3C
      11FF   C6
 .ELITE
+     2A62   00 00 00 ... INCBIN "1-source-files/images/P.ELITE.bin"
 .ASOFT
+     2B62   00 00 00 ... INCBIN "1-source-files/images/P.A-SOFT.bin"
 .CpASOFT
+     2C62   00 00 00 ... INCBIN "1-source-files/images/P.(C)ASFT.bin"
      2D62   F0
      2D63   00
      2D64   00
@@ -5556,6 +5562,26 @@ TVT1code = &2962
 TVT1 = &1100 
 NA% = &1181 
 CHK2 = &11D3 
+.screenData
+     7800   91 9A A0 ... INCBIN "1-source-files/images/$.SCREEN.bin"
+.LoadScreen
+     7BE8   A0 19      LDY #&19
+     7BEA   A2 04      LDX #&04
+.loop1
+     7BEC   B9 E7 77   LDA &77E7,Y
+     7BEF   20 EE FF   JSR &FFEE
+     7BF2   C8         INY
+     7BF3   D0 F7      BNE &7BEC
+     7BF5   EE EE 7B   INC &7BEE
+     7BF8   CA         DEX
+     7BF9   D0 F1      BNE &7BEC
+     7BFB   60         RTS
+     7BFC   20
+     7BFD   20
+     7BFE   20
+     7BFF   20
+S.SCREEN &7800  &7C00  &7800  &7800 
+Saving file '3-assembled-output/SCREEN.bin'
 .ZP
      0070
 .P
@@ -6174,9 +6200,11 @@ Saving file '3-assembled-output/MNUCODE.bin'
      00D2
 .K4
      00E0
-Zero page variables from &0  to &E2 
+ZP workspace from &0 to &E1 inclusive
 .XX3
      0100
+.UP
+     0300
 .KL
      0300
 .KY1
@@ -6375,8 +6403,10 @@ Zero page variables from &0  to &E2
      03CE
 .CATF
      03CF
+UP workspace from &300 to &3CF inclusive
 .K%
      0900
+K% workspace from &900 to &ABB inclusive
 .WP
      0E00
 .LSX
@@ -6411,13 +6441,14 @@ Zero page variables from &0  to &E2
      0FD1
 .CPIR
      0FD2
-WP workspace from  &E00  to &FD3 
+WP workspace from &E00 to &FD2 inclusive
 .S%
      11E3   4C 01 12   JMP &1201
      11E6   4C 01 12   JMP &1201
      11E9   4C FC 1E   JMP &1EFC
      11EC   4B 11
      11EE   4C D5 11   JMP &11D5
+S% workspace (flight) from &11E3 to &11F0 inclusive
 .INBAY
      11F1   A2 F8      LDX #&F8
      11F3   A0 11      LDY #&11
@@ -16343,9 +16374,11 @@ Saving file '3-assembled-output/D.CODE.unprot.bin'
      00D2
 .K4
      00E0
-Zero page variables from &0  to &E2 
+ZP workspace from &0 to &E1 inclusive
 .XX3
      0100
+.UP
+     0300
 .KL
      0300
 .KY1
@@ -16544,8 +16577,10 @@ Zero page variables from &0  to &E2
      03CE
 .CATF
      03CF
+UP workspace from &300 to &3CF inclusive
 .K%
      0900
+K% workspace from &900 to &ABB inclusive
 .WP
      0E00
 .LSX
@@ -16580,13 +16615,14 @@ Zero page variables from &0  to &E2
      0FD1
 .CPIR
      0FD2
-WP workspace from  &E00  to &FD3 
+WP workspace from &E00 to &FD2 inclusive
 .S%
      11E3   4C 1B 12   JMP &121B
      11E6   4C FB 11   JMP &11FB
      11E9   4C 56 1D   JMP &1D56
      11EC   4B 11
      11EE   4C D5 11   JMP &11D5
+S% workspace (docked) from &11E3 to &11F0 inclusive
 .INBAY
      11F1   A2 00      LDX #&00
      11F3   A0 00      LDY #&00
@@ -19030,7 +19066,7 @@ S.ELTB &175B  &1FA6  &11E3  &175B
      2226   A9 00      LDA #&00
      2228   A2 08      LDX #&08
      222A   46 1B      LSR &1B
-.MUL6
+.MUL6K
      222C   90 02      BCC &2230
      222E   65 D1      ADC &D1
      2230   6A         ROR A
@@ -19361,7 +19397,7 @@ S.ELTB &175B  &1FA6  &11E3  &175B
      242F   D0 CE      BNE &23FF
 .PD1
      2431   A2 03      LDX #&03
-.PDL1
+.PDL1K
      2433   B5 6E      LDA &6E,X
      2435   95 00      STA &00,X
      2437   CA         DEX
