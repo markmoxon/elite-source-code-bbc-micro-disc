@@ -10204,16 +10204,20 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MU5
+                        \ --- Mod: Code removed for Compendium: --------------->
 
- STA K                  \ Set K(3 2 1 0) to (A A A A)
- STA K+1
- STA K+2
- STA K+3
+\.MU5
+\
+\STA K                  \ Set K(3 2 1 0) to (A A A A)
+\STA K+1
+\STA K+2
+\STA K+3
+\
+\CLC                    \ Clear the C flag
+\
+\RTS                    \ Return from the subroutine
 
- CLC                    \ Clear the C flag
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10235,18 +10239,22 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MLS2
+                        \ --- Mod: Code removed for Compendium: --------------->
 
- LDX XX                 \ Set (S R) = XX(1 0), starting with the low bytes
- STX R
+\.MLS2
+\
+\LDX XX                 \ Set (S R) = XX(1 0), starting with the low bytes
+\STX R
+\
+\LDX XX+1               \ And then doing the high bytes
+\STX S
+\
+\LDX ALP1               \ This repeats the first two instructions of MLS1, which
+\STX P                  \ is presumably unintentional (though it has no effect)
+\
+\                       \ Fall through into SQUA to calculate (A P) = A * ALP1
 
- LDX XX+1               \ And then doing the high bytes
- STX S
-
- LDX ALP1               \ This repeats the first two instructions of MLS1, which
- STX P                  \ is presumably unintentional (though it has no effect)
-
-                        \ Fall through into SQUA to calculate (A P) = A * ALP1
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10332,14 +10340,18 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MLU1
+                        \ --- Mod: Code removed for Compendium: --------------->
 
- LDA SY,Y               \ Set Y1 the Y-th byte of SY
- STA Y1
+\.MLU1
+\
+\LDA SY,Y               \ Set Y1 the Y-th byte of SY
+\STA Y1
+\
+\                       \ Fall through into MLU2 to calculate:
+\                       \
+\                       \   (A P) = |A| * Q
 
-                        \ Fall through into MLU2 to calculate:
-                        \
-                        \   (A P) = |A| * Q
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10357,15 +10369,19 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MLU2
+                        \ --- Mod: Code removed for Compendium: --------------->
 
- AND #%01111111         \ Clear the sign bit in P, so P = |A|
- STA P
+\.MLU2
+\
+\AND #%01111111         \ Clear the sign bit in P, so P = |A|
+\STA P
+\
+\                       \ Fall through into MULTU to calculate:
+\                       \
+\                       \   (A P) = P * Q
+\                       \         = |A| * Q
 
-                        \ Fall through into MULTU to calculate:
-                        \
-                        \   (A P) = P * Q
-                        \         = |A| * Q
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10471,12 +10487,16 @@ ENDIF
 \
 \ ******************************************************************************
 
-.MU6
+                        \ --- Mod: Code removed for Compendium: --------------->
 
- STA P+1                \ Set P(1 0) = (A A)
- STA P
+\.MU6
+\
+\STA P+1                \ Set P(1 0) = (A A)
+\STA P
+\
+\RTS                    \ Return from the subroutine
 
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -10691,55 +10711,59 @@ ENDIF
 \
 \ ******************************************************************************
 
- STX Q                  \ Store X in Q
+                        \ --- Mod: Code removed for flicker-free ships: ------->
 
-.MLTU2
+\STX Q                  \ Store X in Q
+\
+\.MLTU2
+\
+\EOR #%11111111         \ Flip the bits in A and rotate right, storing the
+\LSR A                  \ result in P+1, so we now calculate (P+1 P) * Q
+\STA P+1
+\
+\LDA #0                 \ Set A = 0 so we can start building the answer in A
+\
+\LDX #16                \ Set up a counter in X to count the 16 bits in (P+1 P)
+\
+\ROR P                  \ Set P = P >> 1 with bit 7 = bit 0 of A
+\                       \ and C flag = bit 0 of P
+\
+\.MUL7
+\
+\BCS MU21               \ If C (i.e. the next bit from P) is set, do not do the
+\                       \ addition for this bit of P, and instead skip to MU21
+\                       \ to just do the shifts
+\
+\ADC Q                  \ Do the addition for this bit of P:
+\                       \
+\                       \   A = A + Q + C
+\                       \     = A + Q
+\
+\ROR A                  \ Rotate (A P+1 P) to the right, so we capture the next
+\ROR P+1                \ digit of the result in P+1, and extract the next digit
+\ROR P                  \ of (P+1 P) in the C flag
+\
+\DEX                    \ Decrement the loop counter
+\
+\BNE MUL7               \ Loop back for the next bit until P has been rotated
+\                       \ all the way
+\
+\RTS                    \ Return from the subroutine
+\
+\.MU21
+\
+\LSR A                  \ Shift (A P+1 P) to the right, so we capture the next
+\ROR P+1                \ digit of the result in P+1, and extract the next digit
+\ROR P                  \ of (P+1 P) in the C flag
+\
+\DEX                    \ Decrement the loop counter
+\
+\BNE MUL7               \ Loop back for the next bit until P has been rotated
+\                       \ all the way
+\
+\RTS                    \ Return from the subroutine
 
- EOR #%11111111         \ Flip the bits in A and rotate right, storing the
- LSR A                  \ result in P+1, so we now calculate (P+1 P) * Q
- STA P+1
-
- LDA #0                 \ Set A = 0 so we can start building the answer in A
-
- LDX #16                \ Set up a counter in X to count the 16 bits in (P+1 P)
-
- ROR P                  \ Set P = P >> 1 with bit 7 = bit 0 of A
-                        \ and C flag = bit 0 of P
-
-.MUL7
-
- BCS MU21               \ If C (i.e. the next bit from P) is set, do not do the
-                        \ addition for this bit of P, and instead skip to MU21
-                        \ to just do the shifts
-
- ADC Q                  \ Do the addition for this bit of P:
-                        \
-                        \   A = A + Q + C
-                        \     = A + Q
-
- ROR A                  \ Rotate (A P+1 P) to the right, so we capture the next
- ROR P+1                \ digit of the result in P+1, and extract the next digit
- ROR P                  \ of (P+1 P) in the C flag
-
- DEX                    \ Decrement the loop counter
-
- BNE MUL7               \ Loop back for the next bit until P has been rotated
-                        \ all the way
-
- RTS                    \ Return from the subroutine
-
-.MU21
-
- LSR A                  \ Shift (A P+1 P) to the right, so we capture the next
- ROR P+1                \ digit of the result in P+1, and extract the next digit
- ROR P                  \ of (P+1 P) in the C flag
-
- DEX                    \ Decrement the loop counter
-
- BNE MUL7               \ Loop back for the next bit until P has been rotated
-                        \ all the way
-
- RTS                    \ Return from the subroutine
+                        \ --- End of removed code ----------------------------->
 
 \ ******************************************************************************
 \
@@ -13384,6 +13408,25 @@ ENDIF
 
 .TT25
 
+                        \ --- Mod: Code added for species bug fix: ------------>
+
+ LDA #%11000000         \ Set the DTW4 flag to %11000000 (justify text, buffer
+ STA DTW4               \ entire token including carriage returns)
+
+ LDA #0                 \ Set DTW5 to 0, so DTW5 (which holds the size of the
+ STA DTW5               \ justified text buffer at BUF) is zeroed
+
+ JSR spec2              \ Print the species string in brackets, into the buffer
+
+ LDA DTW5               \ Modify the operand of the LDA instruction at TT75 to
+ STA TT75+1             \ the length of the species line
+
+ JSR MT15               \ Call MT15 to switch to left-aligned text when printing
+                        \ extended tokens disabling the justify text setting we
+                        \ set above
+
+                        \ --- End of added code ------------------------------->
+
  LDA #1                 \ Clear the top part of the screen, draw a border box,
  JSR TT66               \ and set the current view type in QQ11 to 1
 
@@ -13492,23 +13535,97 @@ ENDIF
  LDX QQ6                \ number with a decimal point (by setting the C flag),
  JSR pr2                \ so the number printed will be population / 10
 
- LDA #198               \ Print recursive token 38 (" BILLION"), followed by a
- JSR TT60               \ paragraph break and Sentence Case
+                        \ --- Mod: Code removed for species bug fix: ---------->
 
- LDA #'('               \ Print an opening bracket
+\LDA #198               \ Print recursive token 38 (" BILLION"), followed by a
+\JSR TT60               \ paragraph break and Sentence Case
+\
+\LDA #'('               \ Print an opening bracket
+\JSR TT27
+
+                        \ --- And replaced by: -------------------------------->
+
+ LDA #198               \ Print recursive token 38 (" BILLION")
  JSR TT27
+
+                        \ --- End of replacement ------------------------------>
 
  LDA QQ15+4             \ Now to calculate the species, so first check bit 7 of
  BMI TT75               \ s2_lo, and if it is set, jump to TT75 as this is an
                         \ alien species
 
+                        \ --- Mod: Code added for species bug fix: ------------>
+
+ JSR TTX69              \ Print a paragraph break and switch to Sentence Case
+
+ LDA #'('               \ Print an opening bracket
+ JSR TT27
+
+                        \ --- End of added code ------------------------------->
+
  LDA #188               \ Bit 7 of s2_lo is clear, so print recursive token 28
  JSR TT27               \ ("HUMAN COLONIAL")
 
- JMP TT76               \ Jump to TT76 to print "S)" and a paragraph break, so
+                        \ --- Mod: Code removed for species bug fix: ---------->
+
+\JMP TT76               \ Jump to TT76 to print "S)" and a paragraph break, so
+\                       \ the whole species string is "(HUMAN COLONIALS)"
+
+                        \ --- And replaced by: -------------------------------->
+
+ JSR TT76               \ Call TT76 to print "S)" and a paragraph break, so
                         \ the whole species string is "(HUMAN COLONIALS)"
 
+ JMP spec3              \ Jump to spec3 to print the rest of the system data
+
+                        \ --- End of replacement ------------------------------>
+
 .TT75
+
+                        \ --- Mod: Code added for species bug fix: ------------>
+
+ LDA #0                 \ The operand in this instruction is modified to the
+                        \ string length by the code at the start of the routine
+                        \
+                        \ So this sets A to the length of the species string
+
+ CMP #LL+2              \ If the species string is too long to fit within the
+ BCS spec1              \ line length in LL (including the carriage return at
+                        \ the end), skip the following instruction, so we drop
+                        \ the blank line after the population line and can
+                        \ spread the species over two lines
+
+ JSR TT67               \ Print a newline
+
+.spec1
+
+                        \ We now print the species as justified text, so long
+                        \ species strings will automatically be split over two
+                        \ lines
+
+ JSR MT14               \ Call MT14 to switch to justified text
+
+ LDA #1                 \ Move the text cursor to column 1 (so short species
+ STA XC                 \ strings still do a carriage return)
+
+ JSR spec2              \ Print the species string in brackets as justified
+                        \ text
+
+ JSR MT15               \ Call MT15 to switch to left-aligned text when printing
+                        \ extended tokens, disabling the justify text setting we
+                        \ set above
+
+ JSR TT67               \ Print a newline to insert a blank line after the
+                        \ species
+
+ JMP spec3              \ Jump to spec3 to print the rest of the system data
+
+.spec2
+
+ LDA #'('               \ Print an opening bracket
+ JSR TT27
+
+                        \ --- End of added code ------------------------------->
 
  LDA QQ15+5             \ This is an alien species, and we start with the first
  LSR A                  \ adjective, so fetch bits 2-7 of s2_hi into A and push
@@ -13593,9 +13710,23 @@ ENDIF
  LDA #'S'               \ Print an "S" to pluralise the species
  JSR TT27
 
+                        \ --- Mod: Code removed for species bug fix: ---------->
+
+\LDA #')'               \ And finally, print a closing bracket, followed by a
+\JSR TT60               \ paragraph break and Sentence Case, to end the species
+\                       \ section
+
+                        \ --- And replaced by: -------------------------------->
+
  LDA #')'               \ And finally, print a closing bracket, followed by a
- JSR TT60               \ paragraph break and Sentence Case, to end the species
-                        \ section
+ JMP TT60               \ paragraph break and Sentence Case, to end the species
+                        \ section, returning from the subroutine using a tail
+                        \ call (so this turns the species-printing code at spec2
+                        \ into a subroutine
+
+.spec3
+
+                        \ --- End of replacement ------------------------------>
 
  LDA #193               \ Print recursive token 33 ("GROSS PRODUCTIVITY"),
  JSR TT68               \ followed by a colon
