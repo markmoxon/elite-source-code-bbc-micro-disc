@@ -7648,6 +7648,14 @@ ENDIF
                         \ we need to buffer the text until we reach the end of
                         \ the paragraph, so we can then pad it out with spaces
 
+                        \ --- Mod: Code added for species bug fix: ------------>
+
+ BIT DTW4               \ If bit 6 of DTW4 is set, then this is an in-flight
+ BVS P%+6               \ message and we should buffer the carriage return
+                        \ character {12}, so skip the following two instructions
+
+                        \ --- End of added code ------------------------------->
+
  CMP #12                \ If the character in A is a carriage return, then we
  BEQ DA1                \ have reached the end of the paragraph, so jump down to
                         \ DA1 to print out the contents of the buffer,
