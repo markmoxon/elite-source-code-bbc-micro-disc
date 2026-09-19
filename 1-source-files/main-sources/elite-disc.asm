@@ -43,7 +43,7 @@
 IF _SRAM_DISC
 
  PUTFILE "1-source-files/boot-files/$.MENUEC.bin", "MENU", &FF1900, &FF8023
- PUTFILE "1-source-files/boot-files/$.SCREEN.bin", "ELTBS", &007800, &007BE8
+ PUTFILE "1-source-files/images/$.SCREEN.bin", "ELTBS", &007800, &007BE8
  PUTFILE "3-assembled-output/ELTROM.bin", "ELTBR", &003400, &003400
  PUTFILE "3-assembled-output/MNUCODE.bin", "ELTBM", &007400, &00743B
  PUTFILE "3-assembled-output/sELITE4.bin", "ELTBI", &001900, &00197B
