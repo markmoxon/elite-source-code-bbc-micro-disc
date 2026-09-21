@@ -4741,7 +4741,7 @@ Saving file '3-assembled-output/ELITE3.bin'
      1A28   20 61 1D   JSR &1D61
      1A2B   AD 91 02   LDA &0291
      1A2E   F0 0D      BEQ &1A3D
-     1A30   A9 DE      LDA #&DE
+     1A30   A9 EE      LDA #&EE
      1A32   8D 1D 11   STA &111D
      1A35   A9 38      LDA #&38
      1A37   8D 24 11   STA &1124
