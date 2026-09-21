@@ -26,14 +26,14 @@ import sys
 
 argv = sys.argv
 argc = len(argv)
-Encrypt = True
+encrypt = True
 interlace_offset = 0
-Scramble = False
+scramble = False
 release = 1
 
 for arg in argv[1:]:
     if arg == "-u":
-        Encrypt = False
+        encrypt = False
     if arg == "-i":
         interlace_offset = 21
     if arg == "-rel1":
@@ -44,8 +44,8 @@ for arg in argv[1:]:
         release = 3
 
 print("Disc Elite Checksum")
-print("Encryption = ", Encrypt)
-print("Scramble main code = ", Scramble)
+print("Encryption = ", encrypt)
+print("Scramble main code = ", scramble)
 
 # Configuration variables for scrambling code and calculating checksums
 #
@@ -190,7 +190,7 @@ else:
 
 # SC routine, which EORs bytes between &1300 and &55FF
 
-if Scramble:
+if scramble:
     for n in range(scramble_from, scramble_to):
         data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
 
@@ -229,7 +229,7 @@ else:
 
 # SC routine, which EORs bytes between &1300 and &9FFF
 
-if Scramble:
+if scramble:
     for n in range(scramble_from, scramble_to):
         data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
 
@@ -259,7 +259,7 @@ if release == 3:
     # checksum is disabled in LOAD in the sideways RAM variant
     d_checksum = 0xE6
 
-if Encrypt:
+if encrypt:
     data_block[checksum_address - load_address] = d_checksum
 
 print("&55FF docked code checksum = ", hex(d_checksum))
