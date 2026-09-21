@@ -28,7 +28,7 @@ argv = sys.argv
 argc = len(argv)
 encrypt = True
 interlace_offset = 0
-Scramble = True
+scramble = True
 release = 1
 
 for arg in argv[1:]:
@@ -41,12 +41,12 @@ for arg in argv[1:]:
     if arg == "-rel2":
         release = 2
     if arg == "-rel3":
-        Scramble = False
+        scramble = False
         release = 3
 
 print("Disc Elite Checksum")
 print("Encryption = ", encrypt)
-print("Scramble main code = ", Scramble)
+print("Scramble main code = ", scramble)
 
 # Configuration variables for scrambling code and calculating checksums
 #
@@ -171,7 +171,7 @@ elite_file.close()
 
 # SC routine, which EORs bytes between &1300 and &55FF
 
-if Scramble:
+if scramble:
     for n in range(scramble_from, scramble_to):
         data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
 
@@ -200,7 +200,7 @@ elite_file.close()
 
 # SC routine, which EORs bytes between &1300 and &9FFF
 
-if Scramble:
+if scramble:
     for n in range(scramble_from, scramble_to):
         data_block[n - load_address] = data_block[n - load_address] ^ (n % 256) ^ scramble_eor
 
