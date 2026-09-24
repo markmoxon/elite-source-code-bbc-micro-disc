@@ -4248,7 +4248,7 @@ Saving file '3-assembled-output/ELITE2.bin'
      5EC1   20 63 01   JSR &0163
      5EC4   24 70      BIT &70
      5EC6   30 4E      BMI &5F16
-.jsr3
+.jsr4
      5EC8   20 B7 01   JSR &01B7
      5ECB   1C
      5ECC   0D
@@ -4279,7 +4279,7 @@ Saving file '3-assembled-output/ELITE2.bin'
      5F0E   20 20 20 ...
      5F14   EA         NOP
      5F15   60         RTS
-.jsr4
+.jsr5
      5F16   20 B7 01   JSR &01B7
      5F19   1C
      5F1A   0D
@@ -4298,11 +4298,11 @@ Saving file '3-assembled-output/ELITE2.bin'
      5F37   20 20 20 ...
      5F41   EA         NOP
      5F42   60         RTS
-.jsr5
+.jsr6
      5F43   20 6C 01   JSR &016C
      5F46   20 E7 FF   JSR &FFE7
      5F49   20 E7 FF   JSR &FFE7
-.jsr6
+.jsr7
      5F4C   20 72 01   JSR &0172
      5F4F   20 E7 FF   JSR &FFE7
 .LOGOS
