@@ -745,8 +745,8 @@ ENDIF
 \       Name: PROT1
 \       Type: Subroutine
 \   Category: Loader
-\    Summary: Various copy protection shenanigans in preparation for showing
-\             the Acornsoft loading screen
+\    Summary: Modify the LOADSCR routine with correct JSR address operands so
+\             the code will run irrespective of the address it loads at
 \
 \ ******************************************************************************
 
@@ -790,6 +790,10 @@ ENDIF
                         \ In other words, this whole routine is a complicated
                         \ way of pointing ZP(1 0) to the &01 byte in the JSR
                         \ instruction above, i.e. to do + 2
+                        \
+                        \ We can then use ZP(1 0) to convert the addresses in
+                        \ LOADSCR from being relative to PROT1 to absolute
+                        \ addresses, which lets the code run at any address
 
  LDA ZP                 \ Set ZP(1 0) = ZP(1 0) - (2 + do - PROT1)
  SEC                    \             = do + 2 - 2 - do + PROT1
@@ -827,7 +831,10 @@ ENDIF
  INC SC+1               \ So, for example, the first entry in TABLE modifies the
  LDA (SC,X)             \ destination address of the JSR at jsr1 by adding PROT1
  ADC ZP+1               \ to it, so the address now points to prstr
- STA (SC,X)
+ STA (SC,X)             \
+                        \ This modification converts the addresses in LOADSCR
+                        \ from being relative to PROT1 to absolute addresses,
+                        \ which lets the code run at any address
 
  INY                    \ Increment Y to point to the next word in TABLE
 
@@ -841,10 +848,10 @@ ENDIF
 
  EQUW jsr1 + 1 - PROT1  \ Offsets within PROT1 of JSR destination addresses that
  EQUW jsr2 + 1 - PROT1  \ we modify with the code above
- EQUW jsr3 + 1 - PROT1
  EQUW jsr4 + 1 - PROT1
  EQUW jsr5 + 1 - PROT1
  EQUW jsr6 + 1 - PROT1
+ EQUW jsr7 + 1 - PROT1
 
  SKIP 14                \ These bytes appear to be unused
 
@@ -988,14 +995,14 @@ ENDIF
 
 .jsr2
 
- JSR jsr5 - PROT1       \ Call jsr5, which calls jsr6, which calls LOGOS (this
+ JSR jsr6 - PROT1       \ Call jsr6, which calls jsr7, which calls LOGOS (this
                         \ destination address is modified by the code above that
                         \ adds PROT1 to the address)
 
  BIT S                  \ If bit 7 of S is set (this is an Electron), jump to
- BMI jsr4               \ jsr4
+ BMI jsr5               \ jsr5
 
-.jsr3
+.jsr4
 
                         \ If we get here then this is a BBC Micro, so we can
                         \ show the game's name in the mode 7 screen
@@ -1049,7 +1056,7 @@ ENDIF
  NOP
  RTS
 
-.jsr4
+.jsr5
 
                         \ If we get here then this is an Electron
 
@@ -1084,9 +1091,9 @@ ENDIF
  NOP
  RTS
 
-.jsr5
+.jsr6
 
- JSR jsr6 - PROT1       \ Call jsr6 (this destination address is modified by the
+ JSR jsr7 - PROT1       \ Call jsr7 (this destination address is modified by the
                         \ code above that adds PROT1 to the address). This calls
                         \ the LOGOS routine twice to print two Acornsoft logos,
                         \ with a newline between then
@@ -1094,7 +1101,7 @@ ENDIF
  JSR OSNEWL             \ Print two newlines
  JSR OSNEWL
 
-.jsr6
+.jsr7
 
  JSR LOGOS - PROT1      \ Call LOGOS (this destination address is modified by
                         \ the code above that adds PROT1 to the address). This
