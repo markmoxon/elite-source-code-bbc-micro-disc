@@ -13777,7 +13777,7 @@ ENDIF
  JMP TT60               \ paragraph break and Sentence Case, to end the species
                         \ section, returning from the subroutine using a tail
                         \ call (so this turns the species-printing code at spec2
-                        \ into a subroutine
+                        \ into a subroutine)
 
 .spec3
 
