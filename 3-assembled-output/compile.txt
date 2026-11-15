@@ -10931,17 +10931,19 @@ Saving file '3-assembled-output/rom-extra3.bin'
      B989   85 81      STA &81
      B98B   68         PLA
      B98C   65 41      ADC &41
-     B98E   85 82      STA &82
-     B990   20 EB 46   JSR &46EB
-     B993   A5 81      LDA &81
-     B995   0A         ASL A
-     B996   A2 00      LDX #&00
-     B998   8E C0 03   STX &03C0
-     B99B   2E C0 03   ROL &03C0
-     B99E   0A         ASL A
+     B98E   90 02      BCC &B992
+     B990   A9 FF      LDA #&FF
+     B992   85 82      STA &82
+     B994   20 EB 46   JSR &46EB
+     B997   A5 81      LDA &81
+     B999   0A         ASL A
+     B99A   A2 00      LDX #&00
+     B99C   8E C0 03   STX &03C0
      B99F   2E C0 03   ROL &03C0
-     B9A2   8D BF 03   STA &03BF
-     B9A5   4C DE 2C   JMP &2CDE
+     B9A2   0A         ASL A
+     B9A3   2E C0 03   ROL &03C0
+     B9A6   8D BF 03   STA &03BF
+     B9A9   4C DE 2C   JMP &2CDE
 Saving file '3-assembled-output/rom-extra4.bin'
      2EC9   A5 F4      LDA &F4
      2ECB   48         PHA
