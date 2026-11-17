@@ -65,6 +65,7 @@ all:
 	$(BEEBASM) -i 1-source-files/main-sources/elite-ships-o.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-ships-p.asm -v >> 3-assembled-output/compile.txt
 	$(BEEBASM) -i 1-source-files/main-sources/elite-readme.asm -v >> 3-assembled-output/compile.txt
+	cat elite-music/elite-music.rom 3-assembled-output/rom-extra1.bin 3-assembled-output/rom-extra2.bin 3-assembled-output/rom-extra3.bin 3-assembled-output/rom-extra4.bin > 3-assembled-output/elite-music.rom
 	$(PYTHON) 2-build-files/elite-checksum.py $(unencrypt) $(interlace) -rel$(variant-number)
 	$(BEEBASM) -i 1-source-files/main-sources/elite-disc.asm -do 5-compiled-game-discs/elite-disc$(suffix).ssd $(boot) -title "E L I T E"
 ifneq ($(verify), no)
