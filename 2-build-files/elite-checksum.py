@@ -28,7 +28,7 @@ argv = sys.argv
 argc = len(argv)
 encrypt = True
 interlace_offset = 0
-scramble = False
+scramble = False    # Changed to False for Multiplayer
 release = 1
 
 for arg in argv[1:]:
