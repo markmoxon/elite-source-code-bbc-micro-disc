@@ -28,7 +28,7 @@ argv = sys.argv
 argc = len(argv)
 encrypt = True
 interlace_offset = 0
-scramble = False    # Change to False for Compendium
+scramble = False    # Changed to False for Compendium
 release = 1
 
 for arg in argv[1:]:
